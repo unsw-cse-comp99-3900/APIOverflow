@@ -4,6 +4,6 @@ fastapi-login==1.10.2
 pymongo==4.9.1
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.12
-
+pytest==8.3.3
 # docker build -t flask-mongo-app .
 # docker run -p 5000:5000 flask-mongo-app
