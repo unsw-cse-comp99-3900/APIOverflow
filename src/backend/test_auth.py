@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from app import app 
 from models import User, db
+from helper import *
 
 # Create a test client
 client = TestClient(app)
@@ -15,8 +16,10 @@ def clear_database():
 def test_register_user():
     """Test user registration."""
     response = client.post("/auth/register", json={
-        "username": "testuser",
-        "password": "testpassword",
+        "username": test_user()["username"],
+        "email": test_user()["email"],
+        "password": test_user()["password"],
+        "role": test_user()["role"]
     })
     assert response.status_code == 200
     assert response.json() == {"message": "User created successfully"}
@@ -24,12 +27,16 @@ def test_register_user():
 def test_register_duplicate_user():
     """Test registering a duplicate user."""
     client.post("/auth/register", json={
-        "username": "testuser",
-        "password": "testpassword"
+        "username": test_user()["username"],
+        "email": test_user()["email"],
+        "password": test_user()["password"],
+        "role": test_user()["role"]
     })
     response = client.post("/auth/register", json={
-        "username": "testuser",
-        "password": "newpassword"
+        "username": test_user()["username"],
+        "email": test_user()["email"],
+        "password": test_user()["password"],
+        "role": test_user()["role"]
     })
     assert response.status_code == 400
     assert response.json() == {"detail": "Username already taken"}
@@ -37,12 +44,14 @@ def test_register_duplicate_user():
 def test_login_user():
     """Test user login."""
     client.post("/auth/register", json={
-        "username": "testuser",
-        "password": "testpassword"
+        "username": test_user()["username"],
+        "email": test_user()["email"],
+        "password": test_user()["password"],
+        "role": test_user()["role"]
     })
     response = client.post("/auth/login", json={
-        "username": "testuser",
-        "password": "testpassword"
+        "username": test_user()["username"],
+        "password": test_user()["password"],
     })
     assert response.status_code == 200
     assert "access_token" in response.json()
@@ -50,8 +59,8 @@ def test_login_user():
 def test_login_invalid_user():
     """Test logging in with invalid credentials."""
     response = client.post("/auth/login", json={
-        "username": "nonexistent",
-        "password": "wrongpassword"
+        "username": test_user()["username"],
+        "password": test_user()["password"],
     })
     assert response.status_code == 400
     assert response.json() == {"detail": "Invalid username or password"}
@@ -59,13 +68,14 @@ def test_login_invalid_user():
 def test_access_protected_route_as_user():
     """Test access to account route as a logged-in user."""
     client.post("/auth/register", json={
-        "username": "user",
-        "password": "password",
-        "role": "account user" 
+        "username": test_user()["username"],
+        "email": test_user()["email"],
+        "password": test_user()["password"],
+        "role": test_user()["role"]
     })
     response = client.post("/auth/login", json={
-        "username": "user",
-        "password": "password"
+        "username": test_user()["username"],
+        "password": test_user()["password"]
     })
     
     assert response.status_code == 200  
@@ -75,18 +85,18 @@ def test_access_protected_route_as_user():
     assert response.status_code == 200 
     assert response.json() == {"message": "Welcome, Account User!"}
 
-
 def test_access_protected_route_as_admin():
     """Test access to admin route."""
     # Register and login as admin
     client.post("/auth/register", json={
-        "username": "adminuser",
-        "password": "adminpassword",
-        "role": "admin"
+        "username": test_admin()["username"],
+        "email": test_admin()["email"],
+        "password": test_admin()["password"],
+        "role": test_admin()["role"]
     })
     response = client.post("/auth/login", json={
-        "username": "adminuser",
-        "password": "adminpassword"
+        "username": test_admin()["username"],
+        "password": test_admin()["password"]
     })
     access_token = response.json()["access_token"]
 
@@ -98,12 +108,14 @@ def test_access_protected_route_as_non_admin():
     """Test access to admin route as non-admin user."""
     # Register and login as guest
     client.post("/auth/register", json={
-        "username": "guestuser",
-        "password": "guestpassword"
+        "username": test_user()["username"],
+        "email": test_user()["email"],
+        "password": test_user()["password"],
+        "role": test_user()["role"]
     })
     response = client.post("/auth/login", json={
-        "username": "guestuser",
-        "password": "guestpassword"
+        "username": test_user()["username"],
+        "password": test_user()["password"],
     })
     access_token = response.json()["access_token"]
 

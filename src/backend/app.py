@@ -3,7 +3,7 @@ from fastapi_login import LoginManager
 from pydantic import BaseModel
 from pymongo import MongoClient
 from passlib.context import CryptContext
-from auth import auth_router
+from auth import auth_router, service_router
 from models import User
 
 app = FastAPI()
@@ -31,8 +31,9 @@ async def home():
 
 # Include authentication router
 app.include_router(auth_router, prefix="/auth")
+app.include_router(service_router, prefix="/service")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host='0.0.0.0', port=5000)
+    uvicorn.run(app, host='0.0.0.0', port=8000)
     # Run using uvicorn app:app --reload
