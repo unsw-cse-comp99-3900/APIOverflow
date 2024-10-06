@@ -11,16 +11,12 @@ const ApiListings = ({ isHome = false }) => {
   useEffect(() => {
     const fetchApis = async () => {
       const baseUrl = process.env.REACT_APP_API_BASE_URL;
-      console.log("hi")
-      console.log(baseUrl)
-      console.log("no hi")
       const apiUrl = isHome
         ? `${baseUrl}/apis?_limit=3`
         : `${baseUrl}/apis`;
       try {
         const res = await fetch(apiUrl);
         const data = await res.json();
-        console.log(data)
         setApis(data);
       } catch (error) {
         console.log('Error fetching data', error);
@@ -38,14 +34,14 @@ const ApiListings = ({ isHome = false }) => {
         <h2 className='text-3xl font-bold text-indigo-500 mb-6 text-center'>
           {isHome ? 'Trending APIs' : 'Browse APIs'}
         </h2>
-  
+      
         {loading ? (
           <Spinner loading={loading} />
         ) : (
           <div className='grid grid-cols-[repeat(auto-fit,minmax(700px,1fr))] gap-6'>
-            {apis.map((api) => (
-              <ApiListing key={api.id} api={api} />
-            ))}
+          {apis.map((api) => (
+            <ApiListing key={api.id} api={api} />
+          ))}
           </div>
         )}
       </div>

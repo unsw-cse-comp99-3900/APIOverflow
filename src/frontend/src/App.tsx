@@ -9,9 +9,12 @@ import HomePage from './pages/HomePage';
 import APIsPage from './pages/ApisPage';
 import AddApiPage from './pages/AddApiPage';
 import ApiPage from './pages/ApiPage';
-// import { apiLoader } from './utils/loaders';
 import EditApiPage from './pages/EditApiPage';
 import CategoriesPage from './pages/CategoriesPage';
+import { deleteApi } from './services/apiServices';
+import { apiLoader } from './utils/loaders';
+
+
 
 const App = () => {
   const router = createBrowserRouter(
@@ -24,7 +27,8 @@ const App = () => {
         <Route path='/categories' element={<CategoriesPage />} />
         <Route
           path='/apis/:id' 
-          element={<ApiPage />}
+          element={<ApiPage deleteApi={deleteApi}/>}
+          loader={apiLoader}
         />
       </Route>
     )

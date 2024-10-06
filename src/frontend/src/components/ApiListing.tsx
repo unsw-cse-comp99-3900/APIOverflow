@@ -25,11 +25,11 @@ const ApiListing = ({ api }: { api: Api }) => {
 
           {/* Content for owner and name */}
           <div>
-            {/* Owner */}
-            <div className='text-gray-600 my-2'>{api.owner}</div>
-
             {/* Name */}
-            <h3 className='text-xl font-bold'>{api.name}</h3>
+            <h3 className='text-xl font-bold my-2'>{api.name}</h3>
+
+            {/* Owner */}
+            <div className='text-gray-600'>{api.owner}</div>
           </div>
         </div>
         <div className='border border-gray-100 mb-5'></div>
