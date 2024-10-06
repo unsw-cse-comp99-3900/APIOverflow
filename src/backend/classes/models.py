@@ -3,10 +3,11 @@ from typing import Optional
 from passlib.context import CryptContext
 from pymongo import MongoClient
 from typing import *
+from bson import ObjectId
 
 # Initialize MongoDB client
 client = MongoClient("mongodb://localhost:27017/")
-db = client.local 
+db = client.local
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -19,7 +20,11 @@ class User(BaseModel):
     @classmethod
     def create(cls, username: str, password: str, role: str, db) -> None:
         hashed_password = pwd_context.hash(password)
-        user_data = {"username": username, "password": hashed_password, "role": role}
+        user_data = {
+            "_id": ObjectId(),
+            "username": username,
+            "password": hashed_password, 
+            "role": role}
         db.users.insert_one(user_data)
 
     @classmethod
@@ -29,6 +34,7 @@ class User(BaseModel):
 
 # Request body for POST methods relating to services
 class ServicePost(BaseModel):
+
     token: str                      # JWT token of user requesting
     name: str                       # Name of service
     icon_url: str                   # URL of service icon uploaded

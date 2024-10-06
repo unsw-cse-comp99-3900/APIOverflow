@@ -18,7 +18,8 @@ schema = {
     'apis' : [],
     'api_count' : 0,
     'tags' : DEFAULT_TAGS,
-    'tag_count' : 0
+    'tag_count' : 0,
+    'image_count' : 0
 }
 
 class Datastore:
@@ -71,6 +72,12 @@ class Datastore:
         self.__store['tags'].append(tag)
         self.__store['tag_count'] += 1
 
+    def add_img_count(self) -> None:
+        '''
+            Increments image counter
+        '''
+        self.__store['image_count'] += 1
+
     ################################
     #   Datastore Search Methods
     ################################
@@ -119,6 +126,12 @@ class Datastore:
             Returns number of tags
         '''
         return self.__store['tag_count']
+    
+    def num_imgs(self) -> int:
+        '''
+            Returns number of imgs stored
+        '''
+        return self.__store['img_count']
     
     ################################
     #   Datastore Deletion Methods

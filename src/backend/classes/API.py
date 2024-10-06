@@ -1,5 +1,5 @@
 from typing import List
-from APIOverflow.src.backend.classes.Service import Service
+from src.backend.classes.Service import Service
 
 class API(Service):
 

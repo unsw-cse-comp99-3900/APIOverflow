@@ -1,9 +1,10 @@
-fastapi==0.115.0
+fastapi[all]==0.115.0
 uvicorn==0.31.0
 fastapi-login==1.10.2
 pymongo==4.9.1
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.12
 pytest==8.3.3
+pillow==10.4.0
 # docker build -t flask-mongo-app .
 # docker run -p 5000:5000 flask-mongo-app

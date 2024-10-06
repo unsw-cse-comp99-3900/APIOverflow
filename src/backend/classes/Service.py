@@ -150,3 +150,42 @@ class Service:
             Adds tag to service
         '''
         self._tags.remove(tag)
+
+    ################################
+    #   Get Methods
+    ################################
+    def get_id(self) -> str:
+        '''
+            Returns sid of service
+        '''
+        return self._id
+    
+    def get_name(self) -> str:
+        '''
+            Returns name of service
+        '''
+        return self._name
+    
+    def get_description(self) -> str:
+        '''
+            Returns description of service
+        '''
+        return self._description
+    
+    def get_owner(self) -> str:
+        '''
+            Returns description of service
+        '''
+        return self._owner
+
+    def get_tags(self) -> List[str]:
+        '''
+            Returns tags of service
+        '''
+        return self._tags
+    
+    def get_icon_url(self) -> str:
+        '''
+            Returns icon_url of service
+        '''
+        return self._icon_url

@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi_login import LoginManager
 from pydantic import BaseModel
 from passlib.context import CryptContext
-from models import User, db
+from src.backend.classes.models import User, db
+from src.backend.classes.datastore import data_store
 from typing import Union, List
 
 auth_router = APIRouter()
@@ -45,6 +46,7 @@ def register(user: UserCreate):
         raise HTTPException(status_code=400, detail="Username already taken")
 
     User.create(user.username, user.password, user.role, db)
+    data_store.add_user(User)
     return {"message": "User created successfully"}
 
 # Role depend routes

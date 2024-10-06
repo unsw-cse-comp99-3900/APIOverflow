@@ -1,8 +1,8 @@
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from app import app 
-from models import User, db
+from src.backend.app import app 
+from src.backend.classes.models import User, db
 
 # Create a test client
 client = TestClient(app)

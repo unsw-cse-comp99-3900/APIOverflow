@@ -3,10 +3,10 @@ from fastapi_login import LoginManager
 from pydantic import BaseModel
 from pymongo import MongoClient
 from passlib.context import CryptContext
-from APIOverflow.src.backend.server.auth import auth_router
-from APIOverflow.src.backend.classes.models import *
-from APIOverflow.src.backend.server.service import *
-from APIOverflow.src.backend.classes.datastore import data_store as ds
+from src.backend.server.auth import auth_router
+from src.backend.classes.models import *
+from src.backend.server.service import *
+from src.backend.classes.datastore import data_store as ds
 
 app = FastAPI()
 
@@ -51,7 +51,8 @@ async def add_service(service: ServicePost, user=Depends(manager)):
     '''
     # Unpack request body
     request = service.model_dump()
-    add_service_wrapper(request)
+    uid = user['_id']
+    add_service_wrapper(request, str(uid))
 
 
 @app.get("service/get_service")
@@ -59,10 +60,9 @@ async def get_service(sid: str, user=Depends(manager)):
     '''
         Method to retrieve a particular service
     '''
-
-
-    return request.json()
-
+    uid = user['_id']
+    response = get_service_wrapper(sid, str(uid))
+    return response
 
 if __name__ == "__main__":
     import uvicorn
