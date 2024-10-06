@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from passlib.context import CryptContext
 from pymongo import MongoClient
+from typing import *
 
 # Initialize MongoDB client
 client = MongoClient("mongodb://localhost:27017/")
@@ -25,3 +26,15 @@ class User(BaseModel):
     def get(cls, username: str, db) -> Optional[dict]:
         return db.users.find_one({"username": username})
 
+
+# Request body for POST methods relating to services
+class ServicePost(BaseModel):
+    token: str                      # JWT token of user requesting
+    name: str                       # Name of service
+    icon_url: str                   # URL of service icon uploaded
+    x_start: int                    # Starting x-coord of img crop
+    x_end: int                      # Ending x-coord of img crop
+    y_start: int                    # Starting y-coord of img crop
+    y_end: int                      # Ending y-coord of img crop
+    description: str                # Descrtipion of service
+    tags: List[str]                 # List of tags assigned to the service
