@@ -6,6 +6,7 @@ from passlib.context import CryptContext
 from APIOverflow.src.backend.server.auth import auth_router
 from APIOverflow.src.backend.classes.models import *
 from APIOverflow.src.backend.server.service import *
+from APIOverflow.src.backend.classes.datastore import data_store as ds
 
 app = FastAPI()
 
@@ -29,6 +30,14 @@ async def home():
         "login_link": "/auth/login",
         "register_link": "/auth/register"
     }
+
+@app.post("/testing/clear")
+async def clear():
+    '''
+        Internal Testing function to clear datastore
+    '''
+    ds.clear_datastore()
+    return {"message" : "Clear Successful"}
 
 # Include authentication router
 app.include_router(auth_router, prefix="/auth")

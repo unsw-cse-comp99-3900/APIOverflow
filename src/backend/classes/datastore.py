@@ -1,25 +1,35 @@
-'''
-    Datastore Class which acts as the backend's live storage and should be 
-    created when server is launched.
-
-    Globally stores everything
-
-'''
-
 from typing import *
 
 T = TypeVar("T")
+DEFAULT_TAGS = [
+    "API",
+    "Microservice",
+    "Productivity",
+    "AI",
+    "Public",
+    "In Development",
+    "Published",
+    "Recently Updated"
+]
 
 schema = {
     'users' : [],
     'user_count' : 0,
     'apis' : [],
     'api_count' : 0,
-    'tags' : [],
+    'tags' : DEFAULT_TAGS,
     'tag_count' : 0
 }
 
 class Datastore:
+
+    '''
+    Datastore Class which acts as the backend's live storage and should be 
+    created when server is launched.
+
+    Globally stores everything
+
+    '''
 
     def __init__(self) -> None:
         '''
@@ -33,6 +43,9 @@ class Datastore:
     def load_datastore(self) -> None:
         # TODO - load data from mongoDB
         pass
+
+    def clear_datastore(self) -> None:
+        self.__store = schema
 
     ##################################
     #   Datastore Insertion Methods
