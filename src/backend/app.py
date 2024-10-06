@@ -45,12 +45,24 @@ app.include_router(auth_router, prefix="/auth")
 
 
 @app.post("/service/add")
-async def add_service(service: ServicePost):
-
+async def add_service(service: ServicePost, user=Depends(manager)):
+    '''
+        Method used to add service to platform
+    '''
     # Unpack request body
     request = service.model_dump()
     add_service_wrapper(request)
-    return SUCCESS
+
+
+@app.get("service/get_service")
+async def get_service(sid: str, user=Depends(manager)):
+    '''
+        Method to retrieve a particular service
+    '''
+
+
+    return request.json()
+
 
 if __name__ == "__main__":
     import uvicorn

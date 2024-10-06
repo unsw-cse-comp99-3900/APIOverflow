@@ -52,8 +52,8 @@ def test_invalid_user(simple_user):
         Test that add_service is only usable by users not guests
     '''
     response = client.post("/service/add",
+                           headers={"Authorization": "Bearer"},
                            json={
-                                'token' : "",
                                 'name' : 'Test API',
                                 'icon_url' : '',
                                 'x_start' : 0,
@@ -70,8 +70,8 @@ def test_no_name(simple_user):
         Test whether no name is caught
     '''
     response = client.post("/service/add",
-                           json={
-                                'token' : simple_user['token'],
+                            headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            json={
                                 'name' : '',
                                 'icon_url' : '',
                                 'x_start' : 0,
@@ -88,8 +88,8 @@ def test_invalid_url():
         Test whether bad url (www.googlefake.xyzabsdh) is caught
     '''
     response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
-                                'token' : simple_user['token'],
                                 'name' : 'Test API',
                                 'icon_url' : 'www.googlefake.xyzabsdh',
                                 'x_start' : 0,
@@ -107,8 +107,8 @@ def test_invalid_dimensions(simple_user):
     '''
     # Negative x-start
     response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
-                                'token' : simple_user['token'],
                                 'name' : 'Test API',
                                 'icon_url' : '',
                                 'x_start' : -10,
@@ -122,8 +122,8 @@ def test_invalid_dimensions(simple_user):
 
     # x-start bigger than x-end
     response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
-                                'token' : simple_user['token'],
                                 'name' : 'Test API',
                                 'icon_url' : '',
                                 'x_start' : 1000,
@@ -137,8 +137,8 @@ def test_invalid_dimensions(simple_user):
 
     # Negative y-start
     response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
-                                'token' : simple_user['token'],
                                 'name' : 'Test API',
                                 'icon_url' : '',
                                 'x_start' : 0,
@@ -152,8 +152,8 @@ def test_invalid_dimensions(simple_user):
 
     # Bigger y-start than y-end
     response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
-                                'token' : simple_user['token'],
                                 'name' : 'Test API',
                                 'icon_url' : '',
                                 'x_start' : 0,
@@ -170,8 +170,8 @@ def test_no_description(simple_user):
         Test whether no description given is caught
     '''
     response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
-                                'token' : simple_user['token'],
                                 'name' : 'Test API',
                                 'icon_url' : '',
                                 'x_start' : 0,
@@ -188,8 +188,8 @@ def test_no_tags(simple_user):
         Test whether no description given is caught
     '''
     response = client.post("/service/add",
+                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
-                                'token' : simple_user['token'],
                                 'name' : 'Test API',
                                 'icon_url' : '',
                                 'x_start' : 0,
@@ -207,7 +207,6 @@ def test_create_api(simple_user):
         Test whether an API is correctly created
     '''
     api_info = {
-                'token' : simple_user['token'],
                 'name' : 'Test API',
                 'icon_url' : '',
                 'x_start' : 0,
@@ -219,13 +218,14 @@ def test_create_api(simple_user):
                 }
 
     response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info)
     assert response.status_code == SUCCESS
     sid = response.json()['sid']
 
     response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'token' : simple_user['token'],
                               'sid' : sid
                           })
     
@@ -241,7 +241,6 @@ def test_multiple_tags(simple_user):
         Test whether an API is correctly created where it has multiple tags
     '''
     api_info = {
-                'token' : simple_user['token'],
                 'name' : 'Test API',
                 'icon_url' : '',
                 'x_start' : 0,
@@ -253,13 +252,14 @@ def test_multiple_tags(simple_user):
                 }
 
     response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info)
     assert response.status_code == SUCCESS
     sid = response.json()['sid']
 
     response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'token' : simple_user['token'],
                               'sid' : sid
                           })
     
@@ -276,7 +276,6 @@ def test_custom_icon():
             https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png
     '''
     api_info = {
-                'token' : simple_user['token'],
                 'name' : 'Fake Google',
                 'icon_url' : 'https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png',
                 'x_start' : 0,
@@ -288,11 +287,13 @@ def test_custom_icon():
                 }
 
     response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info)
     assert response.status_code == SUCCESS
     sid = response.json()['sid']
 
     response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
                               'token' : simple_user['token'],
                               'sid' : sid
