@@ -9,7 +9,7 @@ import HomePage from './pages/HomePage';
 import APIsPage from './pages/ApisPage';
 import AddApiPage from './pages/AddApiPage';
 import ApiPage from './pages/ApiPage';
-import { apiLoader } from './utils/loaders';
+// import { apiLoader } from './utils/loaders';
 import EditApiPage from './pages/EditApiPage';
 import CategoriesPage from './pages/CategoriesPage';
 

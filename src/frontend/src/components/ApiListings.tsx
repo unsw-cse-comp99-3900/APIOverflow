@@ -10,7 +10,13 @@ const ApiListings = ({ isHome = false }) => {
 
   useEffect(() => {
     const fetchApis = async () => {
-      const apiUrl = isHome ? 'http://localhost:8000/apis?_limit=3' : 'http://localhost:8000/apis';
+      const baseUrl = process.env.REACT_APP_API_BASE_URL;
+      console.log("hi")
+      console.log(baseUrl)
+      console.log("no hi")
+      const apiUrl = isHome
+        ? `${baseUrl}/apis?_limit=3`
+        : `${baseUrl}/apis`;
       try {
         const res = await fetch(apiUrl);
         const data = await res.json();
@@ -24,7 +30,7 @@ const ApiListings = ({ isHome = false }) => {
     };
 
     fetchApis();
-  }, []);
+  }, [isHome]);
 
   return (
     <section className='bg-blue-50 px-4 py-10'>
