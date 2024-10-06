@@ -131,3 +131,9 @@ class Datastore:
                 self.__store['tags'].remove(tag)
                 self.__store['tag_count'] -= 1
                 return
+
+print('Loading Datastore...')
+
+global data_store
+data_store = Datastore()
+#data_store.load_database()
