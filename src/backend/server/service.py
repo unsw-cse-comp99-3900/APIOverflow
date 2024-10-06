@@ -15,6 +15,7 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
         Adds a Service (default to API) to the platform
 
         Raises:     HTTP Error 400 if missing info/bad request
+        Returns:    sid representing id of newly created service
     '''
 
     # Error Checking
@@ -33,12 +34,15 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     x_start, x_end = packet['x_start'], packet['x_end']
     y_start, y_end = packet['y_start'], packet['y_end']
 
+    if x_start < 0 or y_start < 0 or x_start > x_end or y_start > y_end:
+        raise HTTPException(status_code=400,
+                            detail="Invalid X/Y dimensions")
+
     # Handle custom image
     if img_url != '':
         internal_url = f"{IMAGE_PATH}/image{data_store.num_imgs()}.jpg"
         try:
-            image, response = urllib.request.urlretrieve(
-                img_url, internal_url)
+            image, response = urllib.request.urlretrieve(img_url, internal_url)
         except HTTPError as err:
             raise HTTPException(status_code=400,
                                 detail=f"HTTP exception {response} raised when retrieving image") from err
@@ -66,7 +70,9 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
         image_cropped.save(internal_url)
 
     else:
-        internal_url = f"{IMAGE_PATH}/default_icon2.jpg"
+        internal_url = f"{IMAGE_PATH}/default_icon2.png"
+
+
     # Create new API
     new_api = API(  str(data_store.num_apis()),
                     packet['name'],
@@ -76,8 +82,9 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
                     packet['tags'])
 
     data_store.add_api(new_api)
+    return str(new_api.get_id())
 
-def get_service_wrapper(sid: str, uid: str) -> dict[T : K]:
+def get_service_wrapper(sid: str) -> dict[T : K]:
     '''
         Gets a service by sid
 
@@ -96,8 +103,8 @@ def get_service_wrapper(sid: str, uid: str) -> dict[T : K]:
     # Error checking
     if sid == '':
         raise HTTPException(status_code=400, detail='No service id provided')
-    
-    service = data_store.get_by_id(sid, 'apis')
+
+    service = data_store.get_api_by_id(sid)
     if service == None:
         raise HTTPException(status_code=404, detail='No service found with given sid')
     

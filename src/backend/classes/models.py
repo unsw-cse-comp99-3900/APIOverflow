@@ -35,7 +35,6 @@ class User(BaseModel):
 # Request body for POST methods relating to services
 class ServicePost(BaseModel):
 
-    token: str                      # JWT token of user requesting
     name: str                       # Name of service
     icon_url: str                   # URL of service icon uploaded
     x_start: int                    # Starting x-coord of img crop

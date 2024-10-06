@@ -37,6 +37,7 @@ async def clear():
         Internal Testing function to clear datastore
     '''
     ds.clear_datastore()
+    assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
 # Include authentication router
@@ -45,23 +46,23 @@ app.include_router(auth_router, prefix="/auth")
 
 
 @app.post("/service/add")
-async def add_service(service: ServicePost, user=Depends(manager)):
+async def add_service(service: ServicePost, user: User = Depends(manager)):
     '''
         Method used to add service to platform
     '''
     # Unpack request body
     request = service.model_dump()
     uid = user['_id']
-    add_service_wrapper(request, str(uid))
+    sid = add_service_wrapper(request, str(uid))
+    return {'sid' : sid}
 
 
-@app.get("service/get_service")
-async def get_service(sid: str, user=Depends(manager)):
+@app.get("/service/get_service")
+async def get_service(sid: str, user: User=Depends(manager)):
     '''
         Method to retrieve a particular service
     '''
-    uid = user['_id']
-    response = get_service_wrapper(sid, str(uid))
+    response = get_service_wrapper(sid)
     return response
 
 if __name__ == "__main__":

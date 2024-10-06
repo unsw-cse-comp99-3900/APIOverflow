@@ -19,7 +19,7 @@ schema = {
     'api_count' : 0,
     'tags' : DEFAULT_TAGS,
     'tag_count' : 0,
-    'image_count' : 0
+    'img_count' : 0
 }
 
 class Datastore:
@@ -46,7 +46,15 @@ class Datastore:
         pass
 
     def clear_datastore(self) -> None:
-        self.__store = schema
+        self.__store = {
+                            'users' : [],
+                            'user_count' : 0,
+                            'apis' : [],
+                            'api_count' : 0,
+                            'tags' : DEFAULT_TAGS,
+                            'tag_count' : 0,
+                            'img_count' : 0
+                        }
 
     ##################################
     #   Datastore Insertion Methods
@@ -99,11 +107,21 @@ class Datastore:
         '''
         return self.__store['tags']
 
-    def get_by_id(self, eid: str, i_type: Literal['users', 'apis']) -> T | None:
+    def get_api_by_id(self, eid: str) -> T | None:
         '''
             Returns with the given ID, or None if cannot find user
         '''
-        for item in self.__store[i_type]:
+        for item in self.__store['apis']:
+            if item.get_id() == eid:
+                return item
+        
+        return None
+
+    def get_user_by_id(self, eid: str) -> T | None:
+        '''
+            Returns with the given ID, or None if cannot find user
+        '''
+        for item in self.__store['users']:
             if item.get_id() == eid:
                 return item
         
