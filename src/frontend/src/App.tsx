@@ -13,7 +13,7 @@ import EditApiPage from './pages/EditApiPage';
 import CategoriesPage from './pages/CategoriesPage';
 import { deleteApi } from './services/apiServices';
 import { apiLoader } from './utils/loaders';
-
+import Login from './components/Login';  // Import Login component
 
 
 const App = () => {
@@ -27,13 +27,15 @@ const App = () => {
         <Route path='/categories' element={<CategoriesPage />} />
         <Route
           path='/apis/:id' 
-          element={<ApiPage deleteApi={deleteApi}/>}
+          element={<ApiPage deleteApi={deleteApi} />}
           loader={apiLoader}
         />
+        {/* Add the login route */}
+        <Route path='/login' element={<Login />} />
       </Route>
     )
-      
   );
+  
   return <RouterProvider router={router} />;
 }
 
