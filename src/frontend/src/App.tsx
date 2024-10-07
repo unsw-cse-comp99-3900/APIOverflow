@@ -5,6 +5,7 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
+import UserProfileLayout from './layouts/UserProfileLayout';
 import HomePage from './pages/HomePage';
 import APIsPage from './pages/ApisPage';
 import AddApiPage from './pages/AddApiPage';
@@ -25,7 +26,9 @@ const App = () => {
         <Route path='/add-api' element={<AddApiPage />} />
         <Route path='/edit-api' element={<EditApiPage />} />
 
-        <Route path='/profile/myApis' element={<MyApisPage />} />
+        <Route path='/profile' element={<UserProfileLayout />}>
+          <Route path='/profile/myApis' element={<MyApisPage />} />
+        </Route>
       </Route>
     )
       
