@@ -116,26 +116,40 @@ class Datastore:
                 return item
         
         return None
+    
+    # assumes item already exists
+    def update_api_by_id(self, eid: str, api: T ) -> None:
+<<<<<<< Updated upstream
+        '''
+            updates an api by id
+        '''
+        self.delete_item(eid, 'api')
+        self.__store['apis'].append(api)
+        return None
+
+    def get_user_by_id(self, eid: str) -> T | None:
+=======
+>>>>>>> Stashed changes
+        '''
+            updates an api by id
+        '''
+        self.delete_item(eid, 'api')
+        self.__store['apis'].append(api)
+        return None
 
     def get_user_by_id(self, eid: str) -> T | None:
         '''
-            Returns with user obj base on given ID, or None if cannot find user
+            Returns with the given ID, or None if cannot find user
         '''
         for item in self.__store['users']:
-            if item.get_id() == eid:
-                return item
-
-        return None
-
-    def get_user_by_name(self, name: str) -> T | None:
-        '''
-            Returns with user obj based on username, or None if cannot find user
-        '''
-        for item in self.__store['users']:
+<<<<<<< Updated upstream
             print("Item's name: %s | Name wanted: %s", item.get_name(), name)
             if item.get_name() == name:
+=======
+            if str(item['_id']) == eid:
+>>>>>>> Stashed changes
                 return item
-            
+
         return None
 
     def num_users(self) -> int:

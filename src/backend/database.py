@@ -40,3 +40,20 @@ def db_get_service(name: str) -> Optional[dict]:
         Grabs service from MongoDB
     '''
     return db.services.find_one({'service_name': name})
+
+
+###################################
+#       Update (put) Methods
+###################################
+def db_update_user(username: str, new_user: dict[T, K]) -> None:
+    '''
+        Update a mongodb user into MongoDB
+    '''
+    db.users.update_one({"username": username}, new_user)
+
+def db_update_service(service_name: str, new_service: dict[T, K]) -> None:
+    '''
+        Update a service into MongoDB
+    '''
+    db.services.update_one({'service_name': service_name}, new_service)
+

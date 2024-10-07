@@ -56,6 +56,16 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
     sid = add_service_wrapper(request, str(uid))
     return {'sid' : sid}
 
+@app.put("/service/update")
+async def update_service(sid: str, service: ServicePost, user: User = Depends(manager)):
+    '''
+        Method used to update service to platform
+    '''
+    # Unpack request body
+    request = service.model_dump()
+    uid = user['_id']
+    sid = update_service_wrapper(sid, request, str(uid))
+    return None
 
 @app.get("/service/get_service")
 async def get_service(sid: str, user: User=Depends(manager)):
