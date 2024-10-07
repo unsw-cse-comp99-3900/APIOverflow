@@ -6,6 +6,11 @@ from urllib.error import HTTPError, URLError
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
+from flask import jsonify
+
+# Ollama information
+OLLAMA_API_KEY = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBqE8KSc69XaJ4GwS37IXdk44ooXGidxNxeaKJNOUm4r'
+OLLAMA_API_URL = 'http://<ip>:11434/api/generate'
 
 IMAGE_PATH = "src/backend/static"
 T = TypeVar('T')
@@ -123,3 +128,64 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
             'tags' : service.get_tags()
     }
     
+# function to match vincent's format, the one above is sid instead of id
+def api_into_json(api) -> dict:
+    return {
+        'id': api.get_id(),
+        'name': api.get_name(),
+        'owner': api.get_owner(),
+        'description': api.get_description(),
+        'icon_url': api.get_icon_url(),
+        'tags': api.get_tags()
+    }
+
+# filter through database to find APIs that are fitted to the selected tags
+# returns a list of the filtered apis
+def api_tag_filter(tags, providers) -> List:
+
+    api_list = data_store.get_apis()
+    filtered_apis = []
+
+    #query = input("Search")
+
+    #if query != "":
+        # if not empty, then Ollama match
+    #    data = {
+    #        "model": "llama3.2",
+    #        "prompt": query
+    #    }    
+    #    response = requests.post(url, json=data)
+        
+    if len(tags) == 0:
+        # if they don't specify any tags, assume all APIs
+        for api in api_list:
+            filtered_apis.append(api)
+    else:
+        # otherwise get all the APIs with the tag/s
+        for api in api_list:
+            for tag in tags:
+                if tag in api.get_tags():
+                    filtered_apis.append(api)
+    
+    if len(providers) != 0:
+        # if providers list is not empty
+        for api in filtered_apis:
+            for provider in providers:
+                if provider in api.get_owners():
+                    break
+                # if we've reached here that means none of the providers specified
+                # were in the owners list. therefore, filter it
+                filtered_apis.remove(api)
+
+    # list of JSON objects
+    return_list = []
+    for api in filtered_apis:
+        return_list.append(jsonify(api_into_json(api)))
+    return filtered_apis
+
+def list_apis():
+    api_list = data_store.get_apis()
+    return_list = []
+    for api in api_list:
+        return_list.append(jsonify(api_into_json(api)))
+    return return_list

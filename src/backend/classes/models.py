@@ -41,6 +41,10 @@ class LoginModel(BaseModel):
     username: str
     password: str
 
+class FilterRequest(BaseModel):
+    tags: List[str],
+    provider: List[str]
+
 # Request body for POST methods relating to services
 class ServicePost(BaseModel):
 

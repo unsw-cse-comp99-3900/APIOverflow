@@ -117,6 +117,19 @@ async def account_user_route(user: User = Depends(manager), role: str = Depends(
 async def guest_route(user: User = Depends(manager), role: str = Depends(role_required("guest"))):
     return {"message": "Welcome, Guest!"}
 
+@app.get("/service/filter")
+async def filter(request: FilterRequest):
+    # tags is a list of the tag name
+    # providers is a list of provider ids
+    tags = request.tags
+    providers = request.providers 
+    return api_tag_filter(tags, providers)
+
+@app.get("/service/apis")
+async def view_apis():
+    return list_apis()
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host='0.0.0.0', port=5000)
