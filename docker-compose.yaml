@@ -1,0 +1,29 @@
+services:
+  # docker compose start 
+  backend:
+    build: ./src/backend
+    volumes: 
+      # 'mounts' a volume so that modifying code locally automatically modifies
+      # the code in the container so we don't have to rebuild each time
+      - ./src/backend:/app/src/backend
+    # Add if necessary
+    # environment:
+    ports:
+      # be exposes port 5000
+      # map containers port 5000 to external port 5001
+      - 5001:5000
+    
+  frontend:
+    build: ./src/frontend 
+    volumes:
+      - ./src/frontend:/app/src/frontend
+      - /app/frontend/node_modules
+    ports: 
+      # fe exports port 3000
+      - 3000:3000
+    
+    depends_on:
+      - backend
+
+    environment:
+      - CHOKIDAR_USEPOLLING=true
