@@ -35,7 +35,8 @@ def simple_user():
     # Register user
     user_creds = {
         "username" : "Tester 1",
-        "password" : "password"
+        "password" : "password",
+        "email" : "doxxed@gmail.com"
     }
 
     usable_data = {"token" : None}

@@ -119,12 +119,22 @@ class Datastore:
 
     def get_user_by_id(self, eid: str) -> T | None:
         '''
-            Returns with the given ID, or None if cannot find user
+            Returns with user obj base on given ID, or None if cannot find user
         '''
         for item in self.__store['users']:
-            if str(item['_id']) == eid:
+            if item.get_id() == eid:
                 return item
 
+        return None
+
+    def get_user_by_name(self, name: str) -> T | None:
+        '''
+            Returns with user obj based on username, or None if cannot find user
+        '''
+        for item in self.__store['users']:
+            if item.get_name() == name:
+                return item
+            
         return None
 
     def num_users(self) -> int:

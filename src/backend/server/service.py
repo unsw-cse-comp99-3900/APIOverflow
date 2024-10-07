@@ -5,6 +5,7 @@ import urllib.request
 from urllib.error import HTTPError, URLError
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
+from src.backend.database import *
 
 IMAGE_PATH = "src/backend/static"
 T = TypeVar('T')
@@ -42,7 +43,7 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     # TODO
     #   Shrink images instead of cropping
     #   Impose some sort of icon limit 
-    
+
     if img_url != '':
         internal_url = f"{IMAGE_PATH}/image{data_store.num_imgs()}.jpg"
         try:
@@ -86,6 +87,7 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
                     packet['tags'])
 
     data_store.add_api(new_api)
+    db_add_service(new_api.to_json())
     return str(new_api.get_id())
 
 def get_service_wrapper(sid: str) -> dict[T : K]:
@@ -109,7 +111,7 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
         raise HTTPException(status_code=400, detail='No service id provided')
 
     service = data_store.get_api_by_id(sid)
-    if service == None:
+    if service is None:
         raise HTTPException(status_code=404, detail='No service found with given sid')
     
     return {

@@ -1,6 +1,7 @@
 from typing import *
 
 T = TypeVar("T")
+K = TypeVar("K")
 
 class Service:
 
@@ -205,3 +206,24 @@ class Service:
             Returns icon_url of service
         '''
         return self._icon_url
+    
+    ################################
+    #  Storage Methods
+    ################################
+    def to_json(self) -> dict[T, K]:
+        '''
+            Converts object into json
+        '''
+        return {
+            'id': self._id,
+            'name' : self._name,
+            'owner' : self._owner,
+            'icon_url' : self._icon_url,
+            'description' : self._description,
+            'tags' : self._tags,
+            'documents' : self._docs,
+            'users' : self._users,
+            'reviews': self._reviews,
+            'upvotes': self._upvotes,
+            'type': self._type
+        }

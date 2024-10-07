@@ -31,6 +31,15 @@ class User(BaseModel):
     def get(cls, username: str, db) -> Optional[dict]:
         return db.users.find_one({"username": username})
 
+class UserCreate(BaseModel):
+    username: str
+    password: str
+    email: str
+    role: str = "account user"
+
+class LoginModel(BaseModel):
+    username: str
+    password: str
 
 # Request body for POST methods relating to services
 class ServicePost(BaseModel):
@@ -43,3 +52,4 @@ class ServicePost(BaseModel):
     y_end: int                      # Ending y-coord of img crop
     description: str                # Descrtipion of service
     tags: List[str]                 # List of tags assigned to the service
+

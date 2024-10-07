@@ -17,6 +17,7 @@ def test_register_user():
     response = client.post("/auth/register", json={
         "username": "testuser",
         "password": "testpassword",
+        "email" : "doxxed@gmail.com"
     })
     assert response.status_code == 200
     assert response.json() == {"message": "User created successfully"}
@@ -25,11 +26,13 @@ def test_register_duplicate_user():
     """Test registering a duplicate user."""
     client.post("/auth/register", json={
         "username": "testuser",
-        "password": "testpassword"
+        "password": "testpassword",
+        "email" : "doxxed@gmail.com"
     })
     response = client.post("/auth/register", json={
         "username": "testuser",
-        "password": "newpassword"
+        "password": "newpassword",
+        "email" : "doxxed@gmail.com"
     })
     assert response.status_code == 400
     assert response.json() == {"detail": "Username already taken"}
@@ -61,7 +64,8 @@ def test_access_protected_route_as_user():
     client.post("/auth/register", json={
         "username": "user",
         "password": "password",
-        "role": "account user" 
+        "role": "account user",
+        "email" : "doxxed@gmail.com"
     })
     response = client.post("/auth/login", json={
         "username": "user",
@@ -82,7 +86,8 @@ def test_access_protected_route_as_admin():
     client.post("/auth/register", json={
         "username": "adminuser",
         "password": "adminpassword",
-        "role": "admin"
+        "role": "admin",
+        "email" : "doxxed@gmail.com"
     })
     response = client.post("/auth/login", json={
         "username": "adminuser",
@@ -99,7 +104,8 @@ def test_access_protected_route_as_non_admin():
     # Register and login as guest
     client.post("/auth/register", json={
         "username": "guestuser",
-        "password": "guestpassword"
+        "password": "guestpassword",
+        "email" : "doxxed@gmail.com"
     })
     response = client.post("/auth/login", json={
         "username": "guestuser",
