@@ -114,10 +114,16 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
     if service is None:
         raise HTTPException(status_code=404, detail='No service found with given sid')
     
+    owner = data_store.get_user_by_id(service.get_owner())
+
     return {
-            'sid' : service.get_id(),
+            'id' : service.get_id(),
             'name' : service.get_name(),
-            'owner' : service.get_owner(),
+            'owner' : {
+                'id' : owner.get_id(),
+                'name' : owner.get_name(),
+                'email' : owner.get_email()
+            },
             'description': service.get_description(),
             'icon_url': service.get_icon_url(),
             'tags' : service.get_tags()

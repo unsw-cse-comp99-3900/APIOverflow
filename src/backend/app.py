@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Depends, Request, HTTPException
 from fastapi_login import LoginManager
-from pydantic import BaseModel
 from pymongo import MongoClient
 from passlib.context import CryptContext
 from src.backend.classes.models import *
@@ -58,7 +57,7 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
 
 
 @app.get("/service/get_service")
-async def get_service(sid: str, user: User=Depends(manager)):
+async def get_service(sid: str):
     '''
         Method to retrieve a particular service
     '''
