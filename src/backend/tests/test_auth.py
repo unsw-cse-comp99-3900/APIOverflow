@@ -11,6 +11,9 @@ client = TestClient(app)
 def clear_database():
     """Fixture to clear the database before each test."""
     db.users.delete_many({})
+    response = client.post("/testing/clear")
+    assert response.status_code == 200
+
 
 def test_register_user():
     """Test user registration."""
@@ -20,7 +23,7 @@ def test_register_user():
         "email" : "doxxed@gmail.com"
     })
     assert response.status_code == 200
-    assert response.json() == {"message": "User created successfully"}
+    assert response.json() == {"uid" : 0}
 
 def test_register_duplicate_user():
     """Test registering a duplicate user."""
@@ -41,7 +44,8 @@ def test_login_user():
     """Test user login."""
     client.post("/auth/register", json={
         "username": "testuser",
-        "password": "testpassword"
+        "password": "testpassword",
+        "email" : "doxxed@gmail.com"
     })
     response = client.post("/auth/login", json={
         "username": "testuser",
@@ -98,6 +102,7 @@ def test_access_protected_route_as_admin():
     response = client.get("/auth/admin", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
     assert response.json() == {"message": "Welcome, Admin!"}
+
 
 def test_access_protected_route_as_non_admin():
     """Test access to admin route as non-admin user."""
