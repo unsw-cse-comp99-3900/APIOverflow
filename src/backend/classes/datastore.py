@@ -165,6 +165,25 @@ class Datastore:
 
         return None
 
+    def get_user_apis(self, eid: str) -> List[T]:
+        '''
+            Returns a list of APIs owned by the user with the given user ID.
+        '''
+        user_apis = []
+        for item in self.__store['apis']:
+            owners = item.get_owner()
+            if str(eid) in owners:
+                api_info = {
+                    'sid': item.get_id(),
+                    'name': item.get_name(),
+                    'owner': item.get_owner(),
+                    'description': item.get_description(),
+                    'icon_url': item.get_icon_url(),
+                    'tags': item.get_tags()
+                }
+                user_apis.append(api_info)
+        return user_apis
+
     def num_users(self) -> int:
         '''
             Returns number of users

@@ -96,6 +96,16 @@ async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
     await upload_docs_wrapper(sid, user['id'], doc_id)
     return 200
 
+@app.get("/service/my_services")
+async def get_user_apis(user: User = Depends(manager)):
+    '''
+        Method to get the list of APIs owned by the currently authenticated user.
+        Returns a list of APIs with specific fields: id, name, owner, description, icon_url, and tags.
+    '''
+    uid = user['id']
+    user_apis = ds.get_user_apis(uid)
+    return user_apis
+
 #####################################
 #   Auth Paths
 #####################################
