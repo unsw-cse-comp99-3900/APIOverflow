@@ -1,6 +1,5 @@
 export interface Api {
-    id: string;
-    sid: string;
+    id: number;
     name: string;
     description: string;
     owner: string;
@@ -8,4 +7,4 @@ export interface Api {
     tags: string[]; 
 }
 
-export type NewApi = Omit<Api, 'id' | 'sid'>;
+export type NewApi = Omit<Api, 'id'>;

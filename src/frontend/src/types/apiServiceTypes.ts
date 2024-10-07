@@ -1,7 +1,7 @@
-import { Api } from "./apiTypes";
+import { Api, NewApi } from "./apiTypes";
 
 export interface AddApiService {
-    addApi: (newApi: Omit<Api, 'id' | 'sid'>) => Promise<void>;
+    addApi: (newApi: NewApi) => Promise<void>;
 }
 
 export interface DeleteApiService {

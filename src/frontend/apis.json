@@ -1,8 +1,7 @@
 {
     "apis":[
         {
-            "id": "1",
-            "sid": "TestSID_1",
+            "id": 1001,
             "name": "TestAPI_1",
             "owner": "TestOwner_1",
             "description": "TestDescription_1",
@@ -10,8 +9,7 @@
             "tags": ["TestTag_1", "TestTag_2", "TestTag_3"]
         },
         {
-            "id": "2",
-            "sid": "TestSID_2",
+            "id": 2002,
             "name": "TestAPI_2",
             "owner": "TestOwner_2",
             "description": "VeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTestDescription_2",
@@ -19,8 +17,7 @@
             "tags": ["TestTag_1", "TestTag_2", "TestTag_3"]
         },
         {
-            "id": "3",
-            "sid": "TestSID_3",
+            "id": 3003,
             "name": "TestAPI_3",
             "owner": "TestOwner_3",
             "description": "TestDescription_3",
@@ -29,8 +26,7 @@
         }
         ,
         {
-            "id": "4",
-            "sid": "TestSID_4",
+            "id": 4004,
             "name": "TestAPI_4",
             "owner": "TestOwner_4",
             "description": "TestDescription_4",
@@ -39,8 +35,7 @@
         }
         ,
         {
-            "id": "5",
-            "sid": "TestSID_5",
+            "id": 5005,
             "name": "TestAPI_5",
             "owner": "TestOwner_5",
             "description": "TestDescription_5",
@@ -48,8 +43,7 @@
             "tags": ["TestTag_1", "TestTag_2", "TestTag_3"]
         },
         {
-            "id": "6",
-            "sid": "TestSID_6",
+            "id": 6006,
             "name": "TestAPI_6",
             "owner": "TestOwner_6",
             "description": "TestDescription_6",
