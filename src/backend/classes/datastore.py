@@ -1,4 +1,7 @@
 from typing import *
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 T = TypeVar("T")
 DEFAULT_TAGS = [
@@ -132,6 +135,7 @@ class Datastore:
             Returns with user obj based on username, or None if cannot find user
         '''
         for item in self.__store['users']:
+            print("Item's name: %s | Name wanted: %s", item.get_name(), name)
             if item.get_name() == name:
                 return item
             

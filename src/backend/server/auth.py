@@ -7,6 +7,9 @@ from src.backend.classes.User import User
 from typing import Union, List, TypeVar
 from src.backend.database import *
 from src.backend.classes.Manager import manager
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
@@ -27,6 +30,7 @@ def login_wrapper(username: str, password: str) -> T:
         Wrapper used to handle logging in
     '''
     user = data_store.get_user_by_name(username)
+    print("Auth: username=%s | user found: %s", username, user)
     if not user or not manager.verify_password(password, user.get_password()):
         raise HTTPException(status_code=400, detail="Invalid username or password")
 

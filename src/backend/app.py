@@ -19,10 +19,14 @@ db = client.local
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 manager = LoginManager(SECRET, token_url='/auth/login')
+
 @manager.user_loader()
-def load_user(username: str):
-    user = User.get(username, db)
-    return user
+def load_user(uid: str):
+    '''
+        Allows manager to access user
+    '''
+    user = ds.get_user_by_id(uid)
+    return user.to_json()
 
 @app.get("/")
 async def home():
@@ -48,7 +52,7 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
     '''
     # Unpack request body
     request = service.model_dump()
-    uid = user['_id']
+    uid = user['id']
     sid = add_service_wrapper(request, str(uid))
     return {'sid' : sid}
 
@@ -78,7 +82,7 @@ def role_required(roles: Union[str, List[str]]):
 
     return role_checker
 
-@app.post("/login")
+@app.post("/auth/login")
 async def login(credentials: LoginModel):
     '''
         Login a user (or attempt to)
@@ -97,19 +101,19 @@ async def register(user: UserCreate):
     return {'uid' : uid}
 
 # Example privileged routes
-@app.get("/admin")
+@app.get("/auth/admin")
 async def admin_route(user: User = Depends(manager), role: str = Depends(role_required("admin"))):
     return {"message": "Welcome, Admin!"}
 
-@app.get("/service")
+@app.get("/auth/service")
 async def service_provider_route(user: User = Depends(manager), role: str = Depends(role_required("service provider"))):
     return {"message": "Welcome, Service Provider!"}
 
-@app.get("/account")
+@app.get("/auth/account")
 async def account_user_route(user: User = Depends(manager), role: str = Depends(role_required("account user"))):
     return {"message": "Welcome, Account User!"}
 
-@app.get("/guest")
+@app.get("/auth/guest")
 async def guest_route(user: User = Depends(manager), role: str = Depends(role_required("guest"))):
     return {"message": "Welcome, Guest!"}
 
