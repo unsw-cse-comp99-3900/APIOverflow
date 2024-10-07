@@ -141,7 +141,7 @@ def api_into_json(api) -> dict:
 
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
-def api_tag_filter(tags, providers) -> List:
+def api_tag_filter(tags, providers):
 
     api_list = data_store.get_apis()
     filtered_apis = []

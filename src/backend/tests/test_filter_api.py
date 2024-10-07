@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from src.backend.classes import Service
 from src.backend.app import app, register, add_service, login
-from src.backend.classes.models import User, db, UserCreate, LoginModel, 
+from src.backend.classes.models import User, db, UserCreate, LoginModel
 from src.backend.database import db_add_service
 
 # Create a test client
