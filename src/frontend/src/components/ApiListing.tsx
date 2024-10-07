@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Api } from '../types/apiTypes';
+import Tag from './Tag';
 
 const ApiListing = ({ api }: { api: Api }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -15,12 +16,12 @@ const ApiListing = ({ api }: { api: Api }) => {
     <div className='bg-white rounded-xl shadow-md relative'>
       <div className='p-4'>
         {/* Container for icon and owner + name */}
-        <div className='flex items-start mb-6'>
+        <div className='flex items-start mb-2'>
           {/* Icon on the left */}
           <img
             src={api.icon_url}
             alt='API Icon'
-            className='w-16 h-16 mr-4 mt-2 rounded-full object-cover'
+            className='w-20 h-20 ml-4 mr-4 mt-2 rounded-full object-cover'
           />
 
           {/* Content for owner and name */}
@@ -30,8 +31,14 @@ const ApiListing = ({ api }: { api: Api }) => {
 
             {/* Owner */}
             <div className='text-gray-600'>{api.owner}</div>
+            <div className="flex flex-wrap mt-4 mb-5">
+              {api?.tags?.map((tag, index) => (
+                <Tag key={index} tag={tag} className="mr-3 mb-2" />
+              ))}
+            </div>
           </div>
         </div>
+
         <div className='border border-gray-100 mb-5'></div>
 
         {/* Description (without icon) */}

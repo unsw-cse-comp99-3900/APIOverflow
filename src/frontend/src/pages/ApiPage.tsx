@@ -6,6 +6,7 @@ import { Api } from '../types/apiTypes';
 import { DeleteApiService } from '../types/apiServiceTypes';
 import { getApi } from '../services/apiServices';
 import FetchStatus from '../components/FetchStatus';  // Import the new reusable component
+import Tag from '../components/Tag';
 
 const ApiPage = ({ deleteApi }: DeleteApiService) => {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const ApiPage = ({ deleteApi }: DeleteApiService) => {
 
   return (
     <>
+      {/* NavBar (Already implemented, so keeping as it is) */}
       <section>
         <div className="container m-auto py-6 px-6">
           <Link to="/apis" className="text-indigo-500 hover:text-indigo-600 flex items-center">
@@ -50,42 +52,61 @@ const ApiPage = ({ deleteApi }: DeleteApiService) => {
         </div>
       </section>
 
-      <section className="bg-indigo-50">
-        <div className="container m-auto py-10 px-6">
-          <FetchStatus loading={loading} error={error} data={api}>
-            <div className="grid grid-cols-1 md:grid-cols-70/30 w-full gap-6">
-              <main>
-                <div className="bg-white p-6 rounded-lg shadow-md text-center md:text-left">
-                  <div className="text-gray-500 mb-4">{api?.name}</div>
-                  <h1 className="text-3xl font-bold mb-4">{api?.name}</h1>
-                </div>
+      {/* Main Layout */}
+      <section className="w-full h-full relative bg-indigo-50 py-10 px-6">
+        <FetchStatus loading={loading} error={error} data={api}>
+          {/* Header Section */}
+          <div className="mx-auto max-w-7xl relative bg-white rounded-2xl shadow-lg p-10">
+            <div className="flex items-center">
 
-                <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-                  <h3 className="text-indigo-800 text-lg font-bold mb-6">Api Description</h3>
-                  <p className="mb-4 break-words">{api?.description}</p>
-                </div>
-              </main>
+              {/* Placeholder for API icon */}
+              <div className="flex flex-shrink-0 items-center">  {/* Adjust pl-10 as needed for custom padding */}
+                <img
+                  className='w-56 h-56 rounded-full object-cover mx-auto'
+                  src={api?.icon_url}
+                  alt="API Icon"
+                />
+              </div>
 
-              <aside className="w-full md:w-1/3 p-4">
-                <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-                  <h3 className="text-xl font-bold mb-6">Manage Api</h3>
-                  <Link
-                    to={`/edit-api/${api?.id}`}
-                    className="bg-indigo-500 hover:bg-indigo-600 text-white text-center font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
-                  >
-                    Edit Api
-                  </Link>
-                  <button
-                    onClick={() => onDeleteClick(api!)}  // Ensure api exists before deleting
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
-                  >
-                    Delete Api
-                  </button>
+              {/* Parent div */}
+              <div className="ml-10 w-full">  
+                {/* Fixed top margin for API Name */}
+                <h1 className="text-4xl font-bold mb-5">{api?.name}</h1>
+                
+                {/* Gray border that spans full width */}
+                <div className="border border-gray-100 w-full mb-5"></div>
+
+                {/* Tags section */}
+                <div className="flex flex-wrap max-w-3xl mt-4 mb-5">
+                  {api?.tags.map((tag, index) => (
+                    <Tag key={index} tag={tag} className="mr-3 mb-2" />
+                  ))}
                 </div>
-              </aside>
+              </div>
+
+
             </div>
-          </FetchStatus>
-        </div>
+          </div>
+
+          {/* Reviews, Description, Documentation */}
+          <div className="flex mx-auto max-w-7xl mt-10 space-x-10">
+            <div className="w-1/4 bg-white rounded-2xl shadow-lg p-6">
+              <h2 className="text-xl font-bold mb-4">Reviews</h2>
+              {/* Placeholder for Reviews */}
+              <p>No reviews yet</p>
+            </div>
+            <div className="w-1/2 bg-white rounded-2xl shadow-lg p-6">
+              <h2 className="text-xl font-bold mb-4">Description</h2>
+              {/* API Description */}
+              <p className="break-words">{api?.description}</p>
+            </div>
+            <div className="w-1/4 bg-white rounded-2xl shadow-lg p-6">
+              <h2 className="text-xl font-bold mb-4">Documentation</h2>
+              {/* Placeholder for Documentation */}
+              <p>Coming soon</p>
+            </div>
+          </div>
+        </FetchStatus>
       </section>
     </>
   );
