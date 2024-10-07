@@ -65,6 +65,17 @@ async def get_service(sid: str, user: User=Depends(manager)):
     response = get_service_wrapper(sid)
     return response
 
+@app.get("/service/my_services")
+async def get_user_apis(user: User = Depends(manager)):
+    '''
+        Method to get the list of APIs owned by the currently authenticated user.
+        Returns a list of APIs with specific fields: id, name, owner, description, icon_url, and tags.
+    '''
+    uid = user['id']
+    user_apis = ds.get_user_apis(uid)
+    # print(user_apis)
+    return user_apis
+
 # Role depend routes
 def role_required(roles: Union[str, List[str]]):
     '''
