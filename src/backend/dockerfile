@@ -1,21 +1,37 @@
-# Base image
+# docker build -t backend:version .
+# backend:version is the name we are giving this particular
+# version of docker image
+
+# docker run -t -i -p 5000:5000 backend:version
+
+# FROM baseImage:tag - this specifies the base image and its version
 FROM python:3.10-slim
 
-# Set working directory inside the container
-WORKDIR /app
+# WORKDIR /the/workdir/path - path to use as the working directory
+WORKDIR /src/backend
 
-# Copy all files from current to image
+ENV PYTHONPATH "${PYTHONPATH}:/"
+COPY ../__init__.py /src
+
+# Copy files or folders from source (on your laptop) to the dest path (in the image)
 COPY . .
-
-# Install dependencies
+# RUN is used to run commands inside the container. Here we want to install all required modules from package.json before we actually run our program
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Expose the port the app runs on
+# Here we want to copy all files from our laptop code to the container
+COPY . .
+# EXPOSE is used to specify all ports in the container that we will need
 EXPOSE 5000
+# CMD specifies the command used to start the application. We can only have one CMD statement in our Dockerfile
 
-# Set environment variables for Flask
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
+ARG TEST="false"
+ENV TEST ${TEST}
 
-# Command to run the application
-CMD ["flask", "run"]
+# copied from ray idk if this is better/different
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+
+# to run normally: docker compose build; docker compose up
+# to run pytest: docker compose build --build-arg TEST=t; docker compose up
+# unless switching from normal to pytest or vice versa, no need to run docker compose
+# build again
+
+CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv; fi

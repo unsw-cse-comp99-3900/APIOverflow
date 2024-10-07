@@ -7,7 +7,7 @@ from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
 
-IMAGE_PATH = "src/backend/static"
+IMAGE_PATH = "static"
 T = TypeVar('T')
 K = TypeVar('K')
 
