@@ -17,6 +17,7 @@ const DeleteApiButton = ({
   const navigate = useNavigate();
 
   const onDeleteClick = async (apiId: number) => {
+    console.log(apiId)
     const confirm = window.confirm(
       "Are you sure you want to delete this listing?"
     );
