@@ -1,7 +1,4 @@
 from typing import *
-import logging
-
-LOGGER = logging.getLogger(__name__)
 
 T = TypeVar("T")
 DEFAULT_TAGS = [

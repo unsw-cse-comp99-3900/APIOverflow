@@ -7,9 +7,6 @@ from src.backend.classes.User import User
 from typing import Union, List, TypeVar
 from src.backend.database import *
 from src.backend.classes.Manager import manager
-import logging
-
-LOGGER = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
