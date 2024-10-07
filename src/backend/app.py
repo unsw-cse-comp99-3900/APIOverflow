@@ -61,9 +61,9 @@ async def update_service(sid: str, service: ServicePost, user: User = Depends(ma
     '''
         Method used to update service to platform
     '''
-    # Unpack request body
+    
     request = service.model_dump()
-    uid = user['_id']
+    uid = user['id']
     sid = update_service_wrapper(sid, request, str(uid))
     return None
 

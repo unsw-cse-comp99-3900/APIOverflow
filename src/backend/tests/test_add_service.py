@@ -312,3 +312,95 @@ def test_custom_icon(simple_user):
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
+
+# TODO: modify
+def test_update_api(simple_user):
+    '''
+        Test whether an API is correctly created then updated
+    '''
+    api_info = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API']
+                }
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+    sid = response.json()['sid']
+
+    update_request_info = {
+        'sid' : sid,
+        'name' : 'new name',
+        'icon_url' : '',
+        'x_start' : 1,
+        'x_end' : 1,
+        'y_start' : 1,
+        'y_end' : 1,
+        'description' : 'new description',
+        'tags' : ['new', 'tag']
+    }
+
+    response = client.put("/service/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_request_info)
+    assert response.status_code == SUCCESS
+    
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    assert response_info['sid'] == sid
+    assert response_info['name'] == update_request_info['name']
+    assert response_info['description'] == update_request_info['description']
+    assert response_info['tags'] == update_request_info['tags']
+
+def test_update_api_invalid_sid(simple_user):
+    '''
+        Tests error received when sid is not valid
+    '''
+
+    api_info = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API']
+                }
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+    sid = response.json()['sid']
+
+    update_request_info = {
+        'sid' : sid,
+        'name' : 'new name',
+        'icon_url' : '',
+        'x_start' : 1,
+        'x_end' : 1,
+        'y_start' : 1,
+        'y_end' : 1,
+        'description' : 'new name',
+        'tags' : ['new', 'name']
+    }
+
+    response = client.put("/service/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_request_info)
+    assert response.status_code == 404
+    
