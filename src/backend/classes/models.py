@@ -42,7 +42,7 @@ class LoginModel(BaseModel):
     password: str
 
 class FilterRequest(BaseModel):
-    tags: List[str],
+    tags: List[str]
     provider: List[str]
 
 # Request body for POST methods relating to services
