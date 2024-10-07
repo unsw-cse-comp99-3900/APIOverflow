@@ -1,16 +1,22 @@
 from typing import TypeVar
-from fastapi import APIRouter, HTTPException
+from fastapi import File, UploadFile, HTTPException
 from PIL import Image
 import urllib.request
 from urllib.error import HTTPError, URLError
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
+from src.backend.server.upload import upload_wrapper
 
-IMAGE_PATH = "src/backend/static"
+# Constants
+IMAGE_PATH = "src/backend/static/imgs"
+DOC_PATH = "src/backend/static/docs"
 T = TypeVar('T')
 K = TypeVar('K')
 
+# Helper functions
+
+# Endpoint Wrappers
 def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     '''
         Adds a Service (default to API) to the platform
@@ -81,7 +87,7 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     # Create new API
     new_api = API(  str(data_store.num_apis()),
                     packet['name'],
-                    [user],
+                    user,
                     internal_url,
                     packet['description'],
                     packet['tags'])
@@ -114,8 +120,11 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
     if service is None:
         raise HTTPException(status_code=404, detail='No service found with given sid')
     
-    owner = data_store.get_user_by_id(service.get_owner())
-
+    owner_id = service.get_owner()
+    owner = data_store.get_user_by_id(owner_id)
+    doc_ids = service.get_docs()
+    docs = [data_store.get_doc_by_id(i) for i in doc_ids]
+    doc_paths = [i.get_path() for i in docs]
     return {
             'id' : service.get_id(),
             'name' : service.get_name(),
@@ -126,6 +135,30 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
             },
             'description': service.get_description(),
             'icon_url': service.get_icon_url(),
-            'tags' : service.get_tags()
+            'tags' : service.get_tags(),
+            'docs' : doc_paths
     }
     
+async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
+    '''
+        Function which handles uploading docs to a service
+    '''
+    file = data_store.get_doc_by_id(doc_id)
+    # Error Checks
+    if file is None:
+        raise HTTPException(status_code=400, detail="File not found")
+
+    if file.get_type() != "application/pdf":
+        raise HTTPException(status_code=400, detail="File is not a pdf")
+    
+    # Get service
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Check if user is owner
+    if service.get_owner() != uid:
+        raise HTTPException(status_code=403, detail="User is not service owner")
+
+    # Add document to service
+    service.add_docs([file.get_id()])

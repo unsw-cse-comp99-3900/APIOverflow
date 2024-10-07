@@ -23,7 +23,7 @@ def test_register_user():
         "email" : "doxxed@gmail.com"
     })
     assert response.status_code == 200
-    assert response.json() == {"uid" : 0}
+    assert response.json() == {"uid" : '0'}
 
 def test_register_duplicate_user():
     """Test registering a duplicate user."""

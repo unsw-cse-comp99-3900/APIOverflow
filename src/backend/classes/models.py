@@ -35,7 +35,7 @@ class UserCreate(BaseModel):
     username: str
     password: str
     email: str
-    role: str = "account user"
+    role: str = "general"
 
 class LoginModel(BaseModel):
     username: str
@@ -53,3 +53,7 @@ class ServicePost(BaseModel):
     description: str                # Descrtipion of service
     tags: List[str]                 # List of tags assigned to the service
 
+class ServiceUpload(BaseModel):
+
+    sid: str
+    doc_id: str

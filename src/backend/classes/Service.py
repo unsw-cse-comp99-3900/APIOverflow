@@ -12,7 +12,7 @@ class Service:
     Stores the following:
         sid:            ID of service
         name:           Name of the service
-        owner:          List of User ID(s) of owner(s) of the service
+        owner:          For now, only one owner
         icon_url:       Path to image store on backend
         description:    User-given description of service
         tags:           List of tags given to service
@@ -33,7 +33,7 @@ class Service:
     def __init__(self,
                  sid: str,
                  name: str,
-                 owner: List[str],
+                 owner: str,
                  icon_url: str,
                  description: str,
                  tags: List[str],
@@ -43,7 +43,7 @@ class Service:
         self._id = sid
         self._name = name
         self._owner = owner
-        self._owner_count = len(owner)
+        self._owner_count = 1
         self._icon_url= icon_url
         self._description = description
         self._tags = tags
@@ -96,12 +96,12 @@ class Service:
         '''
         self._tags.append(tag)
 
-    def add_owner(self, owner: str) -> None:
-        '''
-            Adds owner to service
-        '''
-        self._owner.append(owner)
-        self._owner_count += 1
+    # def add_owner(self, owner: str) -> None:
+    #     '''
+    #         Adds owner to service
+    #     '''
+    #     self._owner.append(owner)
+    #     self._owner_count += 1
     
     ################################
     #   Update Methods
@@ -161,12 +161,12 @@ class Service:
         '''
         self._tags.remove(tag)
 
-    def remove_owner(self, uid: str) -> None:
-        '''
-            Remove owner from ownership list
-        '''
-        self._owner.remove(uid)
-        self._owner_count -= 1
+    # def remove_owner(self, uid: str) -> None:
+    #     '''
+    #         Remove owner from ownership list
+    #     '''
+    #     self._owner.remove(uid)
+    #     self._owner_count -= 1
 
     ################################
     #   Get Methods
@@ -207,6 +207,12 @@ class Service:
         '''
         return self._icon_url
     
+    def get_docs(self) -> List[str]:
+        '''
+            Returns icon_url of service
+        '''
+        return self._docs
+
     ################################
     #  Storage Methods
     ################################

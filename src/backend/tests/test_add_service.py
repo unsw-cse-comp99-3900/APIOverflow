@@ -29,7 +29,7 @@ def simple_user():
     '''
         Simulates a simple user registering their account then logging in
     '''
-    # Clear data abse
+    # Clear database
     clear_all()
 
     # Register user
@@ -237,7 +237,7 @@ def test_create_api(simple_user):
     
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['sid'] == sid
+    assert response_info['id'] == sid
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
@@ -271,11 +271,11 @@ def test_multiple_tags(simple_user):
     
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['sid'] == sid
+    assert response_info['id'] == sid
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
-    assert response_info['icon_url'] == 'src/backend/static/default_icon2.png'
+    assert response_info['icon_url'] == 'src/backend/static/imgs/default_icon2.png'
 
 def test_custom_icon(simple_user):
     '''
@@ -308,7 +308,7 @@ def test_custom_icon(simple_user):
     
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['sid'] == sid
+    assert response_info['id'] == sid
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
