@@ -12,6 +12,7 @@ import AddApiPage from './pages/AddApiPage';
 import ApiPage from './pages/ApiPage';
 import EditApiPage from './pages/EditApiPage';
 import MyApisPage from './pages/MyApisPage';
+import MyApiPage from './pages/MyApiPage';
 
 
 
@@ -28,6 +29,7 @@ const App = () => {
 
         <Route path='/profile' element={<UserProfileLayout />}>
           <Route path='/profile/myApis' element={<MyApisPage />} />
+          <Route path='/profile/myApis/:id' element={<MyApiPage />} />
         </Route>
       </Route>
     )

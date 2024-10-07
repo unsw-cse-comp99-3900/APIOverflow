@@ -9,7 +9,7 @@ const UserProfileLayout = () => {
       <UserSideBar />
       
       {/* Content area */}
-      <section className="flex-1 bg-gradient-to-b from-blue-50 px-4 py-6">
+      <section className="flex-1 bg-gradient-to-b from-blue-50 ml-96 py-6">
         <Outlet />  {/* This will render the children components */}
       </section>
     </div>

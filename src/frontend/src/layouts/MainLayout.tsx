@@ -7,7 +7,10 @@ const MainLayout = () => {
   return (
     <>
       <Navbar />
+      <div className='mt-14'>
       <Outlet />
+      </div>
+      
       <ToastContainer />
     </>
   );

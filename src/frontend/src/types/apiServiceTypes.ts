@@ -5,7 +5,7 @@ export interface AddApiService {
 }
 
 export interface DeleteApiService {
-    deleteApi: (api: Api) => Promise<void>;
+    deleteApi: (apiId: Number) => Promise<void>;
 }
 
 export interface UpdateApiService {

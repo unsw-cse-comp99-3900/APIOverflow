@@ -14,8 +14,8 @@ export const getApi = async (id:number) => {
   return data;
 }
 
-export const deleteApi = async (api:Api) => {
-    const res = await fetch(`${baseUrl}/apis/${api.id}`, {
+export const deleteApi = async (apiId:number) => {
+    const res = await fetch(`${baseUrl}/apis/${apiId}`, {
       method: 'DELETE',
     });
     return;
