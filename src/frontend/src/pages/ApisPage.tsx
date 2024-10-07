@@ -2,8 +2,8 @@ import ApiListings from '../components/ApiListings';
 
 const ApisPage = () => {
   return (
-    <section className='bg-blue-50 px-4 py-6'>
-      <ApiListings />
+    <section className='bg-gradient-to-b from-blue-50 to-white px-4 py-6'>
+      <ApiListings isMyAPis={false}/>
     </section>
   );
 };

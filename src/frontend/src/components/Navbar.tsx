@@ -4,11 +4,11 @@ import logo from '../assets/images/logo.svg';
 const Navbar = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
-      ? 'bg-black text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2'
-      : 'text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2';
+      ? 'bg-white text-blue-900 hover:bg-gray-100 hover:text-bg-blue-900 rounded-md px-3 py-2'
+      : 'text-white hover:bg-white hover:text-blue-900 rounded-md px-3 py-2';
 
   return (
-    <nav className='bg-blue-950 border-b border-blue-500'>
+    <nav className='bg-blue-900 border-b border-gray-100'>
       <div className='mx-auto max-w-7xl px-2 sm:px-6 lg:px-8'>
         <div className='flex h-20 items-center justify-between'>
           <div className='flex flex-1 items-center justify-center md:items-stretch md:justify-start'>
@@ -21,16 +21,13 @@ const Navbar = () => {
             <div className='md:ml-auto'>
               <div className='flex space-x-2'>
                 <NavLink to='/' className={linkClass}>
-                  Home
+                <strong>Home</strong>
                 </NavLink>
                 <NavLink to='/apis' className={linkClass}>
-                  APIs
-                </NavLink>
-                <NavLink to='/categories' className={linkClass}>
-                  Categories
+                <strong>APIs</strong>
                 </NavLink>
                 <NavLink to='/add-api' className={linkClass}>
-                  Add API
+                <strong>Add API</strong>
                 </NavLink>
               </div>
             </div>

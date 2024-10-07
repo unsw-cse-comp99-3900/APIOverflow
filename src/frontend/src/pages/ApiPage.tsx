@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { Api } from '../types/apiTypes';
-import { DeleteApiService } from '../types/apiServiceTypes';
 import { getApi } from '../services/apiServices';
 import FetchStatus from '../components/FetchStatus';  // Import the new reusable component
 import Tag from '../components/Tag';
 
-const ApiPage = ({ deleteApi }: DeleteApiService) => {
-  const navigate = useNavigate();
+const ApiPage = () => {
   const [api, setApi] = useState<Api | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,31 +30,18 @@ const ApiPage = ({ deleteApi }: DeleteApiService) => {
     fetchApi();
   }, [id]); // Ensure the effect runs whenever the id changes
 
-  const onDeleteClick = (api: Api) => {
-    const confirm = window.confirm('Are you sure you want to delete this listing?');
-    if (!confirm) return;
-
-    deleteApi(api);
-    toast.success('API deleted successfully');
-    navigate('/apis');
-  };
-
   return (
     <>
-      {/* NavBar (Already implemented, so keeping as it is) */}
-      <section>
-        <div className="container m-auto py-6 px-6">
-          <Link to="/apis" className="text-indigo-500 hover:text-indigo-600 flex items-center">
+      {/* Main Layout */}
+      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white py-10 px-6">
+      <div className="container m-auto py-6 px-6">
+          <Link to="/apis" className="text-blue-800 hover:text-indigo-500 hover:underline font-bold flex items-center">
             <FaArrowLeft className="mr-2" /> Back to Api Listings
           </Link>
         </div>
-      </section>
-
-      {/* Main Layout */}
-      <section className="w-full h-full relative bg-indigo-50 py-10 px-6">
         <FetchStatus loading={loading} error={error} data={api}>
           {/* Header Section */}
-          <div className="mx-auto max-w-7xl relative bg-white rounded-2xl shadow-lg p-10">
+          <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
             <div className="flex items-center">
 
               {/* Placeholder for API icon */}
@@ -89,7 +74,7 @@ const ApiPage = ({ deleteApi }: DeleteApiService) => {
           </div>
 
           {/* Reviews, Description, Documentation */}
-          <div className="flex mx-auto max-w-7xl mt-10 space-x-10">
+          <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
             <div className="w-1/4 bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-xl font-bold mb-4">Reviews</h2>
               {/* Placeholder for Reviews */}
