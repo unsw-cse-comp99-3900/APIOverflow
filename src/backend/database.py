@@ -5,7 +5,7 @@ T = TypeVar("T")
 K = TypeVar("K")
 
 # Initialize MongoDB client
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient("mongodb://mongodb:27017/")
 
 global db
 db = client.local

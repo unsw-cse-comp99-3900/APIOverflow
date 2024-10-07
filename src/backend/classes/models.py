@@ -4,10 +4,7 @@ from passlib.context import CryptContext
 from pymongo import MongoClient
 from typing import *
 from bson import ObjectId
-
-# Initialize MongoDB client
-client = MongoClient("mongodb://localhost:27017/")
-db = client.local
+from src.backend.database import db
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
