@@ -39,6 +39,10 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
                             detail="Invalid X/Y dimensions")
 
     # Handle custom image
+    # TODO
+    #   Shrink images instead of cropping
+    #   Impose some sort of icon limit 
+    
     if img_url != '':
         internal_url = f"{IMAGE_PATH}/image{data_store.num_imgs()}.jpg"
         try:
@@ -76,7 +80,7 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     # Create new API
     new_api = API(  str(data_store.num_apis()),
                     packet['name'],
-                    user,
+                    [user],
                     internal_url,
                     packet['description'],
                     packet['tags'])

@@ -11,12 +11,13 @@ class Service:
     Stores the following:
         sid:            ID of service
         name:           Name of the service
-        owner:          User ID of owner of the service
+        owner:          List of User ID(s) of owner(s) of the service
         icon_url:       Path to image store on backend
         description:    User-given description of service
         tags:           List of tags given to service
         
         ----
+        owner_count:    Number of owners for this service
         documents:      List of paths to documents uploaded by user re service
         doc_count:      Number of documents uploaded to service
         users:          List of users using/subscribed to service
@@ -31,7 +32,7 @@ class Service:
     def __init__(self,
                  sid: str,
                  name: str,
-                 owner: str,
+                 owner: List[str],
                  icon_url: str,
                  description: str,
                  tags: List[str],
@@ -41,6 +42,7 @@ class Service:
         self._id = sid
         self._name = name
         self._owner = owner
+        self._owner_count = len(owner)
         self._icon_url= icon_url
         self._description = description
         self._tags = tags
@@ -93,6 +95,13 @@ class Service:
         '''
         self._tags.append(tag)
 
+    def add_owner(self, owner: str) -> None:
+        '''
+            Adds owner to service
+        '''
+        self._owner.append(owner)
+        self._owner_count += 1
+    
     ################################
     #   Update Methods
     ################################
@@ -120,36 +129,43 @@ class Service:
     ################################
     def remove_doc(self, doc: str) -> None:
         '''
-            Adds paths to documentation
+            Remove path to documentation
         '''
         self._docs.remove(doc)
         self._doc_count -= 1
 
     def remove_user(self, uid: str) -> None:
         '''
-            Adds user to subscription/usage list
+            Removes user from subscription/usage list
         '''
         self._users.remove(uid)
         self._user_count -= 1
 
     def remove_review(self, review: T) -> None:
         '''
-            Adds review to service
+            Removes review from service
         '''
         self._reviews.remove(review)
         self._review_count -= 1
    
     def remove_upvote(self) -> None:
         '''
-            Adds upvote to service
+            Removes upvote from service
         '''
         self._upvotes -= 1
 
     def remove_tag(self, tag) -> None:
         '''
-            Adds tag to service
+            Removes tag from service
         '''
         self._tags.remove(tag)
+
+    def remove_owner(self, uid: str) -> None:
+        '''
+            Remove owner from ownership list
+        '''
+        self._owner.remove(uid)
+        self._owner_count -= 1
 
     ################################
     #   Get Methods

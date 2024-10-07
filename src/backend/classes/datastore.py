@@ -122,9 +122,9 @@ class Datastore:
             Returns with the given ID, or None if cannot find user
         '''
         for item in self.__store['users']:
-            if item.get_id() == eid:
+            if str(item['_id']) == eid:
                 return item
-        
+
         return None
 
     def num_users(self) -> int:
@@ -132,25 +132,25 @@ class Datastore:
             Returns number of users
         '''
         return self.__store['user_count']
-    
+
     def num_apis(self) -> int:
         '''
             Returns number of APIs
         '''
         return self.__store['api_count']
-    
+
     def num_tags(self) -> int:
         '''
             Returns number of tags
         '''
         return self.__store['tag_count']
-    
+
     def num_imgs(self) -> int:
         '''
             Returns number of imgs stored
         '''
         return self.__store['img_count']
-    
+
     ################################
     #   Datastore Deletion Methods
     ################################
