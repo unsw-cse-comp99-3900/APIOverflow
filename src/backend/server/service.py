@@ -6,7 +6,6 @@ from urllib.error import HTTPError, URLError
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
-from flask import jsonify
 
 # Ollama information
 OLLAMA_API_KEY = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBqE8KSc69XaJ4GwS37IXdk44ooXGidxNxeaKJNOUm4r'
@@ -145,6 +144,8 @@ def api_tag_filter(tags, providers):
 
     api_list = data_store.get_apis()
     filtered_apis = []
+    print("api list")
+    print(api_list)
 
     #query = input("Search")
 
@@ -156,36 +157,32 @@ def api_tag_filter(tags, providers):
     #    }    
     #    response = requests.post(url, json=data)
         
-    if len(tags) == 0:
+    if not tags:
+        print("no tags")
         # if they don't specify any tags, assume all APIs
         for api in api_list:
             filtered_apis.append(api)
     else:
+        print("got tags")
         # otherwise get all the APIs with the tag/s
         for api in api_list:
             for tag in tags:
                 if tag in api.get_tags():
                     filtered_apis.append(api)
     
-    if len(providers) != 0:
+    return_list = []
+    if providers:
         # if providers list is not empty
         for api in filtered_apis:
             for provider in providers:
-                if provider in api.get_owners():
+                if provider in api.get_owner():
+                    return_list.append(api)
                     break
-                # if we've reached here that means none of the providers specified
-                # were in the owners list. therefore, filter it
-                filtered_apis.remove(api)
-
-    # list of JSON objects
-    return_list = []
-    for api in filtered_apis:
-        return_list.append(jsonify(api_into_json(api)))
-    return filtered_apis
+    else:
+        print(filtered_apis)
+        return filtered_apis
+    
+    return return_list
 
 def list_apis():
-    api_list = data_store.get_apis()
-    return_list = []
-    for api in api_list:
-        return_list.append(jsonify(api_into_json(api)))
-    return return_list
+    return data_store.get_apis()

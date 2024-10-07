@@ -7,6 +7,7 @@ from src.backend.classes import Service
 from src.backend.app import app, register, add_service, login
 from src.backend.classes.models import User, db, UserCreate, LoginModel
 from src.backend.database import db_add_service
+import json
 
 # Create a test client
 client = TestClient(app)
@@ -25,23 +26,47 @@ def clear_all():
     db.services.delete_many({})
 
 @pytest.fixture
-def simple_filter(simple_user):
+def simple_user():
+    '''
+        Simulates a simple user registering their account then logging in
+    '''
+    # Clear data abse
     clear_all()
-    api1 = {
-                'name' : 'Googl3',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
-                'description' : 'This is a test API',
-                'tags' : ['API', 'Public']
-                }
 
+    # Register user
+    user_creds = {
+        "username" : "Tester 1",
+        "password" : "password",
+        "email" : "doxxed@gmail.com"
+    }
+
+    usable_data = {"token" : None}
+
+    response = client.post("/auth/register",
+                            json=user_creds)
+    assert response.status_code == SUCCESS
+
+    # Log into account
+    response = client.post("/auth/login",
+                           json=user_creds)
+    assert response.status_code == SUCCESS
+    usable_data['token'] = response.json()['access_token']
+
+    return usable_data
+
+def test_simple_filter(simple_user):
     response = client.post("/service/add",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api1)
-    
+                            headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json={
+                                'name' : 'Googl3',
+                                'icon_url' : '',
+                                'x_start' : 0,
+                                'x_end' : 0,
+                                'y_start' : 0,
+                                'y_end' : 0,
+                                'description' : 'This is a test API',
+                                'tags' : ['API', 'Public']
+                           })
     api2 = {
             'name' : 'Googl2',
             'icon_url' : '',
@@ -52,7 +77,6 @@ def simple_filter(simple_user):
             'description' : 'This is a test API',
             'tags' : ['API', 'Private']
             }
-    
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api2)
@@ -63,27 +87,12 @@ def simple_filter(simple_user):
                               'providers': []
                           })
     assert (response.status_code) == SUCCESS 
-    response_info = response.json 
-    assert response_info == [api2]
+    response_info = response.json()
+    assert response_info[0]['_name'] == api2['name']
+    assert response_info[0]['_tags'] == api2['tags']
 
-def simple_filter_multiple(simple_user):
-    clear_all()
-    api1 = {
-                'name' : 'Googl3',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
-                'description' : 'This is a test API',
-                'tags' : ['API', 'Public']
-                }
-
-    response = client.post("/service/add",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api1)
-    
-    api2 = {
+def test_simple_filter_multiple(simple_user):
+    api = {
             'name' : 'Googl2',
             'icon_url' : '',
             'x_start' : 0,
@@ -96,7 +105,33 @@ def simple_filter_multiple(simple_user):
     
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api2)
+                           json=api)
+    
+    response = client.post("/service/add",
+                                headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            json={
+                                    'name' : 'Googl3',
+                                    'icon_url' : '',
+                                    'x_start' : 0,
+                                    'x_end' : 0,
+                                    'y_start' : 0,
+                                    'y_end' : 0,
+                                    'description' : 'This is a test API',
+                                    'tags' : ['API', 'Public']
+                            })
+    api2 = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API']
+            }
+    response = client.post("/service/add",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        json=api2)
 
     response = client.get("/service/filter",
                           params={
@@ -104,28 +139,22 @@ def simple_filter_multiple(simple_user):
                               'providers': []
                           })
     assert (response.status_code) == SUCCESS 
-    response_info = response.json 
-    assert response_info == [api1, api2]
+    response_info = response.json()
+    found1 = False
+    found2 = False
+    found3 = False
+    for api in response_info:
+        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+            found1 = True 
+        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+            found2 = True
+        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+            found3 = True
+    assert found1 and found2 and found3
 
-def filter_same_name(simple_user):
-    clear_all()
-    api1 = {
-                'name' : 'Googl3',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
-                'description' : 'This is a test API',
-                'tags' : ['API', 'Public']
-                }
-
-    response = client.post("/service/add",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api1)
-    
-    api2 = {
-            'name' : 'Googl3',
+def test_providers(simple_user):
+    api = {
+            'name' : 'Googl2',
             'icon_url' : '',
             'x_start' : 0,
             'x_end' : 0,
@@ -137,55 +166,49 @@ def filter_same_name(simple_user):
     
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api2)
+                           json=api)
+    
+    response = client.post("/service/add",
+                                headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            json={
+                                    'name' : 'Googl3',
+                                    'icon_url' : '',
+                                    'x_start' : 0,
+                                    'x_end' : 0,
+                                    'y_start' : 0,
+                                    'y_end' : 0,
+                                    'description' : 'This is a test API',
+                                    'tags' : ['API', 'Public']
+                            })
+    api2 = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API']
+            }
+    response = client.post("/service/add",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        json=api2)
 
     response = client.get("/service/filter",
                           params={
-                              'tags': ['API'],
-                              'providers': []
+                              'tags': [],
+                              'providers': [simple_user['uid']]
                           })
     assert (response.status_code) == SUCCESS 
-    response_info = response.json 
-    assert response_info == [api1, api2]
-
-    def filter_non(simple_user):
-        clear_all()
-        api1 = {
-                    'name' : 'Googl3',
-                    'icon_url' : '',
-                    'x_start' : 0,
-                    'x_end' : 0,
-                    'y_start' : 0,
-                    'y_end' : 0,
-                    'description' : 'This is a test API',
-                    'tags' : ['API', 'Public']
-                    }
-
-        response = client.post("/service/add",
-                            headers={"Authorization": f"Bearer {simple_user['token']}"},
-                            json=api1)
-        
-        api2 = {
-                'name' : 'Googl2',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
-                'description' : 'This is a test API',
-                'tags' : ['API', 'Private']
-                }
-        
-        response = client.post("/service/add",
-                            headers={"Authorization": f"Bearer {simple_user['token']}"},
-                            json=api2)
-
-        response = client.get("/service/filter",
-                            params={
-                                'tags': ['testing1'],
-                                'providers': []
-                            })
-        assert (response.status_code) == SUCCESS 
-        response_info = response.json 
-        assert response_info == []
-
+    response_info = response.json()
+    found1 = False
+    found2 = False
+    found3 = False
+    for api in response_info:
+        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+            found1 = True 
+        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+            found2 = True
+        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+            found3 = True
+    assert found1 and found2 and found3

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Request, HTTPException
+from fastapi import FastAPI, Depends, Request, HTTPException, Query
 from fastapi_login import LoginManager
 from pydantic import BaseModel
 from pymongo import MongoClient
@@ -118,11 +118,10 @@ async def guest_route(user: User = Depends(manager), role: str = Depends(role_re
     return {"message": "Welcome, Guest!"}
 
 @app.get("/service/filter")
-async def filter(request: FilterRequest):
-    # tags is a list of the tag name
-    # providers is a list of provider ids
-    tags = request.tags
-    providers = request.providers 
+async def filter(
+    tags: Optional[List[str]] = Query(None), 
+    providers: Optional[List[str]] = Query(None)
+):
     return api_tag_filter(tags, providers)
 
 @app.get("/service/apis")
