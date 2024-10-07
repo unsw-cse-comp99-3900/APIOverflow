@@ -160,20 +160,19 @@ def api_tag_filter(tags, providers) -> List:
     if len(tags) == 0:
         # if they don't specify any tags, assume all APIs
         for api in api_list:
-
             filtered_apis.append(api)
     else:
         # otherwise get all the APIs with the tag/s
         for api in api_list:
             for tag in tags:
-                if tag in api.tags:
+                if tag in api.get_tags():
                     filtered_apis.append(api)
     
     if len(providers) != 0:
         # if providers list is not empty
         for api in filtered_apis:
             for provider in providers:
-                if provider in api.owners:
+                if provider in api.get_owners():
                     break
                 # if we've reached here that means none of the providers specified
                 # were in the owners list. therefore, filter it
