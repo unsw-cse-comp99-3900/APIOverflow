@@ -25,7 +25,8 @@ async def upload_wrapper(file: UploadFile) -> str:
     else:
         path = IMAGE_PATH
 
-    path_ext = os.path.splitext(f"/{file.filename}")[0] + f"_{data_store.num_docs()}.pdf"
+    path_name = os.path.splitext(f"/{file.filename}")
+    path_ext = f"{path_name[0]}_{data_store.num_docs()}{path_name[1]}"
     path += path_ext
 
     try:
