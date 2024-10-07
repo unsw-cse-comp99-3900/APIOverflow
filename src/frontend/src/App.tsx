@@ -12,7 +12,6 @@ import ApiPage from './pages/ApiPage';
 import EditApiPage from './pages/EditApiPage';
 import CategoriesPage from './pages/CategoriesPage';
 import { deleteApi } from './services/apiServices';
-import { apiLoader } from './utils/loaders';
 
 
 
@@ -25,11 +24,7 @@ const App = () => {
         <Route path='/add-api' element={<AddApiPage />} />
         <Route path='/edit-api' element={<EditApiPage />} />
         <Route path='/categories' element={<CategoriesPage />} />
-        <Route
-          path='/apis/:id' 
-          element={<ApiPage deleteApi={deleteApi}/>}
-          loader={apiLoader}
-        />
+        <Route path='/apis/:id' element={<ApiPage deleteApi={deleteApi}/>}/>
       </Route>
     )
       
