@@ -9,7 +9,6 @@ import { DeleteApiService } from '../types/apiServiceTypes';
 const ApiPage = ({ deleteApi }: DeleteApiService) => {
   const navigate = useNavigate();
   const api = useLoaderData() as Api;
-  console.log("hi");
 
   const onDeleteClick = (api:Api) => {
     const confirm = window.confirm(

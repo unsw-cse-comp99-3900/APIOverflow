@@ -1,14 +1,22 @@
 import { Api, NewApi} from "../types/apiTypes";
 
+let baseUrl = process.env.REACT_APP_API_BASE_URL
+
+export const getApis = async () => {
+    const res = await fetch(`${baseUrl}/apis`);
+    const data = await res.json();
+    return data;
+}
+
 export const deleteApi = async (api:Api) => {
-    const res = await fetch(`/api/${api.id}`, {
+    const res = await fetch(`${baseUrl}/apis/${api.id}`, {
       method: 'DELETE',
     });
     return;
 };
 
 const addApi = async (newApi: NewApi) => {
-  const res = await fetch('/api', {
+  const res = await fetch(`${baseUrl}/apis`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -20,7 +28,7 @@ const addApi = async (newApi: NewApi) => {
 };
 
 const updateApi = async (api:Api) => {
-    const res = await fetch(`/api/${api.id}`, {
+    const res = await fetch(`${baseUrl}/apis/${api.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

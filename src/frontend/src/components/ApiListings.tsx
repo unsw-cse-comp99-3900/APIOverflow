@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import {Api} from '../types/apiTypes';
 import ApiListing from './ApiListing';
 import Spinner from './Spinner';
+import { getApis } from '../services/apiServices';
 
 const ApiListings = ({ isHome = false }) => {
 
@@ -10,14 +11,10 @@ const ApiListings = ({ isHome = false }) => {
 
   useEffect(() => {
     const fetchApis = async () => {
-      const baseUrl = process.env.REACT_APP_API_BASE_URL;
-      const apiUrl = isHome
-        ? `${baseUrl}/apis?_limit=3`
-        : `${baseUrl}/apis`;
       try {
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-        setApis(data);
+        const data = await getApis();
+        const limitedData = isHome ? data.slice(0, 3) : data;
+        setApis(limitedData);
       } catch (error) {
         console.log('Error fetching data', error);
       } finally {
