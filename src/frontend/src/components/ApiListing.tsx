@@ -62,7 +62,7 @@ const ApiListing = ({
 
         {isMyApis && (
           <div className="absolute top-8 right-8 flex space-x-2">
-            <EditApiButton />
+            <EditApiButton apiId={api.id}/>
             <DeleteApiButton apiId={api.id} onDelete={onDelete} />
           </div>
         )}

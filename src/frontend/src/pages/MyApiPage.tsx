@@ -68,7 +68,7 @@ const MyApiPage = () => {
 
                   {/* Conditionally render buttons if api is available */}
                   <div className="absolute top-8 right-8 flex space-x-2">
-                    <EditApiButton />
+                    <EditApiButton apiId={api.id}/>
                     {api?.id && (
                       <DeleteApiButton
                         apiId={api.id}
