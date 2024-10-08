@@ -1,6 +1,6 @@
 import React from "react";
-import { Link } from 'react-router-dom';
-import { FaPen } from 'react-icons/fa';
+import { Link } from "react-router-dom";
+import { FaPen } from "react-icons/fa";
 import { Api } from "../types/apiTypes";
 
 const EditApiButton = () => {

@@ -83,7 +83,8 @@ const ApiPage = () => {
               {/* Reviews, Description, Documentation */}
               <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
                 <ApiReviews />
-                <ApiDescription api={api} /> {/* Pass api only when it's not null */}
+                <ApiDescription api={api} />{" "}
+                {/* Pass api only when it's not null */}
                 <ApiDocs />
               </div>
             </>

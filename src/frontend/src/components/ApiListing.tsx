@@ -46,7 +46,9 @@ const ApiListing = ({
 
           <div className="border border-gray-100 mx-4 mb-5"></div>
 
-          <div className="mx-4 mb-2 text-justify break-words text-gray-700 ">{description}</div>
+          <div className="mx-4 mb-2 text-justify break-words text-gray-700 ">
+            {description}
+          </div>
 
           {description.length > 90 && (
             <button

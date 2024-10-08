@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const AddApiPage = () => {
-  return (
-    <div>AddApiPage</div>
-  )
-}
+  return <div>AddApiPage</div>;
+};
 
-export default AddApiPage
+export default AddApiPage;

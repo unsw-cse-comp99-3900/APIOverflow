@@ -1,9 +1,9 @@
-import ClipLoader from 'react-spinners/PacmanLoader';
-import { FC } from 'react';
+import ClipLoader from "react-spinners/PacmanLoader";
+import { FC } from "react";
 
 const override = {
-  display: 'block',
-  margin: '100px auto',
+  display: "block",
+  margin: "100px auto",
 };
 
 interface SpinnerProps {
@@ -13,7 +13,7 @@ interface SpinnerProps {
 const Spinner: FC<SpinnerProps> = ({ loading }) => {
   return (
     <ClipLoader
-      color='#4338ca'
+      color="#4338ca"
       loading={loading}
       cssOverride={override}
       size={50}

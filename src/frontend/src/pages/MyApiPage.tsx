@@ -76,7 +76,10 @@ const MyApiPage = () => {
                   <div className="absolute top-8 right-8 flex space-x-2">
                     <EditApiButton />
                     {api?.id && (
-                      <DeleteApiButton apiId={api.id} apisRoute="/profile/myApis" />
+                      <DeleteApiButton
+                        apiId={api.id}
+                        apisRoute="/profile/myApis"
+                      />
                     )}
                   </div>
                 </div>
@@ -85,7 +88,8 @@ const MyApiPage = () => {
               {/* Reviews, Description, Documentation */}
               <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
                 <ApiReviews />
-                <ApiDescription api={api} /> {/* Pass api only when it's not null */}
+                <ApiDescription api={api} />{" "}
+                {/* Pass api only when it's not null */}
                 <ApiDocs />
               </div>
             </>
