@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, Request, HTTPException, Query, UploadFile, File, Form
 from fastapi_login import LoginManager
 from pymongo import MongoClient
+from fastapi.middleware.cors import CORSMiddleware
 from passlib.context import CryptContext
 from src.backend.classes.models import *
 from src.backend.server.service import *
@@ -11,6 +12,20 @@ from src.backend.database import db
 
 app = FastAPI()
 
+# Define allowed origins
+origins = [
+    "http://localhost:3000",  # Allow your frontend to make requests
+    # Add more origins here if needed
+]
+
+# Add the CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allow only specified origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 manager = _manager.get_manager()
 
