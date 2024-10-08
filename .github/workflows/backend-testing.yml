@@ -15,6 +15,8 @@ jobs:
   test:
     name: Run Backend Tests
     runs-on: ubuntu-latest
+    env:
+      COMPOSE_FILE: .ci/docker-compose.yml
 
     steps: 
     - uses: actions/checkout@v4
