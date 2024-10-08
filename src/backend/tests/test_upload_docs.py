@@ -74,7 +74,8 @@ def two_users():
                 'y_start' : 0,
                 'y_end' : 0,
                 'description' : 'This is a test API',
-                'tags' : ['API']
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
                 }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {usable_data['creator']}"},

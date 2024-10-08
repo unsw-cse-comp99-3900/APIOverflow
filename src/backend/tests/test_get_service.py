@@ -66,7 +66,8 @@ def test_get_apis(simple_user):
                 'y_start' : 0,
                 'y_end' : 0,
                 'description' : 'This is a test API',
-                'tags' : ['API']
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
                 }
     
     api_info2 = {
@@ -77,7 +78,8 @@ def test_get_apis(simple_user):
                 'y_start' : 0,
                 'y_end' : 0,
                 'description' : 'This is a test API',
-                'tags' : ['API']
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
                 }
     
     response = client.post("/service/add",
