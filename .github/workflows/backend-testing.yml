@@ -26,5 +26,5 @@ jobs:
       run: docker compose up
 
     - name: Exit
-      if success() || failure()
+      if: success() || failure()
       run: docker compose down
