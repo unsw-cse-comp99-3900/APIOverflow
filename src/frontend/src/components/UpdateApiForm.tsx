@@ -1,0 +1,177 @@
+import { PhotoIcon } from "@heroicons/react/24/solid";
+import React, { useEffect, useState } from "react";
+import { Api, NewApi } from "../types/apiTypes";
+import { getApi, updateApi, addApi } from "../services/apiServices";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
+const EditApiForm = ({ apiId }: { apiId?: number }) => {
+  const [api, setApi] = useState<Api | null>(null);
+  const navigate = useNavigate();
+  const [apiName, setApiName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  console.log(api?.description)
+
+  useEffect(() => {
+    const fetchApi = async () => {
+      if (!apiId) {
+        return;
+      }
+      try {
+        const data = await getApi(Number(apiId));
+        setApi(data);
+        setApiName(data.name);
+        setDescription(data.description);
+      } catch (error) {
+        console.log("Error fetching data", error);
+        toast.error("Error loading API data");
+      }
+    };
+    fetchApi();
+  }, []); // Ensure the effect runs whenever the id changes
+
+
+  const submitApiUpdate = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+		if (apiId) {
+      const updatedApi:Api = {
+        id: Number(apiId),
+        name: apiName,
+        description,
+        icon_url: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
+        owner: "sample_owner",
+        tags: ["sample_tag"],
+      };
+      updateApi(updatedApi);
+    }else{
+      const newApi:NewApi = {
+        name: apiName,
+        description,
+        icon_url: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
+        owner: "sample_owner",
+        tags: ["sample_tag"],
+      }; 
+      addApi(newApi);
+    }
+
+    toast.success('Job Updated Successfully');
+
+    navigate(`/profile/my-apis/${apiId}`);
+  };
+
+
+  return (
+    <div className="container-xl lg:container mx-auto px-10">
+      <h2 className="text-3xl font-bold text-blue-800 mb-6 mt-6 text-left">
+        {apiId ? `Edit API` : "Add API"}
+      </h2>
+
+      <form onSubmit={submitApiUpdate}>
+        <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
+          <div className="mt-10 grid gap-x-6 gap-y-8 grid-cols-6">
+            <div className="col-span-full flex flex-col items-center mt-6 -mx-2">
+              <button
+                type="button"
+                className="rounded-full bg-white h-56 w-56 px-5 py-5 ring-2 ring-inset ring-gray-300 hover:bg-gray-50 flex justify-center items-center"
+              >
+                <PhotoIcon className="h-32 w-32 text-gray-400" />
+              </button>
+            </div>
+
+            <div className="col-span-full">
+              <label
+                htmlFor="apiName"
+                className="block text-2xl font-semibold py-6 leading-6 text-blue-800"
+              >
+                Name
+              </label>
+
+              <div className="mt-2">
+                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 max-w-md">
+                  <input
+                    id="apiName"
+                    name="apiName"
+                    required
+                    type="text"
+                    onChange={(e) => setApiName(e.target.value)}
+                    placeholder="MyAwesomeAPI"
+                    autoComplete="username"
+                    defaultValue={api?.name}
+                    className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 focus:font-semibold text-md leading-6"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="col-span-full">
+              <label
+                htmlFor="description"
+                className="block text-2xl font-semibold py-4 leading-6 text-blue-800"
+              >
+                Description
+              </label>
+              <div className="mt-2">
+                <textarea
+                  id="description"
+                  name="description"
+                  placeholder="Write a few sentences about your API."
+                  required
+                  onChange={(e) => setDescription(e.target.value)}
+                  value={description}
+                  className="block w-full rounded-md border-0 py-2 pl-3 min-h-10 text-black text-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
+                  defaultValue={api?.description}
+                />
+              </div>
+            </div>
+
+            <div className="col-span-full">
+              <label
+                htmlFor="Documentation"
+                className="block text-2xl font-semibold py-6 leading-6 text-blue-800"
+              >
+                Documentations
+              </label>
+              <div className="mt-2 flex justify-center rounded-lg border border-dashed border-blue-800/25 px-6 py-10">
+                <div className="text-center">
+                  <PhotoIcon
+                    aria-hidden="true"
+                    className="mx-auto h-12 w-12 text-gray-300"
+                  />
+                  <div className="mt-4 flex text-2xl leading-6 text-gray-600">
+                    <label
+                      htmlFor="file-upload"
+                      className="relative cursor-pointer hover:underline rounded-md bg-white font-semibold text-indigo-600 hover:text-indigo-500"
+                    >
+                      <span>Upload a file</span>
+                      <input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                      />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs leading-5 pt-1 text-gray-600">
+                    PDF up to 10MB
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center justify-end gap-x-6">
+            <button
+              type="submit"
+              className="rounded-md bg-blue-800 px-3 py-2 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default EditApiForm;
