@@ -197,7 +197,7 @@ def test_providers(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': [],
-                              'providers': [simple_user['uid']]
+                              'providers': ['0']
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -212,3 +212,361 @@ def test_providers(simple_user):
         if "Googl2" == api['_name'] and ['API'] == api['_tags']:
             found3 = True
     assert found1 and found2 and found3
+
+def test_providers_with_tags(simple_user):
+    api = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API', 'Private']
+            }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api)
+    
+    response = client.post("/service/add",
+                                headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            json={
+                                    'name' : 'Googl3',
+                                    'icon_url' : '',
+                                    'x_start' : 0,
+                                    'x_end' : 0,
+                                    'y_start' : 0,
+                                    'y_end' : 0,
+                                    'description' : 'This is a test API',
+                                    'tags' : ['API', 'Public']
+                            })
+    api2 = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API']
+            }
+    response = client.post("/service/add",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        json=api2)
+
+    response = client.get("/service/filter",
+                          params={
+                              'tags': ['Private'],
+                              'providers': ['0']
+                          })
+    assert (response.status_code) == SUCCESS 
+    response_info = response.json()
+    found1 = False
+    found2 = False
+    found3 = False
+    print(response_info)
+    for api in response_info:
+        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+            found1 = True 
+        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+            found2 = True
+        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+            found3 = True
+    assert not found1 and found2 and not found3
+
+def test_invalid_providers(simple_user):
+    api = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API', 'Private']
+            }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api)
+    
+    response = client.post("/service/add",
+                                headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            json={
+                                    'name' : 'Googl3',
+                                    'icon_url' : '',
+                                    'x_start' : 0,
+                                    'x_end' : 0,
+                                    'y_start' : 0,
+                                    'y_end' : 0,
+                                    'description' : 'This is a test API',
+                                    'tags' : ['API', 'Public']
+                            })
+    api2 = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API']
+            }
+    response = client.post("/service/add",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        json=api2)
+
+    response = client.get("/service/filter",
+                          params={
+                              'tags': ['Private'],
+                              'providers': ['5']
+                          })
+    assert (response.status_code) == SUCCESS 
+    response_info = response.json()
+    found1 = False
+    found2 = False
+    found3 = False
+    print(response_info)
+    for api in response_info:
+        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+            found1 = True 
+        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+            found2 = True
+        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+            found3 = True
+    assert not found1 and not found2 and not found3
+
+def test_providers_with_tags2(simple_user):
+    api = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API', 'Private']
+            }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api)
+    
+    response = client.post("/service/add",
+                                headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            json={
+                                    'name' : 'Googl3',
+                                    'icon_url' : '',
+                                    'x_start' : 0,
+                                    'x_end' : 0,
+                                    'y_start' : 0,
+                                    'y_end' : 0,
+                                    'description' : 'This is a test API',
+                                    'tags' : ['API', 'Public']
+                            })
+    api2 = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['NOT API']
+            }
+    response = client.post("/service/add",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        json=api2)
+
+    response = client.get("/service/filter",
+                          params={
+                              'tags': ['API'],
+                              'providers': ['0']
+                          })
+    assert (response.status_code) == SUCCESS 
+    response_info = response.json()
+    found1 = False
+    found2 = False
+    found3 = False
+    print(response_info)
+    for api in response_info:
+        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+            found1 = True 
+        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+            found2 = True
+        if "Googl2" == api['_name'] and ['NOT API'] == api['_tags']:
+            found3 = True
+    assert found1 and found2 and not found3
+
+def test_providers_with_tags_multiple(simple_user):
+
+    user_creds = {
+        "username" : "Tester 2",
+        "password" : "passwordsad",
+        "email" : "doxxed2@gmail.com"
+    }
+
+    usable_data2 = {"token" : None}
+
+    response = client.post("/auth/register",
+                            json=user_creds)
+    assert response.status_code == SUCCESS
+
+    # Log into account
+    response = client.post("/auth/login",
+                           json=user_creds)
+    assert response.status_code == SUCCESS
+    usable_data2['token'] = response.json()['access_token']
+
+    api = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API', 'Private']
+            }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api)
+    
+    response = client.post("/service/add",
+                                headers={"Authorization": f"Bearer {usable_data2['token']}"},
+                            json={
+                                    'name' : 'Googl3',
+                                    'icon_url' : '',
+                                    'x_start' : 0,
+                                    'x_end' : 0,
+                                    'y_start' : 0,
+                                    'y_end' : 0,
+                                    'description' : 'This is a test API',
+                                    'tags' : ['API', 'Public']
+                            })
+    api2 = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API']
+            }
+    
+    response = client.post("/service/add",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        json=api2)
+
+    response = client.get("/service/filter",
+                          params={
+                              'tags': ['API'],
+                              'providers': ['0', '1']
+                          })
+    assert (response.status_code) == SUCCESS 
+    response_info = response.json()
+    found1 = False
+    found2 = False
+    found3 = False
+
+    #api1 is simple user
+    #api2 is user2
+    #api3 is simple user
+
+    for api in response_info:
+        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+            found1 = True 
+        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+            found2 = True
+        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+            found3 = True
+    assert found1 and found2 and found3
+
+def test_providers_with_tags_multiple2(simple_user):
+
+    user_creds = {
+        "username" : "Tester 2",
+        "password" : "passwordsad",
+        "email" : "doxxed2@gmail.com"
+    }
+
+    usable_data2 = {"token" : None}
+
+    response = client.post("/auth/register",
+                            json=user_creds)
+    assert response.status_code == SUCCESS
+
+    # Log into account
+    response = client.post("/auth/login",
+                           json=user_creds)
+    assert response.status_code == SUCCESS
+    usable_data2['token'] = response.json()['access_token']
+
+    api = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API', 'Private']
+            }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api)
+    
+    response = client.post("/service/add",
+                                headers={"Authorization": f"Bearer {usable_data2['token']}"},
+                            json={
+                                    'name' : 'Googl3',
+                                    'icon_url' : '',
+                                    'x_start' : 0,
+                                    'x_end' : 0,
+                                    'y_start' : 0,
+                                    'y_end' : 0,
+                                    'description' : 'This is a test API',
+                                    'tags' : ['NOT API', 'Public']
+                            })
+    api2 = {
+            'name' : 'Googl2',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API']
+            }
+    
+    response = client.post("/service/add",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        json=api2)
+
+    response = client.get("/service/filter",
+                          params={
+                              'tags': ['NOT API'],
+                              'providers': ['0']
+                          })
+    assert (response.status_code) == SUCCESS 
+    response_info = response.json()
+    found1 = False
+    found2 = False
+    found3 = False
+
+    #api1 is simple user
+    #api2 is user2
+    #api3 is simple user
+
+    for api in response_info:
+        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+            found1 = True 
+        if "Googl2" == api['_name'] and ['NOT API', 'Private'] == api['_tags']:
+            found2 = True
+        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+            found3 = True
+    assert not found1 and not found2 and not found3

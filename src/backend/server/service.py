@@ -144,8 +144,6 @@ def api_tag_filter(tags, providers):
 
     api_list = data_store.get_apis()
     filtered_apis = []
-    print("api list")
-    print(api_list)
 
     #query = input("Search")
 
@@ -170,10 +168,14 @@ def api_tag_filter(tags, providers):
                 if tag in api.get_tags():
                     filtered_apis.append(api)
     
+    print(filtered_apis)
+
     return_list = []
     if providers:
         # if providers list is not empty
+        print("got providers")
         for api in filtered_apis:
+            print(api.get_owner())
             for provider in providers:
                 if provider in api.get_owner():
                     return_list.append(api)
@@ -182,6 +184,8 @@ def api_tag_filter(tags, providers):
         print(filtered_apis)
         return filtered_apis
     
+    print("shoudl be here")
+    print(return_list)
     return return_list
 
 def list_apis():
