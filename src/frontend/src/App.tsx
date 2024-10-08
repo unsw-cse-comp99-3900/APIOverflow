@@ -26,8 +26,9 @@ const App = () => {
         <Route path="/edit-api" element={<EditApiPage />} />
 
         <Route path="/profile" element={<UserProfileLayout />}>
-          <Route path="/profile/myApis" element={<MyApisPage />} />
-          <Route path="/profile/myApis/:id" element={<MyApiPage />} />
+          <Route path="/profile/my-apis" element={<MyApisPage />} />
+          <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
+          <Route path="/profile/add-api" element={<AddApiPage />} />
         </Route>
       </Route>
     )

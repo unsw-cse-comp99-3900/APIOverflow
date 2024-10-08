@@ -9,6 +9,7 @@ import Tag from "../components/Tag";
 import ApiReviews from "../components/ApiReviews";
 import ApiDescription from "../components/ApiDescription";
 import ApiDocs from "../components/ApiDocs";
+import BackButton from "../components/BackButton";
 
 const ApiPage = () => {
   const [api, setApi] = useState<Api | null>(null);
@@ -36,15 +37,8 @@ const ApiPage = () => {
   return (
     <>
       {/* Main Layout */}
-      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white py-10 px-6">
-        <div className="container m-auto py-6 px-6">
-          <Link
-            to="/apis"
-            className="text-blue-800 hover:text-indigo-500 hover:underline font-bold flex items-center"
-          >
-            <FaArrowLeft className="mr-2" /> Back
-          </Link>
-        </div>
+      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white px-6">
+      <BackButton toUrl="/apis" />
         <FetchStatus loading={loading} error={error} data={api}>
           {api && (
             <>

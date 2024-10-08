@@ -26,7 +26,7 @@ const Navbar = () => {
                 <NavLink to="/apis" className={linkClass}>
                   <strong>APIs</strong>
                 </NavLink>
-                <NavLink to="/add-api" className={linkClass}>
+                <NavLink to="/profile/add-api" className={linkClass}>
                   <strong>Add API</strong>
                 </NavLink>
               </div>

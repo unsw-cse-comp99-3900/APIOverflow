@@ -29,12 +29,10 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
   };
 
   return (
-    <section className="bg-gradient-to-b from-blue-50 to-white px-4 py-10">
-      <div className="container-xl lg:container m-auto">
-        <h2 className="text-3xl font-bold text-blue-800 mb-6 text-left">
+      <div className="container-xl lg:container mx-auto px-10">
+        <h2 className="text-3xl font-bold text-blue-800 mb-6 mt-6 text-left">
           {isMyAPis ? "My APIs" : "Browse APIs"}
         </h2>
-
         {loading ? (
           <Spinner loading={loading} />
         ) : (
@@ -50,7 +48,6 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
           </div>
         )}
       </div>
-    </section>
   );
 };
 

@@ -69,7 +69,7 @@ const ApiListing = ({
 
         <div className="absolute bottom-8 right-8">
           <Link
-            to={isMyApis ? `/profile/myApis/${api.id}` : `/apis/${api.id}`}
+            to={isMyApis ? `/profile/my-apis/${api.id}` : `/apis/${api.id}`}
             className="h-[36px] bg-blue-800 hover:bg-amber-200 text-white hover:text-black font-semibold hover:underline px-4 py-2 rounded-lg text-center text-sm"
           >
             Read More

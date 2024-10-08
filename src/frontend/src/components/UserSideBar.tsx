@@ -1,5 +1,5 @@
 import React from "react";
-import { FaSignOutAlt, FaCode } from "react-icons/fa";
+import { FaSignOutAlt, FaCode, FaPlus, FaPlusCircle, FaPlusSquare,FaRegPlusSquare } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 const UserSideBar = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -25,15 +25,23 @@ const UserSideBar = () => {
       <div className="border border-gray-100 mb-5 mt-5"></div>
       <div className="flex flex-col justify-between flex-1">
         <nav>
-          {/* MyApis Link */}
-          <NavLink to="/profile/myApis" className={linkClass}>
+          {/* Functional Tabs */}
+          <NavLink to="/profile/my-apis" className={linkClass}>
             <span className="ml-3 font-medium flex items-center">
-              <FaCode className="mr-2" /> MyAPIs
+              <FaCode className="mr-2" /> My APIs
             </span>
           </NavLink>
-          <NavLink to="/profile/Logout" className={linkClass}>
+          <NavLink to="/profile/add-api" className={linkClass}>
             <span className="ml-3 font-medium flex items-center">
-              <FaSignOutAlt className="mr-2" /> LogOut
+              <FaRegPlusSquare className="mr-2" /> New API
+            </span>
+          </NavLink>
+
+          {/* Setting tabs */}
+          <div className="border border-gray-100 mb-5 mt-5"></div>
+          <NavLink to="/profile/Logout" className={linkClass}>
+            <span className="ml-3 font-medium flex items-center ">
+              <FaSignOutAlt className="mr-2" /> Log Out
             </span>
           </NavLink>
         </nav>
