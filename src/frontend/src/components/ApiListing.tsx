@@ -46,7 +46,9 @@ const ApiListing = ({
 
           <div className="border border-gray-100 mx-4 mb-5"></div>
 
-          <div className="mx-4 mb-2 text-justify break-words text-gray-700 ">{description}</div>
+          <div className="mx-4 mb-2 text-justify break-words text-gray-700 ">
+            {description}
+          </div>
 
           {description.length > 90 && (
             <button
@@ -60,14 +62,14 @@ const ApiListing = ({
 
         {isMyApis && (
           <div className="absolute top-8 right-8 flex space-x-2">
-            <EditApiButton />
+            <EditApiButton apiId={api.id}/>
             <DeleteApiButton apiId={api.id} onDelete={onDelete} />
           </div>
         )}
 
         <div className="absolute bottom-8 right-8">
           <Link
-            to={isMyApis ? `/profile/myApis/${api.id}` : `/apis/${api.id}`}
+            to={isMyApis ? `/profile/my-apis/${api.id}` : `/apis/${api.id}`}
             className="h-[36px] bg-blue-800 hover:bg-amber-200 text-white hover:text-black font-semibold hover:underline px-4 py-2 rounded-lg text-center text-sm"
           >
             Read More

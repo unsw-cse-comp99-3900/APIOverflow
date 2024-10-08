@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Api } from "../types/apiTypes";
 import { getApi } from "../services/apiServices";
@@ -9,6 +8,7 @@ import Tag from "../components/Tag";
 import ApiReviews from "../components/ApiReviews";
 import ApiDescription from "../components/ApiDescription";
 import ApiDocs from "../components/ApiDocs";
+import BackButton from "../components/BackButton";
 
 const ApiPage = () => {
   const [api, setApi] = useState<Api | null>(null);
@@ -18,7 +18,13 @@ const ApiPage = () => {
 
   useEffect(() => {
     const fetchApi = async () => {
+      if (!id) {
+        setError("Invalid API ID");
+        setLoading(false);
+        return;
+      }
       try {
+        console.log(id)
         const data = await getApi(Number(id));
         setApi(data);
       } catch (error) {
@@ -36,15 +42,8 @@ const ApiPage = () => {
   return (
     <>
       {/* Main Layout */}
-      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white py-10 px-6">
-        <div className="container m-auto py-6 px-6">
-          <Link
-            to="/apis"
-            className="text-blue-800 hover:text-indigo-500 hover:underline font-bold flex items-center"
-          >
-            <FaArrowLeft className="mr-2" /> Back to Api Listings
-          </Link>
-        </div>
+      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white px-6">
+      <BackButton toUrl="/apis" />
         <FetchStatus loading={loading} error={error} data={api}>
           {api && (
             <>
@@ -83,7 +82,8 @@ const ApiPage = () => {
               {/* Reviews, Description, Documentation */}
               <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
                 <ApiReviews />
-                <ApiDescription api={api} /> {/* Pass api only when it's not null */}
+                <ApiDescription api={api} />{" "}
+                {/* Pass api only when it's not null */}
                 <ApiDocs />
               </div>
             </>

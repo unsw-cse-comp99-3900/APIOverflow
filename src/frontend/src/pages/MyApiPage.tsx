@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Api } from "../types/apiTypes";
 import { getApi } from "../services/apiServices";
@@ -11,6 +10,7 @@ import DeleteApiButton from "../components/DeleteApiButton";
 import ApiReviews from "../components/ApiReviews";
 import ApiDescription from "../components/ApiDescription";
 import ApiDocs from "../components/ApiDocs";
+import BackButton from "../components/BackButton";
 
 const MyApiPage = () => {
   const [api, setApi] = useState<Api | null>(null);
@@ -37,15 +37,8 @@ const MyApiPage = () => {
 
   return (
     <>
-      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white py-10 px-6">
-        <div className="container m-auto py-6 px-6">
-          <Link
-            to="/profile/myApis"
-            className="text-blue-800 hover:text-indigo-500 hover:underline font-bold flex items-center"
-          >
-            <FaArrowLeft className="mr-2" /> Back to Api Listings
-          </Link>
-        </div>
+      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white px-6">
+        <BackButton toUrl="/profile/my-apis" />
 
         {/* Use FetchStatus for loading and error handling */}
         <FetchStatus loading={loading} error={error} data={api}>
@@ -74,9 +67,12 @@ const MyApiPage = () => {
 
                   {/* Conditionally render buttons if api is available */}
                   <div className="absolute top-8 right-8 flex space-x-2">
-                    <EditApiButton />
+                    <EditApiButton apiId={api.id}/>
                     {api?.id && (
-                      <DeleteApiButton apiId={api.id} apisRoute="/profile/myApis" />
+                      <DeleteApiButton
+                        apiId={api.id}
+                        apisRoute="/profile/myApis"
+                      />
                     )}
                   </div>
                 </div>
@@ -85,7 +81,8 @@ const MyApiPage = () => {
               {/* Reviews, Description, Documentation */}
               <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
                 <ApiReviews />
-                <ApiDescription api={api} /> {/* Pass api only when it's not null */}
+                <ApiDescription api={api} />{" "}
+                {/* Pass api only when it's not null */}
                 <ApiDocs />
               </div>
             </>
