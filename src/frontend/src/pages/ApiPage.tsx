@@ -42,7 +42,7 @@ const ApiPage = () => {
             to="/apis"
             className="text-blue-800 hover:text-indigo-500 hover:underline font-bold flex items-center"
           >
-            <FaArrowLeft className="mr-2" /> Back to Api Listings
+            <FaArrowLeft className="mr-2" /> Back
           </Link>
         </div>
         <FetchStatus loading={loading} error={error} data={api}>
