@@ -5,22 +5,15 @@ on:
     branches: [ "main" ]
 
 jobs:
-  frontend-tests:
+  test:
+    name: Run Frontend Tests [todo]
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-    steps:
-        - name: Setup Environment
-          uses: actions/checkout@v4
 
-        - name: Install Node.js
-          uses: actions/setup-node@v4
-          with:
-              node-version: '20'
+    steps: 
+    - uses: actions/checkout@v4
 
-        - name: Install Dependencies
-          run: npm install
-
-        - name: Run Tests
-          run: npm test
+    - name: Build docker container
+      run: docker compose build
+    
+    - name: Run tests
+      run: docker compose up
