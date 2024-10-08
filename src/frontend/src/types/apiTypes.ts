@@ -4,6 +4,7 @@ export interface Api {
   description: string;
   owner: string;
   icon_url: string;
+  endpoint: string;
   tags: string[];
 }
 

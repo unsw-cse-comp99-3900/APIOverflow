@@ -94,6 +94,10 @@ async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
     doc_id = request['doc_id']
     await upload_docs_wrapper(sid, user['id'], doc_id)
     return 200
+    
+@app.get("/service/apis")
+async def view_apis():
+    return list_apis()
 
 @app.get("/service/my_services")
 async def get_user_apis(user: User = Depends(manager)):
@@ -150,9 +154,7 @@ async def filter(
 ):
     return api_tag_filter(tags, providers)
 
-@app.get("/service/apis")
-async def view_apis():
-    return list_apis()
+
 
 
 if __name__ == "__main__":
