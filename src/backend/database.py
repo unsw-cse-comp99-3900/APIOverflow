@@ -1,11 +1,21 @@
 from pymongo import MongoClient
 from typing import TypeVar, Optional
+from dotenv import load_dotenv
+import os
 
 T = TypeVar("T")
 K = TypeVar("K")
 
+load_dotenv()
 # Initialize MongoDB client
-client = MongoClient("mongodb://mongodb:27017/")
+# client = MongoClient("mongodb://mongodb:27017/", connect=False)
+
+mongo_env = os.getenv('MONGO_ENV', 'local')
+
+if mongo_env == 'docker':
+    client = MongoClient("mongodb://host.docker.internal:27017/", connect=False)
+else:
+    client = MongoClient("mongodb://localhost:27017/", connect=False)
 
 global db
 db = client.local

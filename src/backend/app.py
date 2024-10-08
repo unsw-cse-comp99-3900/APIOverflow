@@ -1,30 +1,41 @@
-from fastapi import FastAPI, Depends, Request, HTTPException
+from fastapi import FastAPI, Depends, Request, HTTPException, UploadFile, File, Form
 from fastapi_login import LoginManager
-from pydantic import BaseModel
 from pymongo import MongoClient
 from passlib.context import CryptContext
 from src.backend.classes.models import *
 from src.backend.server.service import *
 from src.backend.classes.datastore import data_store as ds
 from src.backend.server.auth import *
-from src.backend.classes.Manager import manager
+from src.backend.classes.Manager import manager as _manager
+from src.backend.database import db
 
 app = FastAPI()
 
-SECRET = 'supersecretkey'
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+manager = _manager.get_manager()
 
-manager = LoginManager(SECRET, token_url='/auth/login')
-
-@manager.user_loader()
-def load_user(uid: str):
+#####################################
+#   Helper Functions
+#####################################
+def role_required(roles: Union[str, List[str]]):
     '''
-        Allows manager to access user
+        Used to verify dependency of user roles
     '''
-    user = ds.get_user_by_id(uid)
-    return user.to_json()
+    if isinstance(roles, str):
+        roles = [roles]
 
+    def role_checker(user=Depends(manager)):
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+        if user["role"] not in roles:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+        return user
+
+    return role_checker
+
+#####################################
+#   Misc Paths
+#####################################
 @app.get("/")
 async def home():
     return {
@@ -42,6 +53,17 @@ async def clear():
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
+@app.post("/upload")
+async def upload(file: UploadFile = File(...)):
+    '''
+        Endpoint to upload files
+    '''
+    doc_id = await upload_wrapper(file)
+    return {'doc_id': doc_id}
+
+#####################################
+#   Service Paths
+#####################################
 @app.post("/service/add")
 async def add_service(service: ServicePost, user: User = Depends(manager)):
     '''
@@ -55,29 +77,44 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
 
 
 @app.get("/service/get_service")
-async def get_service(sid: str, user: User=Depends(manager)):
+async def get_service(sid: str):
     '''
         Method to retrieve a particular service
     '''
     response = get_service_wrapper(sid)
     return response
 
-# Role depend routes
-def role_required(roles: Union[str, List[str]]):
+@app.post("/service/upload_docs")
+async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
     '''
-        Used to verify dependency of user roles
+        Method to upload documententation to service
     '''
-    if isinstance(roles, str):
-        roles = [roles]
+    request = info.model_dump()
+    sid = request['sid']
+    doc_id = request['doc_id']
+    await upload_docs_wrapper(sid, user['id'], doc_id)
+    return 200
 
-    def role_checker(user=Depends(manager)):
-        if user is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-        if user["role"] not in roles:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
-        return user
+@app.get("/service/my_services")
+async def get_user_apis(user: User = Depends(manager)):
+    '''
+        Method to get the list of APIs owned by the currently authenticated user.
+        Returns a list of APIs with specific fields: id, name, owner, description, icon_url, and tags.
+    '''
+    uid = user['id']
+    user_apis = ds.get_user_apis(uid)
+    return user_apis
 
-    return role_checker
+#####################################
+#   Auth Paths
+#####################################
+@app.post("/auth/register")
+async def register(user: UserCreate):
+    '''
+        Register a user onto the platform
+    '''
+    uid = register_wrapper(user.username, user.password, user.email, user.role)
+    return {'uid' : uid}
 
 @app.post("/auth/login")
 async def login(credentials: LoginModel):
@@ -88,14 +125,6 @@ async def login(credentials: LoginModel):
     password = credentials.password
     access_token = login_wrapper(username, password)
     return {"access_token": access_token, "token_type": "bearer"}
-
-@app.post("/auth/register")
-async def register(user: UserCreate):
-    '''
-        Register a user onto the platform
-    '''
-    uid = register_wrapper(user.username, user.password, user.email, user.role)
-    return {'uid' : uid}
 
 # Example privileged routes
 @app.get("/auth/admin")

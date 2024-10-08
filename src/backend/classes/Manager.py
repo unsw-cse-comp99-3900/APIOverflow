@@ -56,7 +56,7 @@ def load_user(username: str):
     '''
         Grabs user for manager
     '''
-    user = data_store.get_user_by_name(username)
+    user = data_store.get_user_by_id(username)
     user_body = {
         'id' : user.get_id(),
         'username' : user.get_name(),

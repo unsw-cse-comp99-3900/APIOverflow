@@ -32,7 +32,7 @@ class UserCreate(BaseModel):
     username: str
     password: str
     email: str
-    role: str = "account user"
+    role: str = "general"
 
 class LoginModel(BaseModel):
     username: str
@@ -49,4 +49,9 @@ class ServicePost(BaseModel):
     y_end: int                      # Ending y-coord of img crop
     description: str                # Descrtipion of service
     tags: List[str]                 # List of tags assigned to the service
+    endpoint: str                   # Endpoint of the service uploaded
 
+class ServiceUpload(BaseModel):
+
+    sid: str
+    doc_id: str
