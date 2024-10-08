@@ -2,7 +2,7 @@ name: frontend-testing
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "fix-CICD" ]
 
 jobs:
   test:
