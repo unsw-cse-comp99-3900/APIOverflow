@@ -8,9 +8,15 @@ from src.backend.classes.API import API
 from src.backend.database import *
 from src.backend.server.upload import upload_wrapper
 
+
+# Ollama information
+OLLAMA_API_KEY = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBqE8KSc69XaJ4GwS37IXdk44ooXGidxNxeaKJNOUm4r'
+OLLAMA_API_URL = 'http://<ip>:11434/api/generate'
+
 # Constants
 IMAGE_PATH = "static/imgs"
 DOC_PATH = "static/docs"
+
 T = TypeVar('T')
 K = TypeVar('K')
 
@@ -145,6 +151,57 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
             'docs' : doc_paths
     }
     
+# function to match vincent's format, the one above is sid instead of id
+def api_into_json(api) -> dict:
+    return {
+        'id': api.get_id(),
+        'name': api.get_name(),
+        'owner': api.get_owner(),
+        'description': api.get_description(),
+        'icon_url': api.get_icon_url(),
+        'tags': api.get_tags()
+    }
+
+# filter through database to find APIs that are fitted to the selected tags
+# returns a list of the filtered apis
+def api_tag_filter(tags, providers):
+
+    api_list = data_store.get_apis()
+    filtered_apis = []
+
+    #query = input("Search")
+
+    #if query != "":
+        # if not empty, then Ollama match
+    #    data = {
+    #        "model": "llama3.2",
+    #        "prompt": query
+    #    }    
+    #    response = requests.post(url, json=data)
+        
+    if not tags:
+        # if they don't specify any tags, assume all APIs
+        for api in api_list:
+            filtered_apis.append(api)
+    else:
+        # otherwise get all the APIs with the tag/s
+        for api in api_list:
+            for tag in tags:
+                if tag in api.get_tags():
+                    filtered_apis.append(api)
+
+    return_list = []
+    if providers:
+        # if providers list is not empty
+        for api in filtered_apis:
+            for provider in providers:
+                if provider in api.get_owner():
+                    return_list.append(api)
+                    break
+    else:
+        return filtered_apis
+    return return_list
+    
 async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
     '''
         Function which handles uploading docs to a service
@@ -168,3 +225,7 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
 
     # Add document to service
     service.add_docs([file.get_id()])
+    
+
+def list_apis():
+    return data_store.get_apis()

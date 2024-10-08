@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Request, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, Depends, Request, HTTPException, Query, UploadFile, File, Form
 from fastapi_login import LoginManager
 from pymongo import MongoClient
 from passlib.context import CryptContext
@@ -142,6 +142,18 @@ async def account_user_route(user: User = Depends(manager), role: str = Depends(
 @app.get("/auth/guest")
 async def guest_route(user: User = Depends(manager), role: str = Depends(role_required("guest"))):
     return {"message": "Welcome, Guest!"}
+
+@app.get("/service/filter")
+async def filter(
+    tags: Optional[List[str]] = Query(None), 
+    providers: Optional[List[str]] = Query(None)
+):
+    return api_tag_filter(tags, providers)
+
+@app.get("/service/apis")
+async def view_apis():
+    return list_apis()
+
 
 if __name__ == "__main__":
     import uvicorn
