@@ -22,8 +22,7 @@ export const getApi = async (id: number) => {
 };
 
 export const deleteApi = async (id: number) => {
-  
-  const res = await fetch(`${baseUrl}/apis/${id}`, {
+  await fetch(`${baseUrl}/apis/${id}`, {
     method: "DELETE",
   });
   return;
@@ -42,7 +41,7 @@ export const addApi = async (newApi: NewApi) => {
 };
 
 export const updateApi = async (api: Api) => {
-  const res = await fetch(`${baseUrl}/apis/${api.id}`, {
+  await fetch(`${baseUrl}/apis/${api.id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

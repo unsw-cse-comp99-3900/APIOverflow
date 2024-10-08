@@ -1,7 +1,6 @@
 import React from "react";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { Api } from "../types/apiTypes";
 import { deleteApi } from "../services/apiServices";
 import { useNavigate } from "react-router-dom";
 

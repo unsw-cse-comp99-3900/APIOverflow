@@ -1,5 +1,5 @@
 import React from "react";
-import { FaSignOutAlt, FaCode, FaPlus, FaPlusCircle, FaPlusSquare,FaRegPlusSquare } from "react-icons/fa";
+import { FaSignOutAlt, FaCode, FaRegPlusSquare } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 const UserSideBar = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>

@@ -1,5 +1,4 @@
 import React from "react";
-import { PhotoIcon } from "@heroicons/react/24/solid";
 import EditApiForm from "../components/UpdateApiForm";
 
 const AddApiPage = () => {
