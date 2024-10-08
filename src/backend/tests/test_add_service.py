@@ -30,7 +30,7 @@ def simple_user():
     '''
         Simulates a simple user registering their account then logging in
     '''
-    # Clear data abse
+    # Clear database
     clear_all()
 
     # Register user
@@ -69,7 +69,8 @@ def test_invalid_user(simple_user):
                                 'y_start' : 0,
                                 'y_end' : 0,
                                 'description' : '',
-                                'tags' : []
+                                'tags' : [],
+                                'endpoint': ''
                            })
     assert response.status_code == AUTHENTICATION_ERROR
 
@@ -88,7 +89,8 @@ def test_no_name(simple_user):
                                 'y_start' : 0,
                                 'y_end' : 0,
                                 'description' : '',
-                                'tags' : []
+                                'tags' : [],
+                                'endpoint': ''
                            })
     assert response.status_code == INPUT_ERROR
 
@@ -106,7 +108,8 @@ def test_invalid_url(simple_user):
                                 'y_start' : 0,
                                 'y_end' : 0,
                                 'description' : 'hi',
-                                'tags' : ['API']
+                                'tags' : ['API'],
+                                'endpoint': ''
                            })
     assert response.status_code == INPUT_ERROR
 
@@ -125,7 +128,8 @@ def test_invalid_dimensions(simple_user):
                                 'y_start' : 0,
                                 'y_end' : 0,
                                 'description' : 'hi',
-                                'tags' : ['API']
+                                'tags' : ['API'],
+                                'endpoint': ''
                            })
     assert response.status_code == INPUT_ERROR
 
@@ -140,7 +144,8 @@ def test_invalid_dimensions(simple_user):
                                 'y_start' : 0,
                                 'y_end' : 0,
                                 'description' : 'hi',
-                                'tags' : ['API']
+                                'tags' : ['API'],
+                                'endpoint': ''
                            })
     assert response.status_code == INPUT_ERROR
 
@@ -155,7 +160,8 @@ def test_invalid_dimensions(simple_user):
                                 'y_start' : -10,
                                 'y_end' : 0,
                                 'description' : 'hi',
-                                'tags' : ['API']
+                                'tags' : ['API'],
+                                'endpoint': ''
                            })
     assert response.status_code == INPUT_ERROR
 
@@ -170,7 +176,8 @@ def test_invalid_dimensions(simple_user):
                                 'y_start' : 1000,
                                 'y_end' : 0,
                                 'description' : 'hi',
-                                'tags' : ['API']
+                                'tags' : ['API'],
+                                'endpoint': ''
                            })
     assert response.status_code == INPUT_ERROR
 
@@ -188,7 +195,8 @@ def test_no_description(simple_user):
                                 'y_start' : 0,
                                 'y_end' : 0,
                                 'description' : '',
-                                'tags' : []
+                                'tags' : [],
+                                'endpoint': ''
                            })
     assert response.status_code == INPUT_ERROR
 
@@ -206,7 +214,27 @@ def test_no_tags(simple_user):
                                 'y_start' : 0,
                                 'y_end' : 0,
                                 'description' : 'This is a test API',
-                                'tags' : []
+                                'tags' : [],
+                                'endpoint': ''
+                           })
+    assert response.status_code == INPUT_ERROR
+
+def test_no_endpoint(simple_user):
+    '''
+        Test whether no description given is caught
+    '''
+    response = client.post("/service/add",
+                            headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json={
+                                'name' : 'Test API',
+                                'icon_url' : '',
+                                'x_start' : 0,
+                                'x_end' : 0,
+                                'y_start' : 0,
+                                'y_end' : 0,
+                                'description' : 'This is a test API',
+                                'tags' : ['API'],
+                                'endpoint': ''
                            })
     assert response.status_code == INPUT_ERROR
 
@@ -223,7 +251,8 @@ def test_create_api(simple_user):
                 'y_start' : 0,
                 'y_end' : 0,
                 'description' : 'This is a test API',
-                'tags' : ['API']
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
                 }
 
     response = client.post("/service/add",
@@ -239,10 +268,11 @@ def test_create_api(simple_user):
     
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['sid'] == sid
+    assert response_info['id'] == sid
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
+    assert response_info['endpoint'] == api_info['endpoint']
 
 def test_multiple_tags(simple_user):
     '''
@@ -256,7 +286,8 @@ def test_multiple_tags(simple_user):
                 'y_start' : 0,
                 'y_end' : 0,
                 'description' : 'This is a test API',
-                'tags' : ['API', 'Public', 'In Development']
+                'tags' : ['API', 'Public', 'In Development'],
+                'endpoint': 'https://api.example.com/users/12345'
                 }
 
     response = client.post("/service/add",
@@ -273,11 +304,12 @@ def test_multiple_tags(simple_user):
     
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['sid'] == sid
+    assert response_info['id'] == sid
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
-    assert response_info['icon_url'] == 'static/default_icon2.png'
+    assert response_info['endpoint'] == api_info['endpoint']
+    assert response_info['icon_url'] == 'static/imgs/default_icon2.png'
 
 def test_custom_icon(simple_user):
     '''
@@ -292,7 +324,8 @@ def test_custom_icon(simple_user):
                 'y_start' : 0,
                 'y_end' : 100,
                 'description' : 'This is a definitely... Google',
-                'tags' : ['API', 'Public', 'In Development']
+                'tags' : ['API', 'Public', 'In Development'],
+                'endpoint': 'https://api.example.com/users/12345'
                 }
 
     response = client.post("/service/add",
@@ -300,7 +333,6 @@ def test_custom_icon(simple_user):
                            json=api_info)
     assert response.status_code == SUCCESS
     sid = response.json()['sid']
-
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
@@ -310,7 +342,8 @@ def test_custom_icon(simple_user):
     
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['sid'] == sid
+    assert response_info['id'] == sid
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
+    assert response_info['endpoint'] == api_info['endpoint']

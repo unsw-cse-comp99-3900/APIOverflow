@@ -16,8 +16,9 @@ class API(Service):
                  owner: str,
                  icon_url: str,
                  description: str,
-                 tags: List[str]) -> None:
-        super().__init__(sid, name, owner, icon_url, description, tags, 'api')
+                 tags: List[str],
+                 endpoint: str) -> None:
+        super().__init__(sid, name, owner, icon_url, description, tags, endpoint, 'api')
     
     def get_type(self):
         '''

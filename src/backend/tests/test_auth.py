@@ -2,7 +2,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from src.backend.app import app 
-from src.backend.classes.models import User, db
+from src.backend.classes.models import db
 
 # Create a test client
 client = TestClient(app)
@@ -23,7 +23,7 @@ def test_register_user():
         "email" : "doxxed@gmail.com"
     })
     assert response.status_code == 200
-    assert response.json() == {"uid" : 0}
+    assert response.json() == {"uid" : '0'}
 
 def test_register_duplicate_user():
     """Test registering a duplicate user."""

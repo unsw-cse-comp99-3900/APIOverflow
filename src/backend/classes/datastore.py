@@ -19,7 +19,9 @@ schema = {
     'api_count' : 0,
     'tags' : DEFAULT_TAGS,
     'tag_count' : 0,
-    'img_count' : 0
+    'img_count' : 0,
+    'docs_count': 0,
+    'docs': []
 }
 
 class Datastore:
@@ -53,7 +55,9 @@ class Datastore:
                             'api_count' : 0,
                             'tags' : DEFAULT_TAGS,
                             'tag_count' : 0,
-                            'img_count' : 0
+                            'img_count' : 0,
+                            'docs_count': 0,
+                            'docs': []
                         }
 
     ##################################
@@ -86,6 +90,13 @@ class Datastore:
         '''
         self.__store['image_count'] += 1
 
+    def add_docs(self, doc: T) -> None:
+        '''
+            Adds a document to the datastore
+        '''
+        self.__store['docs'].append(doc)
+        self.__store['docs_count'] += 1
+
     ################################
     #   Datastore Search Methods
     ################################
@@ -106,6 +117,12 @@ class Datastore:
             Returns a list of all tags
         '''
         return self.__store['tags']
+
+    def get_docs(self) -> List[T]:
+        '''
+            Returns a list of all users
+        '''
+        return self.__store['docs']
 
     def get_api_by_id(self, eid: str) -> T | None:
         '''
@@ -138,6 +155,35 @@ class Datastore:
             
         return None
 
+    def get_doc_by_id(self, eid: str) -> T | None:
+        '''
+            Returns with user obj base on given ID, or None if cannot find user
+        '''
+        for item in self.__store['docs']:
+            if item.get_id() == eid:
+                return item
+
+        return None
+
+    def get_user_apis(self, eid: str) -> List[T]:
+        '''
+            Returns a list of APIs owned by the user with the given user ID.
+        '''
+        user_apis = []
+        for item in self.__store['apis']:
+            owners = item.get_owner()
+            if str(eid) in owners:
+                api_info = {
+                    'id': item.get_id(),
+                    'name': item.get_name(),
+                    'owner': item.get_owner(),
+                    'description': item.get_description(),
+                    'icon_url': item.get_icon_url(),
+                    'tags': item.get_tags()
+                }
+                user_apis.append(api_info)
+        return user_apis
+
     def num_users(self) -> int:
         '''
             Returns number of users
@@ -161,6 +207,12 @@ class Datastore:
             Returns number of imgs stored
         '''
         return self.__store['img_count']
+
+    def num_docs(self) -> int:
+        '''
+            Returns number of docs
+        '''
+        return self.__store['docs_count']
 
     ################################
     #   Datastore Deletion Methods

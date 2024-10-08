@@ -1,11 +1,12 @@
 from typing import TypeVar
-from fastapi import APIRouter, HTTPException
+from fastapi import File, UploadFile, HTTPException
 from PIL import Image
 import urllib.request
 from urllib.error import HTTPError, URLError
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
+from src.backend.server.upload import upload_wrapper
 
 
 # Ollama information
@@ -13,12 +14,15 @@ OLLAMA_API_KEY = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBqE8KSc69XaJ4GwS37IXdk44o
 OLLAMA_API_URL = 'http://<ip>:11434/api/generate'
 
 # Constants
-IMAGE_PATH = "src/backend/static/imgs"
-DOC_PATH = "src/backend/static/docs"
+IMAGE_PATH = "static/imgs"
+DOC_PATH = "static/docs"
 
 T = TypeVar('T')
 K = TypeVar('K')
 
+# Helper functions
+
+# Endpoint Wrappers
 def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     '''
         Adds a Service (default to API) to the platform
@@ -36,6 +40,9 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     
     if len(packet['tags']) == 0:
         raise HTTPException(status_code=400, detail='No service tags provided')
+    
+    if packet['endpoint'] == '':
+        raise HTTPException(status_code=400, detail='No service endpoint provided')
 
     # Retrieve image from url
     response = None
@@ -89,10 +96,11 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     # Create new API
     new_api = API(  str(data_store.num_apis()),
                     packet['name'],
-                    [user],
+                    user,
                     internal_url,
                     packet['description'],
-                    packet['tags'])
+                    packet['tags'],
+                    packet['endpoint'])
 
     data_store.add_api(new_api)
     db_add_service(new_api.to_json())
@@ -111,6 +119,7 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
                         description
                         icon_url
                         tags
+                        endpoint
                     }
     '''
 
@@ -122,13 +131,24 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
     if service is None:
         raise HTTPException(status_code=404, detail='No service found with given sid')
     
+    owner_id = service.get_owner()
+    owner = data_store.get_user_by_id(owner_id)
+    doc_ids = service.get_docs()
+    docs = [data_store.get_doc_by_id(i) for i in doc_ids]
+    doc_paths = [i.get_path() for i in docs]
     return {
-            'sid' : service.get_id(),
+            'id' : service.get_id(),
             'name' : service.get_name(),
-            'owner' : service.get_owner(),
+            'owner' : {
+                'id' : owner.get_id(),
+                'name' : owner.get_name(),
+                'email' : owner.get_email()
+            },
             'description': service.get_description(),
             'icon_url': service.get_icon_url(),
-            'tags' : service.get_tags()
+            'tags' : service.get_tags(),
+            'endpoint' : service.get_endpoint(),
+            'docs' : doc_paths
     }
     
 # function to match vincent's format, the one above is sid instead of id
@@ -180,8 +200,32 @@ def api_tag_filter(tags, providers):
                     break
     else:
         return filtered_apis
-    
     return return_list
+    
+async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
+    '''
+        Function which handles uploading docs to a service
+    '''
+    file = data_store.get_doc_by_id(doc_id)
+    # Error Checks
+    if file is None:
+        raise HTTPException(status_code=400, detail="File not found")
+
+    if file.get_type() != "application/pdf":
+        raise HTTPException(status_code=400, detail="File is not a pdf")
+    
+    # Get service
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Check if user is owner
+    if service.get_owner() != uid:
+        raise HTTPException(status_code=403, detail="User is not service owner")
+
+    # Add document to service
+    service.add_docs([file.get_id()])
+    
 
 def list_apis():
     return data_store.get_apis()

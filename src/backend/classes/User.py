@@ -15,7 +15,7 @@ class User:
             password:   Hashed password for security
             email:      Email registered with user
             icon_url:   Path to image store on backend (todo)
-            role:       List of user roles (user, service provider, admin)
+            role:       general | admin
             ---
             following:  List of services/users user is following
     
@@ -26,7 +26,7 @@ class User:
                  username: str,
                  password: str,
                  email: str,
-                 role: List[str],
+                 role: str,
                  icon_url: str = None) -> None:
         
         # Initialised vars
@@ -44,13 +44,6 @@ class User:
     ################################
     #   Add Methods
     ################################
-    def add_role(self, role : str) -> None:
-        '''
-            Adds role to user
-        '''
-        # todo - duplicate checking
-        self._role.append(role)
-    
     def add_following(self, uid: str) -> None:
         '''
             Adds another user to list of users self is following
@@ -128,6 +121,12 @@ class User:
             Return num of users self is following
         '''
         return self._num_following
+    
+    def get_role(self) -> List[str]:
+        '''
+            Return role of user
+        '''
+        return self._role
     
     ################################
     #  Storage Methods
