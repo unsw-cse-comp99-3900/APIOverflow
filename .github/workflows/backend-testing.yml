@@ -15,15 +15,16 @@ jobs:
   test:
     name: Run Backend Tests
     runs-on: ubuntu-latest
-    env:
-      COMPOSE_FILE: ci/docker-compose.yml
+
 
     steps: 
     - uses: actions/checkout@v4
 
     - name: Build docker container
       run: docker compose build --build-arg TEST=t
-    
+      env:
+        COMPOSE_FILE: ci/docker-compose.yml
+
     - name: Run tests
       run: docker compose up
 
