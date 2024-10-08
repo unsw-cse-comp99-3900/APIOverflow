@@ -265,7 +265,6 @@ def test_providers_with_tags(simple_user):
     found1 = False
     found2 = False
     found3 = False
-    print(response_info)
     for api in response_info:
         if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
             found1 = True 
@@ -327,7 +326,6 @@ def test_invalid_providers(simple_user):
     found1 = False
     found2 = False
     found3 = False
-    print(response_info)
     for api in response_info:
         if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
             found1 = True 
@@ -389,7 +387,6 @@ def test_providers_with_tags2(simple_user):
     found1 = False
     found2 = False
     found3 = False
-    print(response_info)
     for api in response_info:
         if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
             found1 = True 

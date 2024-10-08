@@ -156,36 +156,27 @@ def api_tag_filter(tags, providers):
     #    response = requests.post(url, json=data)
         
     if not tags:
-        print("no tags")
         # if they don't specify any tags, assume all APIs
         for api in api_list:
             filtered_apis.append(api)
     else:
-        print("got tags")
         # otherwise get all the APIs with the tag/s
         for api in api_list:
             for tag in tags:
                 if tag in api.get_tags():
                     filtered_apis.append(api)
-    
-    print(filtered_apis)
 
     return_list = []
     if providers:
         # if providers list is not empty
-        print("got providers")
         for api in filtered_apis:
-            print(api.get_owner())
             for provider in providers:
                 if provider in api.get_owner():
                     return_list.append(api)
                     break
     else:
-        print(filtered_apis)
         return filtered_apis
     
-    print("shoudl be here")
-    print(return_list)
     return return_list
 
 def list_apis():
