@@ -8,6 +8,12 @@ export const getApis = async () => {
     return data;
 }
 
+export const getMyApis = async () => {
+  const res = await fetch(`${baseUrl}/apis`);
+  const data = await res.json();
+  return data;
+}
+
 export const getApi = async (id:number) => {
   const res = await fetch(`${baseUrl}/apis/${id}`);
   const data = await res.json();
