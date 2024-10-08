@@ -5,6 +5,7 @@ export interface Api {
   owner: string;
   icon_url: string;
   tags: string[];
+  endpoint: string;
 }
 
 export type NewApi = Omit<Api, "id">;

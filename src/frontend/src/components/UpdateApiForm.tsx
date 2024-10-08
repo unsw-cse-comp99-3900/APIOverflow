@@ -42,6 +42,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
         icon_url: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
         owner: "sample_owner",
         tags: ["sample_tag"],
+        endpoint: "sample_endpoint",
       };
       updateApi(updatedApi);
     }else{
@@ -51,6 +52,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
         icon_url: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
         owner: "sample_owner",
         tags: ["sample_tag"],
+        endpoint: "sample_endpoint",
       }; 
       addApi(newApi);
     }

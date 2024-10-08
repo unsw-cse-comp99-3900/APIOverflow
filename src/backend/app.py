@@ -99,6 +99,10 @@ async def get_service(sid: str):
     response = get_service_wrapper(sid)
     return response
 
+@app.get("/service/apis")
+async def view_apis():
+    return list_apis()
+
 @app.post("/service/upload_docs")
 async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
     '''
@@ -164,10 +168,6 @@ async def filter(
     providers: Optional[List[str]] = Query(None)
 ):
     return api_tag_filter(tags, providers)
-
-@app.get("/service/apis")
-async def view_apis():
-    return list_apis()
 
 
 if __name__ == "__main__":
