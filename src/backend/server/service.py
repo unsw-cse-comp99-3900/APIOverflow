@@ -34,6 +34,9 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     
     if len(packet['tags']) == 0:
         raise HTTPException(status_code=400, detail='No service tags provided')
+    
+    if packet['endpoint'] == '':
+        raise HTTPException(status_code=400, detail='No service endpoint provided')
 
     # Retrieve image from url
     response = None
@@ -90,7 +93,8 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
                     user,
                     internal_url,
                     packet['description'],
-                    packet['tags'])
+                    packet['tags'],
+                    packet['endpoint'])
 
     data_store.add_api(new_api)
     db_add_service(new_api.to_json())
@@ -109,6 +113,7 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
                         description
                         icon_url
                         tags
+                        endpoint
                     }
     '''
 
@@ -136,6 +141,7 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
             'description': service.get_description(),
             'icon_url': service.get_icon_url(),
             'tags' : service.get_tags(),
+            'endpoint' : service.get_endpoint(),
             'docs' : doc_paths
     }
     

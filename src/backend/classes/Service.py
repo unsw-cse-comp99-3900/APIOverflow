@@ -16,6 +16,7 @@ class Service:
         icon_url:       Path to image store on backend
         description:    User-given description of service
         tags:           List of tags given to service
+        endpoint:       Endpoint of the service
         
         ----
         owner_count:    Number of owners for this service
@@ -37,6 +38,7 @@ class Service:
                  icon_url: str,
                  description: str,
                  tags: List[str],
+                 endpoint: str,
                  stype: str) -> None:
         
         # Initialised vars
@@ -47,6 +49,7 @@ class Service:
         self._icon_url= icon_url
         self._description = description
         self._tags = tags
+        self._endpoint = endpoint
         self._type = stype
 
         # Default vars
@@ -207,6 +210,12 @@ class Service:
         '''
         return self._icon_url
     
+    def get_endpoint(self) -> str:
+        '''
+            Returns endpoint of service
+        '''
+        return self._endpoint
+    
     def get_docs(self) -> List[str]:
         '''
             Returns icon_url of service
@@ -227,6 +236,7 @@ class Service:
             'icon_url' : self._icon_url,
             'description' : self._description,
             'tags' : self._tags,
+            'endpoint': self._endpoint,
             'documents' : self._docs,
             'users' : self._users,
             'reviews': self._reviews,

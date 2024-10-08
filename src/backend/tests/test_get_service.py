@@ -96,13 +96,13 @@ def test_get_apis(simple_user):
                           headers={"Authorization": f"Bearer {simple_user['token']}"})
     assert response.status_code == SUCCESS
     response_info = response.json()[0]
-    assert response_info['sid'] == sid1
+    assert response_info['id'] == sid1
     assert response_info['name'] == api_info1['name']
     assert response_info['description'] == api_info1['description']
     assert response_info['tags'] == api_info1['tags']
 
     response_info = response.json()[1]
-    assert response_info['sid'] == sid2
+    assert response_info['id'] == sid2
     assert response_info['name'] == api_info2['name']
     assert response_info['description'] == api_info2['description']
     assert response_info['tags'] == api_info2['tags']

@@ -174,7 +174,7 @@ class Datastore:
             owners = item.get_owner()
             if str(eid) in owners:
                 api_info = {
-                    'sid': item.get_id(),
+                    'id': item.get_id(),
                     'name': item.get_name(),
                     'owner': item.get_owner(),
                     'description': item.get_description(),
