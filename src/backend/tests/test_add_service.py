@@ -333,7 +333,6 @@ def test_custom_icon(simple_user):
                            json=api_info)
     assert response.status_code == SUCCESS
     sid = response.json()['sid']
-
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
