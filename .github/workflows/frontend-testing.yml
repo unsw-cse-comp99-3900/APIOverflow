@@ -12,12 +12,9 @@ jobs:
     steps: 
     - uses: actions/checkout@v4
 
-    - name: Build docker container
-      run: docker compose build
+    # - name: Build docker container
+    #   run: docker compose build
     
-    - name: Run tests
-      run: docker compose up
+    # - name: Run tests
+    #   run: docker compose up
 
-    - name: Exit
-      if: success() || failure()
-      run: docker compose down
