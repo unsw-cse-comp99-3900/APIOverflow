@@ -5,7 +5,8 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from src.backend.classes import Service
 from src.backend.app import app
-from src.backend.classes.models import User, db
+from src.backend.classes.models import User
+from src.backend.database import db
 
 
 # Create a test client
@@ -71,6 +72,7 @@ def test_invalid_user(simple_user):
                                 'tags' : []
                            })
     assert response.status_code == AUTHENTICATION_ERROR
+
 
 def test_no_name(simple_user):
     '''

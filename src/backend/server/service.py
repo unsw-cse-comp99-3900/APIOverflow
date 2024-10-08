@@ -8,9 +8,11 @@ from src.backend.classes.API import API
 from src.backend.database import *
 from src.backend.server.upload import upload_wrapper
 
+
 # Constants
 IMAGE_PATH = "src/backend/static/imgs"
 DOC_PATH = "src/backend/static/docs"
+
 T = TypeVar('T')
 K = TypeVar('K')
 
