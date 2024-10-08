@@ -7,7 +7,7 @@ from src.backend.classes.models import *
 from src.backend.server.service import *
 from src.backend.classes.datastore import data_store as ds
 from src.backend.server.auth import *
-from src.backend.classes.Manager import manager
+from src.backend.classes.Manager import manager as _manager
 
 app = FastAPI()
 
@@ -18,7 +18,7 @@ db = client.local
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-manager = LoginManager(SECRET, token_url='/auth/login')
+manager = _manager.get_manager()
 
 @manager.user_loader()
 def load_user(uid: str):
