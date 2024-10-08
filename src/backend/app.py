@@ -13,9 +13,6 @@ app = FastAPI()
 
 SECRET = 'supersecretkey'
 
-client = MongoClient('mongodb://localhost:27017')
-db = client.local
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 manager = _manager.get_manager()

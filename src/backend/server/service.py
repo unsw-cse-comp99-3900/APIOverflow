@@ -7,11 +7,15 @@ from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
 
+
 # Ollama information
 OLLAMA_API_KEY = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBqE8KSc69XaJ4GwS37IXdk44ooXGidxNxeaKJNOUm4r'
 OLLAMA_API_URL = 'http://<ip>:11434/api/generate'
 
-IMAGE_PATH = "src/backend/static"
+# Constants
+IMAGE_PATH = "src/backend/static/imgs"
+DOC_PATH = "src/backend/static/docs"
+
 T = TypeVar('T')
 K = TypeVar('K')
 
