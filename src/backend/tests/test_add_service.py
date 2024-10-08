@@ -5,7 +5,8 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from src.backend.classes import Service
 from src.backend.app import app
-from src.backend.classes.models import User, db
+from src.backend.classes.models import User
+from src.backend.database import db
 
 
 # Create a test client
@@ -71,6 +72,7 @@ def test_invalid_user(simple_user):
                                 'tags' : []
                            })
     assert response.status_code == AUTHENTICATION_ERROR
+
 
 def test_no_name(simple_user):
     '''
@@ -275,7 +277,8 @@ def test_multiple_tags(simple_user):
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
-    assert response_info['icon_url'] == 'src/backend/static/imgs/default_icon2.png'
+    assert response_info['icon_url'] == 'static/imgs/default_icon2.png'
+
 
 def test_custom_icon(simple_user):
     '''

@@ -11,8 +11,8 @@ import aiofiles
 import os
 
 # Constants
-IMAGE_PATH = "src/backend/static/imgs"
-DOC_PATH = "src/backend/static/docs"
+IMAGE_PATH = "static/imgs"
+DOC_PATH = "static/docs"
 MB1 = 1024 * 1024
 
 async def upload_wrapper(file: UploadFile) -> str:

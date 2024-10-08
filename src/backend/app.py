@@ -7,11 +7,10 @@ from src.backend.server.service import *
 from src.backend.classes.datastore import data_store as ds
 from src.backend.server.auth import *
 from src.backend.classes.Manager import manager as _manager
+from src.backend.database import db
 
 app = FastAPI()
 
-client = MongoClient('mongodb://localhost:27017')
-db = client.local
 
 manager = _manager.get_manager()
 

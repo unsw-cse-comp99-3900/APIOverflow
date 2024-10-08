@@ -1,26 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  Route,
+  createBrowserRouter,
+  createRoutesFromElements,
+  RouterProvider,
+} from 'react-router-dom';
+import MainLayout from './layouts/MainLayout';
+import UserProfileLayout from './layouts/UserProfileLayout';
+import HomePage from './pages/HomePage';
+import APIsPage from './pages/ApisPage';
+import AddApiPage from './pages/AddApiPage';
+import ApiPage from './pages/ApiPage';
+import EditApiPage from './pages/EditApiPage';
+import MyApisPage from './pages/MyApisPage';
+import MyApiPage from './pages/MyApiPage';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+
+const App = () => {
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route path='/' element={<MainLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path='/apis' element={<APIsPage />} />
+        <Route path='/apis/:id' element={<ApiPage/>}/>
+
+        <Route path='/add-api' element={<AddApiPage />} />
+        <Route path='/edit-api' element={<EditApiPage />} />
+
+        <Route path='/profile' element={<UserProfileLayout />}>
+          <Route path='/profile/myApis' element={<MyApisPage />} />
+          <Route path='/profile/myApis/:id' element={<MyApiPage />} />
+        </Route>
+      </Route>
+    )
+      
   );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
