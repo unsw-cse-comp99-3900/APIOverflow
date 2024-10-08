@@ -14,10 +14,9 @@ const DeleteApiButton = ({
   apisRoute?: string;
   onDelete?: (id: number) => void;
 }) => {
+  console.log(`API with id ${apiId} deleted`);
   const navigate = useNavigate();
-
   const onDeleteClick = async (apiId: number) => {
-    console.log(apiId);
     const confirm = window.confirm(
       "Are you sure you want to delete this listing?"
     );
@@ -26,6 +25,7 @@ const DeleteApiButton = ({
     try {
       await deleteApi(apiId);
       toast.success("API deleted successfully");
+      
       if (onDelete) onDelete(apiId); // Trigger the deletion callback to update the state
       if (apisRoute) navigate(apisRoute); // Redirect to the APIs page
     } catch (error) {

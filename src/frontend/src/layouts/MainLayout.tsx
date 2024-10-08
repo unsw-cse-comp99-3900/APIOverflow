@@ -7,7 +7,7 @@ const MainLayout = () => {
   return (
     <>
       <Navbar />
-      <div className="mt-24">
+      <div className="mt-24 bg-gradient-to-b from-blue-50">
         <Outlet />
       </div>
       <ToastContainer />

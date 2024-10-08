@@ -15,19 +15,21 @@ export const getMyApis = async () => {
 };
 
 export const getApi = async (id: number) => {
+  console.log(id);
   const res = await fetch(`${baseUrl}/apis/${id}`);
   const data = await res.json();
   return data;
 };
 
-export const deleteApi = async (apiId: number) => {
-  const res = await fetch(`${baseUrl}/apis/${apiId}`, {
+export const deleteApi = async (id: number) => {
+  
+  const res = await fetch(`${baseUrl}/apis/${id}`, {
     method: "DELETE",
   });
   return;
 };
 
-const addApi = async (newApi: NewApi) => {
+export const addApi = async (newApi: NewApi) => {
   const res = await fetch(`${baseUrl}/apis`, {
     method: "POST",
     headers: {
@@ -39,7 +41,7 @@ const addApi = async (newApi: NewApi) => {
   return res;
 };
 
-const updateApi = async (api: Api) => {
+export const updateApi = async (api: Api) => {
   const res = await fetch(`${baseUrl}/apis/${api.id}`, {
     method: "PUT",
     headers: {

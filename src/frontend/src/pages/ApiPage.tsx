@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Api } from "../types/apiTypes";
 import { getApi } from "../services/apiServices";
@@ -19,7 +18,13 @@ const ApiPage = () => {
 
   useEffect(() => {
     const fetchApi = async () => {
+      if (!id) {
+        setError("Invalid API ID");
+        setLoading(false);
+        return;
+      }
       try {
+        console.log(id)
         const data = await getApi(Number(id));
         setApi(data);
       } catch (error) {

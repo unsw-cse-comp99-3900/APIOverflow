@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Api } from "../types/apiTypes";
 import { getApi } from "../services/apiServices";
