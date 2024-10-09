@@ -11,7 +11,7 @@ const UserSideBar = () => {
     <aside className="fixed left-0 w-80 h-full px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
       <div className="flex flex-col items-center mt-6 -mx-2">
         <img
-          className="object-cover w-40 h-40 mx-2 rounded-full"
+          className="object-cover w-40 h-40 mx-2 rounded-full border-2 border-gray-300"
           src="https://img.freepik.com/premium-vector/anonymous-user-circle-icon-vector-illustration-flat-style-with-long-shadow_520826-1931.jpg?semt=ais_hybrid"
           alt="User Avatar"
         />
