@@ -3,10 +3,13 @@ import { Api } from "../types/apiTypes";
 import ApiListing from "./ApiListing";
 import Spinner from "./Spinner";
 import { getApis, getMyApis } from "../services/apiServices";
+import FetchStatus from "./FetchStatus";
 
 const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
   const [apis, setApis] = useState<Api[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
 
   useEffect(() => {
     const fetchApis = async () => {
@@ -15,6 +18,7 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
         setApis(data);
       } catch (error) {
         console.log("Error fetching data", error);
+        setError("Failed to load API data");
       } finally {
         setLoading(false);
       }
@@ -28,13 +32,11 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
   };
 
   return (
-      <div className="container-xl lg:container mx-auto px-10">
+    <FetchStatus loading={loading} error={error} data={apis}> 
+          <div className="container-xl lg:container mx-auto px-10">
         <h2 className="text-3xl font-bold text-blue-800 mb-6 mt-6 text-left">
           {isMyAPis ? "My APIs" : "Browse APIs"}
         </h2>
-        {loading ? (
-          <Spinner loading={loading} />
-        ) : (
           <div className="grid grid-cols-[repeat(auto-fit,minmax(700px,1fr))] gap-6">
             {apis.map((api) => (
               <ApiListing
@@ -45,8 +47,9 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
               />
             ))}
           </div>
-        )}
       </div>
+    </FetchStatus>
+
   );
 };
 

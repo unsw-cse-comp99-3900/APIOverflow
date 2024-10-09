@@ -14,7 +14,6 @@ const ApiListing = ({
   isMyApis: boolean;
   onDelete: (id: number) => void;
 }) => {
-  
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   let description = api.description;

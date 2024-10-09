@@ -1,4 +1,5 @@
-import { Api, NewApi } from "../types/apiTypes";
+import { Api, DetailedApi, NewApi } from "../types/apiTypes";
+import { apiDataFormatter } from "../utils/dataFormatters";
 import { removeUnderscores } from "../utils/removeUnderscores";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -20,12 +21,11 @@ export const getMyApis = async () => {
 };
 
 export const getApi = async (id: number) => {
-  const res = await fetch(`${baseUrl}/service`, {
+  const res = await fetch(`${baseUrl}/service/get_service?sid=${id}`, {
     method: "GET",
-    body: JSON.stringify(id),
   });
   const data = await res.json();
-  return removeUnderscores(data);
+  return apiDataFormatter(removeUnderscores(data));
 };
 
 // BE un-implemented
