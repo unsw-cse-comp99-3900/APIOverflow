@@ -4,6 +4,7 @@ import { Api, NewApi, DetailedApi } from "../types/apiTypes";
 import { getApi, updateApi, addApi } from "../services/apiServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { ServicePost } from "../types/backendTypes";
 
 const EditApiForm = ({ apiId }: { apiId?: number }) => {
   const [api, setApi] = useState<Api | null>(null);
@@ -47,14 +48,16 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
       };
       updateApi(updatedApi);
     }else{
-      const newApi:NewApi = {
+      const newApi:ServicePost = {
         name: apiName,
+        x_start : 0,
+        x_end : 0,
+        y_start : 0,
+        y_end : 0,
         description,
-        iconUrl: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
-        ownerName: "sample_owner",
+        icon_url: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
         tags: ["sample_tag"],
         endpoint: "sample_endpoint",
-        documents: ["sample_document"],
       }; 
       addApi(newApi);
     }

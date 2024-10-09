@@ -1,4 +1,5 @@
 import { Api, DetailedApi, NewApi } from "../types/apiTypes";
+import { LoginModel, ServicePost, UserCreate } from "../types/backendTypes";
 import { apiDataFormatter } from "../utils/dataFormatters";
 import { removeUnderscores } from "../utils/removeUnderscores";
 
@@ -30,7 +31,7 @@ export const getMyApis = async () => {
   return removeUnderscores(data);
 };
 
-export const getApi = async (id: number) => {
+export const getApi = async (id: number | string) => {
   const res = await fetch(`${baseUrl}/service/get_service?id=${id}`, {
     method: "GET",
   });
@@ -48,13 +49,13 @@ export const deleteApi = async (id: number) => {
   return;
 };
 
-export const addApi = async (newApi: NewApi) => {
+export const addApi = async (service: ServicePost) => {
   const res = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(newApi),
+    body: JSON.stringify(service),
   });
   return res;
 };
@@ -72,16 +73,13 @@ export const updateApi = async (api: Api) => {
 };
 
 /*        Auth Services       */
-export const userLogin = async (username: string, password: string) => {
+export const userLogin = async (credentials: LoginModel) => {
   const res = await fetch(`${baseUrl}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ 
-      username, 
-      password 
-    }), 
+    body: JSON.stringify(credentials), 
   });
 
   if (!res.ok) {
@@ -93,3 +91,14 @@ export const userLogin = async (username: string, password: string) => {
   const data = await res.json();
   return data.access_token;
 };
+
+export const userRegister = async (user:UserCreate) => {
+  await fetch(`${baseUrl}/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  });
+  return;
+}

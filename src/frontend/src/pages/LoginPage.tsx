@@ -6,6 +6,7 @@ import Blob1 from "../assets/images/blobs/blob1.svg";
 import Blob2 from "../assets/images/blobs/blob2.svg";
 import { useAuth } from "../authentication/AuthProvider";
 import { userLogin } from "../services/apiServices";
+import { LoginModel } from "../types/backendTypes";
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -27,7 +28,11 @@ const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const token = await userLogin(username, password);
+        const credentials: LoginModel = {
+            username,
+            password,
+          };
+          const token = await userLogin(credentials);
       login(token);
       setIsLoading(false);
       console.log("Login successful:", { username, password });

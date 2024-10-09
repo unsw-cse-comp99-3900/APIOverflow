@@ -5,7 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Blob1 from "../assets/images/blobs/blob1.svg";
 import Blob2 from "../assets/images/blobs/blob2.svg";
 import { useAuth } from "../authentication/AuthProvider";
-import { userLogin } from "../services/apiServices";
+import { userLogin, userRegister } from "../services/apiServices";
+import { LoginModel, UserCreate } from "../types/backendTypes";
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -25,10 +26,19 @@ const RegisterPage: React.FC = () => {
       setError("Please fill in both fields.");
       return;
     }
-
+    const newUser: UserCreate = {
+      email,
+      username,
+      password,
+    };
+    await userRegister(newUser);
     setIsLoading(true);
     try {
-      const token = await userLogin(username, password);
+      const credentials: LoginModel = {
+        username,
+        password,
+      };
+      const token = await userLogin(credentials);
       login(token);
       setIsLoading(false);
       console.log("Login successful:", { username, password });
