@@ -30,7 +30,7 @@ const ApiListing = ({
             <img
               src={api.iconUrl}
               alt="API Icon"
-              className="w-20 h-20 ml-4 mr-4 mt-2 rounded-full object-cover"
+              className="w-20 h-20 ml-4 mr-4 mt-2 rounded-full object-cover border-2 border-gray-300"
             />
 
             <div>
