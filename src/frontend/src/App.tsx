@@ -10,11 +10,12 @@ import APIsPage from './pages/ApisPage';
 import AddApiPage from './pages/AddApiPage';
 import ApiPage from './pages/ApiPage';
 import EditApiPage from './pages/EditApiPage';
-import { deleteApi } from './services/apiServices';
+// import { deleteApi } from './services/apiServices';
 import Login from './components/Login'; 
 import UserProfileLayout from "./layouts/UserProfileLayout";
 import MyApisPage from "./pages/MyApisPage";
 import MyApiPage from "./pages/MyApiPage";
+import Register from './components/Register';
 
 const App = () => {
   const router = createBrowserRouter(
@@ -29,7 +30,7 @@ const App = () => {
         <Route path="/apis/:id" element={<ApiPage />} />
 
         <Route path="/edit-api" element={<EditApiPage />} />
-
+        <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<UserProfileLayout />}>
           <Route path="/profile/my-apis" element={<MyApisPage />} />
           <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
