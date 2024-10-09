@@ -315,7 +315,7 @@ def test_multiple_tags(simple_user):
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
     assert response_info['endpoint'] == api_info['endpoint']
-    assert response_info['icon_url'] == 'static/imgs/default_icon2.png'
+    assert response_info['icon_url'] == ''
 
 def test_custom_icon(simple_user):
     '''

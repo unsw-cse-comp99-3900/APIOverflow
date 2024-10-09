@@ -82,7 +82,7 @@ def create_api(packet: dict[T, K], user: str, old_sid: str = "") -> dict[T, K]:
         image_cropped.save(internal_url)
 
     else:
-        internal_url = f"{IMAGE_PATH}/default_icon2.png"
+        internal_url = ""
 
     api_sid = str(data_store.num_apis()) if old_sid == "" else old_sid
 
