@@ -1,25 +1,47 @@
-import { Api, NewApi} from "../types/apiTypes";
+import { Api, NewApi } from "../types/apiTypes";
 
-let baseUrl = process.env.REACT_APP_API_BASE_URL
+let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 export const getApis = async () => {
-    const res = await fetch(`${baseUrl}/apis`);
-    const data = await res.json();
-    return data;
-}
-
-export const deleteApi = async (api:Api) => {
-    const res = await fetch(`${baseUrl}/apis/${api.id}`, {
-      method: 'DELETE',
-    });
-    return;
+  const res = await fetch(`${baseUrl}/service/apis`, {
+    method: "GET",
+  });
+  const data = await res.json();
+  return data;
 };
 
-const addApi = async (newApi: NewApi) => {
-  const res = await fetch(`${baseUrl}/apis`, {
-    method: 'POST',
+export const getMyApis = async () => {
+  const res = await fetch(`${baseUrl}/service/my_services`, {
+    method: "GET",
+  });
+  const data = await res.json();
+  return data;
+};
+
+export const getApi = async (id: number) => {
+  const res = await fetch(`${baseUrl}/service`, {
+    method: "GET",
+    body: JSON.stringify(id),
+  });
+  const data = await res.json();
+  return data;
+};
+
+// BE un-implemented
+export const deleteApi = async (id: number) => {
+  const res = await fetch(`${baseUrl}/service/${id}`, {
+    method: "DELETE",
+
+    body: JSON.stringify(id)
+  });
+  return;
+};
+
+export const addApi = async (newApi: NewApi) => {
+  const res = await fetch(`${baseUrl}/service/add`, {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(newApi),
   });
@@ -27,13 +49,14 @@ const addApi = async (newApi: NewApi) => {
   return res;
 };
 
-const updateApi = async (api:Api) => {
-    const res = await fetch(`${baseUrl}/apis/${api.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(api),
-    });
-    return;
-  };
+// BE un-implemented
+export const updateApi = async (api: Api) => {
+  const res = await fetch(`${baseUrl}/service/${api.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(api),
+  });
+  return;
+};

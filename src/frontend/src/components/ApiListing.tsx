@@ -1,58 +1,79 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Api } from '../types/apiTypes';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Api } from "../types/apiTypes";
+import Tag from "./Tag";
+import DeleteApiButton from "./DeleteApiButton";
+import EditApiButton from "./EditApiButton";
 
-const ApiListing = ({ api }: { api: Api }) => {
+const ApiListing = ({
+  api,
+  isMyApis,
+  onDelete,
+}: {
+  api: Api;
+  isMyApis: boolean;
+  onDelete: (id: number) => void;
+}) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   let description = api.description;
 
-  if (!showFullDescription) {
-    description = description.substring(0, 90) + '...';
+  if (!showFullDescription && description.length > 90) {
+    description = description.substring(0, 90) + "...";
   }
 
   return (
-    <div className='bg-white rounded-xl shadow-md relative'>
-      <div className='p-4'>
-        {/* Container for icon and owner + name */}
-        <div className='flex items-start mb-6'>
-          {/* Icon on the left */}
-          <img
-            src={api.icon_url}
-            alt='API Icon'
-            className='w-16 h-16 mr-4 mt-2 rounded-full object-cover'
-          />
+    <div className="bg-white rounded-xl shadow-md relative">
+      <div className="p-4">
+        <div className="pb-16">
+          <div className="flex items-start mb-2">
+            <img
+              src={api.icon_url}
+              alt="API Icon"
+              className="w-20 h-20 ml-4 mr-4 mt-2 rounded-full object-cover"
+            />
 
-          {/* Content for owner and name */}
-          <div>
-            {/* Name */}
-            <h3 className='text-xl font-bold my-2'>{api.name}</h3>
-
-            {/* Owner */}
-            <div className='text-gray-600'>{api.owner}</div>
+            <div>
+              <h3 className="text-xl font-bold my-2">{api.name}</h3>
+              <div className="text-gray-600">{api.owner}</div>
+              <div className="flex flex-wrap mt-4 mb-3">
+                {api?.tags?.map((tag, index) => (
+                  <Tag key={index} tag={tag} className="mr-3 mb-2" />
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-        <div className='border border-gray-100 mb-5'></div>
 
-        {/* Description (without icon) */}
-        <div className='mb-5 break-words text-gray-700'>{description}</div>
+          <div className="border border-gray-100 mx-4 mb-5"></div>
 
-        <button
-          onClick={() => setShowFullDescription((prevState) => !prevState)}
-          className='text-indigo-500 mb-5 hover:text-indigo-600'
-        >
-          {showFullDescription ? 'Less' : 'More'}
-        </button>
+          <div className="mx-4 mb-2 text-justify break-words text-gray-700 ">
+            {description}
+          </div>
 
-        <div className='flex flex-col lg:flex-row justify-between mb-4'>
-          <div className='ml-auto'>
-            <Link
-              to={`/apis/${api.id}`}
-              className='h-[36px] bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-center text-sm'
+          {description.length > 90 && (
+            <button
+              onClick={() => setShowFullDescription((prevState) => !prevState)}
+              className="text-indigo-500 hover:text-indigo-600 underline font-semibold ml-4"
             >
-              Read More
-            </Link>
+              {showFullDescription ? "Less" : "More"}
+            </button>
+          )}
+        </div>
+
+        {isMyApis && (
+          <div className="absolute top-8 right-8 flex space-x-2">
+            <EditApiButton apiId={api.id}/>
+            <DeleteApiButton apiId={api.id} onDelete={onDelete} />
           </div>
+        )}
+
+        <div className="absolute bottom-8 right-8">
+          <Link
+            to={isMyApis ? `/profile/my-apis/${api.id}` : `/apis/${api.id}`}
+            className="h-[36px] bg-blue-800 hover:bg-amber-200 text-white hover:text-black font-semibold hover:underline px-4 py-2 rounded-lg text-center text-sm"
+          >
+            Read More
+          </Link>
         </div>
       </div>
     </div>

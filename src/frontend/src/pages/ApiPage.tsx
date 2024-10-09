@@ -1,103 +1,94 @@
-import { useParams, useLoaderData, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaMapMarker } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { Api } from '../types/apiTypes';
-import { DeleteApiService } from '../types/apiServiceTypes';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Api } from "../types/apiTypes";
+import { getApi } from "../services/apiServices";
+import FetchStatus from "../components/FetchStatus"; // Import the new reusable component
+import Tag from "../components/Tag";
+import ApiReviews from "../components/ApiReviews";
+import ApiDescription from "../components/ApiDescription";
+import ApiDocs from "../components/ApiDocs";
+import BackButton from "../components/BackButton";
 
+const ApiPage = () => {
+  const [api, setApi] = useState<Api | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { id } = useParams();
 
-const ApiPage = ({ deleteApi }: DeleteApiService) => {
-  const navigate = useNavigate();
-  const api = useLoaderData() as Api;
+  useEffect(() => {
+    const fetchApi = async () => {
+      if (!id) {
+        setError("Invalid API ID");
+        setLoading(false);
+        return;
+      }
+      try {
+        console.log(id)
+        const data = await getApi(Number(id));
+        setApi(data);
+      } catch (error) {
+        console.log("Error fetching data", error);
+        setError("Failed to load API data");
+        toast.error("Error loading API data");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const onDeleteClick = (api:Api) => {
-    const confirm = window.confirm(
-      'Are you sure you want to delete this listing?'
-    );
-
-    if (!confirm) return;
-
-    deleteApi(api);
-    toast.success('Api deleted successfully');
-    navigate('/apis');
-  };
+    fetchApi();
+  }, [id]); // Ensure the effect runs whenever the id changes
 
   return (
     <>
-      <section>
-        <div className='container m-auto py-6 px-6'>
-          <Link
-            to='/apis'
-            className='text-indigo-500 hover:text-indigo-600 flex items-center'
-          >
-            <FaArrowLeft className='mr-2' /> Back to Api Listings
-          </Link>
-        </div>
-      </section>
+      {/* Main Layout */}
+      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white px-6">
+      <BackButton toUrl="/apis" />
+        <FetchStatus loading={loading} error={error} data={api}>
+          {api && (
+            <>
+              {/* Header Section */}
+              <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
+                <div className="flex items-center">
+                  {/* Placeholder for API icon */}
+                  <div className="flex flex-shrink-0 items-center">
+                    {" "}
+                    {/* Adjust pl-10 as needed for custom padding */}
+                    <img
+                      className="w-56 h-56 rounded-full object-cover mx-auto"
+                      src={api?.icon_url}
+                      alt="API Icon"
+                    />
+                  </div>
 
-      <section className='bg-indigo-50'>
-        <div className='container m-auto py-10 px-6'>
-          <div className='grid grid-cols-1 md:grid-cols-70/30 w-full gap-6'>
-            <main>
-              <div className='bg-white p-6 rounded-lg shadow-md text-center md:text-left'>
-                <div className='text-gray-500 mb-4'>{api.name}</div>
-                <h1 className='text-3xl font-bold mb-4'>{api.name}</h1>
+                  {/* Parent div */}
+                  <div className="ml-10 w-full">
+                    {/* Fixed top margin for API Name */}
+                    <h1 className="text-4xl font-bold mb-5">{api?.name}</h1>
+
+                    {/* Gray border that spans full width */}
+                    <div className="border border-gray-100 w-full mb-5"></div>
+
+                    {/* Tags section */}
+                    <div className="flex flex-wrap max-w-3xl mt-4 mb-5">
+                      {api?.tags.map((tag, index) => (
+                        <Tag key={index} tag={tag} className="mr-3 mb-2" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className='bg-white p-6 rounded-lg shadow-md mt-6'>
-                <h3 className='text-indigo-800 text-lg font-bold mb-6'>
-                  Api Description
-                </h3>
-
-                <p className='mb-4 break-words'>{api.description}</p>
-
+              {/* Reviews, Description, Documentation */}
+              <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
+                <ApiReviews />
+                <ApiDescription api={api} />{" "}
+                {/* Pass api only when it's not null */}
+                <ApiDocs />
               </div>
-            </main>
-
-            {/* <!-- Sidebar --> */}
-            <aside className="w-full md:w-1/3 p-4">
-						
-            {/* <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className='text-xl font-bold mb-6'>User Info</h3>
-
-                <h2 className='text-2xl'>{api.name}</h2>
-
-                <p className='my-2'>{api.name}</p>
-
-                <hr className='my-4' />
-
-                <h3 className='text-xl'>Contact Email:</h3>
-
-                <p className='my-2 bg-indigo-100 p-2 font-bold'>
-                  {api.name}
-                </p>
-
-                <h3 className='text-xl'>Contact Phone:</h3>
-
-                <p className='my-2 bg-indigo-100 p-2 font-bold'>
-                  {' '}
-                  {api.name}
-                </p>
-              </div> */}
-
-              <div className='bg-white p-6 rounded-lg shadow-md mt-6'>
-                <h3 className='text-xl font-bold mb-6'>Manage Api</h3>
-                <Link
-                  to={`/edit-api/${api.id}`}
-                  className='bg-indigo-500 hover:bg-indigo-600 text-white text-center font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block'
-                >
-                  Edit Api
-                </Link>
-                <button
-                  onClick={() => onDeleteClick(api)}
-                  className='bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block'
-                >
-                  Delete Api
-                </button>
-              </div>
-            </aside>
-          </div>
-        </div>
+            </>
+          )}
+        </FetchStatus>
       </section>
     </>
   );
