@@ -44,6 +44,7 @@ async def home():
         "register_link": "/auth/register"
     }
 
+# todo: auth gate this so that endpoint is private
 @app.post("/testing/clear")
 async def clear():
     '''
@@ -51,7 +52,7 @@ async def clear():
     '''
     ds.clear_datastore()
     clear_all_users()
-    clear_all_services
+    clear_all_services()
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
