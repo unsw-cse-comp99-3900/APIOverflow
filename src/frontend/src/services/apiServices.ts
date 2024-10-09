@@ -26,7 +26,7 @@ export const getMyApis = async () => {
 };
 
 export const getApi = async (id: number | string) => {
-  const res = await fetch(`${baseUrl}/service/get_service?id=${id}`, {
+  const res = await fetch(`${baseUrl}/service/get_service?sid=${id}`, {
     method: "GET",
   });
   const data = await res.json();
