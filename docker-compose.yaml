@@ -24,7 +24,9 @@ services:
       - MONGO_ENV=docker
     depends_on:
       - mongodb
-    
+    links:
+      - mongodb
+  
   frontend:
     build: ./src/frontend 
     volumes:
