@@ -16,6 +16,7 @@ import UserProfileLayout from "./layouts/UserProfileLayout";
 import MyApisPage from "./pages/MyApisPage";
 import MyApiPage from "./pages/MyApiPage";
 import ThemeLayout from './layouts/ThemeLayout';
+import { AuthProvider } from './authentication/AuthProvider';
 
 const App = () => {
   const router = createBrowserRouter(
@@ -47,7 +48,8 @@ const App = () => {
     )
   );
   
-  return <RouterProvider router={router} />;
+  return <AuthProvider><RouterProvider router={router} />
+  </AuthProvider>;
 };
 
 export default App;

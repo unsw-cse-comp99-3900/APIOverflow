@@ -4,30 +4,38 @@ import { useNavigate } from 'react-router-dom';
 // Import the blob SVG
 import Blob1 from '../assets/images/blobs/blob1.svg';
 import Blob2 from '../assets/images/blobs/blob2.svg';
+import { useAuth } from '../authentication/AuthProvider';
+import { userLogin } from '../services/apiServices';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const auth = useAuth();
+
+  const { login } = auth!;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (email === '' || password === '') {
+    if (username === '' || password === '') {
       setError('Please fill in both fields.');
       return;
     }
 
-    setError('');
     setIsLoading(true);
-
-    setTimeout(() => {
+    try {
+      const token = await userLogin(username, password);
+      login(token);
       setIsLoading(false);
-      console.log('Login successful:', { email, password });
-      navigate('/dashboard');
-    }, 2000);
+      console.log('Login successful:', { username, password });
+      navigate('/apis');
+    }catch(error){
+      setError('Invalid credentials');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -45,15 +53,15 @@ const Login: React.FC = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">Email:</label>
+            <label htmlFor="username" className="block text-sm font-bold text-gray-700 mb-2">Username:</label>
             <input
-              type="email"
-              id="email"
-              name="email"
+              type="username"
+              id="username"
+              name="username"
               className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
