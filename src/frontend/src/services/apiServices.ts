@@ -15,12 +15,6 @@ export const getApis = async () => {
 };
 
 export const getMyApis = async () => {
-  console.log({
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    method: "GET",
-  });
   const res = await fetch(`${baseUrl}/service/my_services`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,

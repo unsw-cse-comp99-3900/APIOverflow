@@ -15,7 +15,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
 
   useEffect(() => {
     const fetchApi = async () => {
-      if (!apiId) {
+      if (apiId === undefined) {
         return;
       }
       try {
