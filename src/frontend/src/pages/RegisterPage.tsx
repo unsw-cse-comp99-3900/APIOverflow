@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Import the blob SVG
 import Blob1 from "../assets/images/blobs/blob1.svg";
@@ -56,8 +56,9 @@ const RegisterPage: React.FC = () => {
 
         {/* Login Form */}
         <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8 z-10">
-          <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
-
+          <h1 className="text-2xl font-bold text-center text-blue-900 mb-6">
+            Sign Up
+          </h1>
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
           <form onSubmit={handleSubmit}>
@@ -72,7 +73,7 @@ const RegisterPage: React.FC = () => {
                 type="email"
                 id="email"
                 name="email"
-                className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -91,7 +92,7 @@ const RegisterPage: React.FC = () => {
                 type="username"
                 id="username"
                 name="username"
-                className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
                 placeholder="Enter your username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -110,7 +111,7 @@ const RegisterPage: React.FC = () => {
                 type="password"
                 id="password"
                 name="password"
-                className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -129,11 +130,22 @@ const RegisterPage: React.FC = () => {
             ) : (
               <button
                 type="submit"
-                className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none"
+                className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none font-semibold"
               >
-                Login
+                Sign Up
               </button>
             )}
+            <div className="flex justify-center pt-3">
+              <span className="font-semibold text-gray-700">
+                Already have an account?
+              </span>
+              <Link
+                to="/login"
+                className="pl-2 text-blue-700 underline font-semibold"
+              >
+                Sign In
+              </Link>
+            </div>
           </form>
         </div>
       </div>

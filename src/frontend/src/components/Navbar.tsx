@@ -41,7 +41,7 @@ const Navbar = () => {
                 >
                   <span className="flex items-center space-x-2">
                     <FaUserCircle className={`h-8 w-8 ${{ linkClass }}`} />
-                    <strong>{isLoggedIn ? "My Profile" : "Log In"}</strong>
+                    <strong className="px-2">{isLoggedIn ? "My Profile" : "Sign In"}</strong>
                   </span>
                 </NavLink>
               </div>

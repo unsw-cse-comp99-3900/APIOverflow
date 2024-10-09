@@ -15,10 +15,10 @@ const UserSideBar = () => {
   const { logout } = auth!;
 
   const onLogOutClick = async () => {
-    const confirm = window.confirm("Are you sure you want to log out?");
+    const confirm = window.confirm("Are you sure you want to sign out?");
     if (!confirm) return;
     logout()
-    toast.success("Logged out successfully");
+    toast.success("Signed out successfully");
     navigate("/apis");
   };
 
@@ -59,7 +59,7 @@ const UserSideBar = () => {
             onClick={onLogOutClick}
           >
             <span className="ml-3 font-medium flex items-center ">
-              <FaSignOutAlt className="mr-2" /> Log Out
+              <FaSignOutAlt className="mr-2" /> Sign Out
             </span>
           </button>
         </nav>

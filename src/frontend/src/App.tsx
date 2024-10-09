@@ -26,7 +26,7 @@ const App = () => {
         <Route path="/" element={<ThemeLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<RegisterPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Route>
 
         <Route path="/" element={<ContentLayout />}>
