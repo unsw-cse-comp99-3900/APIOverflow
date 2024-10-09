@@ -5,11 +5,12 @@ export interface Api {
   ownerName: string;
   iconUrl: string;
   tags: string[];
+  endpoint: string;
 }
 
 export type DetailedApi = Api & {
   documents: string[];
-  endpoint: string;
+
 }
 
 export type NewApi = Omit<DetailedApi, "id">;

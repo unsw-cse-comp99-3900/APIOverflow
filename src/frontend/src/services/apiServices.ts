@@ -50,9 +50,12 @@ export const deleteApi = async (id: number) => {
 };
 
 export const addApi = async (service: ServicePost) => {
+
+  console.log(service);
   const res = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(service),

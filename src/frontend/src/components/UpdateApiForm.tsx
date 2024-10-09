@@ -11,7 +11,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
   const navigate = useNavigate();
   const [apiName, setApiName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  console.log(api?.description)
+  const [endpoint, setEndpoint] = useState<string>("");
 
   useEffect(() => {
     const fetchApi = async () => {
@@ -44,7 +44,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
         ownerName: "sample_owner",
         tags: ["sample_tag"],
         documents: ["sample_document"],
-        endpoint: "sample_endpoint",
+        endpoint: endpoint,
       };
       updateApi(updatedApi);
     }else{
@@ -57,7 +57,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
         description,
         icon_url: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
         tags: ["sample_tag"],
-        endpoint: "sample_endpoint",
+        endpoint: endpoint,
       }; 
       addApi(newApi);
     }
@@ -101,14 +101,39 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
                     required
                     type="text"
                     onChange={(e) => setApiName(e.target.value)}
-                    placeholder="MyAwesomeAPI"
-                    autoComplete="username"
+                    placeholder="API Overflow"
                     defaultValue={api?.name}
                     className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 focus:font-semibold text-md leading-6"
                   />
                 </div>
               </div>
             </div>
+
+            <div className="col-span-full">
+              <label
+                htmlFor="apiName"
+                className="block text-2xl font-semibold py-6 leading-6 text-blue-800"
+              >
+                Endpoint
+              </label>
+
+              <div className="mt-2">
+                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                  <input
+                    id="endpoint"
+                    name="endpoint"
+                    required
+                    type="text"
+                    onChange={(e) => setEndpoint(e.target.value)}
+                    placeholder="https://api-overflow.com/non-playable-coders/example-endpoint"
+                    defaultValue={api?.endpoint}
+                    className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 text-md leading-6"
+                  />
+                </div>
+              </div>
+            </div>
+
+
             <div className="col-span-full">
               <label
                 htmlFor="description"
@@ -120,7 +145,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
                 <textarea
                   id="description"
                   name="description"
-                  placeholder="Write a few sentences about your API."
+                  placeholder="A library of Apis and Microservices"
                   required
                   onChange={(e) => setDescription(e.target.value)}
                   value={description}
