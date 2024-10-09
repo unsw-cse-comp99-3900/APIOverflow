@@ -1,17 +1,32 @@
 import React from "react";
 import { FaSignOutAlt, FaCode, FaRegPlusSquare } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAuth } from "../authentication/AuthProvider";
+
 const UserSideBar = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
       ? "flex items-center px-4 py-2 text-gray-900 bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3"
       : "flex items-center px-4 py-2 text-gray-900 bg-white rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3";
 
+  const navigate = useNavigate();
+  const auth = useAuth();
+  const { logout } = auth!;
+
+  const onLogOutClick = async () => {
+    const confirm = window.confirm("Are you sure you want to sign out?");
+    if (!confirm) return;
+    logout()
+    toast.success("Signed out successfully");
+    navigate("/");
+  };
+
   return (
     <aside className="fixed left-0 w-80 h-full px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
       <div className="flex flex-col items-center mt-6 -mx-2">
         <img
-          className="object-cover w-40 h-40 mx-2 rounded-full"
+          className="object-cover w-40 h-40 mx-2 rounded-full border-2 border-gray-300"
           src="https://img.freepik.com/premium-vector/anonymous-user-circle-icon-vector-illustration-flat-style-with-long-shadow_520826-1931.jpg?semt=ais_hybrid"
           alt="User Avatar"
         />
@@ -39,11 +54,14 @@ const UserSideBar = () => {
 
           {/* Setting tabs */}
           <div className="border border-gray-100 mb-5 mt-5"></div>
-          <NavLink to="/profile/Logout" className={linkClass}>
+          <button
+            className="flex w-full items-center px-4 py-2 text-gray-900 bg-white rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3"
+            onClick={onLogOutClick}
+          >
             <span className="ml-3 font-medium flex items-center ">
-              <FaSignOutAlt className="mr-2" /> Log Out
+              <FaSignOutAlt className="mr-2" /> Sign Out
             </span>
-          </NavLink>
+          </button>
         </nav>
       </div>
     </aside>

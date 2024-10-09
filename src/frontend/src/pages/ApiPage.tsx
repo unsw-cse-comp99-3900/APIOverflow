@@ -43,11 +43,10 @@ const ApiPage = () => {
   return (
     <>
       {/* Main Layout */}
-      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white px-6">
       <BackButton toUrl="/apis" />
         <FetchStatus loading={loading} error={error} data={api}>
           {api && (
-            <>
+            <div className="px-10">
               <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
                 <div className="flex items-center">
                   {/* Placeholder for API icon */}
@@ -71,13 +70,12 @@ const ApiPage = () => {
               </div>
               <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
                 <ApiReviews />
-                <ApiDescription api={api} />{" "}
+                <ApiDescription api={api} />
                 <ApiDocs />
               </div>
-            </>
+            </div>
           )}
         </FetchStatus>
-      </section>
     </>
   );
 };

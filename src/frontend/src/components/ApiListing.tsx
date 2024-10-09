@@ -18,7 +18,6 @@ const ApiListing = ({
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   let description = api.description;
-  console.log(api)
 
   if (!showFullDescription && description.length > 90) {
     description = description.substring(0, 90) + "...";

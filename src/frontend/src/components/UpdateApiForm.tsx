@@ -1,24 +1,25 @@
-import { PhotoIcon } from "@heroicons/react/24/solid";
+import { PhotoIcon, DocumentIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useState } from "react";
 import { Api, NewApi, DetailedApi } from "../types/apiTypes";
 import { getApi, updateApi, addApi } from "../services/apiServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { ServicePost } from "../types/backendTypes";
 
 const EditApiForm = ({ apiId }: { apiId?: number }) => {
   const [api, setApi] = useState<Api | null>(null);
   const navigate = useNavigate();
   const [apiName, setApiName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  console.log(api?.description)
+  const [endpoint, setEndpoint] = useState<string>("");
 
   useEffect(() => {
     const fetchApi = async () => {
-      if (!apiId) {
+      if (apiId === undefined) {
         return;
       }
       try {
-        const data = await getApi(Number(apiId));
+        const data = await getApi(apiId);
         setApi(data);
         setApiName(data.name);
         setDescription(data.description);
@@ -31,7 +32,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
   }, []); // Ensure the effect runs whenever the id changes
 
 
-  const submitApiUpdate = (e: React.FormEvent<HTMLFormElement>) => {
+  const submitApiUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
 		if (apiId) {
@@ -39,29 +40,35 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
         id: Number(apiId),
         name: apiName,
         description,
-        iconUrl: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
+        iconUrl: "",
         ownerName: "sample_owner",
         tags: ["sample_tag"],
         documents: ["sample_document"],
-        endpoint: "sample_endpoint",
+        endpoint: endpoint,
       };
-      updateApi(updatedApi);
+      
+      await updateApi(updatedApi);
+      navigate(`/profile/my-apis/${apiId}`);
     }else{
-      const newApi:NewApi = {
+      const newApi:ServicePost = {
         name: apiName,
+        x_start : 0,
+        x_end : 100,
+        y_start : 0,
+        y_end : 100,
         description,
-        iconUrl: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
-        ownerName: "sample_owner",
+        icon_url: "",
         tags: ["sample_tag"],
-        endpoint: "sample_endpoint",
-        documents: ["sample_document"],
+        endpoint: endpoint,
       }; 
-      addApi(newApi);
+      const newId = await addApi(newApi);
+      console.log(newId)
+      navigate(`/profile/my-apis/${newId}`);
     }
-
-    toast.success('Job Updated Successfully');
-
-    navigate(`/profile/my-apis/${apiId}`);
+    console.log(apiId)
+    
+    toast.success('Success!');
+    
   };
 
 
@@ -99,14 +106,39 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
                     required
                     type="text"
                     onChange={(e) => setApiName(e.target.value)}
-                    placeholder="MyAwesomeAPI"
-                    autoComplete="username"
+                    placeholder="API Overflow"
                     defaultValue={api?.name}
                     className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 focus:font-semibold text-md leading-6"
                   />
                 </div>
               </div>
             </div>
+
+            <div className="col-span-full">
+              <label
+                htmlFor="apiName"
+                className="block text-2xl font-semibold py-6 leading-6 text-blue-800"
+              >
+                Endpoint
+              </label>
+
+              <div className="mt-2">
+                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                  <input
+                    id="endpoint"
+                    name="endpoint"
+                    required
+                    type="text"
+                    onChange={(e) => setEndpoint(e.target.value)}
+                    placeholder="https://api-overflow.com/non-playable-coders/example-endpoint"
+                    defaultValue={api?.endpoint}
+                    className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 text-md leading-6"
+                  />
+                </div>
+              </div>
+            </div>
+
+
             <div className="col-span-full">
               <label
                 htmlFor="description"
@@ -118,7 +150,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
                 <textarea
                   id="description"
                   name="description"
-                  placeholder="Write a few sentences about your API."
+                  placeholder="A library of Apis and Microservices"
                   required
                   onChange={(e) => setDescription(e.target.value)}
                   value={description}
@@ -137,7 +169,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
               </label>
               <div className="mt-2 flex justify-center rounded-lg border border-dashed border-blue-800/25 px-6 py-10">
                 <div className="text-center">
-                  <PhotoIcon
+                  <DocumentIcon
                     aria-hidden="true"
                     className="mx-auto h-12 w-12 text-gray-300"
                   />

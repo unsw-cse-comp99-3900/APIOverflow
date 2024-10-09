@@ -13,11 +13,10 @@ const DeleteApiButton = ({
   apisRoute?: string;
   onDelete?: (id: number) => void;
 }) => {
-  console.log(`API with id ${apiId} deleted`);
   const navigate = useNavigate();
   const onDeleteClick = async (apiId: number) => {
     const confirm = window.confirm(
-      "Are you sure you want to delete this listing?"
+      "Are you sure you want to delete this API?"
     );
     if (!confirm) return;
 

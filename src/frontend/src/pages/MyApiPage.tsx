@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Api } from "../types/apiTypes";
+import { DetailedApi } from "../types/apiTypes";
 import { getApi } from "../services/apiServices";
 import FetchStatus from "../components/FetchStatus";
 import Tag from "../components/Tag";
 import EditApiButton from "../components/EditApiButton";
 import DeleteApiButton from "../components/DeleteApiButton";
+import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import ApiReviews from "../components/ApiReviews";
 import ApiDescription from "../components/ApiDescription";
 import ApiDocs from "../components/ApiDocs";
 import BackButton from "../components/BackButton";
 
 const MyApiPage = () => {
-  const [api, setApi] = useState<Api | null>(null);
+  const [api, setApi] = useState<DetailedApi | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { id } = useParams();
@@ -37,20 +38,18 @@ const MyApiPage = () => {
 
   return (
     <>
-      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white px-6">
         <BackButton toUrl="/profile/my-apis" />
-
         {/* Use FetchStatus for loading and error handling */}
         <FetchStatus loading={loading} error={error} data={api}>
           {api && (
-            <>
+            <div className="px-10">
               {/* Header Section */}
               <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
                 <div className="flex items-center">
                   <div className="flex flex-shrink-0 items-center">
                     <img
                       className="w-56 h-56 rounded-full object-cover mx-auto"
-                      src={api?.iconUrl}
+                      src={api.iconUrl || defaultApiIcon}
                       alt="API Icon"
                     />
                   </div>
@@ -85,10 +84,9 @@ const MyApiPage = () => {
                 {/* Pass api only when it's not null */}
                 <ApiDocs />
               </div>
-            </>
+            </div>
           )}
         </FetchStatus>
-      </section>
     </>
   );
 };
