@@ -39,32 +39,38 @@ def db_add_service(item: dict[T, K]) -> None:
 ###################################
 #       Get Methods
 ###################################
-def db_get_user(username: str) -> dict[T, K] | None:
+def db_get_user(uid: str) -> dict[T, K] | None:
     '''
         Grabs user from MongoDB
     '''
-    return db.users.find_one({"username": username})
+    return db.users.find_one({"id": uid})
 
-def db_get_service(name: str) -> dict[T, K] | None:
+def db_get_service(sid: str) -> dict[T, K] | None:
     '''
         Grabs service from MongoDB
     '''
-    return db.services.find_one({'name': name})
+    return db.services.find_one({'id': sid})
 
 ###################################
 #       Update (put) Methods
 ###################################
-def db_update_user(username: str, new_user: dict[T, K]) -> None:
+
+def db_update_user(uid: str, new_user: dict[T, K]) -> None:
     '''
         Update a mongodb user into MongoDB
     '''
-    db.users.replace_one({"username": username}, new_user)
+    db.users.replace_one({"id": uid}, new_user)
 
-def db_update_service(service_name: str, new_service: dict[T, K]) -> None:
+def db_update_service(sid: str, updated_service_object: dict[T, K]) -> None:
     '''
         Update a service into MongoDB
     '''
-    db.services.replace_one({'name': service_name}, new_service)
+    db.services.replace_one({'id': sid}, updated_service_object)
+
+def db_add_document(sid: str, new_doc: int) -> None:
+    old_documents = db_get_service(sid)["documents"]
+    old_documents.append(new_doc)
+    db.services.update_one({'id': sid}, {"$set": {'documents': old_documents}}, upsert=False)
 
 ###################################
 #       Delete Methods
@@ -75,3 +81,10 @@ def clear_all_users() -> None:
 
 def clear_all_services() -> None:
     db.services.delete_many({})
+
+def db_delete_service(name: str) -> None:
+    """
+    Deletes a service from MongoDB by its name.
+    """
+    db.services.delete_one({'name': name})
+    return True

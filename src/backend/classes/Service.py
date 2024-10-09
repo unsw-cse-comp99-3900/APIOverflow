@@ -65,7 +65,7 @@ class Service:
     #   Add Methods
     ################################
 
-    def add_docs(self, docs: List[str]) -> None:
+    def add_docs(self, docs: List[int]) -> None:
         '''
             Adds paths to documentation
         '''

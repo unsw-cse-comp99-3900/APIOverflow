@@ -40,5 +40,6 @@ async def upload_wrapper(file: UploadFile) -> str:
         await file.close()
 
     doc = Document(str(data_store.num_docs()), path, file.content_type)
+
     data_store.add_docs(doc)
     return doc.get_id()
