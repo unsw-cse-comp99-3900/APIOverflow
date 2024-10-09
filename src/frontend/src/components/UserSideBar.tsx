@@ -1,11 +1,26 @@
 import React from "react";
 import { FaSignOutAlt, FaCode, FaRegPlusSquare } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAuth } from "../authentication/AuthProvider";
+
 const UserSideBar = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
       ? "flex items-center px-4 py-2 text-gray-900 bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3"
       : "flex items-center px-4 py-2 text-gray-900 bg-white rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3";
+
+  const navigate = useNavigate();
+  const auth = useAuth();
+  const { logout } = auth!;
+
+  const onLogOutClick = async () => {
+    const confirm = window.confirm("Are you sure you want to log out?");
+    if (!confirm) return;
+    logout()
+    toast.success("Logged out successfully");
+    navigate("/apis");
+  };
 
   return (
     <aside className="fixed left-0 w-80 h-full px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
@@ -39,11 +54,14 @@ const UserSideBar = () => {
 
           {/* Setting tabs */}
           <div className="border border-gray-100 mb-5 mt-5"></div>
-          <NavLink to="/profile/Logout" className={linkClass}>
+          <button
+            className="flex w-full items-center px-4 py-2 text-gray-900 bg-white rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3"
+            onClick={onLogOutClick}
+          >
             <span className="ml-3 font-medium flex items-center ">
               <FaSignOutAlt className="mr-2" /> Log Out
             </span>
-          </NavLink>
+          </button>
         </nav>
       </div>
     </aside>

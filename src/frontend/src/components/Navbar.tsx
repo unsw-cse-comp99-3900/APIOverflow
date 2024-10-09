@@ -1,12 +1,16 @@
 import { NavLink } from "react-router-dom";
 import logo from "../assets/images/logo.svg";
 import { FaUserCircle } from "react-icons/fa"; // Import the user icon
+import { useAuth } from "../authentication/AuthProvider";
 
 const Navbar = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
       ? "bg-white text-blue-900 hover:bg-gray-100 hover:text-bg-blue-900 rounded-md flex items-center justify-center h-12 w-auto px-4 py-2"
       : "text-white hover:bg-white hover:text-blue-900 rounded-md flex items-center justify-center h-12 w-auto px-4 py-2";
+  const loggedIn = localStorage.getItem("token");
+  const auth = useAuth();
+  const { isLoggedIn } = auth!;
 
   return (
     <nav className="bg-blue-900 fixed top-0 w-full z-50 ">
@@ -31,16 +35,15 @@ const Navbar = () => {
                 <NavLink to="/profile/add-api" className={linkClass}>
                   <strong>Add API</strong>
                 </NavLink>
-                <NavLink to='/login' className={linkClass}>
-                  <strong>Login</strong>
-                </NavLink>
-                <NavLink to="/profile/my-apis" className={linkClass}>
+                <NavLink
+                  to={loggedIn ? "/profile/my-apis" : "/login"}
+                  className={linkClass}
+                >
                   <span className="flex items-center space-x-2">
-                  <FaUserCircle className={`h-8 w-8 ${{ linkClass }}`} />
-                    <strong>My Profile</strong>
+                    <FaUserCircle className={`h-8 w-8 ${{ linkClass }}`} />
+                    <strong>{isLoggedIn ? "My Profile" : "Log In"}</strong>
                   </span>
                 </NavLink>
-
               </div>
             </div>
           </div>
