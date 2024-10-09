@@ -32,7 +32,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
   }, []); // Ensure the effect runs whenever the id changes
 
 
-  const submitApiUpdate = (e: React.FormEvent<HTMLFormElement>) => {
+  const submitApiUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
 		if (apiId) {
@@ -46,20 +46,21 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
         documents: ["sample_document"],
         endpoint: endpoint,
       };
-      updateApi(updatedApi);
+      
+      await updateApi(updatedApi);
     }else{
       const newApi:ServicePost = {
         name: apiName,
         x_start : 0,
-        x_end : 0,
+        x_end : 100,
         y_start : 0,
-        y_end : 0,
+        y_end : 100,
         description,
         icon_url: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
         tags: ["sample_tag"],
         endpoint: endpoint,
       }; 
-      addApi(newApi);
+      await addApi(newApi);
     }
 
     toast.success('Success!');

@@ -1,11 +1,8 @@
 // TODO: Define the types for the backend API
-
-
-
 export interface ServicePost {
     name: string;
-    description: string;
     icon_url: string;
+    description: string;
     x_start:number;
     x_end: number;
     y_start: number;

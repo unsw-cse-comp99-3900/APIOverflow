@@ -16,14 +16,14 @@ export const getApis = async () => {
 
 export const getMyApis = async () => {
   console.log({
-    headers:{
-      Authorization: `Bearer ${localStorage.getItem("token")}`
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
     method: "GET",
-  })
+  });
   const res = await fetch(`${baseUrl}/service/my_services`, {
-    headers:{
-      Authorization: `Bearer ${localStorage.getItem("token")}`
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
     method: "GET",
   });
@@ -50,8 +50,6 @@ export const deleteApi = async (id: number) => {
 };
 
 export const addApi = async (service: ServicePost) => {
-
-  console.log(service);
   const res = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
@@ -82,7 +80,7 @@ export const userLogin = async (credentials: LoginModel) => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(credentials), 
+    body: JSON.stringify(credentials),
   });
 
   if (!res.ok) {
@@ -95,7 +93,7 @@ export const userLogin = async (credentials: LoginModel) => {
   return data.access_token;
 };
 
-export const userRegister = async (user:UserCreate) => {
+export const userRegister = async (user: UserCreate) => {
   await fetch(`${baseUrl}/auth/register`, {
     method: "POST",
     headers: {
@@ -104,4 +102,4 @@ export const userRegister = async (user:UserCreate) => {
     body: JSON.stringify(user),
   });
   return;
-}
+};
