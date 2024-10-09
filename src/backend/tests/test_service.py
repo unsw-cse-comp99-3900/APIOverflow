@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from src.backend.classes import Service
 from src.backend.app import app
 from src.backend.classes.models import User
-from src.backend.database import db
+from src.backend.database import *
 
 
 # Create a test client
@@ -22,8 +22,7 @@ def clear_all():
     '''
     response = client.post("/testing/clear")
     assert response.status_code == SUCCESS
-    assert  response.json() == {"message" : "Clear Successful"}
-    db.users.delete_many({})
+    assert response.json() == {"message" : "Clear Successful"}
 
 @pytest.fixture
 def simple_user():
@@ -263,7 +262,7 @@ def test_create_api(simple_user):
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'sid' : sid
+                              'id' : sid
                           })
     
     assert response.status_code == SUCCESS
@@ -273,6 +272,13 @@ def test_create_api(simple_user):
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
     assert response_info['endpoint'] == api_info['endpoint']
+
+    database_object = db_get_service(api_info['name'])
+    assert database_object['id'] == sid
+    assert database_object['name'] == api_info['name']
+    assert database_object['description'] == api_info['description']
+    assert database_object['tags'] == api_info['tags']
+    assert database_object['endpoint'] == api_info['endpoint']
 
 def test_multiple_tags(simple_user):
     '''
@@ -299,7 +305,7 @@ def test_multiple_tags(simple_user):
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'sid' : sid
+                              'id' : sid
                           })
     
     assert response.status_code == SUCCESS
@@ -309,7 +315,7 @@ def test_multiple_tags(simple_user):
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
     assert response_info['endpoint'] == api_info['endpoint']
-    assert response_info['icon_url'] == 'static/imgs/default_icon2.png'
+    assert response_info['icon_url'] == ''
 
 def test_custom_icon(simple_user):
     '''
@@ -337,7 +343,7 @@ def test_custom_icon(simple_user):
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
                               'token' : simple_user['token'],
-                              'sid' : sid
+                              'id' : sid
                           })
     
     assert response.status_code == SUCCESS
@@ -347,3 +353,106 @@ def test_custom_icon(simple_user):
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
     assert response_info['endpoint'] == api_info['endpoint']
+
+# todo: test new fields
+def test_update_api(simple_user):
+    '''
+        Test whether an API is correctly created then updated
+    '''
+    api_info = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
+                }
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+    sid = response.json()['sid']
+
+    update_request_info = {
+        'sid' : sid,
+        'name' : 'new name',
+        'icon_url' : '',
+        'x_start' : 1,
+        'x_end' : 1,
+        'y_start' : 1,
+        'y_end' : 1,
+        'description' : 'new description',
+        'tags' : ['new', 'tag'],
+        'endpoint': 'https://api.example.com/users/12345'
+    }
+
+    response = client.put("/service/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_request_info)
+    assert response.status_code == SUCCESS
+    
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'id' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+   
+    assert response_info['id'] == sid
+    assert response_info['name'] == update_request_info['name']
+    assert response_info['description'] == update_request_info['description']
+    assert response_info['tags'] == update_request_info['tags']
+    assert response_info['endpoint'] == update_request_info['endpoint']
+
+    database_object = db_get_service(update_request_info['name'])
+    assert database_object['id'] == sid
+    assert database_object['name'] == update_request_info['name']
+    assert database_object['description'] == update_request_info['description']
+    assert database_object['tags'] == update_request_info['tags']
+    assert database_object['endpoint'] == update_request_info['endpoint']
+
+def test_update_api_invalid_sid(simple_user):
+    '''
+        Tests error received when sid is not valid
+    '''
+
+    api_info = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
+                }
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+
+    update_request_info = {
+        'sid' : "invalid id",
+        'name' : 'new name',
+        'icon_url' : '',
+        'x_start' : 1,
+        'x_end' : 1,
+        'y_start' : 1,
+        'y_end' : 1,
+        'description' : 'new name',
+        'tags' : ['new', 'name'],
+        'endpoint': 'https://api.example.com/users/12345'
+    }
+
+    response = client.put("/service/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_request_info)
+    assert response.status_code == 404

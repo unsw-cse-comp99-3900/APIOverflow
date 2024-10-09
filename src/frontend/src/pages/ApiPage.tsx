@@ -6,6 +6,7 @@ import { getApi } from "../services/apiServices";
 import FetchStatus from "../components/FetchStatus";
 import Tag from "../components/Tag";
 import ApiReviews from "../components/ApiReviews";
+import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import ApiDescription from "../components/ApiDescription";
 import ApiDocs from "../components/ApiDocs";
 import BackButton from "../components/BackButton";
@@ -15,6 +16,7 @@ const ApiPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { id } = useParams();
+  
 
   useEffect(() => {
     const fetchApi = async () => {
@@ -52,7 +54,7 @@ const ApiPage = () => {
                   <div className="flex flex-shrink-0 items-center">
                     <img
                       className="w-56 h-56 rounded-full object-cover mx-auto border-2 border-gray-300"
-                      src={api?.iconUrl}
+                      src={api.iconUrl || defaultApiIcon}
                       alt="API Icon"
                     />
                   </div>

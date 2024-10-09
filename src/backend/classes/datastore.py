@@ -215,6 +215,16 @@ class Datastore:
         return self.__store['docs_count']
 
     ################################
+    #   Datastore Update Methods
+    ################################
+    
+     # assumes item already exists
+    def update_api_by_id(self, eid: str, api: T ) -> None:
+        self.delete_item(eid, 'api')
+        self.__store['apis'].append(api)
+        return None
+
+    ################################
     #   Datastore Deletion Methods
     ################################
     def delete_item(self, eid: int, i_type: Literal['user', 'api']) -> None:

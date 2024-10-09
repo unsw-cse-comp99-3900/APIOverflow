@@ -9,7 +9,7 @@ export const getApis = async () => {
     method: "GET",
   });
   const data = await res.json();
-  return removeUnderscores(data);
+  return removeUnderscores(data).map(apiDataFormatter);
 };
 
 export const getMyApis = async () => {
@@ -21,10 +21,11 @@ export const getMyApis = async () => {
 };
 
 export const getApi = async (id: number) => {
-  const res = await fetch(`${baseUrl}/service/get_service?sid=${id}`, {
+  const res = await fetch(`${baseUrl}/service/get_service?id=${id}`, {
     method: "GET",
   });
   const data = await res.json();
+  console.log(data)
   return apiDataFormatter(removeUnderscores(data));
 };
 

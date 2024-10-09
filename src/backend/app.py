@@ -89,11 +89,11 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
 
 
 @app.get("/service/get_service")
-async def get_service(sid: str):
+async def get_service(id: str):
     '''
         Method to retrieve a particular service
     '''
-    response = get_service_wrapper(sid)
+    response = get_service_wrapper(id)
     return response
 
 @app.get("/service/apis")
@@ -120,6 +120,7 @@ async def get_user_apis(user: User = Depends(manager)):
     uid = user['id']
     user_apis = ds.get_user_apis(uid)
     return user_apis
+
 
 #####################################
 #   Auth Paths
@@ -165,7 +166,6 @@ async def filter(
     providers: Optional[List[str]] = Query(None)
 ):
     return api_tag_filter(tags, providers)
-
 
 if __name__ == "__main__":
     import uvicorn
