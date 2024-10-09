@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Api } from "../types/apiTypes";
+import { DetailedApi } from "../types/apiTypes";
 import { getApi } from "../services/apiServices";
 import FetchStatus from "../components/FetchStatus"; // Import the new reusable component
 import Tag from "../components/Tag";
@@ -11,7 +11,7 @@ import ApiDocs from "../components/ApiDocs";
 import BackButton from "../components/BackButton";
 
 const ApiPage = () => {
-  const [api, setApi] = useState<Api | null>(null);
+  const [api, setApi] = useState<DetailedApi | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { id } = useParams();
@@ -56,7 +56,7 @@ const ApiPage = () => {
                     {/* Adjust pl-10 as needed for custom padding */}
                     <img
                       className="w-56 h-56 rounded-full object-cover mx-auto"
-                      src={api?.icon_url}
+                      src={api?.iconUrl}
                       alt="API Icon"
                     />
                   </div>

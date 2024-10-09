@@ -50,7 +50,7 @@ const MyApiPage = () => {
                   <div className="flex flex-shrink-0 items-center">
                     <img
                       className="w-56 h-56 rounded-full object-cover mx-auto"
-                      src={api?.icon_url}
+                      src={api?.iconUrl}
                       alt="API Icon"
                     />
                   </div>

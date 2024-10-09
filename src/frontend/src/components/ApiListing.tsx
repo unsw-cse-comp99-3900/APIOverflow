@@ -14,6 +14,7 @@ const ApiListing = ({
   isMyApis: boolean;
   onDelete: (id: number) => void;
 }) => {
+  
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   let description = api.description;
@@ -28,14 +29,14 @@ const ApiListing = ({
         <div className="pb-16">
           <div className="flex items-start mb-2">
             <img
-              src={api.icon_url}
+              src={api.iconUrl}
               alt="API Icon"
               className="w-20 h-20 ml-4 mr-4 mt-2 rounded-full object-cover"
             />
 
             <div>
               <h3 className="text-xl font-bold my-2">{api.name}</h3>
-              <div className="text-gray-600">{api.owner}</div>
+              <div className="text-gray-600">{api.ownerName}</div>
               <div className="flex flex-wrap mt-4 mb-3">
                 {api?.tags?.map((tag, index) => (
                   <Tag key={index} tag={tag} className="mr-3 mb-2" />

@@ -1,6 +1,6 @@
 import { PhotoIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useState } from "react";
-import { Api, NewApi } from "../types/apiTypes";
+import { Api, NewApi, DetailedApi } from "../types/apiTypes";
 import { getApi, updateApi, addApi } from "../services/apiServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -35,13 +35,14 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
     e.preventDefault();
 
 		if (apiId) {
-      const updatedApi:Api = {
+      const updatedApi:DetailedApi = {
         id: Number(apiId),
         name: apiName,
         description,
-        icon_url: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
-        owner: "sample_owner",
+        iconUrl: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
+        ownerName: "sample_owner",
         tags: ["sample_tag"],
+        documents: ["sample_document"],
         endpoint: "sample_endpoint",
       };
       updateApi(updatedApi);
@@ -49,10 +50,11 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
       const newApi:NewApi = {
         name: apiName,
         description,
-        icon_url: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
-        owner: "sample_owner",
+        iconUrl: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
+        ownerName: "sample_owner",
         tags: ["sample_tag"],
         endpoint: "sample_endpoint",
+        documents: ["sample_document"],
       }; 
       addApi(newApi);
     }

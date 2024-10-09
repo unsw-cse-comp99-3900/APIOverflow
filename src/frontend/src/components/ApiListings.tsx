@@ -12,7 +12,6 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
     const fetchApis = async () => {
       try {
         const data = isMyAPis ? await getMyApis() : await getApis();
-
         setApis(data);
       } catch (error) {
         console.log("Error fetching data", error);
