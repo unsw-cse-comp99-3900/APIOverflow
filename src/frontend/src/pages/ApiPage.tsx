@@ -70,7 +70,7 @@ const ApiPage = () => {
               </div>
               <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
                 <ApiReviews />
-                <ApiDescription api={api} />{" "}
+                <ApiDescription api={api} />
                 <ApiDocs />
               </div>
             </>

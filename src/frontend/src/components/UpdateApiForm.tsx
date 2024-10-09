@@ -1,4 +1,4 @@
-import { PhotoIcon } from "@heroicons/react/24/solid";
+import { PhotoIcon, DocumentIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useState } from "react";
 import { Api, NewApi, DetailedApi } from "../types/apiTypes";
 import { getApi, updateApi, addApi } from "../services/apiServices";
@@ -59,8 +59,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
       addApi(newApi);
     }
 
-    toast.success('Job Updated Successfully');
-
+    toast.success('Success!');
     navigate(`/profile/my-apis/${apiId}`);
   };
 
@@ -137,7 +136,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
               </label>
               <div className="mt-2 flex justify-center rounded-lg border border-dashed border-blue-800/25 px-6 py-10">
                 <div className="text-center">
-                  <PhotoIcon
+                  <DocumentIcon
                     aria-hidden="true"
                     className="mx-auto h-12 w-12 text-gray-300"
                   />
