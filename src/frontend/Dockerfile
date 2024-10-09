@@ -8,5 +8,5 @@ COPY . .
 RUN chown -R node /src/frontend/node_modules
 USER node
 EXPOSE 3000
-
+CMD ["npm", "i"]
 CMD ["npm", "start"]
