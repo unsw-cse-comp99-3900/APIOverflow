@@ -167,7 +167,12 @@ async def filter(
 ):
     return api_tag_filter(tags, providers)
 
-
+@app.delete("/service/delete")
+async def delete_api(sid: str):
+    """
+        Delete an API service by its service id (sid).
+    """
+    return delete_service(sid)
 
 
 if __name__ == "__main__":

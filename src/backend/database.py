@@ -75,3 +75,10 @@ def clear_all_users() -> None:
 
 def clear_all_services() -> None:
     db.services.delete_many({})
+
+def db_delete_service(name: str) -> None:
+    """
+    Deletes a service from MongoDB by its service_name.
+    """
+    db.services.delete_one({'name': name})
+    return True

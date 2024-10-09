@@ -254,3 +254,16 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
 
 def list_apis():
     return data_store.get_apis()
+
+def delete_service(sid: str):
+    if sid == '':
+        raise HTTPException(status_code=400, detail='No service id provided')
+
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail='No service found with given sid')
+    service_name = service.get_name()
+    data_store.delete_item(sid, 'api')
+    db_status = db_delete_service(service_name)
+
+    return {"name": service_name, "deleted": db_status}
