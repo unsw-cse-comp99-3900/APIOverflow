@@ -21,7 +21,6 @@ def clear_all():
     response = client.post("/testing/clear")
     assert response.status_code == SUCCESS
     assert  response.json() == {"message" : "Clear Successful"}
-    db.services.delete_many({})
 
 @pytest.fixture
 def simple_user():

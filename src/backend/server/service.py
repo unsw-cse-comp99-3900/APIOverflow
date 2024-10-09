@@ -22,8 +22,7 @@ K = TypeVar('K')
 
 # Helper functions
 
-def create_api(packet: dict[T, K], user: str, old_sid: str = "") -> dict[T, K]:
-    # Error Checking
+def validate_api_fields(packet: dict[T, K]) -> None:
     if packet['name'] == '':
         raise HTTPException(status_code=400, detail='No service name provided')
     
@@ -35,6 +34,26 @@ def create_api(packet: dict[T, K], user: str, old_sid: str = "") -> dict[T, K]:
     
     if packet['endpoint'] == '':
         raise HTTPException(status_code=400, detail='No service endpoint provided')
+
+def get_validate_service_id(sid: str) -> API:
+    if sid == '':
+        raise HTTPException(status_code=400, detail='No service id provided')
+
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail='No service found with given sid')
+    
+    return service
+
+# Endpoint Wrappers
+def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
+    '''
+        Adds a Service (default to API) to the platform
+
+        Raises:     HTTP Error 400 if missing info/bad request
+        Returns:    sid representing id of newly created service
+    '''
+    validate_api_fields(packet)
 
     # Retrieve image from url
     response = None
@@ -50,6 +69,8 @@ def create_api(packet: dict[T, K], user: str, old_sid: str = "") -> dict[T, K]:
     # TODO
     #   Shrink images instead of cropping
     #   Impose some sort of icon limit 
+
+    #image stuff left here for now until updated in next sprint
 
     if img_url != '':
         internal_url = f"{IMAGE_PATH}/image{data_store.num_imgs()}.jpg"
@@ -82,40 +103,16 @@ def create_api(packet: dict[T, K], user: str, old_sid: str = "") -> dict[T, K]:
         image_cropped.save(internal_url)
 
     else:
-        internal_url = f"{IMAGE_PATH}/default_icon2.png"
-
-    api_sid = str(data_store.num_apis()) if old_sid == "" else old_sid
+        internal_url = ""
 
     # Create new API
-    return API(api_sid,
+    new_api = API(str(data_store.num_apis()),
                     packet['name'],
                     user,
                     internal_url,
                     packet['description'],
                     packet['tags'],
                     packet['endpoint'])
-
-def get_validate_service_id(sid: str):
-    if sid == '':
-        raise HTTPException(status_code=400, detail='No service id provided')
-
-    service = data_store.get_api_by_id(sid)
-    if service is None:
-        raise HTTPException(status_code=404, detail='No service found with given sid')
-    
-    return service
-
-
-# Endpoint Wrappers
-def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
-    '''
-        Adds a Service (default to API) to the platform
-
-        Raises:     HTTP Error 400 if missing info/bad request
-        Returns:    sid representing id of newly created service
-    '''
-
-    new_api = create_api(packet, user)
     data_store.add_api(new_api)
     db_add_service(new_api.to_json())
     return str(new_api.get_id())
@@ -130,12 +127,12 @@ def update_service_wrapper(packet: dict[T, K], user: str) -> None:
     '''
     sid = packet["sid"]
     service = get_validate_service_id(sid)
-    old_service_name = service.get_name()
+    validate_api_fields(packet)
 
-    updated_api = create_api(packet, user, sid)
-
-    data_store.update_api_by_id(sid, updated_api)
-    db_update_service(old_service_name, updated_api.to_json())
+    # service is ref to API Obj in data store which gets updated
+    service.update_api_details(packet["name"], packet["description"], packet["tags"], packet["endpoint"])
+    
+    db_update_service(sid, service.to_json())
     return None
 
 def get_service_wrapper(sid: str) -> dict[T : K]:
@@ -250,6 +247,7 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
 
     # Add document to service
     service.add_docs([file.get_id()])
+    db_add_document(sid, file.get_id())
     
 
 def list_apis():
