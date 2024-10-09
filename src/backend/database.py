@@ -78,7 +78,7 @@ def clear_all_services() -> None:
 
 def db_delete_service(name: str) -> None:
     """
-    Deletes a service from MongoDB by its service_name.
+    Deletes a service from MongoDB by its name.
     """
     db.services.delete_one({'name': name})
     return True
