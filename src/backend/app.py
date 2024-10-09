@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, Request, HTTPException, Query, UploadFile, File, Form
 from fastapi_login import LoginManager
 from pymongo import MongoClient
+from fastapi.middleware.cors import CORSMiddleware
 from passlib.context import CryptContext
 from src.backend.classes.models import *
 from src.backend.server.service import *
@@ -11,6 +12,17 @@ from src.backend.database import db
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], 
+    allow_headers=["*"],
+)
 
 manager = _manager.get_manager()
 
@@ -78,25 +90,18 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
     sid = add_service_wrapper(request, str(uid))
     return {'sid' : sid}
 
-@app.put("/service/update")
-async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
-    '''
-        Method used to update service to platform
-    '''
-    
-    request = service.model_dump()
-    uid = user['id']
-    # should this return any additional info?
-    update_service_wrapper(request, str(uid))
-    return None
 
 @app.get("/service/get_service")
-async def get_service(sid: str):
+async def get_service(id: str):
     '''
         Method to retrieve a particular service
     '''
-    response = get_service_wrapper(sid)
+    response = get_service_wrapper(id)
     return response
+
+@app.get("/service/apis")
+async def view_apis():
+    return list_apis()
 
 @app.post("/service/upload_docs")
 async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
@@ -108,10 +113,6 @@ async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
     doc_id = request['doc_id']
     await upload_docs_wrapper(sid, user['id'], doc_id)
     return 200
-    
-@app.get("/service/apis")
-async def view_apis():
-    return list_apis()
 
 @app.get("/service/my_services")
 async def get_user_apis(user: User = Depends(manager)):
@@ -122,6 +123,7 @@ async def get_user_apis(user: User = Depends(manager)):
     uid = user['id']
     user_apis = ds.get_user_apis(uid)
     return user_apis
+
 
 #####################################
 #   Auth Paths
@@ -167,9 +169,6 @@ async def filter(
     providers: Optional[List[str]] = Query(None)
 ):
     return api_tag_filter(tags, providers)
-
-
-
 
 if __name__ == "__main__":
     import uvicorn

@@ -31,13 +31,16 @@ const Navbar = () => {
                 <NavLink to="/profile/add-api" className={linkClass}>
                   <strong>Add API</strong>
                 </NavLink>
-
+                <NavLink to='/login' className={linkClass}>
+                  <strong>Login</strong>
+                </NavLink>
                 <NavLink to="/profile/my-apis" className={linkClass}>
                   <span className="flex items-center space-x-2">
                   <FaUserCircle className={`h-8 w-8 ${{ linkClass }}`} />
                     <strong>My Profile</strong>
                   </span>
                 </NavLink>
+
               </div>
             </div>
           </div>

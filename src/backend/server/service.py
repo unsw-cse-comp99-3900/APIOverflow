@@ -103,7 +103,7 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
         image_cropped.save(internal_url)
 
     else:
-        internal_url = f"{IMAGE_PATH}/default_icon2.png"
+        internal_url = ""
 
     # Create new API
     new_api = API(str(data_store.num_apis()),

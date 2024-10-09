@@ -31,7 +31,6 @@ services:
     build: ./src/frontend 
     volumes:
       - ./src/frontend:/src/frontend
-      - /src/frontend/node_modules
     ports: 
       # fe exports port 3000
       - 3000:3000

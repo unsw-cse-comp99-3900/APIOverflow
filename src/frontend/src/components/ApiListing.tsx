@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Api } from "../types/apiTypes";
+import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import Tag from "./Tag";
 import DeleteApiButton from "./DeleteApiButton";
 import EditApiButton from "./EditApiButton";
@@ -17,6 +18,7 @@ const ApiListing = ({
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   let description = api.description;
+  console.log(api)
 
   if (!showFullDescription && description.length > 90) {
     description = description.substring(0, 90) + "...";
@@ -28,16 +30,16 @@ const ApiListing = ({
         <div className="pb-16">
           <div className="flex items-start mb-2">
             <img
-              src={api.icon_url}
+              src={api.iconUrl || defaultApiIcon}
               alt="API Icon"
-              className="w-20 h-20 ml-4 mr-4 mt-2 rounded-full object-cover"
+              className="w-20 h-20 ml-4 mr-4 mt-2 rounded-full object-cover border-2 border-gray-300"
             />
 
             <div>
               <h3 className="text-xl font-bold my-2">{api.name}</h3>
-              <div className="text-gray-600">{api.owner}</div>
+              <div className="text-gray-600">{api.ownerName}</div>
               <div className="flex flex-wrap mt-4 mb-3">
-                {api?.tags?.map((tag, index) => (
+                {api.tags.map((tag, index) => (
                   <Tag key={index} tag={tag} className="mr-3 mb-2" />
                 ))}
               </div>
