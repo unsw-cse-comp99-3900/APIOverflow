@@ -46,7 +46,7 @@ const ApiPage = () => {
       <BackButton toUrl="/apis" />
         <FetchStatus loading={loading} error={error} data={api}>
           {api && (
-            <>
+            <div className="px-10">
               <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
                 <div className="flex items-center">
                   {/* Placeholder for API icon */}
@@ -73,7 +73,7 @@ const ApiPage = () => {
                 <ApiDescription api={api} />
                 <ApiDocs />
               </div>
-            </>
+            </div>
           )}
         </FetchStatus>
     </>

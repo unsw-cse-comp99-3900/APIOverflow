@@ -84,8 +84,8 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
     # Unpack request body
     request = service.model_dump()
     uid = user['id']
-    sid = add_service_wrapper(request, str(uid))
-    return {'sid' : sid}
+    id = add_service_wrapper(request, str(uid))
+    return {'id' : id}
 
 
 @app.get("/service/get_service")

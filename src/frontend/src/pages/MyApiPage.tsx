@@ -7,6 +7,7 @@ import FetchStatus from "../components/FetchStatus";
 import Tag from "../components/Tag";
 import EditApiButton from "../components/EditApiButton";
 import DeleteApiButton from "../components/DeleteApiButton";
+import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import ApiReviews from "../components/ApiReviews";
 import ApiDescription from "../components/ApiDescription";
 import ApiDocs from "../components/ApiDocs";
@@ -41,14 +42,14 @@ const MyApiPage = () => {
         {/* Use FetchStatus for loading and error handling */}
         <FetchStatus loading={loading} error={error} data={api}>
           {api && (
-            <>
+            <div className="px-10">
               {/* Header Section */}
               <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
                 <div className="flex items-center">
                   <div className="flex flex-shrink-0 items-center">
                     <img
                       className="w-56 h-56 rounded-full object-cover mx-auto"
-                      src={api?.iconUrl}
+                      src={api.iconUrl || defaultApiIcon}
                       alt="API Icon"
                     />
                   </div>
@@ -83,7 +84,7 @@ const MyApiPage = () => {
                 {/* Pass api only when it's not null */}
                 <ApiDocs />
               </div>
-            </>
+            </div>
           )}
         </FetchStatus>
     </>

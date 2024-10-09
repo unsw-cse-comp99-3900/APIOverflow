@@ -36,7 +36,6 @@ export const getApi = async (id: number | string) => {
     method: "GET",
   });
   const data = await res.json();
-  console.log(data);
   return apiDataFormatter(removeUnderscores(data));
 };
 
@@ -50,6 +49,7 @@ export const deleteApi = async (id: number) => {
 };
 
 export const addApi = async (service: ServicePost) => {
+  console.log(service)
   const res = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
@@ -58,7 +58,8 @@ export const addApi = async (service: ServicePost) => {
     },
     body: JSON.stringify(service),
   });
-  return res;
+  const data = await res.json();
+  return data.id;
 };
 
 // BE un-implemented

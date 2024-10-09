@@ -19,7 +19,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
         return;
       }
       try {
-        const data = await getApi(Number(apiId));
+        const data = await getApi(apiId);
         setApi(data);
         setApiName(data.name);
         setDescription(data.description);
@@ -40,7 +40,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
         id: Number(apiId),
         name: apiName,
         description,
-        iconUrl: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
+        iconUrl: "",
         ownerName: "sample_owner",
         tags: ["sample_tag"],
         documents: ["sample_document"],
@@ -48,6 +48,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
       };
       
       await updateApi(updatedApi);
+      navigate(`/profile/my-apis/${apiId}`);
     }else{
       const newApi:ServicePost = {
         name: apiName,
@@ -56,15 +57,18 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
         y_start : 0,
         y_end : 100,
         description,
-        icon_url: "https://e7.pngegg.com/pngimages/500/498/png-clipart-application-programming-interface-representational-state-transfer-web-api-computer-software-hackathon-api-icon-logo-computer-program-thumbnail.png",
+        icon_url: "",
         tags: ["sample_tag"],
         endpoint: endpoint,
       }; 
-      await addApi(newApi);
+      const newId = await addApi(newApi);
+      console.log(newId)
+      navigate(`/profile/my-apis/${newId}`);
     }
-
+    console.log(apiId)
+    
     toast.success('Success!');
-    navigate(`/profile/my-apis/${apiId}`);
+    
   };
 
 
