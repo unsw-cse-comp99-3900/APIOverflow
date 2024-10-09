@@ -195,7 +195,7 @@ def test_successful_upload(two_users):
 
     response = client.get("/service/get_service",
                           params={
-                              'id': data['sid']
+                              'sid': data['sid']
                           })
     assert response.status_code == SUCCESS
     response_info = response.json()

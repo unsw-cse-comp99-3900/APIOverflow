@@ -92,12 +92,24 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
 
 
 @app.get("/service/get_service")
-async def get_service(id: str):
+async def get_service(sid: str):
     '''
         Method to retrieve a particular service
     '''
-    response = get_service_wrapper(id)
+    response = get_service_wrapper(sid)
     return response
+
+@app.put("/service/update")
+async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
+    '''
+        Method used to update service to platform
+    '''
+
+    request = service.model_dump()
+    uid = user['id']
+    # should this return any additional info?
+    update_service_wrapper(request, str(uid))
+    return None
 
 @app.get("/service/apis")
 async def view_apis():
@@ -173,7 +185,7 @@ async def filter(
 @app.delete("/service/delete")
 async def delete_api(sid: str):
     """
-        Delete an API service by its service id (sid).
+        Delete an API service by its service id (id).
     """
     return delete_service(sid)
 

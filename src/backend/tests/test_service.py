@@ -15,6 +15,7 @@ client = TestClient(app)
 INPUT_ERROR = 400
 AUTHENTICATION_ERROR = 401
 SUCCESS = 200
+NOT_FOUND = 404
 
 def clear_all():
     ''' 
@@ -263,7 +264,7 @@ def test_create_api(simple_user):
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'id' : sid
+                              'sid' : sid
                           })
     
     assert response.status_code == SUCCESS
@@ -306,7 +307,7 @@ def test_multiple_tags(simple_user):
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'id' : sid
+                              'sid' : sid
                           })
     
     assert response.status_code == SUCCESS
@@ -344,7 +345,7 @@ def test_custom_icon(simple_user):
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
                               'token' : simple_user['token'],
-                              'id' : sid
+                              'sid' : sid
                           })
     
     assert response.status_code == SUCCESS
@@ -380,11 +381,6 @@ def test_update_api(simple_user):
     update_request_info = {
         'sid' : sid,
         'name' : 'new name',
-        'icon_url' : '',
-        'x_start' : 1,
-        'x_end' : 1,
-        'y_start' : 1,
-        'y_end' : 1,
         'description' : 'new description',
         'tags' : ['new', 'tag'],
         'endpoint': 'https://api.example.com/users/12345'
@@ -398,7 +394,7 @@ def test_update_api(simple_user):
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'id' : sid
+                              'sid' : sid
                           })
     
     assert response.status_code == SUCCESS
@@ -442,11 +438,6 @@ def test_update_api_invalid_sid(simple_user):
     update_request_info = {
         'sid' : "invalid id",
         'name' : 'new name',
-        'icon_url' : '',
-        'x_start' : 1,
-        'x_end' : 1,
-        'y_start' : 1,
-        'y_end' : 1,
         'description' : 'new name',
         'tags' : ['new', 'name'],
         'endpoint': 'https://api.example.com/users/12345'
@@ -534,3 +525,205 @@ def test_update_api_documents(simple_user):
     assert response_info['docs'] == ["static/docs/git_guide_0.pdf"]
     database_object = db_get_service(sid)
     assert database_object['documents'] == [doc_id]
+
+# Delete non-existing service
+def test_delete_non_api(simple_user):
+    '''
+        Test whether an delete a fake service works
+    '''
+    response = client.get("/service/my_services",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"})
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    assert response_info == []
+
+    response = client.delete("/service/delete",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        params={
+                              'sid' : 'what'
+                          })
+    assert response.status_code == NOT_FOUND
+
+# Delete instances
+def test_delete_api(simple_user):
+    '''
+        Test whether delete an API works
+    '''
+    api_info1 = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
+                }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info1)
+    assert response.status_code == SUCCESS
+    sid = response.json()['sid']
+
+    response = client.get("/service/my_services",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"})
+    assert response.status_code == SUCCESS
+    response_info = response.json()[0]
+    assert response_info != {}
+
+    assert db_get_service(sid) is not None
+
+    response = client.delete("/service/delete",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        params={
+                              'sid' : sid
+                          })
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    assert response_info["name"] == api_info1['name']
+    assert response_info["deleted"] == True
+    assert db_get_service(sid) is None
+
+    response = client.get("/service/my_services",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"})
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    assert response_info == []
+
+def test_delete_apis(simple_user):
+    '''
+        Test whether delete an API with out of multiple APIs work
+    '''
+    api_info1 = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
+                }
+    
+    api_info2 = {
+                'name' : 'Test API I',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
+                }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info1)
+    assert response.status_code == SUCCESS
+    sid1 = response.json()['sid']
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info2)
+    assert response.status_code == SUCCESS
+    sid2 = response.json()['sid']
+
+    response = client.delete("/service/delete",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        params={
+                              'sid' : sid1
+                          })
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    assert response_info["name"] == api_info1['name']
+    assert response_info["deleted"] == True
+
+    response = client.get("/service/my_services",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"})
+    assert response.status_code == SUCCESS
+    response_info = response.json()[0]
+    assert response_info['id'] == sid2
+    assert response_info['name'] == api_info2['name']
+    assert response_info['description'] == api_info2['description']
+    assert response_info['tags'] == api_info2['tags']
+
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid1
+                          })
+    assert response.status_code == NOT_FOUND
+
+    response = client.delete("/service/delete",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        params={
+                              'sid' : sid2
+                          })
+    assert response.status_code == SUCCESS
+
+    response = client.get("/service/my_services",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"})
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    assert response_info == []
+
+
+# Valid instances
+def test_get_apis(simple_user):
+    '''
+        Test whether an API is correctly get
+    '''
+    api_info1 = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
+                }
+    
+    api_info2 = {
+                'name' : 'Test API I',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
+                }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info1)
+    assert response.status_code == SUCCESS
+    sid1 = response.json()['sid']
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info2)
+    assert response.status_code == SUCCESS
+    sid2 = response.json()['sid']
+
+    response = client.get("/service/my_services",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"})
+    assert response.status_code == SUCCESS
+    response_info = response.json()[0]
+    assert response_info['id'] == sid1
+    assert response_info['name'] == api_info1['name']
+    assert response_info['description'] == api_info1['description']
+    assert response_info['tags'] == api_info1['tags']
+
+    response_info = response.json()[1]
+    assert response_info['id'] == sid2
+    assert response_info['name'] == api_info2['name']
+    assert response_info['description'] == api_info2['description']
+    assert response_info['tags'] == api_info2['tags']
