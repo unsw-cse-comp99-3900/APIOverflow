@@ -50,8 +50,6 @@ async def clear():
         Internal Testing function to clear datastore
     '''
     ds.clear_datastore()
-    clear_all_users()
-    clear_all_services
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
@@ -77,17 +75,6 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
     sid = add_service_wrapper(request, str(uid))
     return {'sid' : sid}
 
-@app.put("/service/update")
-async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
-    '''
-        Method used to update service to platform
-    '''
-    
-    request = service.model_dump()
-    uid = user['id']
-    # should this return any additional info?
-    update_service_wrapper(request, str(uid))
-    return None
 
 @app.get("/service/get_service")
 async def get_service(id: str):
@@ -107,10 +94,6 @@ async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
     doc_id = request['doc_id']
     await upload_docs_wrapper(sid, user['id'], doc_id)
     return 200
-    
-@app.get("/service/apis")
-async def view_apis():
-    return list_apis()
 
 @app.get("/service/my_services")
 async def get_user_apis(user: User = Depends(manager)):
@@ -121,6 +104,11 @@ async def get_user_apis(user: User = Depends(manager)):
     uid = user['id']
     user_apis = ds.get_user_apis(uid)
     return user_apis
+
+@app.get("/service/apis")
+async def view_apis():
+    return list_apis()
+
 
 #####################################
 #   Auth Paths
@@ -166,9 +154,6 @@ async def filter(
     providers: Optional[List[str]] = Query(None)
 ):
     return api_tag_filter(tags, providers)
-
-
-
 
 if __name__ == "__main__":
     import uvicorn

@@ -262,7 +262,7 @@ def test_create_api(simple_user):
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'sid' : sid
+                              'id' : sid
                           })
     
     assert response.status_code == SUCCESS
@@ -305,7 +305,7 @@ def test_multiple_tags(simple_user):
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'sid' : sid
+                              'id' : sid
                           })
     
     assert response.status_code == SUCCESS
@@ -343,7 +343,7 @@ def test_custom_icon(simple_user):
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
                               'token' : simple_user['token'],
-                              'sid' : sid
+                              'id' : sid
                           })
     
     assert response.status_code == SUCCESS
@@ -398,7 +398,7 @@ def test_update_api(simple_user):
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'sid' : sid
+                              'id' : sid
                           })
     
     assert response.status_code == SUCCESS

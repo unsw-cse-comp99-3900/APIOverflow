@@ -96,7 +96,7 @@ class User:
         '''
             Returns email of user
         '''
-        return self._id
+        return self._email
     
     def get_password(self) -> str:
         '''
