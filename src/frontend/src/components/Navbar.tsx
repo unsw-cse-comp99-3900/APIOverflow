@@ -38,6 +38,9 @@ const Navbar = () => {
                     <strong>My Profile</strong>
                   </span>
                 </NavLink>
+                <NavLink to='/login' className={linkClass}>
+                  Login
+                </NavLink>
               </div>
             </div>
           </div>
