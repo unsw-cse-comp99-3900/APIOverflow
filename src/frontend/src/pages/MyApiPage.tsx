@@ -37,9 +37,7 @@ const MyApiPage = () => {
 
   return (
     <>
-      <section className="w-full h-full relative bg-gradient-to-b from-blue-50 to-white px-6">
         <BackButton toUrl="/profile/my-apis" />
-
         {/* Use FetchStatus for loading and error handling */}
         <FetchStatus loading={loading} error={error} data={api}>
           {api && (
@@ -88,7 +86,6 @@ const MyApiPage = () => {
             </>
           )}
         </FetchStatus>
-      </section>
     </>
   );
 };

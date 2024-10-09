@@ -31,9 +31,10 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="relative w-screen h-screen bg-gradient-to-b from-[#171785] to-[#63b3de] flex justify-center items-center">
+    <div className='relative w-screen h-screen pt-24'>
+    <div className="h-full pt-24 bg-gradient-to-b from-blue-900 to-[#63b3de] flex justify-center items-center">
       {/* Add the blob as an SVG image   */}
-      <img src={Blob1} alt="Blob 1" className="absolute top-0 right-0 w-[400px] h-auto" />
+      <img src={Blob1} alt="Blob 1" className="absolute top-24 right-0 w-[400px] h-auto" />
       <img src={Blob2} alt="Blob 2" className="absolute bottom-0 left-0 w-[400px] h-auto" />
 
       {/* Login Form */}
@@ -87,6 +88,7 @@ const Login: React.FC = () => {
           )}
         </form>
       </div>
+    </div>
     </div>
   );
 };

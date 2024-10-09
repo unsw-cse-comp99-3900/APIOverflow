@@ -9,7 +9,7 @@ const Navbar = () => {
       : "text-white hover:bg-white hover:text-blue-900 rounded-md flex items-center justify-center h-12 w-auto px-4 py-2";
 
   return (
-    <nav className="bg-blue-900 border-b border-gray-100 fixed top-0 w-full z-50 ">
+    <nav className="bg-blue-900 fixed top-0 w-full z-50 ">
       <div className="m-auto px-20">
         <div className="flex h-24 items-center justify-between">
           <div className="flex flex-1 items-center justify-center md:items-stretch md:justify-start">

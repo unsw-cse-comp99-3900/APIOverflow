@@ -3,15 +3,16 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "../components/Navbar";
 
-const MainLayout = () => {
+const ThemeLayout = () => {
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
+      {/* Navbar stays fixed at the top */}
       <Navbar />
-      <div className="mt-24 bg-gradient-to-b from-blue-50">
+      {/* Content area below the Navbar */}
         <Outlet />
-      </div>
       <ToastContainer />
-    </>
+    </div>
   );
 };
-export default MainLayout;
+
+export default ThemeLayout;
