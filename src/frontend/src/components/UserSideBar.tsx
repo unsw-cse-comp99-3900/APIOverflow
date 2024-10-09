@@ -19,7 +19,7 @@ const UserSideBar = () => {
     if (!confirm) return;
     logout()
     toast.success("Signed out successfully");
-    navigate("/apis");
+    navigate("/");
   };
 
   return (
