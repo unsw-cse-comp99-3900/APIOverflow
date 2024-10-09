@@ -10,7 +10,6 @@ client = TestClient(app)
 @pytest.fixture(autouse=True)
 def clear_database():
     """Fixture to clear the database before each test."""
-    db.users.delete_many({})
     response = client.post("/testing/clear")
     assert response.status_code == 200
 

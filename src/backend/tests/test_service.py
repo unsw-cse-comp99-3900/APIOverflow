@@ -51,7 +51,8 @@ def simple_user():
     assert response.status_code == SUCCESS
     usable_data['token'] = response.json()['access_token']
 
-    return usable_data
+    yield usable_data
+    clear_all()
 
 # Error testing
 def test_invalid_user(simple_user):
@@ -273,7 +274,7 @@ def test_create_api(simple_user):
     assert response_info['tags'] == api_info['tags']
     assert response_info['endpoint'] == api_info['endpoint']
 
-    database_object = db_get_service(api_info['name'])
+    database_object = db_get_service(sid)
     assert database_object['id'] == sid
     assert database_object['name'] == api_info['name']
     assert database_object['description'] == api_info['description']
@@ -354,7 +355,6 @@ def test_custom_icon(simple_user):
     assert response_info['tags'] == api_info['tags']
     assert response_info['endpoint'] == api_info['endpoint']
 
-# todo: test new fields
 def test_update_api(simple_user):
     '''
         Test whether an API is correctly created then updated
@@ -410,7 +410,7 @@ def test_update_api(simple_user):
     assert response_info['tags'] == update_request_info['tags']
     assert response_info['endpoint'] == update_request_info['endpoint']
 
-    database_object = db_get_service(update_request_info['name'])
+    database_object = db_get_service(sid)
     assert database_object['id'] == sid
     assert database_object['name'] == update_request_info['name']
     assert database_object['description'] == update_request_info['description']
@@ -456,3 +456,81 @@ def test_update_api_invalid_sid(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=update_request_info)
     assert response.status_code == 404
+
+def test_update_api_documents(simple_user):
+    '''
+        Test whether an API is correctly created then updated
+    '''
+    api_info = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
+                }
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+    sid = response.json()['sid']
+
+    filename = 'git_guide.pdf'
+    file = {
+        'file' : (filename, open("tests/resources/git_guide.pdf", 'rb'))
+    }
+    response = client.post("/upload", files=file)
+    assert response.status_code == SUCCESS
+ 
+    doc_id = response.json()['doc_id']
+    api_data = {
+        'sid': sid,
+        'doc_id': doc_id
+    }
+    response = client.post("/service/upload_docs",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_data)
+    assert response.status_code == SUCCESS
+    
+    response = client.get("/service/get_service",
+                        params={
+                            'sid': sid
+                        })
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    assert response_info['docs'] == ["static/docs/git_guide_0.pdf"]
+    database_object = db_get_service(sid)
+
+    # path of file is accessible via get_service but internally
+    # stored by document id instead of path
+    assert database_object['documents'] == [doc_id]
+
+    update_request_info = {
+        'sid' : sid,
+        'name' : 'new name',
+        'description' : 'new description',
+        'tags' : ['new', 'tag'],
+        'endpoint': 'https://api.example.com/users/12345'
+    }
+
+    response = client.put("/service/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_request_info)
+    assert response.status_code == SUCCESS
+    
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+   
+    assert response_info['docs'] == ["static/docs/git_guide_0.pdf"]
+    database_object = db_get_service(sid)
+    assert database_object['documents'] == [doc_id]
