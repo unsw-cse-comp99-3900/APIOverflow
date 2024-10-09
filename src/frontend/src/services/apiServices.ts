@@ -1,4 +1,6 @@
-import { Api, NewApi } from "../types/apiTypes";
+import { Api, DetailedApi, NewApi } from "../types/apiTypes";
+import { apiDataFormatter } from "../utils/dataFormatters";
+import { removeUnderscores } from "../utils/removeUnderscores";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -7,7 +9,7 @@ export const getApis = async () => {
     method: "GET",
   });
   const data = await res.json();
-  return data;
+  return removeUnderscores(data).map(apiDataFormatter);
 };
 
 export const getMyApis = async () => {
@@ -15,24 +17,23 @@ export const getMyApis = async () => {
     method: "GET",
   });
   const data = await res.json();
-  return data;
+  return removeUnderscores(data);
 };
 
 export const getApi = async (id: number) => {
-  const res = await fetch(`${baseUrl}/service`, {
+  const res = await fetch(`${baseUrl}/service/get_service?id=${id}`, {
     method: "GET",
-    body: JSON.stringify(id),
   });
   const data = await res.json();
-  return data;
+  console.log(data)
+  return apiDataFormatter(removeUnderscores(data));
 };
 
 // BE un-implemented
 export const deleteApi = async (id: number) => {
-  const res = await fetch(`${baseUrl}/service/${id}`, {
+    await fetch(`${baseUrl}/service/${id}`, {
     method: "DELETE",
-
-    body: JSON.stringify(id)
+    body: JSON.stringify(id),
   });
   return;
 };
@@ -45,13 +46,12 @@ export const addApi = async (newApi: NewApi) => {
     },
     body: JSON.stringify(newApi),
   });
-
   return res;
 };
 
 // BE un-implemented
 export const updateApi = async (api: Api) => {
-  const res = await fetch(`${baseUrl}/service/${api.id}`, {
+    await fetch(`${baseUrl}/service/${api.id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

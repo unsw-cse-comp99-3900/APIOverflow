@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, Request, HTTPException, Query, UploadFile, File, Form
 from fastapi_login import LoginManager
 from pymongo import MongoClient
+from fastapi.middleware.cors import CORSMiddleware
 from passlib.context import CryptContext
 from src.backend.classes.models import *
 from src.backend.server.service import *
@@ -11,6 +12,17 @@ from src.backend.database import db
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], 
+    allow_headers=["*"],
+)
 
 manager = _manager.get_manager()
 
@@ -84,6 +96,10 @@ async def get_service(id: str):
     response = get_service_wrapper(id)
     return response
 
+@app.get("/service/apis")
+async def view_apis():
+    return list_apis()
+
 @app.post("/service/upload_docs")
 async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
     '''
@@ -104,10 +120,6 @@ async def get_user_apis(user: User = Depends(manager)):
     uid = user['id']
     user_apis = ds.get_user_apis(uid)
     return user_apis
-
-@app.get("/service/apis")
-async def view_apis():
-    return list_apis()
 
 
 #####################################

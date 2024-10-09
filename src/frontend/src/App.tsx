@@ -28,8 +28,6 @@ const App = () => {
         <Route path="/apis" element={<APIsPage />} />xs
         <Route path="/apis/:id" element={<ApiPage />} />
 
-        <Route path="/edit-api" element={<EditApiPage />} />
-
         <Route path="/profile" element={<UserProfileLayout />}>
           <Route path="/profile/my-apis" element={<MyApisPage />} />
           <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
