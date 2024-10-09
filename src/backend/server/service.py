@@ -22,15 +22,7 @@ K = TypeVar('K')
 
 # Helper functions
 
-# Endpoint Wrappers
-def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
-    '''
-        Adds a Service (default to API) to the platform
-
-        Raises:     HTTP Error 400 if missing info/bad request
-        Returns:    sid representing id of newly created service
-    '''
-
+def create_api(packet: dict[T, K], user: str, old_sid: str = "") -> dict[T, K]:
     # Error Checking
     if packet['name'] == '':
         raise HTTPException(status_code=400, detail='No service name provided')
@@ -92,9 +84,10 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     else:
         internal_url = f"{IMAGE_PATH}/default_icon2.png"
 
+    api_sid = str(data_store.num_apis()) if old_sid == "" else old_sid
 
     # Create new API
-    new_api = API(  str(data_store.num_apis()),
+    return API(api_sid,
                     packet['name'],
                     user,
                     internal_url,
@@ -102,9 +95,48 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
                     packet['tags'],
                     packet['endpoint'])
 
+def get_validate_service_id(sid: str):
+    if sid == '':
+        raise HTTPException(status_code=400, detail='No service id provided')
+
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail='No service found with given sid')
+    
+    return service
+
+
+# Endpoint Wrappers
+def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
+    '''
+        Adds a Service (default to API) to the platform
+
+        Raises:     HTTP Error 400 if missing info/bad request
+        Returns:    sid representing id of newly created service
+    '''
+
+    new_api = create_api(packet, user)
     data_store.add_api(new_api)
     db_add_service(new_api.to_json())
     return str(new_api.get_id())
+
+def update_service_wrapper(packet: dict[T, K], user: str) -> None:
+    '''
+        Updates a service by sid
+
+        Raises:     HTTP Error 400 if missing info/bad request
+                    HTTP Error 404 if no such sid found
+        Returns:    None
+    '''
+    sid = packet["sid"]
+    service = get_validate_service_id(sid)
+    old_service_name = service.get_name()
+
+    updated_api = create_api(packet, user, sid)
+
+    data_store.update_api_by_id(sid, updated_api)
+    db_update_service(old_service_name, updated_api.to_json())
+    return None
 
 def get_service_wrapper(sid: str) -> dict[T : K]:
     '''
@@ -123,14 +155,7 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
                     }
     '''
 
-    # Error checking
-    if sid == '':
-        raise HTTPException(status_code=400, detail='No service id provided')
-
-    service = data_store.get_api_by_id(sid)
-    if service is None:
-        raise HTTPException(status_code=404, detail='No service found with given sid')
-    
+    service = get_validate_service_id(sid)
     owner_id = service.get_owner()
     owner = data_store.get_user_by_id(owner_id)
     doc_ids = service.get_docs()

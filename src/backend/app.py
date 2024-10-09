@@ -50,6 +50,8 @@ async def clear():
         Internal Testing function to clear datastore
     '''
     ds.clear_datastore()
+    clear_all_users()
+    clear_all_services
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
@@ -75,6 +77,17 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
     sid = add_service_wrapper(request, str(uid))
     return {'sid' : sid}
 
+@app.put("/service/update")
+async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
+    '''
+        Method used to update service to platform
+    '''
+    
+    request = service.model_dump()
+    uid = user['id']
+    # should this return any additional info?
+    update_service_wrapper(request, str(uid))
+    return None
 
 @app.get("/service/get_service")
 async def get_service(sid: str):
