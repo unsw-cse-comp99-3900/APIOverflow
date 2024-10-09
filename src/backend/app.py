@@ -90,11 +90,11 @@ async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
     return None
 
 @app.get("/service/get_service")
-async def get_service(sid: str):
+async def get_service(id: str):
     '''
         Method to retrieve a particular service
     '''
-    response = get_service_wrapper(sid)
+    response = get_service_wrapper(id)
     return response
 
 @app.post("/service/upload_docs")
