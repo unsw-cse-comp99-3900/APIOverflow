@@ -81,7 +81,7 @@ def two_users():
                            headers={"Authorization": f"Bearer {usable_data['creator']}"},
                            json=api_info)
     assert response.status_code == SUCCESS
-    usable_data['sid'] = response.json()['sid']
+    usable_data['sid'] = response.json()['id']
 
     yield usable_data
 
