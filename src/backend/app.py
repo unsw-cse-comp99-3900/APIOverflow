@@ -9,6 +9,9 @@ from src.backend.classes.datastore import data_store as ds
 from src.backend.server.auth import *
 from src.backend.classes.Manager import manager as _manager
 from src.backend.database import db
+from src.backend.server.tags import *
+from json import dumps
+
 
 app = FastAPI()
 
@@ -188,6 +191,31 @@ async def delete_api(sid: str):
         Delete an API service by its service id (id).
     """
     return delete_service(sid)
+
+#####################################
+#   Tag Paths
+#####################################
+
+@app.post("/tag/add")
+async def add_tag(tag: TagData, user: User = Depends(manager)):
+    '''
+        Endpoint to add a tag
+    '''
+    add_tag_wrapper(tag.tag)
+
+@app.delete("/tag/delete")
+async def delete_tag(tag: str, user: User = Depends(manager), role: str = Depends(role_required("admin"))):
+    '''
+        Endpoint to delete a tag
+    '''
+    delete_tag_wrapper(tag)
+
+@app.get("/tags/get")
+async def get_tags():
+    '''
+        Endpoint to grab all tags
+    '''
+    return get_tags_wrapper()
 
 if __name__ == "__main__":
     import uvicorn

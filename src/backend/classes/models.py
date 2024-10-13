@@ -65,3 +65,6 @@ class ServiceUpload(BaseModel):
 
     sid: str
     doc_id: str
+
+class TagData(BaseModel):
+    tag: str
