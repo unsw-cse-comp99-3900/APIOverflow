@@ -260,7 +260,7 @@ def test_create_api(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info)
     assert response.status_code == SUCCESS
-    sid = response.json()['sid']
+    sid = response.json()['id']
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
@@ -302,7 +302,7 @@ def test_multiple_tags(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info)
     assert response.status_code == SUCCESS
-    sid = response.json()['sid']
+    sid = response.json()['id']
 
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -340,7 +340,7 @@ def test_custom_icon(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info)
     assert response.status_code == SUCCESS
-    sid = response.json()['sid']
+    sid = response.json()['id']
     response = client.get("/service/get_service",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
@@ -376,7 +376,7 @@ def test_update_api(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info)
     assert response.status_code == SUCCESS
-    sid = response.json()['sid']
+    sid = response.json()['id']
 
     update_request_info = {
         'sid' : sid,
@@ -468,7 +468,7 @@ def test_update_api_documents(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info)
     assert response.status_code == SUCCESS
-    sid = response.json()['sid']
+    sid = response.json()['id']
 
     filename = 'git_guide.pdf'
     file = {
@@ -565,7 +565,7 @@ def test_delete_api(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info1)
     assert response.status_code == SUCCESS
-    sid = response.json()['sid']
+    sid = response.json()['id']
 
     response = client.get("/service/my_services",
                           headers={"Authorization": f"Bearer {simple_user['token']}"})
@@ -624,13 +624,13 @@ def test_delete_apis(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info1)
     assert response.status_code == SUCCESS
-    sid1 = response.json()['sid']
+    sid1 = response.json()['id']
 
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info2)
     assert response.status_code == SUCCESS
-    sid2 = response.json()['sid']
+    sid2 = response.json()['id']
 
     response = client.delete("/service/delete",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -705,13 +705,13 @@ def test_get_apis(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info1)
     assert response.status_code == SUCCESS
-    sid1 = response.json()['sid']
+    sid1 = response.json()['id']
 
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api_info2)
     assert response.status_code == SUCCESS
-    sid2 = response.json()['sid']
+    sid2 = response.json()['id']
 
     response = client.get("/service/my_services",
                           headers={"Authorization": f"Bearer {simple_user['token']}"})

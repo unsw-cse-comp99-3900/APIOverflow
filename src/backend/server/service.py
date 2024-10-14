@@ -218,10 +218,10 @@ def api_tag_filter(tags, providers):
         for api in filtered_apis:
             for provider in providers:
                 if provider in api.get_owner():
-                    return_list.append(api)
+                    return_list.append(api_into_json(api))
                     break
     else:
-        return filtered_apis
+        return [api_into_json(api) for api in filtered_apis]
     return return_list
     
 async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
@@ -251,7 +251,7 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
     
 
 def list_apis():
-    return data_store.get_apis()
+    return [api_into_json(api) for api in data_store.get_apis()]
 
 def delete_service(sid: str):
     if sid == '':

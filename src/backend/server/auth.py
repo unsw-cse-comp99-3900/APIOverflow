@@ -8,6 +8,7 @@ from typing import Literal, TypeVar
 from src.backend.database import *
 from src.backend.classes.Manager import manager
 
+
 T = TypeVar("T")
 ADMIN = 'admin'
 GENERAL = 'general'

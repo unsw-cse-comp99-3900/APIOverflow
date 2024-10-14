@@ -17,8 +17,8 @@ schema = {
     'user_count' : 0,
     'apis' : [],
     'api_count' : 0,
-    'tags' : DEFAULT_TAGS,
-    'tag_count' : 0,
+    'tags' : DEFAULT_TAGS.copy(),
+    'tag_count' : len(DEFAULT_TAGS),
     'img_count' : 0,
     'docs_count': 0,
     'docs': []
@@ -53,8 +53,8 @@ class Datastore:
                             'user_count' : 0,
                             'apis' : [],
                             'api_count' : 0,
-                            'tags' : DEFAULT_TAGS,
-                            'tag_count' : 0,
+                            'tags' : DEFAULT_TAGS.copy(),
+                            'tag_count' : len(DEFAULT_TAGS),
                             'img_count' : 0,
                             'docs_count': 0,
                             'docs': []
@@ -77,12 +77,19 @@ class Datastore:
         self.__store['apis'].append(api)
         self.__store['api_count'] += 1
 
-    def add_tag(self, tag: str) -> None:
+    def add_tag(self, tag: str) -> Union[None, bool]:
         '''
             Adds a tag into the datastore
         '''    
+
+        # Shield against duplicates
+        if tag in self.__store['tags']:
+            print(self.__store['tags'])
+            return None
+
         self.__store['tags'].append(tag)
         self.__store['tag_count'] += 1
+        return True
 
     def add_img_count(self) -> None:
         '''
@@ -229,7 +236,7 @@ class Datastore:
                 self.__store[term_count] -= 1
                 return
 
-    def delete_tag(self, tag: str) -> None:
+    def delete_tag(self, tag: str) -> Union[None, bool]:
         ''''
             Deletes a tag from the database
         '''
@@ -237,7 +244,8 @@ class Datastore:
             if _tag == tag:
                 self.__store['tags'].remove(tag)
                 self.__store['tag_count'] -= 1
-                return
+                return True
+        return None
 
 print('Loading Datastore...')
 

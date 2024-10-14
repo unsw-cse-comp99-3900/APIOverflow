@@ -16,5 +16,5 @@ jobs:
     #   run: docker compose build
     
     # - name: Run tests
-    #   run: docker compose up
+    #   run: docker compose up --abort-on-container-exit
 

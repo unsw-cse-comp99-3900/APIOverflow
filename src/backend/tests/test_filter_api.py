@@ -88,8 +88,8 @@ def test_simple_filter(simple_user):
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
     print(response_info)
-    assert response_info[0]['_name'] == api2['name']
-    assert response_info[0]['_tags'] == api2['tags']
+    assert response_info[0]['name'] == api2['name']
+    assert response_info[0]['tags'] == api2['tags']
 
 def test_simple_filter_multiple(simple_user):
     api = {
@@ -147,11 +147,11 @@ def test_simple_filter_multiple(simple_user):
     found2 = False
     found3 = False
     for api in response_info:
-        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+        if "Googl3" == api['name'] and ['API', 'Public'] == api['tags']:
             found1 = True 
-        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API', 'Private'] == api['tags']:
             found2 = True
-        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API'] == api['tags']:
             found3 = True
     assert found1 and found2 and found3
 
@@ -211,11 +211,11 @@ def test_providers(simple_user):
     found2 = False
     found3 = False
     for api in response_info:
-        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+        if "Googl3" == api['name'] and ['API', 'Public'] == api['tags']:
             found1 = True 
-        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API', 'Private'] == api['tags']:
             found2 = True
-        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API'] == api['tags']:
             found3 = True
     assert found1 and found2 and found3
 
@@ -275,11 +275,11 @@ def test_providers_with_tags(simple_user):
     found2 = False
     found3 = False
     for api in response_info:
-        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+        if "Googl3" == api['name'] and ['API', 'Public'] == api['tags']:
             found1 = True 
-        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API', 'Private'] == api['tags']:
             found2 = True
-        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API'] == api['tags']:
             found3 = True
     assert not found1 and found2 and not found3
 
@@ -339,11 +339,11 @@ def test_invalid_providers(simple_user):
     found2 = False
     found3 = False
     for api in response_info:
-        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+        if "Googl3" == api['name'] and ['API', 'Public'] == api['tags']:
             found1 = True 
-        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API', 'Private'] == api['tags']:
             found2 = True
-        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API'] == api['tags']:
             found3 = True
     assert not found1 and not found2 and not found3
 
@@ -403,11 +403,11 @@ def test_providers_with_tags2(simple_user):
     found2 = False
     found3 = False
     for api in response_info:
-        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+        if "Googl3" == api['name'] and ['API', 'Public'] == api['tags']:
             found1 = True 
-        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API', 'Private'] == api['tags']:
             found2 = True
-        if "Googl2" == api['_name'] and ['NOT API'] == api['_tags']:
+        if "Googl2" == api['name'] and ['NOT API'] == api['tags']:
             found3 = True
     assert found1 and found2 and not found3
 
@@ -492,11 +492,11 @@ def test_providers_with_tags_multiple(simple_user):
     #api3 is simple user
 
     for api in response_info:
-        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+        if "Googl3" == api['name'] and ['API', 'Public'] == api['tags']:
             found1 = True 
-        if "Googl2" == api['_name'] and ['API', 'Private'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API', 'Private'] == api['tags']:
             found2 = True
-        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API'] == api['tags']:
             found3 = True
     assert found1 and found2 and found3
 
@@ -581,10 +581,10 @@ def test_providers_with_tags_multiple2(simple_user):
     #api3 is simple user
 
     for api in response_info:
-        if "Googl3" == api['_name'] and ['API', 'Public'] == api['_tags']:
+        if "Googl3" == api['name'] and ['API', 'Public'] == api['tags']:
             found1 = True 
-        if "Googl2" == api['_name'] and ['NOT API', 'Private'] == api['_tags']:
+        if "Googl2" == api['name'] and ['NOT API', 'Private'] == api['tags']:
             found2 = True
-        if "Googl2" == api['_name'] and ['API'] == api['_tags']:
+        if "Googl2" == api['name'] and ['API'] == api['tags']:
             found3 = True
     assert not found1 and not found2 and not found3

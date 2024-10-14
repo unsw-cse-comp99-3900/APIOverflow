@@ -4,6 +4,9 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from src.backend.classes.datastore import data_store
 from src.backend.database import *
+from datetime import timedelta
+
+TOKEN_DURATION = timedelta(days=1)     # 1 day expiration
 
 class Manager:
     '''
@@ -44,7 +47,7 @@ class Manager:
         '''
             Creates a session token with encoded data
         '''
-        return self._manager.create_access_token(data=data)
+        return self._manager.create_access_token(data=data, expires=TOKEN_DURATION)
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
