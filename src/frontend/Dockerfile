@@ -9,4 +9,8 @@ RUN chown -R node /src/frontend/node_modules
 USER node
 EXPOSE 3000
 
+ARG TEST="false"
+ENV TEST ${TEST}
+
 CMD ["npm", "start"]
+
