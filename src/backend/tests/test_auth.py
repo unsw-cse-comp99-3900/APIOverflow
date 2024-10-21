@@ -22,7 +22,7 @@ def test_register_user():
         "email" : "doxxed@gmail.com"
     })
     assert response.status_code == 200
-    assert response.json() == {"uid" : '0'}
+    assert response.json() == {"uid" : '1'}
 
 def test_register_duplicate_user():
     """Test registering a duplicate user."""
@@ -67,7 +67,7 @@ def test_access_protected_route_as_user():
     client.post("/auth/register", json={
         "username": "user",
         "password": "password",
-        "role": "account user",
+        "is_admin": False,
         "email" : "doxxed@gmail.com"
     })
     response = client.post("/auth/login", json={
@@ -89,7 +89,7 @@ def test_access_protected_route_as_admin():
     client.post("/auth/register", json={
         "username": "adminuser",
         "password": "adminpassword",
-        "role": "admin",
+        "is_admin": True,
         "email" : "doxxed@gmail.com"
     })
     response = client.post("/auth/login", json={

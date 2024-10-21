@@ -15,7 +15,8 @@ class User:
             password:   Hashed password for security
             email:      Email registered with user
             icon_url:   Path to image store on backend (todo)
-            role:       general | admin
+            is_admin:   Is the user an admin
+            is_super:   Is the user a super admin
             ---
             following:  List of services/users user is following
     
@@ -26,7 +27,8 @@ class User:
                  username: str,
                  password: str,
                  email: str,
-                 role: str,
+                 is_admin: bool,
+                 is_super: bool,
                  icon_url: str = None) -> None:
         
         # Initialised vars
@@ -35,7 +37,8 @@ class User:
         self._password = password
         self._email = email
         self._icon_url = icon_url
-        self._role = role
+        self._is_admin = is_admin
+        self._is_super = is_super
 
         # Default vars
         self._following = []
@@ -65,6 +68,18 @@ class User:
             Modifies user's email
         '''
         self._email = new
+    
+    def promote_to_admin(self) -> None:
+        '''
+            Promotes user to admin
+        '''
+        self._is_admin = True
+
+    def demote_to_user(self) -> None:
+        '''
+            Demotes user from admin
+        '''
+        self._is_admin = False
 
     ################################
     #  Delete Methods
@@ -122,11 +137,17 @@ class User:
         '''
         return self._num_following
     
-    def get_role(self) -> List[str]:
+    def get_is_admin(self) -> bool:
         '''
-            Return role of user
+            Return the admin status of the user
         '''
-        return self._role
+        return self._is_admin
+    
+    def get_is_super(self) -> bool:
+        '''
+            Return the super admin status of the user
+        '''
+        return self._is_super
     
     ################################
     #  Storage Methods
@@ -141,6 +162,7 @@ class User:
             'password' : self._password,
             'email' : self._email,
             'icon_url' : self._icon_url,
-            'role' : self._role,
+            'is_admin' : self._is_admin,
+            'is_super' : self._is_super,
             'following' : self._following
         }

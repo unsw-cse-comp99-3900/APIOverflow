@@ -37,11 +37,12 @@ def simple_user():
         "email" : "doxxed@gmail.com"
     }
 
-    usable_data = {"token" : None}
+    usable_data = {"token" : None, "uid": None}
 
     response = client.post("/auth/register",
                             json=user_creds)
     assert response.status_code == SUCCESS
+    usable_data['uid'] = response.json()['uid']
 
     # Log into account
     response = client.post("/auth/login",
@@ -203,7 +204,7 @@ def test_providers(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': [],
-                              'providers': ['0']
+                              'providers': [simple_user['uid']]
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -267,7 +268,7 @@ def test_providers_with_tags(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['Private'],
-                              'providers': ['0']
+                              'providers': [simple_user['uid']]
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -395,7 +396,7 @@ def test_providers_with_tags2(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['API'],
-                              'providers': ['0']
+                              'providers': [simple_user['uid']]
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -424,7 +425,7 @@ def test_providers_with_tags_multiple(simple_user):
     response = client.post("/auth/register",
                             json=user_creds)
     assert response.status_code == SUCCESS
-
+    user2_id = response.json()['uid']
     # Log into account
     response = client.post("/auth/login",
                            json=user_creds)
@@ -479,7 +480,7 @@ def test_providers_with_tags_multiple(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['API'],
-                              'providers': ['0', '1']
+                              'providers': [simple_user['uid'], user2_id]
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -568,7 +569,7 @@ def test_providers_with_tags_multiple2(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['NOT API'],
-                              'providers': ['0']
+                              'providers': [simple_user['uid']]
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()

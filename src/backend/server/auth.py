@@ -24,19 +24,28 @@ def login_wrapper(username: str, password: str) -> T:
 
     return manager.create_access_token(data={"sub": user.get_id()})
 
-def register_wrapper(name: str, password: str, email: str, role: str) -> str:
+def register_wrapper(name: str, password: str, email: str, is_admin: bool) -> str:
     '''
         Handles registering a new user    
     '''
     if data_store.get_user_by_name(name):
         raise HTTPException(status_code=400, detail="Username already taken")
-
     new_user = User(str(data_store.num_users()),
                     name,
                     manager.hash_password(password),
                     email,
-                    role)
+                    is_admin,
+                    False)
     db_add_user(new_user.to_json())
     data_store.add_user(new_user)
     return new_user.get_id()
 
+def create_super_admin() -> None:
+    super_admin = User(str(data_store.num_users()),
+                    "superadmin",
+                    manager.hash_password("superadminpassword"),
+                    "superadmin@gmail.com",
+                    True,
+                    True)
+    db_add_user(super_admin.to_json())
+    data_store.add_user(super_admin)

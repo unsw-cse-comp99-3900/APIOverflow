@@ -67,7 +67,7 @@ def admin_user():
         "username" : "Tester 1",
         "password" : "password",
         "email" : "doxxed@gmail.com",
-        "role" : 'admin'
+        "is_admin" : True
     }
 
     usable_data = {"token" : None}
