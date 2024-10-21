@@ -12,16 +12,18 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class User(BaseModel):
     username: str
     password: str
-    role: str
+    is_admin: bool
+    is_super: bool
 
     @classmethod
-    def create(cls, username: str, password: str, role: str, db) -> None:
+    def create(cls, username: str, password: str, is_admin: bool, is_super: bool, db) -> None:
         hashed_password = pwd_context.hash(password)
         user_data = {
             "_id": ObjectId(),
             "username": username,
             "password": hashed_password, 
-            "role": role}
+            "is_admin": is_admin,
+            "is_super": is_super}
         db.users.insert_one(user_data)
 
     @classmethod
@@ -32,7 +34,8 @@ class UserCreate(BaseModel):
     username: str
     password: str
     email: str
-    role: str = "general"
+    is_admin: bool = False
+    is_super: bool = False
 
 class LoginModel(BaseModel):
     username: str

@@ -88,3 +88,10 @@ def db_delete_service(name: str) -> None:
     """
     db.services.delete_one({'name': name})
     return True
+
+def db_delete_user(username: str) -> None:
+    """
+    Deletes a user from MongoDB by its username.
+    """
+    db.users.delete_one({'username': username})
+    return True

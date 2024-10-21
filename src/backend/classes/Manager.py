@@ -65,7 +65,8 @@ def load_user(username: str):
         'username' : user.get_name(),
         'email' : user.get_email(),
         'password' : user.get_password(),
-        'role' : user.get_role(),
+        'is_admin' : user.get_is_admin(),
+        'is_super' : user.get_is_super(),
     }
     return user_body
 

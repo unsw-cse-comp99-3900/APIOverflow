@@ -10,6 +10,7 @@ from src.backend.server.auth import *
 from src.backend.classes.Manager import manager as _manager
 from src.backend.database import db
 from src.backend.server.tags import *
+from src.backend.server.admin import *
 from json import dumps
 
 
@@ -29,24 +30,24 @@ app.add_middleware(
 
 manager = _manager.get_manager()
 
+if ds.num_users() == 0:
+    create_super_admin()
+
 #####################################
 #   Helper Functions
 #####################################
-def role_required(roles: Union[str, List[str]]):
+def admin_required():
     '''
-        Used to verify dependency of user roles
+        Used to verify that the user is an admin
     '''
-    if isinstance(roles, str):
-        roles = [roles]
-
-    def role_checker(user=Depends(manager)):
+    def admin_checker(user=Depends(manager)):
         if user is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-        if user["role"] not in roles:
+        if not user["is_admin"]:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
         return user
 
-    return role_checker
+    return admin_checker
 
 #####################################
 #   Misc Paths
@@ -68,6 +69,7 @@ async def clear():
     ds.clear_datastore()
     clear_all_users()
     clear_all_services()
+    create_super_admin()
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
@@ -139,7 +141,6 @@ async def get_user_apis(user: User = Depends(manager)):
     user_apis = ds.get_user_apis(uid)
     return user_apis
 
-
 #####################################
 #   Auth Paths
 #####################################
@@ -148,7 +149,7 @@ async def register(user: UserCreate):
     '''
         Register a user onto the platform
     '''
-    uid = register_wrapper(user.username, user.password, user.email, user.role)
+    uid = register_wrapper(user.username, user.password, user.email, user.is_admin)
     return {'uid' : uid}
 
 @app.post("/auth/login")
@@ -163,19 +164,19 @@ async def login(credentials: LoginModel):
 
 # Example privileged routes
 @app.get("/auth/admin")
-async def admin_route(user: User = Depends(manager), role: str = Depends(role_required("admin"))):
+async def admin_route(user: User = Depends(manager), role: str = Depends(admin_required())):
     return {"message": "Welcome, Admin!"}
 
 @app.get("/auth/service")
-async def service_provider_route(user: User = Depends(manager), role: str = Depends(role_required("service provider"))):
+async def service_provider_route(user: User = Depends(manager)):
     return {"message": "Welcome, Service Provider!"}
 
 @app.get("/auth/account")
-async def account_user_route(user: User = Depends(manager), role: str = Depends(role_required("account user"))):
+async def account_user_route(user: User = Depends(manager)):
     return {"message": "Welcome, Account User!"}
 
 @app.get("/auth/guest")
-async def guest_route(user: User = Depends(manager), role: str = Depends(role_required("guest"))):
+async def guest_route(user: User = Depends(manager)):
     return {"message": "Welcome, Guest!"}
 
 @app.get("/service/filter")
@@ -204,7 +205,7 @@ async def add_tag(tag: TagData, user: User = Depends(manager)):
     add_tag_wrapper(tag.tag)
 
 @app.delete("/tag/delete")
-async def delete_tag(tag: str, user: User = Depends(manager), role: str = Depends(role_required("admin"))):
+async def delete_tag(tag: str, user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint to delete a tag
     '''
@@ -216,6 +217,38 @@ async def get_tags():
         Endpoint to grab all tags
     '''
     return get_tags_wrapper()
+
+#####################################
+#   Admin Paths
+#####################################
+
+@app.get("/admin/dashboard/users")
+async def get_users(user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint to get all users
+    '''
+    return get_all_users()
+
+@app.post("/admin/promote")
+async def promote(uid: str, user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint to promote given their id
+    '''
+    return promote_user(uid)
+
+@app.post("/admin/demote")
+async def demote(uid: str, user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint to demote a user given their id
+    '''
+    return demote_user(uid, user["is_super"])
+
+@app.delete("/admin/delete/user")
+async def user_delete(uid: str, user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint to delete a user given their id
+    '''
+    return delete_user(uid, user["is_super"])
 
 if __name__ == "__main__":
     import uvicorn
