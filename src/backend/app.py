@@ -162,6 +162,31 @@ async def login(credentials: LoginModel):
     access_token = login_wrapper(username, password)
     return {"access_token": access_token, "token_type": "bearer"}
 
+@app.get("/auth/verify-email/{token}")
+async def verify_email(token: str):
+    uid = verify_token(token)
+    user = data_store.get_user_by_id(uid) 
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    user.verify_user()
+    db_update_user(uid, user.to_json())
+    return {"message": "Email verified successfully."}
+
+@app.post("/auth/reset-password")
+async def request_password_reset(user: User = Depends(manager)):
+    uid = user['id']
+    password_reset_request(uid)
+    return {"message": "Password reset email sent."}
+
+@app.get("/auth/reset-password/{token}")
+async def reset_password_form(token: str, newpass: str):
+    uid = verify_token(token)
+    user = data_store.get_user_by_id(uid) 
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+    change_password(uid, newpass)
+
 # Example privileged routes
 @app.get("/auth/admin")
 async def admin_route(user: User = Depends(manager), role: str = Depends(admin_required())):

@@ -43,6 +43,7 @@ class User:
         # Default vars
         self._following = []
         self._num_following = 0
+        self._is_verified = False
     
     ################################
     #   Add Methods
@@ -80,6 +81,19 @@ class User:
             Demotes user from admin
         '''
         self._is_admin = False
+
+    def verify_user(self) -> None:
+        '''
+            Verify the user
+        '''
+        self._is_verified = True
+
+    def change_password(self, new:str) -> None:
+        '''
+            Changes the user password
+        '''
+        self._password = new
+
 
     ################################
     #  Delete Methods
@@ -148,6 +162,12 @@ class User:
             Return the super admin status of the user
         '''
         return self._is_super
+    
+    def get_is_verified(self) -> bool:
+        '''
+            Return the verify status of the user
+        '''
+        return self._is_verified
     
     ################################
     #  Storage Methods
