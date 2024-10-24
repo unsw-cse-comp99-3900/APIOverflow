@@ -29,8 +29,8 @@ app.add_middleware(
 )
 
 manager = _manager.get_manager()
-
-if ds.num_users() == 0:
+user_count = db.users.count_documents({})
+if ds.num_users() == 0 and user_count == 0:
     create_super_admin()
 
 #####################################

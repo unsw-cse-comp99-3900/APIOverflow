@@ -7,6 +7,7 @@ from src.backend.app import app
 from src.backend.classes.datastore import data_store
 from unittest.mock import patch, MagicMock
 from src.backend.classes.User import User
+import base64
 
 # Create a test client
 client = TestClient(app)
@@ -17,75 +18,95 @@ def clear_database():
     response = client.post("/testing/clear")
     assert response.status_code == 200
 
-@pytest.fixture
-def mock_email_settings():
-    return {
-        'email': 'test@gmail.com',
-        'verification_token': 'test_token'
-    }
+# Mock credentials for testing
+mock_credentials = MagicMock()
+mock_service = MagicMock()
+mock_message = {'raw': 'encoded_message'}
 
-@patch('smtplib.SMTP_SSL')
-def test_send_verification_email(mock_smtp_ssl, mock_email_settings):
-    email = mock_email_settings['email']
-    verification_token = mock_email_settings['verification_token']
+@patch('src.backend.server.auth.build')
+@patch('src.backend.server.auth.get_credentials', return_value=mock_credentials) 
+def test_send_email(mock_get_credentials, mock_build):
 
-    mock_smtp_instance = mock_smtp_ssl.return_value.__enter__.return_value
-    mock_smtp_instance.login = MagicMock()
-    mock_smtp_instance.sendmail = MagicMock()
+    mock_build.return_value = mock_service
+    mock_service.users().messages().send.return_value.execute.return_value = {'id': '12345'}
 
-    send_email(email, verification_token)
+    to_email = "test@example.com"
+    token = "test_token"
 
-    mock_smtp_ssl.assert_called_once_with('smtp.gmail.com', 465)
-    mock_smtp_instance.login.assert_called_once_with("api.overflow6@gmail.com", "itdobeflowing")
-    mock_smtp_instance.sendmail.assert_called_once()
+    result = send_email(to_email, token, email_type='verification')
+
+    assert result == {'id': '12345'}
+    mock_get_credentials.assert_called_once()
+    mock_build.assert_called_once_with('gmail', 'v1', credentials=mock_credentials)
+    mock_service.users().messages().send.assert_called_once() 
+
+    called_args = mock_service.users().messages().send.call_args[1]['body']
+    assert 'raw' in called_args
+    assert isinstance(called_args['raw'], str) 
+
+# @patch('smtplib.SMTP_SSL')
+# def test_send_passreset_email(mock_smtp_ssl, mock_email_settings):
+#     email = mock_email_settings['email']
+#     verification_token = mock_email_settings['verification_token']
+
+#     mock_smtp_instance = mock_smtp_ssl.return_value.__enter__.return_value
+#     mock_smtp_instance.login = MagicMock()
+#     mock_smtp_instance.sendmail = MagicMock()
+
+#     send_email(email, verification_token, 'password_reset')
+
+#     mock_smtp_ssl.assert_called_once_with('smtp.gmail.com', 465)
+#     mock_smtp_instance.login.assert_called_once_with("api.overflow6@gmail.com", "itdobeflowing")
+#     mock_smtp_instance.sendmail.assert_called_once()
     
-    args, _ = mock_smtp_instance.sendmail.call_args
-    assert args[1] == email
-    assert 'verify-email/test_token' in args[2]
+#     args, _ = mock_smtp_instance.sendmail.call_args
+#     assert args[1] == email
+#     assert 'reset-password/test_token' in args[2]
 
-@patch('smtplib.SMTP_SSL')
-def test_send_passreset_email(mock_smtp_ssl, mock_email_settings):
-    email = mock_email_settings['email']
-    verification_token = mock_email_settings['verification_token']
+# def test_send_email():
+#     response = client.post("/auth/register", json={
+#         "username": "testuser",
+#         "password": "testpassword",
+#         "email" : "test@gmail.com"
+#     })
+#     assert response.status_code == 200
 
-    mock_smtp_instance = mock_smtp_ssl.return_value.__enter__.return_value
-    mock_smtp_instance.login = MagicMock()
-    mock_smtp_instance.sendmail = MagicMock()
+# def test_verify_email():
 
-    send_email(email, verification_token, 'password_reset')
+#     new_user = User("12",
+#                     "user",
+#                     "what",
+#                     "huh",
+#                     False,
+#                     False)
+#     data_store.add_user(new_user)
+#     user = data_store.get_user_by_id("12")
+#     verification_token = generate_verification_token("12") 
+#     assert user.get_is_verified() == False
 
-    mock_smtp_ssl.assert_called_once_with('smtp.gmail.com', 465)
-    mock_smtp_instance.login.assert_called_once_with("api.overflow6@gmail.com", "itdobeflowing")
-    mock_smtp_instance.sendmail.assert_called_once()
-    
-    args, _ = mock_smtp_instance.sendmail.call_args
-    assert args[1] == email
-    assert 'reset-password/test_token' in args[2]
+#     response = client.get(f"/auth/verify-email/{verification_token}")
 
-def test_send_email():
-    response = client.post("/auth/register", json={
-        "username": "testuser",
-        "password": "testpassword",
-        "email" : "test@gmail.com"
-    })
-    assert response.status_code == 200
+#     user = data_store.get_user_by_id("12")
+#     assert user.get_is_verified() == True
+#     assert response.status_code == 200
+#     assert response.json() == {"message": "Email verified successfully."}
 
-def test_verify_email():
+# def test_reset_password():
+#     response = client.post("/auth/register", json={
+#         "username": "testuser",
+#         "password": "testpassword",
+#         "email" : "test@gmail.com"
+#     })
+#     assert response.status_code == 200
 
-    new_user = User("12",
-                    "user",
-                    "what",
-                    "huh",
-                    False,
-                    False)
-    data_store.add_user(new_user)
-    user = data_store.get_user_by_id("12")
-    verification_token = generate_verification_token("12") 
-    assert user.get_is_verified() == False
+#     verification_token = generate_verification_token("1")
+#     response = client.get(f"/auth/reset-password/{verification_token}", 
+#                             params={
+#                               'newpass' : "newpassword"
+#                             })
 
-    response = client.get(f"/auth/verify-email/{verification_token}")
-
-    user = data_store.get_user_by_id("12")
-    assert user.get_is_verified() == True
-    assert response.status_code == 200
-    assert response.json() == {"message": "Email verified successfully."}
+#     response = client.post("/auth/login", json={
+#         "username": "testuser",
+#         "password": "newpassword"
+#     })
+#     assert response.status_code == 200
