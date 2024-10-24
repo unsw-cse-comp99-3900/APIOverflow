@@ -5,14 +5,7 @@
 name: Backend Testing with PyTest
 
 on:
-  push:
-    branches: [ "main", "fix-CICD" ]
-  
-  # check_run:
-  #   types: [requested_action, created, rerequested]
-
-  pull_request:
-    types: [opened, reopened, edited]
+  - push
 
 
 
