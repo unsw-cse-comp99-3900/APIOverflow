@@ -7,6 +7,9 @@ name: Backend Testing with PyTest
 on:
   push:
     branches: [ "main", "fix-CICD" ]
+  
+  check_run
+
 
 permissions:
   contents: read
