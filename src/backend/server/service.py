@@ -230,11 +230,7 @@ def api_name_search(name) -> list:
     api_list = data_store.get_apis()
     return_list = []
     for api in api_list:
-        print("matching...")
-        print(api.get_name())
-        print(name)
-        if re.search(name, api.get_name(), re.IGNORECASE):
-            print("found")
+        if re.search(name, api.get_name(), re.IGNORECASE) and api.get_status() == "LIVE":
             return_list.append(api)
     return return_list
 

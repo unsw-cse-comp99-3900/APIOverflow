@@ -61,6 +61,8 @@ class Service:
         self._reviews = []
         self._review_count = 0
         self._upvotes = 0
+        # NEED TO CHANGE THIS TO PENDING INITIALISATION WHEN IMPLEMENTING ADMIN
+        self._status = "LIVE"
     
     ################################
     #   Add Methods
@@ -238,6 +240,12 @@ class Service:
             Returns icon_url of service
         '''
         return self._docs
+    
+    def get_status(self) -> str:
+        '''
+            Returns status of service
+        '''
+        return self._status
 
     ################################
     #  Storage Methods
