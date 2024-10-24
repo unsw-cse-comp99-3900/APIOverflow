@@ -14,17 +14,13 @@ import os
 IMAGE_PATH = "static/imgs"
 DOC_PATH = "static/docs"
 MB1 = 1024 * 1024
+IMAGE_TYPES = ["image/jpg", "image/jpeg", "image/png"]
 
-async def upload_wrapper(file: UploadFile) -> str:
+async def upload_file(file: UploadFile, path: str) -> str:
     '''
-        Function which uploads files into specified path
+        Helper function which uploads a given file to the given file path,
+        returning the file path
     '''
-    # Check type
-    if file.content_type == 'application/pdf':
-        path = DOC_PATH
-    else:
-        path = IMAGE_PATH
-
     path_name = os.path.splitext(f"/{file.filename}")
     path_ext = f"{path_name[0]}_{data_store.num_docs()}{path_name[1]}"
     path += path_ext
@@ -38,8 +34,35 @@ async def upload_wrapper(file: UploadFile) -> str:
     
     finally:
         await file.close()
+    
+    return path
 
+async def upload_pdf_wrapper(file: UploadFile) -> str:
+    '''
+        Function which uploads pdf files
+    '''
+    path = DOC_PATH
+    # Check type
+    if file.content_type != 'application/pdf':
+        raise HTTPException(status_code=400, detail="File uploaded is not PDF")
+
+    path = await upload_file(file, path)
     doc = Document(str(data_store.num_docs()), path, file.content_type)
 
     data_store.add_docs(doc)
-    return doc.get_id()
+    return str(doc.get_id())
+
+async def upload_img_wrapper(file: UploadFile) -> int:
+    '''
+        Function which uploads image files
+    '''
+    path = IMAGE_PATH
+    # Check type
+    if file.content_type not in IMAGE_TYPES:
+        raise HTTPException(status_code=400, detail="File uploaded is not JPG, JPEG or PNG")
+
+    path = await upload_file(file, path)
+    doc = Document(str(data_store.num_docs()), path, file.content_type)
+
+    data_store.add_docs(doc)
+    return str(doc.get_id())

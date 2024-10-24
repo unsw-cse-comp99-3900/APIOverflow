@@ -474,7 +474,7 @@ def test_update_api_documents(simple_user):
     file = {
         'file' : (filename, open("tests/resources/git_guide.pdf", 'rb'))
     }
-    response = client.post("/upload", files=file)
+    response = client.post("/upload/pdfs", files=file)
     assert response.status_code == SUCCESS
  
     doc_id = response.json()['doc_id']

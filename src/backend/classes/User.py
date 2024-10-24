@@ -17,6 +17,7 @@ class User:
             icon_url:   Path to image store on backend (todo)
             is_admin:   Is the user an admin
             is_super:   Is the user a super admin
+            icon:       ID of image file serving as user's icon
             ---
             following:  List of services/users user is following
     

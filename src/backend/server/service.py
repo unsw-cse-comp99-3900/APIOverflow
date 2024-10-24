@@ -6,7 +6,6 @@ from urllib.error import HTTPError, URLError
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
-from src.backend.server.upload import upload_wrapper
 import re
 
 
@@ -240,6 +239,7 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
         Function which handles uploading docs to a service
     '''
     file = data_store.get_doc_by_id(doc_id)
+    
     # Error Checks
     if file is None:
         raise HTTPException(status_code=400, detail="File not found")

@@ -11,6 +11,7 @@ from src.backend.classes.Manager import manager as _manager
 from src.backend.database import db
 from src.backend.server.tags import *
 from src.backend.server.admin import *
+from src.backend.server.upload import *
 from json import dumps
 
 
@@ -73,12 +74,20 @@ async def clear():
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
-@app.post("/upload")
-async def upload(file: UploadFile = File(...)):
+@app.post("/upload/pdfs")
+async def upload_pdf(file: UploadFile = File(...)):
     '''
-        Endpoint to upload files
+        Endpoint to upload pdf files
     '''
-    doc_id = await upload_wrapper(file)
+    doc_id = await upload_pdf_wrapper(file)
+    return {'doc_id': doc_id}
+
+@app.post("/upload/imgs")
+async def upload_image(file: UploadFile = File(...)):
+    '''
+        Endpoint to upload image files (will only support JPEG/JPG and PNG)
+    '''
+    doc_id = await upload_img_wrapper(file)
     return {'doc_id': doc_id}
 
 #####################################
