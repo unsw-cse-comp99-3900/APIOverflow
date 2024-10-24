@@ -9,7 +9,13 @@ on:
     branches: [ "main", "fix-CICD" ]
   
   check_run:
-    types: ["requested_action", "created", "rerequested"]
+    types: [requested_action, created, rerequested]
+
+  # pull_request:
+  #   types: [opened, reopened, edited]
+
+  #   branches:
+      - 
 
 
 permissions:
