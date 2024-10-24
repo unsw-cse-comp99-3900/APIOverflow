@@ -186,6 +186,12 @@ async def filter(
 ):
     return api_tag_filter(tags, providers)
 
+@app.get("/service/search")
+async def search(
+    name: Optional[str] = Query(None),
+):
+    return api_name_search(name)
+
 @app.delete("/service/delete")
 async def delete_api(sid: str):
     """
