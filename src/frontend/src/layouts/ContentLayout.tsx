@@ -3,7 +3,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "../components/Navbar";
 
-const MainLayout = () => {
+const MainLayout: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar stays fixed at the top */}

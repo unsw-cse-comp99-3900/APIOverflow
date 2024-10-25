@@ -1,9 +1,8 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import UserSideBar from '../components/UserSideBar';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import UserSideBar from "../components/UserSideBar";
 
-
-const UserSidebarLayout = () => {
+const UserSidebarLayout: React.FC = () => {
   return (
     <div className="flex">
       <UserSideBar />
