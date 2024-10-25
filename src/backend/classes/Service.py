@@ -192,6 +192,12 @@ class Service:
             Removes icon from service and restores to default
         '''
         self._icon = DEFAULT_ICON
+        
+    def remove_endpoint(self, endpoint: Endpoint) -> None:
+        '''
+            Removes specified endpoint 
+        '''
+        self._endpoints.remove(endpoint)
 
     def remove_endpoint(self, endpoint: Endpoint) -> None:
         '''
