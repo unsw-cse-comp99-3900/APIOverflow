@@ -4,4 +4,6 @@ export type Review = {
   content: string;
 }
 
+export type Tag = string
+
 export type ServiceType = "api" | "micro"

@@ -9,7 +9,6 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-
   useEffect(() => {
     const fetchApis = async () => {
       try {
@@ -31,24 +30,23 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
   };
 
   return (
-    <FetchStatus loading={loading} error={error} data={apis}> 
-          <div className="container-xl lg:container mx-auto px-10">
+    <FetchStatus loading={loading} error={error} data={apis}>
+      <div className="container-xl lg:container mx-auto px-10">
         <h2 className="text-3xl font-bold text-blue-800 mb-6 mt-6 text-left">
           {isMyAPis ? "My APIs" : "Browse APIs"}
         </h2>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(700px,1fr))] gap-6">
-            {apis.map((api) => (
-              <ApiListing
-                key={api.id}
-                api={api}
-                isMyApis={isMyAPis}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(700px,1fr))] gap-6">
+          {apis.map((api) => (
+            <ApiListing
+              key={api.id}
+              api={api}
+              isMyApis={isMyAPis}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
       </div>
     </FetchStatus>
-
   );
 };
 

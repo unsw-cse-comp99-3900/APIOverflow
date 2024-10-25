@@ -95,3 +95,14 @@ export const userRegister = async (user: UserCreate) => {
   });
   return;
 };
+
+
+/*        Tag Services       */
+export const getTags = async () => {
+  const res = await fetch(`${baseUrl}/tags/get`, {
+    method: "GET",
+  });
+  const data = await res.json();
+  console.log(data)
+  return data.tags;
+};

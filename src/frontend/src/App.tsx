@@ -17,9 +17,8 @@ import { AuthProvider } from "./authentication/AuthProvider";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./authentication/ProtectedRoute";
-import SidebarLayout from "./layouts/SidebarLayout";
-import TagsSideBar from "./components/TagsSideBar";
-import UserSideBar from "./components/UserSideBar";
+import TagsSidebarLayout from "./layouts/TagsSidebarLayout";
+import UserSidebarLayout from "./layouts/UserSidebarLayout";
 
 const App = () => {
   const router = createBrowserRouter(
@@ -37,11 +36,11 @@ const App = () => {
           <Route path="/add-api" element={<AddApiPage />} />
           <Route path="/edit-api" element={<EditApiPage />} />
 
-          <Route path="/apis" element={<SidebarLayout Sidebar={TagsSideBar} />}>
+          <Route path="/apis" element={<TagsSidebarLayout/>}>
             <Route path="/apis" element={<APIsPage />} />
           </Route>
           <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<SidebarLayout Sidebar={UserSideBar} />}>
+            <Route path="/profile" element={<UserSidebarLayout />}>
               <Route path="/profile/my-apis" element={<MyApisPage />} />
               <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
               <Route path="/profile/add-api" element={<AddApiPage />} />
