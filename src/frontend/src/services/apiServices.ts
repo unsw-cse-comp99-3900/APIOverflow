@@ -1,11 +1,13 @@
 import { LoginModel, ServicePost, ServiceUpdate, UserCreate } from "../types/backendTypes";
+import { Tag } from "../types/miscTypes";
 import { briefApiDataFormatter, detailedApiDataFormatter } from "../utils/dataFormatters";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async () => {
-  const res = await fetch(`${baseUrl}/service/apis`, {
+export const getApis = async (tags?: Tag[]) => {
+  const queryParams = tags && tags.length > 0 ? `?tags=${tags.join(",")}` : "";
+  const res = await fetch(`${baseUrl}/service/filter${queryParams}`, {
     method: "GET",
   });
   const data = await res.json();
@@ -39,7 +41,6 @@ export const deleteApi = async (id: string) => {
 };
 
 export const addApi = async (service: ServicePost) => {
-  console.log(service)
   const res = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
@@ -53,7 +54,6 @@ export const addApi = async (service: ServicePost) => {
 };
 
 export const updateApi = async (api: ServiceUpdate) => {
-  console.log(api)
   await fetch(`${baseUrl}/service/update`, {
     method: "PUT",
     headers: {
@@ -103,6 +103,5 @@ export const getTags = async () => {
     method: "GET",
   });
   const data = await res.json();
-  console.log(data)
   return data.tags;
 };

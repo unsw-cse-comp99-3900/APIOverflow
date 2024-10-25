@@ -6,14 +6,16 @@ import Tag from "./Tag";
 import DeleteApiButton from "./DeleteApiButton";
 import EditApiButton from "./EditApiButton";
 
-const ApiListing = ({
-  api,
-  isMyApis,
-  onDelete,
-}: {
+interface ApiListingProps {
   api: BriefApi;
   isMyApis: boolean;
   onDelete: (id: string) => void;
+}
+
+const ApiListing: React.FC<ApiListingProps>  = ({
+  api,
+  isMyApis,
+  onDelete,
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
 

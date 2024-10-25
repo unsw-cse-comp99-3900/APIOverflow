@@ -3,8 +3,15 @@ import { Tag } from "../types/miscTypes";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { getTags } from "../services/apiServices";
 
-const TagsSideBar = () => {
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+interface TagsSideBarProps {
+  selectedTags: string[];
+  setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+const TagsSideBar: React.FC<TagsSideBarProps> = ({
+  selectedTags,
+  setSelectedTags,
+}) => {
   const [tags, setTags] = useState<Tag[]>([]);
 
   useEffect(() => {
@@ -16,7 +23,6 @@ const TagsSideBar = () => {
         console.log("Error fetching data", error);
       }
     };
-
     fetchApis();
   }, []);
 
@@ -28,11 +34,10 @@ const TagsSideBar = () => {
     );
 
   const toggleTag = (tag: Tag) => {
-    setSelectedTags(
-      (prevSelected) =>
-        prevSelected.includes(tag)
-          ? prevSelected.filter((prevTag) => prevTag !== tag) // Deselect tag
-          : [...prevSelected, tag] // Select tag
+    setSelectedTags((prevSelected) =>
+      prevSelected.includes(tag)
+        ? prevSelected.filter((prevTag) => prevTag !== tag)
+        : [...prevSelected, tag]
     );
   };
 
@@ -41,6 +46,7 @@ const TagsSideBar = () => {
       <div className="grid grid-cols-1 gap-1">
         {tags.map((tag) => (
           <span
+            key={tag}
             className="flex items-center px-4 py-2 text-gray-900 bg-white rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3 hover:cursor-pointer"
             onClick={() => toggleTag(tag)}
           >

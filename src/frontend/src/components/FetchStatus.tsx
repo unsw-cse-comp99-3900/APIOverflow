@@ -1,5 +1,6 @@
 import React from "react";
 import Spinner from "./Spinner";
+
 interface FetchStatusProps {
   loading: boolean;
   error: string | null;

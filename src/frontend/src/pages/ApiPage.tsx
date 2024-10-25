@@ -11,7 +11,7 @@ import ApiDescription from "../components/ApiDescription";
 import ApiDocs from "../components/ApiDocs";
 import BackButton from "../components/BackButton";
 
-const ApiPage = () => {
+const ApiPage: React.FC = () => {
   const [api, setApi] = useState<DetailedApi | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,10 +58,10 @@ const ApiPage = () => {
                     />
                   </div>
                   <div className="ml-10 w-full">
-                    <h1 className="text-4xl font-bold mb-5">{api?.name}</h1>
+                    <h1 className="text-4xl font-bold mb-5">{api.name}</h1>
                     <div className="border border-gray-100 w-full mb-5"></div>
                     <div className="flex flex-wrap max-w-3xl mt-4 mb-5">
-                      {api?.tags.map((tag, index) => (
+                      {api.tags.map((tag, index) => (
                         <Tag key={index} tag={tag} className="mr-3 mb-2" />
                       ))}
                     </div>

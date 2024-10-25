@@ -42,7 +42,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         name,
         description,
         endpoint,
-        tags: ["sample_tag"],
+        tags: ["test_tag_1"],
       };
       
       await updateApi(updatedApi);
@@ -57,8 +57,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         y_start : 0,
         y_end : 100,
         icon_url: "",
-        tags: ["sample_tag"],
-
+        tags: ["test_tag_2"],
       }; 
       const newId = await addApi(newApi);
       console.log(newId)
