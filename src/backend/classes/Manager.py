@@ -60,6 +60,8 @@ def load_user(username: str):
         Grabs user for manager
     '''
     user = data_store.get_user_by_id(username)
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
     user_body = {
         'id' : user.get_id(),
         'username' : user.get_name(),
