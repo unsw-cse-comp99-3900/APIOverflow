@@ -81,3 +81,6 @@ class ServiceIconInfo(BaseModel):
 
 class ServiceIconDeleteInfo(BaseModel):
     sid: str
+
+class Password(BaseModel):
+    newpass: str

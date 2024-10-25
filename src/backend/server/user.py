@@ -64,4 +64,4 @@ def user_get_icon_wrapper(uid: str) -> FileResponse:
 
     icon_id = user.get_icon()
     icon = data_store.get_doc_by_id(icon_id)
-    return FileResponse(icon.get_patth())
+    return FileResponse(icon.get_path())
