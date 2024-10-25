@@ -184,5 +184,6 @@ class User:
             'icon_url' : self._icon_url,
             'is_admin' : self._is_admin,
             'is_super' : self._is_super,
-            'following' : self._following
+            'following' : self._following,
+            'is_verified': self._is_verified
         }
