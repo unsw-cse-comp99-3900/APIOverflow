@@ -32,10 +32,9 @@ export const getApi = async (id: number | string) => {
 };
 
 // BE un-implemented
-export const deleteApi = async (id: number) => {
-  await fetch(`${baseUrl}/service/${id}`, {
+export const deleteApi = async (id: string) => {
+  await fetch(`${baseUrl}/service/delete?sid=${id}`, {
     method: "DELETE",
-    body: JSON.stringify(id),
   });
   return;
 };
@@ -54,7 +53,6 @@ export const addApi = async (service: ServicePost) => {
   return data.id;
 };
 
-// TODO
 export const updateApi = async (api: ServiceUpdate) => {
   console.log(api)
   await fetch(`${baseUrl}/service/update`, {

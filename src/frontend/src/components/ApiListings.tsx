@@ -26,7 +26,7 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
     fetchApis();
   }, [isMyAPis]);
 
-  const handleDelete = (deletedApiId: number) => {
+  const handleDelete = (deletedApiId: string) => {
     setApis((prevApis) => prevApis.filter((api) => api.id !== deletedApiId));
   };
 

@@ -1,7 +1,7 @@
 import { Review, ServiceType } from "./miscTypes";
 
 export interface BriefApi {
-  id: number;
+  id: string;
   name: string;
   description: string;
   owner: string;
