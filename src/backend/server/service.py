@@ -7,6 +7,7 @@ from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
 from src.backend.server.upload import upload_wrapper
+import re
 
 
 # Ollama information
@@ -186,7 +187,7 @@ def api_into_json(api) -> dict:
 
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
-def api_tag_filter(tags, providers):
+def api_tag_filter(tags, providers) -> list:
 
     api_list = data_store.get_apis()
     filtered_apis = []
@@ -223,6 +224,16 @@ def api_tag_filter(tags, providers):
     else:
         return [api_into_json(api) for api in filtered_apis]
     return return_list
+
+# returns a list of regex matching services 
+def api_name_search(name) -> list: 
+    api_list = data_store.get_apis()
+    return_list = []
+    for api in api_list:
+        if re.search(name, api.get_name(), re.IGNORECASE) and api.get_status() == "LIVE":
+            return_list.append(api)
+    return return_list
+
     
 async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
     '''
