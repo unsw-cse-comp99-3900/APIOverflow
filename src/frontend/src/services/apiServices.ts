@@ -1,7 +1,5 @@
-import { Api, DetailedApi, NewApi } from "../types/apiTypes";
-import { LoginModel, ServicePost, UserCreate } from "../types/backendTypes";
-import { apiDataFormatter } from "../utils/dataFormatters";
-import { removeUnderscores } from "../utils/removeUnderscores";
+import { LoginModel, ServicePost, ServiceUpdate, UserCreate } from "../types/backendTypes";
+import { briefApiDataFormatter, detailedApiDataFormatter } from "../utils/dataFormatters";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -11,7 +9,7 @@ export const getApis = async () => {
     method: "GET",
   });
   const data = await res.json();
-  return removeUnderscores(data).map(apiDataFormatter);
+  return data.map(briefApiDataFormatter);
 };
 
 export const getMyApis = async () => {
@@ -22,7 +20,7 @@ export const getMyApis = async () => {
     method: "GET",
   });
   const data = await res.json();
-  return removeUnderscores(data);
+  return data;
 };
 
 export const getApi = async (id: number | string) => {
@@ -30,7 +28,7 @@ export const getApi = async (id: number | string) => {
     method: "GET",
   });
   const data = await res.json();
-  return apiDataFormatter(removeUnderscores(data));
+  return detailedApiDataFormatter(data);
 };
 
 // BE un-implemented
@@ -56,11 +54,13 @@ export const addApi = async (service: ServicePost) => {
   return data.id;
 };
 
-// BE un-implemented
-export const updateApi = async (api: Api) => {
-  await fetch(`${baseUrl}/service/${api.id}`, {
+// TODO
+export const updateApi = async (api: ServiceUpdate) => {
+  console.log(api)
+  await fetch(`${baseUrl}/service/update`, {
     method: "PUT",
     headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(api),

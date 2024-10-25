@@ -70,7 +70,7 @@ const MyApiPage = () => {
                     {api?.id && (
                       <DeleteApiButton
                         apiId={api.id}
-                        apisRoute="/profile/myApis"
+                        apisRoute="/profile/my-apis"
                       />
                     )}
                   </div>

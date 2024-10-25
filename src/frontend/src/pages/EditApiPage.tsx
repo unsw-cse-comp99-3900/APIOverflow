@@ -4,10 +4,9 @@ import { useParams } from "react-router-dom";
 
 const EditApiPage = () => {
   const { id } = useParams();
-  const numericApiId = Number(id);
   
   return (
-      <EditApiForm apiId={numericApiId} />
+      <EditApiForm apiId={id} />
   );
 };
 

@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { Api } from "../types/apiTypes";
+import { BriefApi } from "../types/apiTypes";
 import ApiListing from "./ApiListing";
-import Spinner from "./Spinner";
 import { getApis, getMyApis } from "../services/apiServices";
 import FetchStatus from "./FetchStatus";
 
 const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
-  const [apis, setApis] = useState<Api[]>([]);
+  const [apis, setApis] = useState<BriefApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
