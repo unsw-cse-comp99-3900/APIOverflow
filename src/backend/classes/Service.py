@@ -1,4 +1,5 @@
 from typing import *
+from Endpoint import *
 
 T = TypeVar("T")
 K = TypeVar("K")
@@ -38,7 +39,7 @@ class Service:
                  icon_url: str,
                  description: str,
                  tags: List[str],
-                 endpoint: str,
+                 endpoints: list[Endpoint],
                  stype: str) -> None:
         
         # Initialised vars
@@ -49,7 +50,7 @@ class Service:
         self._icon_url= icon_url
         self._description = description
         self._tags = tags
-        self._endpoint = endpoint
+        self._endpoints = endpoints
         self._type = stype
 
         # Default vars
@@ -98,6 +99,16 @@ class Service:
             Adds tag to service
         '''
         self._tags.append(tag)
+
+    def add_endpoint(self, tab, parameters, method) -> None:
+        '''
+            Adds an endpoint to the service
+        '''
+        try: 
+            new_endpoint = Endpoint(tab, parameters, method)
+            self._endpoints.append(new_endpoint)
+        except ValueError as e:
+            print(e)
 
     # def add_owner(self, owner: str) -> None:
     #     '''
@@ -163,6 +174,12 @@ class Service:
             Removes tag from service
         '''
         self._tags.remove(tag)
+
+    def remove_endpoint(self, endpoint: Endpoint) -> None:
+        '''
+            Removes specified endpoint 
+        '''
+        self._endpoints.remove(endpoint)
 
     # def remove_owner(self, uid: str) -> None:
     #     '''
