@@ -1,16 +1,20 @@
-export interface Api {
+import { Review, ServiceType } from "./miscTypes";
+
+export interface BriefApi {
   id: number;
   name: string;
   description: string;
-  ownerName: string;
+  owner: string;
   iconUrl: string;
   tags: string[];
-  endpoint: string;
 }
 
-export type DetailedApi = Api & {
+export type DetailedApi = BriefApi & {
   documents: string[];
-
+  endpoint: string;
+  reviews: Review[];
+  upvotes: number;
+  type: ServiceType;
 }
 
 export type NewApi = Omit<DetailedApi, "id">;

@@ -1,15 +1,15 @@
 import { PhotoIcon, DocumentIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useState } from "react";
-import { Api, NewApi, DetailedApi } from "../types/apiTypes";
+import { DetailedApi, NewApi } from "../types/apiTypes";
 import { getApi, updateApi, addApi } from "../services/apiServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { ServicePost } from "../types/backendTypes";
+import { ServicePost, ServiceUpdate } from "../types/backendTypes";
 
-const EditApiForm = ({ apiId }: { apiId?: number }) => {
-  const [api, setApi] = useState<Api | null>(null);
+const EditApiForm = ({ apiId }: { apiId?: string }) => {
+  const [api, setApi] = useState<DetailedApi | null>(null);
   const navigate = useNavigate();
-  const [apiName, setApiName] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [endpoint, setEndpoint] = useState<string>("");
 
@@ -21,8 +21,9 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
       try {
         const data = await getApi(apiId);
         setApi(data);
-        setApiName(data.name);
+        setName(data.name);
         setDescription(data.description);
+        setEndpoint(data.endpoint);
       } catch (error) {
         console.log("Error fetching data", error);
         toast.error("Error loading API data");
@@ -36,30 +37,28 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
     e.preventDefault();
 
 		if (apiId) {
-      const updatedApi:DetailedApi = {
-        id: Number(apiId),
-        name: apiName,
+      const updatedApi:ServiceUpdate = {
+        sid: apiId,
+        name,
         description,
-        iconUrl: "",
-        ownerName: "sample_owner",
+        endpoint,
         tags: ["sample_tag"],
-        documents: ["sample_document"],
-        endpoint: endpoint,
       };
       
       await updateApi(updatedApi);
       navigate(`/profile/my-apis/${apiId}`);
-    }else{
+    } else {
       const newApi:ServicePost = {
-        name: apiName,
+        name,
+        description,
+        endpoint,
         x_start : 0,
         x_end : 100,
         y_start : 0,
         y_end : 100,
-        description,
         icon_url: "",
         tags: ["sample_tag"],
-        endpoint: endpoint,
+
       }; 
       const newId = await addApi(newApi);
       console.log(newId)
@@ -105,7 +104,7 @@ const EditApiForm = ({ apiId }: { apiId?: number }) => {
                     name="apiName"
                     required
                     type="text"
-                    onChange={(e) => setApiName(e.target.value)}
+                    onChange={(e) => setName(e.target.value)}
                     placeholder="API Overflow"
                     defaultValue={api?.name}
                     className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 focus:font-semibold text-md leading-6"
