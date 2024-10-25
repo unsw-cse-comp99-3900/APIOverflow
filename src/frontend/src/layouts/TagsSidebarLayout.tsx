@@ -1,9 +1,15 @@
 import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useOutletContext } from "react-router-dom";
 import TagsSideBar from "../components/TagsSideBar";
 
+interface OutletContext {
+  selectedTags: string[];
+  setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
 const TagsSidebarLayout: React.FC = () => {
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  const { selectedTags, setSelectedTags } = useOutletContext<OutletContext>();
   return (
     <div className="flex">
       <TagsSideBar
