@@ -71,3 +71,13 @@ class ServiceUpload(BaseModel):
 
 class TagData(BaseModel):
     tag: str
+
+class DocumentID(BaseModel):
+    doc_id: str
+
+class ServiceIconInfo(BaseModel):
+    sid: str
+    doc_id: str
+
+class ServiceIconDeleteInfo(BaseModel):
+    sid: str

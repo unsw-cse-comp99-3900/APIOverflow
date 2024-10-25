@@ -1,4 +1,5 @@
 from typing import *
+from src.backend.classes.Document import Document
 
 T = TypeVar("T")
 DEFAULT_TAGS = [
@@ -12,6 +13,9 @@ DEFAULT_TAGS = [
     "Recently Updated"
 ]
 
+DEFAULT_ICON_PATH = "/static/imgs/default_icon0.png"
+DEFAULT_ICON = Document('0', DEFAULT_ICON_PATH, 'image/png')
+
 schema = {
     'users' : [],
     'user_count' : 0,
@@ -20,8 +24,8 @@ schema = {
     'tags' : DEFAULT_TAGS.copy(),
     'tag_count' : len(DEFAULT_TAGS),
     'img_count' : 0,
-    'docs_count': 0,
-    'docs': []
+    'docs_count': 1,
+    'docs': [DEFAULT_ICON]
 }
 
 class Datastore:
@@ -56,8 +60,8 @@ class Datastore:
                             'tags' : DEFAULT_TAGS.copy(),
                             'tag_count' : len(DEFAULT_TAGS),
                             'img_count' : 0,
-                            'docs_count': 0,
-                            'docs': []
+                            'docs_count': 1,
+                            'docs': [DEFAULT_ICON]
                         }
 
     ##################################
