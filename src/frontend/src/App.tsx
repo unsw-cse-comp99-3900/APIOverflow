@@ -42,7 +42,6 @@ const App = () => {
         </Route>
 
         <Route path="/" element={<ContentLayout />}>
-          <Route path="/apis" element={<APIsPage />} />
           <Route path="/apis/:id" element={<ApiPage />} />
           <Route path="/add-api" element={<AddApiPage />} />
           <Route path="/edit-api" element={<EditApiPage />} />

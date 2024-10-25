@@ -2,17 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Tag } from "../types/miscTypes";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { getTags } from "../services/apiServices";
+import { useSelectedTags } from "../contexts/SelectedTagsContext";
 
-interface TagsSideBarProps {
-  selectedTags: string[];
-  setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
-}
-
-const TagsSideBar: React.FC<TagsSideBarProps> = ({
-  selectedTags,
-  setSelectedTags,
-}) => {
+const TagsSideBar: React.FC = () => {
   const [tags, setTags] = useState<Tag[]>([]);
+  const { selectedTags, toggleTag } = useSelectedTags();
 
   useEffect(() => {
     const fetchApis = async () => {
@@ -32,14 +26,6 @@ const TagsSideBar: React.FC<TagsSideBarProps> = ({
     ) : (
       <FaRegSquare className="mr-2" />
     );
-
-  const toggleTag = (tag: Tag) => {
-    setSelectedTags((prevSelected) =>
-      prevSelected.includes(tag)
-        ? prevSelected.filter((prevTag) => prevTag !== tag)
-        : [...prevSelected, tag]
-    );
-  };
 
   return (
     <aside className="fixed left-0 w-80 h-full px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
