@@ -71,3 +71,6 @@ class ServiceUpload(BaseModel):
 
 class TagData(BaseModel):
     tag: str
+
+class Password(BaseModel):
+    newpass: str

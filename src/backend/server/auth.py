@@ -11,12 +11,9 @@ import jwt
 from datetime import datetime, timedelta, timezone
 import os
 from oauth2client import client, tools, file
-from google.oauth2.credentials import Credentials
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
 import base64
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -24,7 +21,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 T = TypeVar("T")
 ADMIN = 'admin'
 GENERAL = 'general'
-email = True
+email = os.getenv("EMAIL", "False") == "True" 
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 APPLICATION_NAME = 'Gmail API Python Send Email'
@@ -34,13 +31,14 @@ def get_credentials():
     credential_dir = os.path.join(os.path.expanduser('~'), '.credentials')
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir, 'gmail-python-email-send.json')
+    credential_path = os.path.join(credential_dir, 'api-overflow-gmail.json')
     store = file.Storage(credential_path)
     credentials = store.get()
     if not credentials or credentials.invalid:
         flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
-        credentials = tools.run_flow(flow, store)
+        flags = tools.argparser.parse_args([])
+        credentials = tools.run_flow(flow, store, flags)
     return credentials
 
 def send_email(to_email: str, token: str, email_type: str = 'verification'):
