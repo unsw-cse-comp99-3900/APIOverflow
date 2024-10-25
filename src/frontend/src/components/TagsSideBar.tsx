@@ -6,7 +6,7 @@ import { useSelectedTags } from "../contexts/SelectedTagsContext";
 
 const TagsSideBar: React.FC = () => {
   const [tags, setTags] = useState<Tag[]>([]);
-  const { selectedTags, toggleTag } = useSelectedTags();
+  const { selectedTags, toggleTag, clearTags } = useSelectedTags();
 
   useEffect(() => {
     const fetchApis = async () => {
@@ -29,6 +29,18 @@ const TagsSideBar: React.FC = () => {
 
   return (
     <aside className="fixed left-0 w-80 h-full px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
+      <div className="flex justify-between items-center px-4">
+        <h4 className="font-bold text-gray-800 dark:text-gray-200 ml-3">
+          Filter by Tags
+        </h4>
+        <button
+          className="text-blue-600 hover:underline"
+          onClick={clearTags}
+        >
+          Reset
+        </button>
+      </div>
+      <div className="border border-gray-100 mb-5 mt-5"></div>
       <div className="grid grid-cols-1 gap-1">
         {tags.map((tag) => (
           <span
