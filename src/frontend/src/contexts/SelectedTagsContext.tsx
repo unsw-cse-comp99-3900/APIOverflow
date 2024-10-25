@@ -4,6 +4,7 @@ import { Tag } from "../types/miscTypes";
 interface SelectedTagsContextProps {
   selectedTags: string[];
   toggleTag: (tag: Tag) => void;
+  setTags: (tags: Tag[]) => void;
   clearTags: () => void;
 }
 
@@ -22,6 +23,10 @@ export const useSelectedTags = () => {
 export const SelectedTagsProvider = ({ children }: { children: ReactNode }) => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
+  const setTags = (tags: Tag[]) => {
+    setSelectedTags(tags);
+  }
+
   const toggleTag = (tag: Tag) => {
     setSelectedTags((prevSelected) =>
       prevSelected.includes(tag)
@@ -35,7 +40,7 @@ export const SelectedTagsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <SelectedTagsContext.Provider value={{ selectedTags, toggleTag, clearTags }}>
+    <SelectedTagsContext.Provider value={{ selectedTags, toggleTag, setTags, clearTags }}>
       {children}
     </SelectedTagsContext.Provider>
   );

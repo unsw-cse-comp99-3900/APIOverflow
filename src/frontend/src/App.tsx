@@ -18,8 +18,8 @@ import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import TagsSidebarLayout from "./layouts/TagsSidebarLayout";
 import UserSidebarLayout from "./layouts/UserSidebarLayout";
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
 
 const ProtectedRoute = () => {
   const auth = useAuth();
@@ -45,10 +45,10 @@ const App = () => {
           <Route path="/apis/:id" element={<ApiPage />} />
           <Route path="/add-api" element={<AddApiPage />} />
           <Route path="/edit-api" element={<EditApiPage />} />
-
-          <Route path="/apis" element={<TagsSidebarLayout/>}>
+          <Route path="/apis" element={<TagsSidebarLayout />}>
             <Route path="/apis" element={<APIsPage />} />
           </Route>
+          
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<UserSidebarLayout />}>
               <Route path="/profile/my-apis" element={<MyApisPage />} />
