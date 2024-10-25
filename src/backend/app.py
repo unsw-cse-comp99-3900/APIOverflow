@@ -12,6 +12,7 @@ from src.backend.database import db
 from src.backend.server.tags import *
 from src.backend.server.admin import *
 from src.backend.server.upload import *
+from src.backend.server.user import *
 from json import dumps
 
 
@@ -150,6 +151,47 @@ async def get_user_apis(user: User = Depends(manager)):
     user_apis = ds.get_user_apis(uid)
     return user_apis
 
+@app.get("/service/filter")
+async def filter(
+    tags: Optional[List[str]] = Query(None), 
+    providers: Optional[List[str]] = Query(None)
+):
+    return api_tag_filter(tags, providers)
+
+@app.get("/service/search")
+async def search(
+    name: Optional[str] = Query(None),
+):
+    return api_name_search(name)
+
+@app.delete("/service/delete")
+async def delete_api(sid: str):
+    """
+        Delete an API service by its service id (id).
+    """
+    return delete_service(sid)
+
+@app.post("/service/add_icon")
+async def api_add_icon(info: ServiceIconInfo, user: User = Depends(manager)):
+    '''
+        Adds an icon to the service
+    '''
+    service_add_icon_wrapper(user['id'], info.sid, info.doc_id)
+
+@app.delete("/service/delete_icon")
+async def api_delete_icon(info: Annotated[ServiceIconDeleteInfo, Query()], user: User = Depends(manager)):
+    '''
+        Deletes an icon from the service
+    '''
+    service_delete_icon_wrapper(user['id'], info.sid)
+
+@app.get("/service/get/icon")
+async def api_get_icon(sid: str):
+    '''
+        Retrieves service icon as image file
+    '''
+    return service_get_icon_wrapper(sid)
+
 #####################################
 #   Auth Paths
 #####################################
@@ -223,25 +265,6 @@ async def account_user_route(user: User = Depends(manager)):
 async def guest_route(user: User = Depends(manager)):
     return {"message": "Welcome, Guest!"}
 
-@app.get("/service/filter")
-async def filter(
-    tags: Optional[List[str]] = Query(None), 
-    providers: Optional[List[str]] = Query(None)
-):
-    return api_tag_filter(tags, providers)
-
-@app.get("/service/search")
-async def search(
-    name: Optional[str] = Query(None),
-):
-    return api_name_search(name)
-
-@app.delete("/service/delete")
-async def delete_api(sid: str):
-    """
-        Delete an API service by its service id (id).
-    """
-    return delete_service(sid)
 
 #####################################
 #   Tag Paths
@@ -299,6 +322,38 @@ async def user_delete(uid: str, user: User = Depends(manager), role: str = Depen
         Endpoint to delete a user given their id
     '''
     return delete_user(uid, user["is_super"])
+
+#####################################
+#   User Paths
+#####################################
+@app.post("/user/add_icon")
+async def user_add_icon(doc: DocumentID, user: User=Depends(manager)):
+    '''
+        Endpoint to add an icon to a user
+    '''
+    user_add_icon_wrapper(user['id'], doc.doc_id)
+
+
+@app.delete("/user/delete_icon")
+async def user_delete_icon(user: User=Depends(manager)):
+    '''
+        Endpoint to delete user icon
+    '''
+    user_delete_icon_wrapper(user['id'])
+
+@app.get("/user/get")
+async def user_get(user: User=Depends(manager)):
+    '''
+        Endpoint which retrieves user information
+    '''
+    return user_get_wrapper(user['id'])
+
+@app.get("/user/get/icon")
+async def user_get_icon(user: User=Depends(manager)):
+    '''
+        Endpoint which retrieves user's icon (if one exists)
+    '''
+    return user_get_icon_wrapper(user['id'])
 
 if __name__ == "__main__":
     import uvicorn

@@ -3,6 +3,8 @@ from typing import *
 T = TypeVar("T")
 K = TypeVar("K")
 
+DEFAULT_ICON = '0'
+
 class User:
 
     '''
@@ -44,6 +46,7 @@ class User:
         # Default vars
         self._following = []
         self._num_following = 0
+        self._icon = None
         self._is_verified = False
     
     ################################
@@ -55,7 +58,7 @@ class User:
         '''
         self._following.append(uid)
         self._num_following += 1
-    
+
     ################################
     #  Modify Methods
     ################################
@@ -83,6 +86,12 @@ class User:
         '''
         self._is_admin = False
 
+    def modify_icon(self, doc_id: str) -> None:
+        '''
+            Modifies user's icon
+        '''
+        self._icon = doc_id
+
     def verify_user(self) -> None:
         '''
             Verify the user
@@ -106,6 +115,11 @@ class User:
         self._following.remove(uid)
         self._num_following -= 1
     
+    def remove_icon(self) -> None:
+        '''
+            Removes user's current icon
+        '''
+        self._icon = DEFAULT_ICON
 
     ################################
     #  Get Methods
@@ -164,6 +178,12 @@ class User:
         '''
         return self._is_super
     
+    def get_icon(self) -> str:
+        '''
+            Grabs user's icon (in doc_id form)
+        '''
+        return self._icon
+
     def get_is_verified(self) -> bool:
         '''
             Return the verify status of the user

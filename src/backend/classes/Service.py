@@ -3,6 +3,7 @@ from Endpoint import *
 
 T = TypeVar("T")
 K = TypeVar("K")
+DEFAULT_ICON = '0'
 
 class Service:
 
@@ -20,6 +21,7 @@ class Service:
         endpoint:       Endpoint of the service
         
         ----
+        icon            Doc_ID of service icon. Has a default icon
         owner_count:    Number of owners for this service
         documents:      List of paths to documents uploaded by user re service
         doc_count:      Number of documents uploaded to service
@@ -40,7 +42,8 @@ class Service:
                  description: str,
                  tags: List[str],
                  endpoints: list[Endpoint],
-                 stype: str) -> None:
+                 stype: str,
+                 icon: str = DEFAULT_ICON) -> None:
         
         # Initialised vars
         self._id = sid
@@ -63,6 +66,7 @@ class Service:
         self._upvotes = 0
         # NEED TO CHANGE THIS TO PENDING INITIALISATION WHEN IMPLEMENTING ADMIN
         self._status = "LIVE"
+        self._icon = icon
     
     ################################
     #   Add Methods
@@ -141,6 +145,12 @@ class Service:
         '''
         self._description = desc
 
+    def update_icon_id(self, doc_id: str) -> None:
+        '''
+            Update service icon
+        '''
+        self._icon = doc_id
+
     ################################
     #   Delete Methods
     ################################
@@ -176,6 +186,12 @@ class Service:
             Removes tag from service
         '''
         self._tags.remove(tag)
+
+    def remove_icon(self) -> None:
+        '''
+            Removes icon from service and restores to default
+        '''
+        self._icon = DEFAULT_ICON
 
     def remove_endpoint(self, endpoint: Endpoint) -> None:
         '''
@@ -213,7 +229,7 @@ class Service:
     
     def get_owner(self) -> str:
         '''
-            Returns description of service
+            Returns owner of service
         '''
         return self._owner
 
@@ -247,6 +263,12 @@ class Service:
         '''
         return self._status
 
+    def get_icon(self) -> str:
+        '''
+            Returns service's icon
+        '''
+        return self._icon
+
     ################################
     #  Storage Methods
     ################################
@@ -266,5 +288,6 @@ class Service:
             'users' : self._users,
             'reviews': self._reviews,
             'upvotes': self._upvotes,
-            'type': self._type
+            'type': self._type,
+            'icon': self._icon
         }
