@@ -4,7 +4,15 @@ import ApiListing from "./ApiListing";
 import { getApis, getMyApis } from "../services/apiServices";
 import FetchStatus from "./FetchStatus";
 
-const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
+interface ApiListingsProps {
+  isMyAPis: boolean;
+  selectedTags: string[];
+}
+
+const ApiListings: React.FC<ApiListingsProps> = ({
+  isMyAPis,
+  selectedTags,
+}) => {
   const [apis, setApis] = useState<BriefApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -12,7 +20,7 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
   useEffect(() => {
     const fetchApis = async () => {
       try {
-        const data = isMyAPis ? await getMyApis() : await getApis();
+        const data = isMyAPis ? await getMyApis() : await getApis(selectedTags);
         setApis(data);
       } catch (error) {
         console.log("Error fetching data", error);
@@ -23,7 +31,7 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
     };
 
     fetchApis();
-  }, [isMyAPis]);
+  }, [selectedTags, isMyAPis]);
 
   const handleDelete = (deletedApiId: string) => {
     setApis((prevApis) => prevApis.filter((api) => api.id !== deletedApiId));
@@ -35,7 +43,7 @@ const ApiListings = ({ isMyAPis }: { isMyAPis: boolean }) => {
         <h2 className="text-3xl font-bold text-blue-800 mb-6 mt-6 text-left">
           {isMyAPis ? "My APIs" : "Browse APIs"}
         </h2>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(700px,1fr))] gap-6">
+        <div className="grid grid-cols-1 gap-6">
           {apis.map((api) => (
             <ApiListing
               key={api.id}

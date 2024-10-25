@@ -3,7 +3,11 @@ import { DetailedApi } from "../types/apiTypes";
 import { toast } from "react-toastify";
 import { FaRegCopy } from "react-icons/fa";
 
-const ApiDescription = ({ api }: { api: DetailedApi }) => {
+interface ApiDescriptionProps {
+  api: DetailedApi;
+}
+
+const ApiDescription: React.FC<ApiDescriptionProps> = ({ api }) => {
   const textToCopy = api.endpoint;
   const copyToClipboard = async () => {
     try {

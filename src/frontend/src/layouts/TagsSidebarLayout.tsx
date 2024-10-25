@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import TagsSideBar from '../components/TagsSideBar';
 
 
 const TagsSidebarLayout = () => {
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   return (
     <div className="flex">
-      <TagsSideBar />
+      <TagsSideBar selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
       <section className="flex-1 ml-80">
-        <Outlet />
+        <Outlet context={{ selectedTags }}/>
       </section>
     </div>
   );

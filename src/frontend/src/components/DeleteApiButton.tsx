@@ -4,26 +4,26 @@ import { toast } from "react-toastify";
 import { deleteApi } from "../services/apiServices";
 import { useNavigate } from "react-router-dom";
 
-const DeleteApiButton = ({
-  apiId,
-  apisRoute,
-  onDelete,
-}: {
+interface DeleteApiButtonProps {
   apiId: string;
   apisRoute?: string;
   onDelete?: (id: string) => void;
+}
+
+const DeleteApiButton: React.FC<DeleteApiButtonProps> = ({
+  apiId,
+  apisRoute,
+  onDelete,
 }) => {
   const navigate = useNavigate();
   const onDeleteClick = async (apiId: string) => {
-    const confirm = window.confirm(
-      "Are you sure you want to delete this API?"
-    );
+    const confirm = window.confirm("Are you sure you want to delete this API?");
     if (!confirm) return;
 
     try {
       await deleteApi(apiId);
       toast.success("API deleted successfully");
-      
+
       if (onDelete) onDelete(apiId); // Trigger the deletion callback to update the state
       if (apisRoute) navigate(apisRoute); // Redirect to the APIs page
     } catch (error) {
