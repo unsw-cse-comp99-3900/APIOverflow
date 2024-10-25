@@ -13,12 +13,23 @@ import EditApiPage from "./pages/EditApiPage";
 import MyApisPage from "./pages/MyApisPage";
 import MyApiPage from "./pages/MyApiPage";
 import ThemeLayout from "./layouts/ThemeLayout";
-import { AuthProvider } from "./authentication/AuthProvider";
+import { AuthProvider } from "./contexts/AuthContext";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
-import ProtectedRoute from "./authentication/ProtectedRoute";
 import TagsSidebarLayout from "./layouts/TagsSidebarLayout";
 import UserSidebarLayout from "./layouts/UserSidebarLayout";
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
+
+const ProtectedRoute = () => {
+  const auth = useAuth();
+  const { isLoggedIn } = auth!;
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Outlet />;
+};
 
 const App = () => {
   const router = createBrowserRouter(

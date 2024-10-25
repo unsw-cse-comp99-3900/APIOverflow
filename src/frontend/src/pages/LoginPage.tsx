@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 // Import the blob SVG
 import Blob1 from "../assets/images/blobs/blob1.svg";
 import Blob2 from "../assets/images/blobs/blob2.svg";
-import { useAuth } from "../authentication/AuthProvider";
+import { useAuth } from "../contexts/AuthContext";
 import { userLogin } from "../services/apiServices";
 import { LoginModel } from "../types/backendTypes";
 
