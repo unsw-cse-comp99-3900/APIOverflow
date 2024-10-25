@@ -3,7 +3,7 @@ import ApiListings from "../components/ApiListings";
 
 const MyApisPage: React.FC = () => {
   return (
-      <ApiListings isMyAPis={true} selectedTags={[]}/>
+      <ApiListings isMyAPis={true}/>
   );
 };
 

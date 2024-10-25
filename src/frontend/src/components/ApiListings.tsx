@@ -3,19 +3,19 @@ import { BriefApi } from "../types/apiTypes";
 import ApiListing from "./ApiListing";
 import { getApis, getMyApis } from "../services/apiServices";
 import FetchStatus from "./FetchStatus";
+import { useSelectedTags } from "../contexts/SelectedTagsContext";
 
 interface ApiListingsProps {
   isMyAPis: boolean;
-  selectedTags: string[];
 }
 
 const ApiListings: React.FC<ApiListingsProps> = ({
   isMyAPis,
-  selectedTags,
 }) => {
   const [apis, setApis] = useState<BriefApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { selectedTags} = useSelectedTags();
 
   useEffect(() => {
     const fetchApis = async () => {
