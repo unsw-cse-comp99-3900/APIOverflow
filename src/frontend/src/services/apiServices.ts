@@ -31,7 +31,6 @@ export const getApi = async (id: number | string) => {
   return detailedApiDataFormatter(data);
 };
 
-// BE un-implemented
 export const deleteApi = async (id: string) => {
   await fetch(`${baseUrl}/service/delete?sid=${id}`, {
     method: "DELETE",
