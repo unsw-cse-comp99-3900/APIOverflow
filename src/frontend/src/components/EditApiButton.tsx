@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FaPen } from "react-icons/fa";
 
-const EditApiButton = ({apiId}:{apiId:number}) => {
+const EditApiButton = ({apiId}:{apiId:string}) => {
   return (
     <Link
       to={`/profile/my-apis/${apiId}/edit`}

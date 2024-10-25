@@ -13,7 +13,7 @@ const ApiListing = ({
 }: {
   api: BriefApi;
   isMyApis: boolean;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
 
