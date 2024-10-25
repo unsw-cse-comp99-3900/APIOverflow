@@ -1,14 +1,12 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import UserSideBar from '../components/UserSideBar';
 
-interface SidebarLayoutProps {
-  Sidebar: React.FC;
-}
 
-const SidebarLayout: React.FC<SidebarLayoutProps> = ({ Sidebar }) => {
+const UserSidebarLayout = () => {
   return (
     <div className="flex">
-      <Sidebar />
+      <UserSideBar />
       <section className="flex-1 ml-80">
         <Outlet />
       </section>
@@ -16,4 +14,4 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ Sidebar }) => {
   );
 };
 
-export default SidebarLayout;
+export default UserSidebarLayout;
