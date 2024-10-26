@@ -40,8 +40,8 @@ const ApiListing: React.FC<ApiListingProps>  = ({
               <h3 className="text-xl font-bold my-2">{api.name}</h3>
               <div className="text-gray-600">{api.owner}</div>
               <div className="flex flex-wrap mt-4 mb-3">
-                {api.tags.map((tag, index) => (
-                  <Tag key={index} tag={tag} className="mr-3 mb-2" />
+                {api.tags.map((tag) => (
+                  <Tag key={tag} tag={tag} className="mr-3 mb-2" />
                 ))}
               </div>
             </div>

@@ -47,6 +47,7 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
 
   // Event Handlers
   const handleAddClick = () => {
+    if (newTag === "") return;
     setTags([...tags, newTag]);
     addTag({
       tag: newTag,
@@ -74,13 +75,14 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
 
         {/* All Tags */}
         <div className="flex flex-wrap">
-        <h2 className="text-2xl font-semibold text-blue-800 mb-3 mx-1">Tags</h2>
-
-
+          <h2 className="text-2xl font-semibold text-blue-800 mb-3 mx-1">
+            Tags
+          </h2>
         </div>
         <div className="flex flex-wrap">
           {tags.map((tag) => (
             <button
+              key={tag}
               type="button" // Prevent form submission
               onClick={() => toggleTag(tag)}
               className={tagClass({ tag })}
@@ -107,7 +109,7 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
         </div>
 
         <button
-        type="button"
+          type="button"
           onClick={handleResetTags}
           className=" text-blue-500 text-md hover:underline my-2 mx-4"
         >

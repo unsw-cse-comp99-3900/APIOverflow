@@ -124,6 +124,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
             <div className="flex flex-wrap">
               {selectedTags.map((tag) => (
                 <button
+                  key={tag}
                   type="button" // Prevent form submission
                   onClick={() =>
                     setSelectedTags(selectedTags.filter((t) => t !== tag))
@@ -135,7 +136,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                   </span>
 
                   <span className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-red-500 rounded-md transition-opacity duration-200">
-                    <FaTrash/>
+                    <FaTrash />
                   </span>
                 </button>
               ))}
@@ -150,7 +151,12 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
               </button>
             </div>
             {/* Overlay Window */}
-            <TagsOverlay isOpen={isOverlayOpen} onClose={closeOverlay} selectedTags={selectedTags} setSelectedTags={setSelectedTags}/>
+            <TagsOverlay
+              isOpen={isOverlayOpen}
+              onClose={closeOverlay}
+              selectedTags={selectedTags}
+              setSelectedTags={setSelectedTags}
+            />
           </div>
 
           <div className="border border-gray-100 w-full my-3"></div>
