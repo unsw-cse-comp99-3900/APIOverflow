@@ -125,7 +125,7 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
         <button
           type="button"
           onClick={handleResetTags}
-          className=" text-blue-500 text-md hover:underline mx-4"
+          className=" text-blue-500 text-md hover:underline mt-4 mx-4"
         >
           Reset
         </button>
