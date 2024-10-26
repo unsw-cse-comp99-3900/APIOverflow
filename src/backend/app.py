@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Request, HTTPException, Query, UploadFile, File, Form
+from fastapi import FastAPI, Depends, Request, HTTPException, Query, UploadFile, File, Form, Body
 from fastapi_login import LoginManager
 from pymongo import MongoClient
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,8 +29,8 @@ app.add_middleware(
 )
 
 manager = _manager.get_manager()
-
-if ds.num_users() == 0:
+user_count = db.users.count_documents({})
+if ds.num_users() == 0 and user_count == 0:
     create_super_admin()
 
 #####################################
@@ -161,6 +161,41 @@ async def login(credentials: LoginModel):
     password = credentials.password
     access_token = login_wrapper(username, password)
     return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/auth/verify-email/{token}")
+async def verify_email(token: str):
+    '''
+        Verify a user
+    '''
+    uid = verify_token(token)
+    user = data_store.get_user_by_id(uid) 
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    user.verify_user()
+    db_update_user(uid, user.to_json())
+    return {"message": "Email verified successfully."}
+
+@app.post("/auth/reset-password")
+async def request_password_reset(user: User = Depends(manager)):
+    '''
+        Sends a password request
+    '''
+    uid = user['id']
+    password_reset_request(uid)
+    return {"message": "Password reset email sent."}
+
+@app.post("/auth/reset-password/{token}")
+async def reset_password_form(token: str, password: Password):
+    '''
+        Changes user password
+    '''
+    uid = verify_token(token)
+    user = data_store.get_user_by_id(uid) 
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+    change_password(uid, password.newpass)
+    return {"message": "Password changed successfully."}
 
 # Example privileged routes
 @app.get("/auth/admin")
