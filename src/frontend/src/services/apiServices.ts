@@ -7,9 +7,6 @@ let baseUrl = process.env.REACT_APP_API_BASE_URL;
 /*        API Services        */
 export const getApis = async (tags?: Tag[]) => {
   const queryParams = tags && tags.length > 0 ? `?tags=${tags.join("&tags=")}` : "";
-  console.log(`${baseUrl}/service/filter${queryParams}`, {
-    method: "GET",
-  })
   const res = await fetch(`${baseUrl}/service/filter${queryParams}`, {
     method: "GET",
   });
