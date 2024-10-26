@@ -96,3 +96,10 @@ class ServiceReviewEditInfo(BaseModel):
     rating: str
     title: str
     comment: str
+
+class ServiceReviewAdminAction(BaseModel):
+    rid: str
+    reason: str
+
+class AdminGetReviews(BaseModel):
+    option: str = ''

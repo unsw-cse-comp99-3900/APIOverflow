@@ -380,14 +380,15 @@ def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
          raise HTTPException(status_code=400, detail="Invalid rating given")
 
     # Create and add review
-    review = Review(data_store.total_reviews() + 1,
+    review = Review(str(data_store.total_reviews()),
                     user.get_id(),
                     service.get_id(),
                     title,
                     rating,
                     comment)
     data_store.add_review(review)
-    service.add_review(review, rating)
+    service.add_review(review.get_id(), rating)
+    user.add_review(review.get_id())
 
 def service_get_rating_wrapper(sid: str) -> dict[str, Union[int, float]]:
     '''

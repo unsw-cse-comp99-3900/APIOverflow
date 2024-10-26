@@ -101,7 +101,7 @@ class Service:
             self._upvotes += 1
         else:
             self._downvotes += 1
-   
+
     def add_upvote(self) -> None:
         '''
             Adds upvote to service
@@ -273,7 +273,7 @@ class Service:
         return {
             'positive': self._upvotes,
             'negative': self._downvotes,
-            'overall' : round(self._upvotes - self._downvotes, 2)
+            'rating' : round(self._upvotes - self._downvotes, 2)
         }
 
     ################################

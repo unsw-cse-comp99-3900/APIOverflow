@@ -23,7 +23,7 @@ def review_get_wrapper(rid: str) -> dict[str, str]:
     
     return review.to_json()
 
-def review_delete_wrapper(rid: str, uid: str, role: str) -> None:
+def review_delete_wrapper(rid: str, uid: str, is_admin: bool) -> None:
     '''
         Wrapper which deletes a review
     '''
@@ -33,17 +33,17 @@ def review_delete_wrapper(rid: str, uid: str, role: str) -> None:
         raise HTTPException(status_code=404, detail="Review not found")
 
     # Check permissions
-    if review.get_reviewer() != uid and role != 'admin':
+    if review.get_reviewer() != uid and not is_admin: 
         raise HTTPException(status_code=403, detail="No permission to delete review")
 
     # Delete review
-    user = data_store.get_user_by_id(uid)
+    user = data_store.get_user_by_id(review.get_reviewer())
     service = data_store.get_api_by_id(review.get_service())
     user.remove_review(rid)
     service.remove_review(rid, review.get_rating())
     data_store.delete_item(rid, 'review')
 
-def review_edit_wrapper(info: ServiceReviewEditInfo, uid: str, role: str) -> None:
+def review_edit_wrapper(info: ServiceReviewEditInfo, uid: str, is_admin: bool) -> None:
     '''
         Wrapper which edits a given review
     '''
@@ -58,7 +58,7 @@ def review_edit_wrapper(info: ServiceReviewEditInfo, uid: str, role: str) -> Non
         raise HTTPException(status_code=404, detail="Review not found")
 
      # Check permissions
-    if review.get_reviewer() != uid and role != 'admin':
+    if review.get_reviewer() != uid and not is_admin:
         raise HTTPException(status_code=403, detail="No permission to edit review")
 
     # Check validity of input

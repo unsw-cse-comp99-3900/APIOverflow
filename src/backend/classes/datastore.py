@@ -174,7 +174,7 @@ class Datastore:
             Returns with user obj based on username, or None if cannot find user
         '''
         for item in self.__store['users']:
-            print("Item's name: %s | Name wanted: %s", item.get_name(), name)
+            # print("Item's name: %s | Name wanted: %s", item.get_name(), name)
             if item.get_name() == name:
                 return item
             
@@ -196,6 +196,7 @@ class Datastore:
             Retrieves a review by id if it exists, else None
         '''
         for item in self.__store['reviews']:
+            # print(f"RID: {rid} | Item ID: {item.get_id()} Comparison: {rid == item.get_id()}")
             if item.get_id() == rid:
                 return item
 

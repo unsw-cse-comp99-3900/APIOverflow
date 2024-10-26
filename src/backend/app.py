@@ -198,7 +198,7 @@ async def api_add_review(info: ServiceReviewInfo, user : User = Depends(manager)
     '''
         Endpoint to add review to a service
     '''
-    return service_add_review_wrapper(user['id'], info)
+    service_add_review_wrapper(user['id'], info)
 
 
 @app.get("/service/get/rating")
@@ -233,28 +233,28 @@ async def review_delete(rid: str, user: User = Depends(manager)):
     '''
         Endpoint which deletes a given review
     '''
-    review_delete_wrapper(rid, user['id'], user['role'])
+    review_delete_wrapper(rid, user['id'], user['is_admin'])
 
 @app.post("/review/edit")
 async def review_edit(info: ServiceReviewEditInfo, user: User = Depends(manager)):
     '''
         Endpoint which edits a given review
     '''
-    review_edit_wrapper(info, user['id'], user['role'])
+    review_edit_wrapper(info, user['id'], user['is_admin'])
 
 @app.post("/review/approve")
-async def review_approve(rid: str, reason: str, user: User = Depends(manager), role: str = Depends(admin_required())):
+async def review_approve(info: ServiceReviewAdminAction, user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which approves a review
     '''
-    review_approve_wrapper(rid, reason)
+    review_approve_wrapper(info.rid, info.reason)
 
 @app.post("/review/reject")
-async def review_reject(rid: str, reason: str, user: User = Depends(manager), role: str = Depends(admin_required())):
+async def review_reject(info: ServiceReviewAdminAction, user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which rejects a review
     '''
-    review_reject_wrapper(rid, reason)
+    review_reject_wrapper(info.rid, info.reason)
 
 #####################################
 #   Auth Paths
@@ -388,12 +388,12 @@ async def user_delete(uid: str, user: User = Depends(manager), role: str = Depen
     return delete_user(uid, user["is_super"])
 
 @app.get("/admin/get/reviews")
-async def admin_get_reviews(status: str = '', user: User = Depends(manager), role: str = Depends(admin_required())):
+async def admin_get_reviews(option: str = '', user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which retrieves all pending reviews
     '''
     return {
-        'reviews': admin_get_reviews_wrapper(status)
+        'reviews': admin_get_reviews_wrapper(option)
     }
 
 #####################################
