@@ -30,4 +30,4 @@ ENV TEST ${TEST}
 # normally and running pytest
 # todo: figure out how to silence specific service output?
 
-CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv /src/backend/tests/test_user.py; fi
+CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv; fi
