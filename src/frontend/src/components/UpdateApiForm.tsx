@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { ServicePost, ServiceUpdate } from "../types/backendTypes";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import TagsOverlay from "./TagsOverlay";
-import Tag from "./Tag";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const [api, setApi] = useState<DetailedApi | null>(null);
