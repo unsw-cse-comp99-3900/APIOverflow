@@ -1,12 +1,12 @@
 from typing import TypeVar
 from fastapi import File, UploadFile, HTTPException
+from fastapi.responses import FileResponse
 from PIL import Image
 import urllib.request
 from urllib.error import HTTPError, URLError
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
-from src.backend.server.upload import upload_wrapper
 import re
 
 
@@ -149,7 +149,8 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
                         description
                         icon_url
                         tags
-                        endpoint
+                        endpoint,
+                        icon (doc_id)
                     }
     '''
 
@@ -171,7 +172,8 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
             'icon_url': service.get_icon_url(),
             'tags' : service.get_tags(),
             'endpoint' : service.get_endpoint(),
-            'docs' : doc_paths
+            'docs' : doc_paths,
+            'icon' : service.get_icon()
     }
     
 # function to match vincent's format, the one above is sid instead of id
@@ -240,6 +242,7 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
         Function which handles uploading docs to a service
     '''
     file = data_store.get_doc_by_id(doc_id)
+    
     # Error Checks
     if file is None:
         raise HTTPException(status_code=400, detail="File not found")
@@ -276,3 +279,64 @@ def delete_service(sid: str):
     db_status = db_delete_service(service_name)
 
     return {"name": service_name, "deleted": db_status}
+
+def service_add_icon_wrapper(uid: str, sid: str, doc_id: str) -> None:
+    '''
+        Wrapper which handles adding an icon to a service
+    '''
+
+    # Grab user
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail='User not found')
+    
+    # Grab service
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail='Service not found')
+    
+    # Grab icon
+    icon = data_store.get_doc_by_id(doc_id)
+    if icon is None:
+        raise HTTPException(status_code=404, detail='Icon not found')
+
+    # Check whether user is allowed to modify icon
+    if service.get_owner() != user.get_id():
+        raise HTTPException(status_code=403, detail='User not service owner')
+
+    service.update_icon_id(doc_id)
+
+def service_delete_icon_wrapper(uid: str, sid: str) -> None:
+    '''
+        Wrapper which handles deleting an icon to a service
+    '''
+
+    # Grab user
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail='User not found')
+    
+    # Grab service
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail='Service not found')
+    
+    # Check whether user is allowed to modify icon
+    if service.get_owner() != user.get_id():
+        raise HTTPException(status_code=403, detail='User not service owner')
+
+    service.remove_icon()
+
+def service_get_icon_wrapper(sid: str) -> FileResponse:
+    '''
+        Wrapper which returns image file of service's icon
+    '''
+    # Grab service
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail='Service not found')
+
+    # Grab image file
+    icon_id = service.get_icon()
+    icon = data_store.get_doc_by_id(icon_id)
+    return FileResponse(icon.get_path())
