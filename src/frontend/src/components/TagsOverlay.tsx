@@ -90,7 +90,7 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
           ))}
         </div>
 
-        <div className="w-full px-2 mt-32 mx-1 rounded-full border-2 border-gray-200 flex justify-start items-center">
+        <div className="w-full px-2 mt-32 rounded-full border-2 border-gray-200 flex justify-start items-center">
           <input
             type="text"
             placeholder="Can't find your tag? Add it here"
