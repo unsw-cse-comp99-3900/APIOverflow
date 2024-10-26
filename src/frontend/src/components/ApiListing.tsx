@@ -1,19 +1,21 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Api } from "../types/apiTypes";
+import { BriefApi } from "../types/apiTypes";
 import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import Tag from "./Tag";
 import DeleteApiButton from "./DeleteApiButton";
 import EditApiButton from "./EditApiButton";
 
-const ApiListing = ({
+interface ApiListingProps {
+  api: BriefApi;
+  isMyApis: boolean;
+  onDelete: (id: string) => void;
+}
+
+const ApiListing: React.FC<ApiListingProps>  = ({
   api,
   isMyApis,
   onDelete,
-}: {
-  api: Api;
-  isMyApis: boolean;
-  onDelete: (id: number) => void;
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
 
@@ -36,7 +38,7 @@ const ApiListing = ({
 
             <div>
               <h3 className="text-xl font-bold my-2">{api.name}</h3>
-              <div className="text-gray-600">{api.ownerName}</div>
+              <div className="text-gray-600">{api.owner}</div>
               <div className="flex flex-wrap mt-4 mb-3">
                 {api.tags.map((tag, index) => (
                   <Tag key={index} tag={tag} className="mr-3 mb-2" />

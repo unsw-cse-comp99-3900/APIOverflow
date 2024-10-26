@@ -1,6 +1,7 @@
 import ApiListings from '../components/ApiListings';
 
-const ApisPage = () => {
+
+const ApisPage: React.FC = () => {
   return (
       <ApiListings isMyAPis={false}/>
   );

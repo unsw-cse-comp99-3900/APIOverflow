@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import logo from "../assets/images/logo.svg";
 import { FaUserCircle } from "react-icons/fa"; // Import the user icon
-import { useAuth } from "../authentication/AuthProvider";
+import { useAuth } from "../contexts/AuthContext";
 
 const Navbar = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
