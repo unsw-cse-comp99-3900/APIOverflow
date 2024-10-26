@@ -1,4 +1,4 @@
-import { LoginModel, ServicePost, ServiceUpdate, UserCreate } from "../types/backendTypes";
+import { LoginModel, ServicePost, ServiceUpdate, TagData, UserCreate } from "../types/backendTypes";
 import { Tag } from "../types/miscTypes";
 import { briefApiDataFormatter, detailedApiDataFormatter } from "../utils/dataFormatters";
 
@@ -104,4 +104,16 @@ export const getTags = async () => {
   });
   const data = await res.json();
   return data.tags;
+};
+
+export const addTag = async (tag: TagData) => {
+  await fetch(`${baseUrl}/tag/add`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(tag),
+  });
+  return;
 };
