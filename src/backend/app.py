@@ -141,6 +141,13 @@ async def get_user_apis(user: User = Depends(manager)):
     user_apis = ds.get_user_apis(uid)
     return user_apis
 
+@app.get("/service/filter")
+async def filter(
+    tags: Optional[List[str]] = Query(None), 
+    providers: Optional[List[str]] = Query(None)
+):
+    return api_tag_filter(tags, providers)
+
 #####################################
 #   Auth Paths
 #####################################
