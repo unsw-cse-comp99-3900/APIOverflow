@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Tag } from "../types/miscTypes";
-import { addTag, getTags } from "../services/apiServices";
+import { getTags } from "../services/apiServices";
 import { FaPlus } from "react-icons/fa";
 
 interface TagsOverlayProps {
