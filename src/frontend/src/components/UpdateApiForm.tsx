@@ -13,7 +13,6 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const navigate = useNavigate();
   const [api, setApi] = useState<DetailedApi | null>(null);
   const [name, setName] = useState<string>("");
-  const [newTag, setNewTag] = useState("");
   const [description, setDescription] = useState<string>("");
   const [endpoint, setEndpoint] = useState<string>("");
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
