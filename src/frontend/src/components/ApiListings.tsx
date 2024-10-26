@@ -21,6 +21,7 @@ const ApiListings: React.FC<ApiListingsProps> = ({
     const fetchApis = async () => {
       try {
         const data = isMyAPis ? await getMyApis() : await getApis(selectedTags);
+        console.log(data)
         setApis(data);
       } catch (error) {
         console.log("Error fetching data", error);
