@@ -14,7 +14,7 @@ const Tag: React.FC<TagProps> = ({ tag, className }) => {
       setTags([tag]);
     }}>
       <span
-        className={`bg-blue-800 hover:bg-amber-200 text-white hover:text-black text-sm font-semibold px-3 py-1 rounded-md cursor-pointer`}
+        className={` border-blue-800 border-2 bg-white hover:bg-blue-800 text-blue-800 hover:text-white text-sm font-semibold px-3 py-1 rounded-md cursor-pointer`}
       >
         {tag}
       </span>

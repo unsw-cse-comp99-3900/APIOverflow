@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { ServicePost, ServiceUpdate } from "../types/backendTypes";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import TagsOverlay from "./TagsOverlay";
+import { Tag } from "../types/miscTypes";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const [api, setApi] = useState<DetailedApi | null>(null);
@@ -15,10 +16,8 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const [description, setDescription] = useState<string>("");
   const [endpoint, setEndpoint] = useState<string>("");
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-  const [selectedTags, setSelectedTags] = useState([
-    "API",
-    "Microservice",
-    "AI",
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([
+    "API"
   ]);
   const openOverlay = () => setIsOverlayOpen(true);
   const closeOverlay = () => setIsOverlayOpen(false);
@@ -34,6 +33,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         setName(data.name);
         setDescription(data.description);
         setEndpoint(data.endpoint);
+        setSelectedTags(data.tags);
       } catch (error) {
         console.log("Error fetching data", error);
         toast.error("Error loading API data");
@@ -146,17 +146,17 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
               <button
                 type="button" // Prevent form submission
                 onClick={openOverlay}
-                className="bg-blue-800 text-white w-7 h-7 flex items-center justify-center rounded-md hover:bg-amber-200  hover:text-black mx-1 my-1"
+                className="border-blue-800 border-2 bg-white hover:bg-blue-800 hover:text-white text-blue-800 w-7 h-7 flex items-center justify-center rounded-md mx-1 my-1"
               >
                 <FaPlus className="text-sm" />
               </button>
             </div>
 
             {/* Overlay Window */}
-            <TagsOverlay isOpen={isOverlayOpen} onClose={closeOverlay} />
+            <TagsOverlay isOpen={isOverlayOpen} onClose={closeOverlay} selectedTags={selectedTags} setSelectedTags={setSelectedTags}/>
           </div>
 
-          <div className="border border-gray-100 w-full my-6"></div>
+          <div className="border border-gray-100 w-full my-3"></div>
           <div className="col-span-full">
             <label
               htmlFor="apiName"
