@@ -212,15 +212,15 @@ def api_tag_filter(tags, providers) -> list:
         # otherwise get all the APIs with the tag/s
         for api in api_list:
             for tag in tags:
-                if tag in api.get_tags():
-                    filtered_apis.append(api)
+                if tag in api.get_tags() and api not in filtered_apis:
+                        filtered_apis.append(api)
 
     return_list = []
     if providers:
         # if providers list is not empty
         for api in filtered_apis:
             for provider in providers:
-                if provider in api.get_owner():
+                if provider in api.get_owner() and api not in return_list:
                     return_list.append(api_into_json(api))
                     break
     else:

@@ -192,6 +192,7 @@ async def api_get_icon(sid: str):
     '''
     return service_get_icon_wrapper(sid)
 
+
 #####################################
 #   Auth Paths
 #####################################
