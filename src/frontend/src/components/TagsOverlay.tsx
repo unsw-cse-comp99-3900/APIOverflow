@@ -6,19 +6,25 @@ import { FaPlus } from "react-icons/fa";
 interface TagsOverlayProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedTags: string[];
+  selectedTags: Tag[];
+  newTags: Tag[];
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
+  setNewTags: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const TagsOverlay: React.FC<TagsOverlayProps> = ({
   isOpen,
   onClose,
   selectedTags,
+  newTags,
   setSelectedTags,
+  setNewTags
 }) => {
   // React hooks
   const [tags, setTags] = useState<Tag[]>([]);
   const [newTag, setNewTag] = useState<Tag>("");
+  const [error, setError] = useState<string>("");
+
   useEffect(() => {
     const fetchApis = async () => {
       try {
@@ -47,12 +53,18 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
 
   // Event Handlers
   const handleAddClick = () => {
-    if (newTag === "") return;
+    if (newTag === ""){
+      setError("Tag cannot be empty");
+      return
+    } else if (tags.includes(newTag)){
+      setError("Tag already exists");
+      return
+    }
+
     setTags([...tags, newTag]);
-    addTag({
-      tag: newTag,
-    });
+    setNewTags([...newTags, newTag]);
     setSelectedTags([...selectedTags, newTag]);
+    setError("");
     setNewTag("");
   };
 
@@ -96,6 +108,7 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
           <input
             type="text"
             placeholder="Can't find your tag? Add it here"
+            value={newTag}
             className="w-full text-gray-700 focus:outline-none focus:ring-0 border-none rounded-full"
             onChange={(e) => setNewTag(e.target.value)} // Update state on change
           />
@@ -107,11 +120,12 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
             <FaPlus className="text-lg m-1" />
           </button>
         </div>
-
+        {/* Error message */}
+        {error && <p className="text-red-500 text-sm my-2 mx-4">{error}</p>}
         <button
           type="button"
           onClick={handleResetTags}
-          className=" text-blue-500 text-md hover:underline my-2 mx-4"
+          className=" text-blue-500 text-md hover:underline mx-4"
         >
           Reset
         </button>

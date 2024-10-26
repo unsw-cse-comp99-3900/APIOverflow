@@ -1,7 +1,7 @@
 import { PhotoIcon, DocumentIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useState } from "react";
 import { DetailedApi } from "../types/apiTypes";
-import { getApi, updateApi, addApi } from "../services/apiServices";
+import { getApi, updateApi, addApi, addTag } from "../services/apiServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { ServicePost, ServiceUpdate } from "../types/backendTypes";
@@ -17,6 +17,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const [endpoint, setEndpoint] = useState<string>("");
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [selectedTags, setSelectedTags] = useState<Tag[]>(["API"]);
+  const [newTags, setNewTags] = useState<Tag[]>([]);
   const openOverlay = () => setIsOverlayOpen(true);
   const closeOverlay = () => setIsOverlayOpen(false);
 
@@ -42,6 +43,14 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
   const submitApiUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    for (const newTag of newTags) {
+      if (selectedTags.includes(newTag)) {
+        await addTag({
+          tag: newTag,
+        });
+      }
+    }
 
     if (apiId) {
       const updatedApi: ServiceUpdate = {
@@ -155,7 +164,9 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
               isOpen={isOverlayOpen}
               onClose={closeOverlay}
               selectedTags={selectedTags}
+              newTags={newTags}
               setSelectedTags={setSelectedTags}
+              setNewTags={setNewTags}
             />
           </div>
 
