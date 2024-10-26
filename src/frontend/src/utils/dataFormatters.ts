@@ -1,13 +1,28 @@
-// TODO: Change any to the correct backend API type
-export const apiDataFormatter = (data:any) => {
+export const briefApiDataFormatter = (data:any) => {
     return {
         id: data.id,
         name: data.name,
         description: data.description,
-        ownerName: data.owner.name,
+        owner: data.owner,
         iconUrl: data.icon_url,
         tags: data.tags,
         documents: data.documents,
         endpoint: data.endpoint,
+      }
+}
+
+export const detailedApiDataFormatter = (data:any) => {
+    return {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        owner: data.owner,
+        iconUrl: data.icon_url,
+        tags: data.tags,
+        documents: data.documents,
+        endpoint: data.endpoint,
+        reviews: data.reviews,
+        upvotes: data.upvotes,
+        type: data.type,
       }
 }

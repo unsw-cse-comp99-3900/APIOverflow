@@ -2,12 +2,11 @@ import React from "react";
 import EditApiForm from "../components/UpdateApiForm";
 import { useParams } from "react-router-dom";
 
-const EditApiPage = () => {
+const EditApiPage: React.FC = () => {
   const { id } = useParams();
-  const numericApiId = Number(id);
   
   return (
-      <EditApiForm apiId={numericApiId} />
+      <EditApiForm apiId={id} />
   );
 };
 

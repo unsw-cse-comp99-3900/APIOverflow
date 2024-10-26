@@ -10,14 +10,26 @@ import APIsPage from "./pages/ApisPage";
 import AddApiPage from "./pages/AddApiPage";
 import ApiPage from "./pages/ApiPage";
 import EditApiPage from "./pages/EditApiPage";
-import UserProfileLayout from "./layouts/UserProfileLayout";
 import MyApisPage from "./pages/MyApisPage";
 import MyApiPage from "./pages/MyApiPage";
 import ThemeLayout from "./layouts/ThemeLayout";
-import { AuthProvider } from "./authentication/AuthProvider";
+import { AuthProvider } from "./contexts/AuthContext";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
-import ProtectedRoute from "./authentication/ProtectedRoute";
+import TagsSidebarLayout from "./layouts/TagsSidebarLayout";
+import UserSidebarLayout from "./layouts/UserSidebarLayout";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
+
+const ProtectedRoute = () => {
+  const auth = useAuth();
+  const { isLoggedIn } = auth!;
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Outlet />;
+};
 
 const App = () => {
   const router = createBrowserRouter(
@@ -30,14 +42,15 @@ const App = () => {
         </Route>
 
         <Route path="/" element={<ContentLayout />}>
-          <Route path="/apis" element={<APIsPage />} />
           <Route path="/apis/:id" element={<ApiPage />} />
           <Route path="/add-api" element={<AddApiPage />} />
           <Route path="/edit-api" element={<EditApiPage />} />
-
-          <Route path="/apis" element={<APIsPage />} />
+          <Route path="/apis" element={<TagsSidebarLayout />}>
+            <Route path="/apis" element={<APIsPage />} />
+          </Route>
+          
           <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<UserProfileLayout />}>
+            <Route path="/profile" element={<UserSidebarLayout />}>
               <Route path="/profile/my-apis" element={<MyApisPage />} />
               <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
               <Route path="/profile/add-api" element={<AddApiPage />} />

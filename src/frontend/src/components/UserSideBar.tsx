@@ -2,7 +2,7 @@ import React from "react";
 import { FaSignOutAlt, FaCode, FaRegPlusSquare } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useAuth } from "../authentication/AuthProvider";
+import { useAuth } from "../contexts/AuthContext";
 
 const UserSideBar = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) =>

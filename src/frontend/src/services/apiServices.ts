@@ -1,17 +1,20 @@
-import { Api, DetailedApi, NewApi } from "../types/apiTypes";
-import { LoginModel, ServicePost, UserCreate } from "../types/backendTypes";
-import { apiDataFormatter } from "../utils/dataFormatters";
-import { removeUnderscores } from "../utils/removeUnderscores";
+import { LoginModel, ServicePost, ServiceUpdate, TagData, UserCreate } from "../types/backendTypes";
+import { Tag } from "../types/miscTypes";
+import { briefApiDataFormatter, detailedApiDataFormatter } from "../utils/dataFormatters";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async () => {
-  const res = await fetch(`${baseUrl}/service/apis`, {
+export const getApis = async (tags?: Tag[]) => {
+  const queryParams = tags && tags.length > 0 ? `?tags=${tags.join("&tags=")}` : "";
+  console.log(`${baseUrl}/service/filter${queryParams}`, {
+    method: "GET",
+  })
+  const res = await fetch(`${baseUrl}/service/filter${queryParams}`, {
     method: "GET",
   });
   const data = await res.json();
-  return removeUnderscores(data).map(apiDataFormatter);
+  return data.map(briefApiDataFormatter);
 };
 
 export const getMyApis = async () => {
@@ -22,7 +25,7 @@ export const getMyApis = async () => {
     method: "GET",
   });
   const data = await res.json();
-  return removeUnderscores(data);
+  return data;
 };
 
 export const getApi = async (id: number | string) => {
@@ -30,20 +33,17 @@ export const getApi = async (id: number | string) => {
     method: "GET",
   });
   const data = await res.json();
-  return apiDataFormatter(removeUnderscores(data));
+  return detailedApiDataFormatter(data);
 };
 
-// BE un-implemented
-export const deleteApi = async (id: number) => {
-  await fetch(`${baseUrl}/service/${id}`, {
+export const deleteApi = async (id: string) => {
+  await fetch(`${baseUrl}/service/delete?sid=${id}`, {
     method: "DELETE",
-    body: JSON.stringify(id),
   });
   return;
 };
 
 export const addApi = async (service: ServicePost) => {
-  console.log(service)
   const res = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
@@ -56,11 +56,11 @@ export const addApi = async (service: ServicePost) => {
   return data.id;
 };
 
-// BE un-implemented
-export const updateApi = async (api: Api) => {
-  await fetch(`${baseUrl}/service/${api.id}`, {
+export const updateApi = async (api: ServiceUpdate) => {
+  await fetch(`${baseUrl}/service/update`, {
     method: "PUT",
     headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(api),
@@ -95,6 +95,28 @@ export const userRegister = async (user: UserCreate) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(user),
+  });
+  return;
+};
+
+
+/*        Tag Services       */
+export const getTags = async () => {
+  const res = await fetch(`${baseUrl}/tags/get`, {
+    method: "GET",
+  });
+  const data = await res.json();
+  return data.tags;
+};
+
+export const addTag = async (tag: TagData) => {
+  await fetch(`${baseUrl}/tag/add`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(tag),
   });
   return;
 };

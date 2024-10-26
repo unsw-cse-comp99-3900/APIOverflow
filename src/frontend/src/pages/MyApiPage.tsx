@@ -13,7 +13,7 @@ import ApiDescription from "../components/ApiDescription";
 import ApiDocs from "../components/ApiDocs";
 import BackButton from "../components/BackButton";
 
-const MyApiPage = () => {
+const MyApiPage: React.FC = () => {
   const [api, setApi] = useState<DetailedApi | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +70,7 @@ const MyApiPage = () => {
                     {api?.id && (
                       <DeleteApiButton
                         apiId={api.id}
-                        apisRoute="/profile/myApis"
+                        apisRoute="/profile/my-apis"
                       />
                     )}
                   </div>

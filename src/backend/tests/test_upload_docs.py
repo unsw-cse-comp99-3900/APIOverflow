@@ -94,10 +94,12 @@ def test_invalid_file(two_users):
     file = {
         'file' : open('tests/resources/default_icon.png', 'rb')
     }
-    response = client.post("/upload", files=file)
-    print(response.json())
-    assert response.status_code == SUCCESS
+    response = client.post("/upload/pdfs", files=file)
+    assert response.status_code == INPUT_ERROR
  
+    response = client.post("/upload/imgs", files=file)
+    assert response.status_code == SUCCESS
+
     doc_id = response.json()['doc_id']
     api_data = {
         'sid': data['sid'],
@@ -132,7 +134,7 @@ def test_no_service(two_users):
     file = {
         'file' : (filename, open("tests/resources/git_guide.pdf", 'rb'))
     }
-    response = client.post("/upload",
+    response = client.post("/upload/pdfs",
                            files=file)
     assert response.status_code == SUCCESS
  
@@ -155,7 +157,7 @@ def test_no_perms(two_users):
     file = {
         'file' : (filename, open("tests/resources/git_guide.pdf", 'rb'))
     }
-    response = client.post("/upload",
+    response = client.post("/upload/pdfs",
                            files=file)
     assert response.status_code == SUCCESS
  
@@ -180,7 +182,7 @@ def test_successful_upload(two_users):
     file = {
         'file' : (filename, open("tests/resources/git_guide.pdf", 'rb'))
     }
-    response = client.post("/upload", files=file)
+    response = client.post("/upload/pdfs", files=file)
     assert response.status_code == SUCCESS
  
     doc_id = response.json()['doc_id']
@@ -199,4 +201,4 @@ def test_successful_upload(two_users):
                           })
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['docs'] == ["static/docs/git_guide_0.pdf"]
+    assert response_info['docs'] == ["static/docs/git_guide_1.pdf"]
