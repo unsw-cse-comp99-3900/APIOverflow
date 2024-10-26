@@ -15,13 +15,19 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from googleapiclient.discovery import build
 import base64
+from dotenv import load_dotenv
+from pathlib import Path
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 T = TypeVar("T")
 ADMIN = 'admin'
 GENERAL = 'general'
-email = os.getenv("EMAIL", "False") == "True" 
+
+def load_email_setting():
+    load_dotenv(Path(__file__).parent.parent / '.env')
+    return os.getenv("EMAIL") == "True"
+email = load_email_setting()
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 APPLICATION_NAME = 'Gmail API Python Send Email'

@@ -12,16 +12,6 @@ import os
 
 # Create a test client
 client = TestClient(app)
-from dotenv import load_dotenv
-
-# Load .env file
-load_dotenv()
-
-@pytest.fixture(autouse=True)
-def set_email_env():
-    os.environ["EMAIL"] = "True"
-    yield 
-    os.environ["EMAIL"] = "False"
 
 @pytest.fixture(autouse=True)
 def clear_database():
