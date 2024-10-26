@@ -39,7 +39,7 @@ const ApiListings: React.FC<ApiListingsProps> = ({
 
   return (
     <FetchStatus loading={loading} error={error} data={apis}>
-      <div className="container-xl lg:container mx-auto px-10">
+      <div className="container-xl lg:container mx-auto p-10">
         <h2 className="text-3xl font-bold text-blue-800 mb-6 mt-6 text-left">
           {isMyAPis ? "My APIs" : "Browse APIs"}
         </h2>

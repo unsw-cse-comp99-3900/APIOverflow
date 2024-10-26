@@ -28,3 +28,7 @@ export interface UserCreate {
     password: string;
     email: string;
 }
+
+export interface TagData {
+    tag: string;
+}

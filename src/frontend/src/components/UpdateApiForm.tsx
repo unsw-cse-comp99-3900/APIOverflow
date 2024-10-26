@@ -10,15 +10,14 @@ import TagsOverlay from "./TagsOverlay";
 import { Tag } from "../types/miscTypes";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
-  const [api, setApi] = useState<DetailedApi | null>(null);
   const navigate = useNavigate();
+  const [api, setApi] = useState<DetailedApi | null>(null);
   const [name, setName] = useState<string>("");
+  const [newTag, setNewTag] = useState("");
   const [description, setDescription] = useState<string>("");
   const [endpoint, setEndpoint] = useState<string>("");
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([
-    "API"
-  ]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>(["API"]);
   const openOverlay = () => setIsOverlayOpen(true);
   const closeOverlay = () => setIsOverlayOpen(false);
 
@@ -130,7 +129,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                   onClick={() =>
                     setSelectedTags(selectedTags.filter((t) => t !== tag))
                   }
-                  className="relative  bg-blue-800 text-white flex items-center justify-center rounded-md text-sm font-semibold px-3 py-1 mx-1 my-1"
+                  className="relative bg-blue-800 text-white flex items-center justify-center rounded-md text-sm font-semibold px-3 py-1 mx-1 my-1"
                 >
                   <span className="transition-opacity duration-200 hover:opacity-0">
                     {tag}
@@ -151,7 +150,6 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                 <FaPlus className="text-sm" />
               </button>
             </div>
-
             {/* Overlay Window */}
             <TagsOverlay isOpen={isOverlayOpen} onClose={closeOverlay} selectedTags={selectedTags} setSelectedTags={setSelectedTags}/>
           </div>

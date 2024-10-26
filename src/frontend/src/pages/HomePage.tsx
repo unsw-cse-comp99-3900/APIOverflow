@@ -30,11 +30,11 @@ const HomePage: React.FC = () => {
         <div className="flex flex-col justify-center items-center">
           <div className="flex justify-center items-center gap-4 mb-4">
             {/* Search Bar */}
-            <div className="w-[612px] h-[50px] px-4 py-3 bg-white rounded-full border border-[#d9d9d9] flex justify-start items-center gap-2">
+            <div className="w-[612px] h-[50px] px-4 py-3 bg-white rounded-full border-2 border-gray-200 flex justify-start items-center gap-2">
               <input
                 type="text"
                 placeholder="Search API >:)"
-                className="w-full px-4 py-2 text-gray-700 focus:outline-none focus:ring-0 border-none"
+                className="w-full px-4 py-2 text-gray-700 focus:outline-none focus:ring-0 border-none rounded-full"
               />
               <button className="text-indigo-600">
                 <svg
