@@ -589,3 +589,70 @@ def test_providers_with_tags_multiple2(simple_user):
         if "Googl2" == api['name'] and ['API'] == api['tags']:
             found3 = True
     assert not found1 and not found2 and not found3
+
+def test_duplicate_apis(simple_user):
+
+    user_creds = {
+        "username" : "Tester 2",
+        "password" : "passwordsad",
+        "email" : "doxxed2@gmail.com"
+    }
+
+    usable_data2 = {"token" : None}
+
+    response = client.post("/auth/register",
+                            json=user_creds)
+    assert response.status_code == SUCCESS
+
+    # Log into account
+    response = client.post("/auth/login",
+                           json=user_creds)
+    assert response.status_code == SUCCESS
+    usable_data2['token'] = response.json()['access_token']
+
+    api = {
+            'name' : 'test1',
+            'icon_url' : '',
+            'x_start' : 0,
+            'x_end' : 0,
+            'y_start' : 0,
+            'y_end' : 0,
+            'description' : 'This is a test API',
+            'tags' : ['API', 'Private'],
+            'endpoint': 'https://api.example.com/users/12345'
+            }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api)
+    
+    response = client.post("/service/add",
+                                headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            json={
+                                    'name' : 'test2',
+                                    'icon_url' : '',
+                                    'x_start' : 0,
+                                    'x_end' : 0,
+                                    'y_start' : 0,
+                                    'y_end' : 0,
+                                    'description' : 'This is a test API',
+                                    'tags' : ['Not API', 'Public'],
+                                    'endpoint': 'https://api.example.com/users/12345'
+                            })
+
+    response = client.get("/service/filter",
+                          params={
+                              'tags': ['API', 'Private'],
+                              'provicers': []
+                          })
+    assert (response.status_code) == SUCCESS 
+    response_info = response.json()
+    found1 = False
+    found2 = False
+
+    for api in response_info:
+        if "test1" == api['name'] and ['API', 'Private'] == api['tags']:
+            found1 = True 
+        if "test2" == api['name'] and ['Not API', 'Public'] == api['tags']:
+            found2 = True
+    assert found1 and not found2

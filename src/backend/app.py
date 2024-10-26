@@ -158,6 +158,7 @@ async def filter(
 ):
     return api_tag_filter(tags, providers)
 
+<<<<<<< HEAD
 @app.get("/service/search")
 async def search(
     name: Optional[str] = Query(None),
@@ -192,6 +193,8 @@ async def api_get_icon(sid: str):
     '''
     return service_get_icon_wrapper(sid)
 
+=======
+>>>>>>> 572941b (fixed little bit)
 #####################################
 #   Auth Paths
 #####################################
