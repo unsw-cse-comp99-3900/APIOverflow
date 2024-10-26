@@ -655,4 +655,5 @@ def test_duplicate_apis(simple_user):
             found1 = True 
         if "test2" == api['name'] and ['Not API', 'Public'] == api['tags']:
             found2 = True
+    assert len(response_info) == 1
     assert found1 and not found2
