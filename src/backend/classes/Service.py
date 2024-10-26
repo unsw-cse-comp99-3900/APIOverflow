@@ -29,7 +29,10 @@ class Service:
         reviews:        List of reviews given by users
         review_count:   Number of reviews the service has
         upvotes:        Number of upvotes given to service
+        downvotes:      Number of downvotes given to service
         type:           Type of service ['api', 'micro']
+        status:         Status of service [LIVE, PENDING, REJECTED]
+        reviews:        List of reviews (rid)
 
     '''
 
@@ -63,6 +66,7 @@ class Service:
         self._reviews = []
         self._review_count = 0
         self._upvotes = 0
+        self._downvotes = 0
         # NEED TO CHANGE THIS TO PENDING INITIALISATION WHEN IMPLEMENTING ADMIN
         self._status = "LIVE"
         self._icon = icon
@@ -86,12 +90,17 @@ class Service:
         self._users.append(uid)
         self._user_count += 1
 
-    def add_review(self, review: T) -> None:
+    def add_review(self, review: str, rating: str) -> None:
         '''
             Adds review to service
         '''
         self._reviews.append(review)
         self._review_count += 1
+    
+        if rating == 'positive':
+            self._upvotes += 1
+        else:
+            self._downvotes += 1
    
     def add_upvote(self) -> None:
         '''
@@ -157,19 +166,18 @@ class Service:
         self._users.remove(uid)
         self._user_count -= 1
 
-    def remove_review(self, review: T) -> None:
+    def remove_review(self, review: str, rating: str) -> None:
         '''
             Removes review from service
         '''
         self._reviews.remove(review)
         self._review_count -= 1
-   
-    def remove_upvote(self) -> None:
-        '''
-            Removes upvote from service
-        '''
-        self._upvotes -= 1
 
+        if rating == 'positive':
+            self._upvotes -= 1
+        else:
+            self._downvotes -= 1
+   
     def remove_tag(self, tag) -> None:
         '''
             Removes tag from service
@@ -252,6 +260,22 @@ class Service:
         '''
         return self._icon
 
+    def get_reviews(self) -> List[str]:
+        '''
+            Returns service's reviews
+        '''
+        return self._reviews
+    
+    def get_ratings(self) -> Dict[str, int]:
+        '''
+            Returns ratings of service
+        '''
+        return {
+            'positive': self._upvotes,
+            'negative': self._downvotes,
+            'overall' : round(self._upvotes - self._downvotes, 2)
+        }
+
     ################################
     #  Storage Methods
     ################################
@@ -272,5 +296,6 @@ class Service:
             'reviews': self._reviews,
             'upvotes': self._upvotes,
             'type': self._type,
-            'icon': self._icon
+            'icon': self._icon,
+            'downvotes': self._downvotes
         }

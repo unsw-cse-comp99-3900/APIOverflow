@@ -25,7 +25,10 @@ schema = {
     'tag_count' : len(DEFAULT_TAGS),
     'img_count' : 0,
     'docs_count': 1,
-    'docs': [DEFAULT_ICON]
+    'docs': [DEFAULT_ICON],
+    'reviews' : [],
+    'review_count': 0,
+    'review_total': 0
 }
 
 class Datastore:
@@ -61,7 +64,10 @@ class Datastore:
                             'tag_count' : len(DEFAULT_TAGS),
                             'img_count' : 0,
                             'docs_count': 1,
-                            'docs': [DEFAULT_ICON]
+                            'docs': [DEFAULT_ICON],
+                            'reviews' : [],
+                            'review_count': 0,
+                            'review_total': 0
                         }
 
     ##################################
@@ -107,6 +113,14 @@ class Datastore:
         '''
         self.__store['docs'].append(doc)
         self.__store['docs_count'] += 1
+
+    def add_review(self, review: T) -> None:
+        '''
+            Adds a review to the datastore
+        '''
+        self.__store['reviews'].append(review)
+        self.__store['review_count'] += 1
+        self.__store['review_total'] += 1
 
     ################################
     #   Datastore Search Methods
@@ -170,13 +184,28 @@ class Datastore:
         '''
             Returns with user obj base on given ID, or None if cannot find user
         '''
-        print(self.__store['docs'])
         for item in self.__store['docs']:
-            print(item.get_id(), type(item.get_id()), eid, type(eid), item.get_id() == eid)
+            # print(item.get_id(), type(item.get_id()), eid, type(eid), item.get_id() == eid)
             if item.get_id() == eid:
                 return item
 
         return None
+
+    def get_review_by_id(self, rid: str) -> T | None:
+        '''
+            Retrieves a review by id if it exists, else None
+        '''
+        for item in self.__store['reviews']:
+            if item.get_id() == rid:
+                return item
+
+        return None
+
+    def get_reviews(self) -> List[T]:
+        '''
+            Gets all reviews
+        '''
+        return self.__store['reviews']
 
     def get_user_apis(self, eid: str) -> List[T]:
         '''
@@ -227,10 +256,22 @@ class Datastore:
         '''
         return self.__store['docs_count']
 
+    def num_reviews(self) -> int:
+        '''
+            Returns number of reviews
+        '''
+        return self.__store['review_count']
+    
+    def total_reviews(self) -> int:
+        '''
+            Returns number of reviews created in total
+        '''
+        return self.__store['review_total']
+
     ################################
     #   Datastore Deletion Methods
     ################################
-    def delete_item(self, eid: int, i_type: Literal['user', 'api']) -> None:
+    def delete_item(self, eid: int, i_type: Literal['user', 'api', 'review']) -> None:
         '''
             Deletes an item from the database (not tags)
         '''

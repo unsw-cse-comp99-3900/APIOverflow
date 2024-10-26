@@ -13,6 +13,7 @@ from src.backend.server.tags import *
 from src.backend.server.admin import *
 from src.backend.server.upload import *
 from src.backend.server.user import *
+from src.backend.server.review import *
 from json import dumps
 
 
@@ -192,6 +193,68 @@ async def api_get_icon(sid: str):
     '''
     return service_get_icon_wrapper(sid)
 
+@app.post("/service/review/add")
+async def api_add_review(info: ServiceReviewInfo, user : User = Depends(manager)):
+    '''
+        Endpoint to add review to a service
+    '''
+    return service_add_review_wrapper(user['id'], info)
+
+
+@app.get("/service/get/rating")
+async def api_get_rating(sid: str):
+    '''
+        Endpoint to retrieve a service's rating
+    '''
+    return service_get_rating_wrapper(sid)
+
+@app.get("/service/get/reviews")
+async def api_get_reviews(sid: str, testing: bool = False):
+    '''
+        Endpoint to retrieve a service's reviews
+    '''
+    return {
+        'reviews' : service_get_reviews_wrapper(sid, testing)
+    } 
+
+#####################################
+#   Review Paths
+#####################################
+
+@app.get("/review/get")
+async def review_get(rid: str):
+    '''
+        Endpoint which directly retrieves a review
+    '''
+    return review_get_wrapper(rid)
+
+@app.delete("/review/delete")
+async def review_delete(rid: str, user: User = Depends(manager)):
+    '''
+        Endpoint which deletes a given review
+    '''
+    review_delete_wrapper(rid, user['id'], user['role'])
+
+@app.post("/review/edit")
+async def review_edit(info: ServiceReviewEditInfo, user: User = Depends(manager)):
+    '''
+        Endpoint which edits a given review
+    '''
+    review_edit_wrapper(info, user['id'], user['role'])
+
+@app.post("/review/approve")
+async def review_approve(rid: str, reason: str, user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint which approves a review
+    '''
+    review_approve_wrapper(rid, reason)
+
+@app.post("/review/reject")
+async def review_reject(rid: str, reason: str, user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint which rejects a review
+    '''
+    review_reject_wrapper(rid, reason)
 
 #####################################
 #   Auth Paths
@@ -324,6 +387,15 @@ async def user_delete(uid: str, user: User = Depends(manager), role: str = Depen
     '''
     return delete_user(uid, user["is_super"])
 
+@app.get("/admin/get/reviews")
+async def admin_get_reviews(status: str = '', user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint which retrieves all pending reviews
+    '''
+    return {
+        'reviews': admin_get_reviews_wrapper(status)
+    }
+
 #####################################
 #   User Paths
 #####################################
@@ -355,6 +427,16 @@ async def user_get_icon(user: User=Depends(manager)):
         Endpoint which retrieves user's icon (if one exists)
     '''
     return user_get_icon_wrapper(user['id'])
+
+@app.get("/user/get/reviews")
+async def user_get_reviews(user: User=Depends(manager)):
+    '''
+        Endpoint which retrieves all reviews user has made
+    '''
+    return {
+        'reviews' : user_get_reviews_wrapper(user['id'])
+    }
+
 
 if __name__ == "__main__":
     import uvicorn
