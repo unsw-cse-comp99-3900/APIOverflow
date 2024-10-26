@@ -47,7 +47,7 @@ class User:
         # Default vars
         self._following = []
         self._num_following = 0
-        self._icon = None
+        self._icon = DEFAULT_ICON
         self._is_verified = False
         self._reviews = []
         self._num_reviews = 0
@@ -212,6 +212,16 @@ class User:
         '''
         return self._reviews
     
+    def get_profile(self) -> dict[str, str]:
+        '''
+            Returns profile info of user
+        '''
+        return {
+            'email': self._email,
+            'username': self._name,
+            'icon': self._icon
+        }
+
     ################################
     #  Storage Methods
     ################################
@@ -230,4 +240,5 @@ class User:
             'following' : self._following,
             'is_verified': self._is_verified,
             'reviews': self._reviews,
+            'icon' : self._icon
         }

@@ -80,3 +80,15 @@ def user_get_reviews_wrapper(uid: str) -> List[dict[str, str]]:
         review = data_store.get_review_by_id(rid)
         reviews.append(review.to_json(brief=True))
     return reviews
+
+def user_get_profile_wrapper(uid: str) -> dict[str, str]:
+    '''
+        Wrapper which returns profile information of user
+    '''
+
+    # Grab user
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail="No such user found")
+
+    return user.get_profile()

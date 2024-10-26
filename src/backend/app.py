@@ -437,6 +437,12 @@ async def user_get_reviews(user: User=Depends(manager)):
         'reviews' : user_get_reviews_wrapper(user['id'])
     }
 
+@app.get("/user/get/profile")
+async def user_get_profile(user: User = Depends(manager)):
+    '''
+        Endpoint which retrieves profile information of user
+    '''
+    return user_get_profile_wrapper(user['id'])
 
 if __name__ == "__main__":
     import uvicorn
