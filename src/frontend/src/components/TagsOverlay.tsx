@@ -44,11 +44,21 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
       : "relative border-blue-800 border-2 bg-white hover:bg-blue-800 text-blue-800 hover:text-white flex items-center justify-center rounded-md text-sm font-semibold px-3 py-1 mx-1 my-1";
 
   const toggleTag = (tag: string) => {
+    // remove tag
     if (selectedTags.includes(tag)) {
+
+      if ((selectedTags.includes("API") !== selectedTags.includes("Microservice")) && ( tag === "API" || tag === "Microservice")) {
+        setError("You must select either API or Microservice");
+        return;
+      }
+
       setSelectedTags(selectedTags.filter((t) => t !== tag));
+
+    // add tag
     } else {
       setSelectedTags([...selectedTags, tag]);
     }
+    setError("");
   };
 
   // Event Handlers
