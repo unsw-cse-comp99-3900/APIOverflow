@@ -176,6 +176,5 @@ export const apiGetIcon = async (sid: string) => {
   });
   const blob = await response.blob(); // Get the Blob data
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
-  console.log(url)
   return url
 };

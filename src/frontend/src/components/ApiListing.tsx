@@ -56,7 +56,7 @@ const ApiListing: React.FC<ApiListingProps>  = ({
             <img
               src={iconURL || defaultApiIcon}
               alt="API Icon"
-              className="w-20 h-20 p-1 ml-4 mr-4 mt-2 rounded-full object-cover border-2 border-gray-300"
+              className="w-20 h-20 ml-4 mr-4 mt-2 rounded-full object-cover border-2 border-gray-300"
             />
 
             <div>

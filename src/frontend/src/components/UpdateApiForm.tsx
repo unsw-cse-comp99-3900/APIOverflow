@@ -144,7 +144,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
           <div className="col-span-full flex flex-col items-center py-6 mx-2">
             <button
               type="button"
-              className="rounded-full bg-white h-56 w-56 p-1 border-2 border-gray-300 hover:bg-gray-50 flex justify-center items-center"
+              className="rounded-full bg-white h-56 w-56 border-2 border-gray-300 hover:bg-gray-50 flex justify-center items-center"
             >
               <label className="flex items-center justify-center cursor-pointer">
                 {selectedImage ? (

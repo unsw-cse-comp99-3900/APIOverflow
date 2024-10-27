@@ -62,7 +62,7 @@ const ApiPage: React.FC = () => {
                   {/* Placeholder for API icon */}
                   <div className="flex flex-shrink-0 items-center">
                     <img
-                      className="w-56 h-56 p-1 rounded-full object-cover mx-auto border-2 border-gray-300"
+                      className="w-56 h-56 rounded-full object-cover mx-auto border-2 border-gray-300"
                       src={iconURL || defaultApiIcon}
                       alt="API Icon"
                     />
