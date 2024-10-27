@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaThumbsDown, FaThumbsUp } from 'react-icons/fa';
 
 const ApiReviews: React.FC = () => {
   const [reviews, setReviews] = useState<string[]>([]);
@@ -24,24 +25,30 @@ const ApiReviews: React.FC = () => {
           className="w-full h-24 p-2 border rounded-lg focus:outline-none focus:border-blue-500"
           placeholder="Write your review..."
         />
-        <button
-          type="submit"
-          className="mt-2 w-1/4 bg-blue-800 text-white py-2 rounded-lg hover:bg-blue-700"
-        >
-          Submit Review
-        </button>
-        <button
-          type="submit"
-          className="mt-2 w-1/4 bg-blue-800 text-white py-2 rounded-lg hover:bg-blue-700"
-        >
-          Submit Review
-        </button>
-        <button
-          type="submit"
-          className="mt-2 w-1/2 bg-blue-800 text-white py-2 rounded-lg hover:bg-blue-700"
-        >
-          Submit Review
-        </button>
+        <div className="flex items-center justify-between space-x-2 mt-2">
+          <div className="flex space-x-2">
+            <button
+              type="button"
+              className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-xl"
+            >
+              <FaThumbsUp />
+            </button>
+            <button
+              type="button"
+              className="w-10 h-10 flex items-center justify-center bg-red-500 text-white rounded-xl"
+            >
+              <FaThumbsDown />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleReviewSubmit}
+            className="px-4 py-2 bg-blue-800 text-white rounded-lg font-semibold"
+          >
+            Submit Review
+          </button>
+        </div>
       </form>
 
       {/* Display Reviews */}
