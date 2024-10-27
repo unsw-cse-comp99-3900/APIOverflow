@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { DetailedApi } from "../types/apiTypes";
 import { apiGetIcon, getApi } from "../services/apiServices";
@@ -18,7 +18,6 @@ const MyApiPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [iconURL, setIconURL] = useState<string>("")
-  const navigate = useNavigate();
   const { id } = useParams();
 
   useEffect(() => {
@@ -36,10 +35,10 @@ const MyApiPage: React.FC = () => {
       } catch (error) {
         console.log("Error fetching data", error);
         if (error instanceof Error && error.message === "Unauthorized") {
-          navigate('/login');
-          localStorage.removeItem("token");
+          setError("Unauthorized")
+        }else{
+          setError("Failed to load API data");
         }
-        setError("Failed to load API data");
         toast.error("Error loading API data");
       } finally {
         setLoading(false);
