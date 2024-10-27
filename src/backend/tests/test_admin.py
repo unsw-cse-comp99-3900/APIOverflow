@@ -156,6 +156,7 @@ def test_demotion_user(simple_user):
                             })
     assert response.status_code == INPUT_ERROR
     assert response.json() == {"detail": "User Tester 1 is not an admin."}
+    
 
 def test_delete_user(simple_user):
     '''
@@ -183,6 +184,60 @@ def test_delete_user(simple_user):
     assert response.status_code == SUCCESS
     assert response.json()["user_count"] == 1
 
+def test_admin_delete_self(simple_user):
+    '''
+        Test promoting a user
+    '''
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.post("/admin/promote", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": "Tester 1", "status": True}
+
+    response = client.post("/admin/demote", headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == NOT_AUTH
+
+    response = client.post("/admin/demote", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : '0'
+                            })
+    assert response.status_code == NOT_AUTH
+
+def test_admin_demote_self(simple_user):
+    '''
+        Test promoting a user
+    '''
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.post("/admin/promote", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": "Tester 1", "status": True}
+
+    response = client.delete("/admin/delete/user", headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            params={
+                              'uid' : '0'
+                            })
+    assert response.status_code == NOT_AUTH
+
 def test_admin_delete_super(simple_user):
     '''
         Test promoting a user
@@ -202,6 +257,12 @@ def test_admin_delete_super(simple_user):
     assert response.json() == {"name": "Tester 1", "status": True}
 
     response = client.delete("/admin/delete/user", headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == NOT_AUTH
+
+    response = client.delete("/admin/delete/user", headers={"Authorization": f"Bearer {access_token}"},
                             params={
                               'uid' : '0'
                             })
