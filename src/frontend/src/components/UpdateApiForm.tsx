@@ -7,12 +7,14 @@ import {
   addApi,
   addTag,
   uploadImage,
-  apiAddIcon
+  apiAddIcon,
+  uploadPDF,
+  uploadDocs,
 } from "../services/apiServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { ServicePost, ServiceUpdate } from "../types/backendTypes";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaFilePdf, FaPlus, FaTrash } from "react-icons/fa";
 import TagsOverlay from "./TagsOverlay";
 import { Tag } from "../types/miscTypes";
 
@@ -28,7 +30,9 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const [endpoint, setEndpoint] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<Tag[]>(["API"]);
   const [selectedImage, setSelectedImage] = useState<string>("");
-  const [selectedImageData, setSelectedImageData] = useState<File | null> (null)
+  const [selectedImageData, setSelectedImageData] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // const [selectedFileData, setSelectedFileData] = useState<File | null>(null);
 
   // whether the overlay window for adding new tags is open
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
@@ -49,6 +53,13 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       };
       setSelectedImageData(iconImage);
       reader.readAsDataURL(iconImage);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+      uploadPDF(e.target.files[0]); // Trigger upload immediately on selection
     }
   };
 
@@ -85,7 +96,6 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       }
     }
 
-    let sid = apiId
     // Edit existing API
     if (apiId) {
       const updatedApi: ServiceUpdate = {
@@ -96,12 +106,19 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         tags: selectedTags,
       };
       await updateApi(updatedApi);
-      if (selectedImageData){
-        const doc_id = await uploadImage(selectedImageData)
+      if (selectedImageData) {
+        const doc_id = await uploadImage(selectedImageData);
         apiAddIcon({
-          sid:apiId,
+          sid: apiId,
           doc_id,
-        })
+        });
+      }
+      if (selectedFile) {
+        const doc_id = await uploadPDF(selectedFile);
+        uploadDocs({
+          sid: apiId,
+          doc_id,
+        });
       }
       navigate(`/profile/my-apis/${apiId}`);
       // Add new API
@@ -118,23 +135,29 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         tags: selectedTags,
       };
       const newId = await addApi(newApi);
-      if (selectedImageData){
-        const doc_id = await uploadImage(selectedImageData)
+      if (selectedImageData) {
+        const doc_id = await uploadImage(selectedImageData);
         apiAddIcon({
-          sid:newId,
-          doc_id
-        })
+          sid: newId,
+          doc_id,
+        });
+      }
+
+      if (selectedFile) {
+        const doc_id = await uploadPDF(selectedFile);
+        uploadDocs({
+          sid: newId,
+          doc_id,
+        });
       }
       navigate(`/profile/my-apis/${newId}`);
     }
-
-
 
     toast.success("Success!");
   };
 
   return (
-    <div className="container-xl lg:container mx-auto px-10">
+    <div className="container-xl lg:container mx-auto p-10">
       <h2 className="text-3xl font-bold text-blue-800 mb-6 mt-6 text-left">
         {apiId ? `Edit API` : "Add API"}
       </h2>
@@ -159,8 +182,8 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                   <PhotoIcon className="h-32 w-32 text-gray-400" />
                 )}
                 <input
-                  id="file-upload"
-                  name="file-upload"
+                  id="icon-upload"
+                  name="icon-upload"
                   type="file"
                   accept="image/*"
                   className="sr-only"
@@ -300,7 +323,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                   aria-hidden="true"
                   className="mx-auto h-12 w-12 text-gray-300"
                 />
-                <div className="mt-4 flex text-2xl leading-6 text-gray-600">
+                <div className="mt-4 flex flex-col items-center text-2xl leading-6 text-gray-600">
                   <label
                     htmlFor="file-upload"
                     className="relative cursor-pointer hover:underline rounded-md bg-white font-semibold text-indigo-600 hover:text-indigo-500"
@@ -310,10 +333,23 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                       id="file-upload"
                       name="file-upload"
                       type="file"
+                      accept="application/pdf" // Only accept PDF files
                       className="sr-only"
+                      onChange={handleFileChange} // Capture file selection here
                     />
                   </label>
-                  <p className="pl-1">or drag and drop</p>
+                  {/* <p className="pl-1">or drag and drop</p>  Todo: Support drag and drop */}
+
+                  {selectedFile && (
+                    <div className="flex items-center mt-4 p-4 border border-gray-300 rounded-lg shadow-md bg-white">
+                      <FaFilePdf className="text-red-600 text-3xl mr-3" />
+                      <div>
+                        <p className="text-lg font-medium text-gray-800">
+                          {selectedFile.name}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <p className="text-xs leading-5 pt-1 text-gray-600">
                   PDF up to 10MB

@@ -37,3 +37,8 @@ export interface ServiceIconInfo {
     sid: string;
     doc_id: string;
 }
+
+export interface ServiceUpload {
+    sid: string;
+    doc_id: string;
+}

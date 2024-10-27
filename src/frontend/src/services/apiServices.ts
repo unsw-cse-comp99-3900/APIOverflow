@@ -4,6 +4,7 @@ import {
   ServiceIconInfo,
   ServicePost,
   ServiceUpdate,
+  ServiceUpload,
   TagData,
   UserCreate,
 } from "../types/backendTypes";
@@ -148,6 +149,8 @@ export const addTag = async (tag: TagData) => {
 };
 
 /*        Image Services       */
+
+// Upload image to database
 export const uploadImage = async (file: File) => {
   const formData = new FormData();
   formData.append("file", file);
@@ -159,6 +162,7 @@ export const uploadImage = async (file: File) => {
   return data.doc_id;
 };
 
+// Link icon with service
 export const apiAddIcon = async (info: ServiceIconInfo) => {
   const response = await fetch(`${baseUrl}/service/add_icon`, {
     method: "POST",
@@ -178,3 +182,30 @@ export const apiGetIcon = async (sid: string) => {
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
   return url
 };
+
+/*        Document Services       */
+
+// Upload service to database
+export const uploadPDF = async (file: File) => {
+  console.log(file)
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch(`${baseUrl}/upload/pdfs`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await response.json();
+  return data.doc_id;
+}
+
+// Link service with documentation
+export const uploadDocs = async (info: ServiceUpload) => {
+  const response = await fetch(`${baseUrl}/service/upload_docs`, {
+    method: "POST",
+    headers: {  
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(info),
+  });
+}
