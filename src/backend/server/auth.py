@@ -17,7 +17,10 @@ from googleapiclient.discovery import build
 import base64
 from dotenv import load_dotenv
 from pathlib import Path
+import os
 
+app_host = os.getenv("APP_HOST", "localhost")
+app_port = os.getenv("APP_PORT", "5000")
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 T = TypeVar("T")
@@ -50,9 +53,10 @@ def get_credentials():
 def send_email(to_email: str, token: str, email_type: str = 'verification'):
     """Send an email with HTML and plain text content."""
     sender_email = "api.overflow6@gmail.com"
-
+    
+    root_link = f"http://{app_host}:{app_port}/auth"
     if email_type == 'verification':
-        verification_link = f"http://localhost:5000/auth/verify-email/{token}"
+        verification_link = f"{root_link}/verify-email/{token}"
         subject = "Please Verify Your Email Address"
         msg_html = f"""
         Hi,<br/>
@@ -66,7 +70,7 @@ def send_email(to_email: str, token: str, email_type: str = 'verification'):
                     f"{verification_link}\nIf you did not create an account, please ignore this email.\nBest regards,\nAPI Overflow Team"
 
     elif email_type == 'password_reset':
-        reset_link = f"http://localhost:5000/auth/reset-password/{token}"
+        reset_link = f"{root_link}/reset-password/{token}"
         subject = "Password Reset Request"
         msg_html = f"""
         Hi,<br/>
