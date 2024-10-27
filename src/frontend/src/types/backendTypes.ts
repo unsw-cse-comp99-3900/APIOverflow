@@ -32,3 +32,8 @@ export interface UserCreate {
 export interface TagData {
     tag: string;
 }
+
+export interface ServiceIconInfo {
+    sid: string;
+    doc_id: string;
+}

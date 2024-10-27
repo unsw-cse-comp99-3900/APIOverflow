@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { DetailedApi } from "../types/apiTypes";
-import { getApi } from "../services/apiServices";
+import { apiGetIcon, getApi } from "../services/apiServices";
 import FetchStatus from "../components/FetchStatus";
 import Tag from "../components/Tag";
 import ApiReviews from "../components/ApiReviews";
@@ -15,6 +15,7 @@ const ApiPage: React.FC = () => {
   const [api, setApi] = useState<DetailedApi | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [iconURL, setIconURL] = useState<string>("")
   const { id } = useParams();
   
 
@@ -26,8 +27,10 @@ const ApiPage: React.FC = () => {
         return;
       }
       try {
-        const data = await getApi(Number(id));
+        const data = await getApi(id);
+        const iconURL = await apiGetIcon(id)
         setApi(data);
+        setIconURL(iconURL)
       } catch (error) {
         console.log("Error fetching data", error);
         setError("Failed to load API data");
@@ -38,6 +41,13 @@ const ApiPage: React.FC = () => {
     };
 
     fetchApi();
+
+    // Cleanup the object URL to avoid memory leaks
+    return () => {
+      if (iconURL) {
+        URL.revokeObjectURL(iconURL);
+      }
+    };
   }, [id]);
 
   return (
@@ -52,8 +62,8 @@ const ApiPage: React.FC = () => {
                   {/* Placeholder for API icon */}
                   <div className="flex flex-shrink-0 items-center">
                     <img
-                      className="w-56 h-56 rounded-full object-cover mx-auto border-2 border-gray-300"
-                      src={api.iconUrl || defaultApiIcon}
+                      className="w-56 h-56 p-1 rounded-full object-cover mx-auto border-2 border-gray-300"
+                      src={iconURL || defaultApiIcon}
                       alt="API Icon"
                     />
                   </div>

@@ -1,12 +1,24 @@
-import { LoginModel, ServicePost, ServiceUpdate, TagData, UserCreate } from "../types/backendTypes";
+import { json } from "stream/consumers";
+import {
+  LoginModel,
+  ServiceIconInfo,
+  ServicePost,
+  ServiceUpdate,
+  TagData,
+  UserCreate,
+} from "../types/backendTypes";
 import { Tag } from "../types/miscTypes";
-import { briefApiDataFormatter, detailedApiDataFormatter } from "../utils/dataFormatters";
+import {
+  briefApiDataFormatter,
+  detailedApiDataFormatter,
+} from "../utils/dataFormatters";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
 export const getApis = async (tags?: Tag[]) => {
-  const queryParams = tags && tags.length > 0 ? `?tags=${tags.join("&tags=")}` : "";
+  const queryParams =
+    tags && tags.length > 0 ? `?tags=${tags.join("&tags=")}` : "";
   const response = await fetch(`${baseUrl}/service/filter${queryParams}`, {
     method: "GET",
   });
@@ -21,7 +33,7 @@ export const getMyApis = async () => {
     },
     method: "GET",
   });
-  
+
   if (response.status === 401) {
     throw new Error("Unauthorized");
   }
@@ -30,7 +42,7 @@ export const getMyApis = async () => {
   return data;
 };
 
-export const getApi = async (id: number | string) => {
+export const getApi = async (id: string) => {
   const response = await fetch(`${baseUrl}/service/get_service?sid=${id}`, {
     method: "GET",
   });
@@ -110,7 +122,6 @@ export const userRegister = async (user: UserCreate) => {
   return;
 };
 
-
 /*        Tag Services       */
 export const getTags = async () => {
   const response = await fetch(`${baseUrl}/tags/get`, {
@@ -134,4 +145,37 @@ export const addTag = async (tag: TagData) => {
     throw new Error("Unauthorized");
   }
   return;
+};
+
+/*        Image Services       */
+export const uploadImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch(`${baseUrl}/upload/imgs`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await response.json();
+  return data.doc_id;
+};
+
+export const apiAddIcon = async (info: ServiceIconInfo) => {
+  const response = await fetch(`${baseUrl}/service/add_icon`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(info),
+  });
+};
+
+export const apiGetIcon = async (sid: string) => {
+  const response = await fetch(`${baseUrl}/service/get/icon?sid=${sid}`, {
+    method: "GET",
+  });
+  const blob = await response.blob(); // Get the Blob data
+  const url = URL.createObjectURL(blob); // Create a URL for the Blob
+  console.log(url)
+  return url
 };

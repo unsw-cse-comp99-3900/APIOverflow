@@ -1,7 +1,14 @@
 import { PhotoIcon, DocumentIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useState } from "react";
 import { DetailedApi } from "../types/apiTypes";
-import { getApi, updateApi, addApi, addTag } from "../services/apiServices";
+import {
+  getApi,
+  updateApi,
+  addApi,
+  addTag,
+  uploadImage,
+  apiAddIcon
+} from "../services/apiServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { ServicePost, ServiceUpdate } from "../types/backendTypes";
@@ -11,15 +18,39 @@ import { Tag } from "../types/miscTypes";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const navigate = useNavigate();
+
+  // current api detail for editing
   const [api, setApi] = useState<DetailedApi | null>(null);
+
+  // API information
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [endpoint, setEndpoint] = useState<string>("");
-  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [selectedTags, setSelectedTags] = useState<Tag[]>(["API"]);
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [selectedImageData, setSelectedImageData] = useState<File | null> (null)
+
+  // whether the overlay window for adding new tags is open
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+
+  // New tags that the user has created in the overlay
   const [newTags, setNewTags] = useState<Tag[]>([]);
+
+  // operations for opening and closing the overlay
   const openOverlay = () => setIsOverlayOpen(true);
   const closeOverlay = () => setIsOverlayOpen(false);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const iconImage = event.target.files?.[0];
+    if (iconImage) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setSelectedImage(reader.result as string);
+      };
+      setSelectedImageData(iconImage);
+      reader.readAsDataURL(iconImage);
+    }
+  };
 
   useEffect(() => {
     const fetchApi = async () => {
@@ -39,11 +70,13 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       }
     };
     fetchApi();
-  }, [apiId]); // Ensure the effect runs whenever the id changes
+  }, [apiId]);
 
+  // Submit the API update to the backend
   const submitApiUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Add newly created tags to the database
     for (const newTag of newTags) {
       if (selectedTags.includes(newTag)) {
         await addTag({
@@ -52,6 +85,8 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       }
     }
 
+    let sid = apiId
+    // Edit existing API
     if (apiId) {
       const updatedApi: ServiceUpdate = {
         sid: apiId,
@@ -60,9 +95,16 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         endpoint,
         tags: selectedTags,
       };
-
       await updateApi(updatedApi);
+      if (selectedImageData){
+        const doc_id = await uploadImage(selectedImageData)
+        apiAddIcon({
+          sid:apiId,
+          doc_id,
+        })
+      }
       navigate(`/profile/my-apis/${apiId}`);
+      // Add new API
     } else {
       const newApi: ServicePost = {
         name,
@@ -76,9 +118,18 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         tags: selectedTags,
       };
       const newId = await addApi(newApi);
-      console.log(newId);
+      if (selectedImageData){
+        const doc_id = await uploadImage(selectedImageData)
+        apiAddIcon({
+          sid:newId,
+          doc_id
+        })
+      }
       navigate(`/profile/my-apis/${newId}`);
     }
+
+
+
     toast.success("Success!");
   };
 
@@ -90,27 +141,30 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
       <form onSubmit={submitApiUpdate}>
         <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
-          
           <div className="col-span-full flex flex-col items-center py-6 mx-2">
             <button
               type="button"
-              className="rounded-full bg-white h-56 w-56 px-5 py-5 ring-2 ring-inset ring-gray-300 hover:bg-gray-50 flex justify-center items-center"
+              className="rounded-full bg-white h-56 w-56 p-1 border-2 border-gray-300 hover:bg-gray-50 flex justify-center items-center"
             >
               <label className="flex items-center justify-center cursor-pointer">
-                <PhotoIcon className="h-32 w-32 text-gray-400" />
+                {selectedImage ? (
+                  // Display the uploaded image
+                  <img
+                    src={selectedImage}
+                    alt="Uploaded"
+                    className="h-full w-full object-cover rounded-full"
+                  />
+                ) : (
+                  // Display the placeholder icon if no image is uploaded
+                  <PhotoIcon className="h-32 w-32 text-gray-400" />
+                )}
                 <input
                   id="file-upload"
                   name="file-upload"
                   type="file"
                   accept="image/*"
                   className="sr-only"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      console.log("Selected file:", file);
-                      // Add file upload logic here
-                    }
-                  }}
+                  onChange={(e) => handleImageUpload(e)}
                 />
               </label>
             </button>

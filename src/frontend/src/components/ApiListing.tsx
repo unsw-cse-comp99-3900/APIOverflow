@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BriefApi } from "../types/apiTypes";
 import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import Tag from "./Tag";
 import DeleteApiButton from "./DeleteApiButton";
 import EditApiButton from "./EditApiButton";
+import { apiGetIcon } from "../services/apiServices";
 
 interface ApiListingProps {
   api: BriefApi;
@@ -12,18 +13,40 @@ interface ApiListingProps {
   onDelete: (id: string) => void;
 }
 
+
+
 const ApiListing: React.FC<ApiListingProps>  = ({
   api,
   isMyApis,
   onDelete,
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [iconURL, setIconURL] = useState<string>("")
+  useEffect(() => {
+    const fetchIcon = async () => {
+      try{
+        const iconURL = await apiGetIcon(api.id)
+        setIconURL(iconURL)
+      } catch(error){
+        console.log(error)
+      }
+    }
+    fetchIcon();
 
+    // Cleanup the object URL to avoid memory leaks
+    return () => {
+      if (iconURL) {
+        URL.revokeObjectURL(iconURL);
+      }
+    };
+
+  }, [])
   let description = api.description;
 
   if (!showFullDescription && description.length > 90) {
     description = description.substring(0, 90) + "...";
   }
+
 
   return (
     <div className="bg-white rounded-xl shadow-md relative">
@@ -31,9 +54,9 @@ const ApiListing: React.FC<ApiListingProps>  = ({
         <div className="pb-16">
           <div className="flex items-start mb-2">
             <img
-              src={api.iconUrl || defaultApiIcon}
+              src={iconURL || defaultApiIcon}
               alt="API Icon"
-              className="w-20 h-20 ml-4 mr-4 mt-2 rounded-full object-cover border-2 border-gray-300"
+              className="w-20 h-20 p-1 ml-4 mr-4 mt-2 rounded-full object-cover border-2 border-gray-300"
             />
 
             <div>
