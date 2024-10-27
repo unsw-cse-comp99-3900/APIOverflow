@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from src.backend.app import app 
 from src.backend.classes.models import db
+from src.backend.classes.datastore import data_store
 
 # Create a test client
 client = TestClient(app)
@@ -308,3 +309,52 @@ def test_admin_demote_admin(simple_user):
                             })
     assert response.status_code == NOT_AUTH
     assert response.json() == {"detail": "Admins cannot demote other Admins."}
+
+def test_admin_check_dashboard(simple_user):
+    '''
+        Test promoting a user
+    '''
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+    
+    user0 = data_store.get_user_by_id("0")
+    user1 = data_store.get_user_by_id(simple_user['uid'])
+    user_creds2 = {
+        "username" : "Tester 2",
+        "password" : "password22",
+        "email": "doxx22ed@gmail.com"
+    }
+    response = client.post("/auth/register", json=user_creds2)
+    assert response.status_code == SUCCESS
+    uid2 = response.json()['uid']
+    user2 = data_store.get_user_by_id(uid2)
+
+    user_creds3 = {
+        "username" : "Tester 3",
+        "password" : "password33",
+        "email": "doxx33ed@gmail.com"
+    }
+    response = client.post("/auth/register", json=user_creds3)
+    assert response.status_code == SUCCESS
+    uid3 = response.json()['uid']
+    user3 = data_store.get_user_by_id(uid3)
+
+    response = client.get("/admin/dashboard/users", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+    assert response.json()["user_count"] == 4
+    assert response.json()["users"] == [user0.to_json(), user1.to_json(), user2.to_json(), user3.to_json()]
+
+    response = client.delete("/admin/delete/user", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == SUCCESS
+
+    response = client.get("/admin/dashboard/users", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+    assert response.json()["user_count"] == 3
+    assert response.json()["users"] == [user0.to_json(), user2.to_json(), user3.to_json()]
