@@ -29,11 +29,12 @@ async def upload_file(file: UploadFile, path: str) -> str:
         async with aiofiles.open(path, 'wb') as f:
             while contents := await file.read(MB1):
                 await f.write(contents)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Error with uploading file")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error with uploading file: {e}")
     
     finally:
         await file.close()
+        await f.close()
     
     return path
 
