@@ -20,6 +20,7 @@ import TagsSidebarLayout from "./layouts/TagsSidebarLayout";
 import UserSidebarLayout from "./layouts/UserSidebarLayout";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
+import NotFoundPage from "./pages/NotFoundPage";
 
 const ProtectedRoute = () => {
   const auth = useAuth();
@@ -60,6 +61,8 @@ const App = () => {
               />
             </Route>
           </Route>
+
+          <Route path="/*" element={<NotFoundPage />} />
         </Route>
       </>
     )

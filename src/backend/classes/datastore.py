@@ -13,7 +13,7 @@ DEFAULT_TAGS = [
     "Recently Updated"
 ]
 
-DEFAULT_ICON_PATH = "/static/imgs/default_icon0.png"
+DEFAULT_ICON_PATH = "static/imgs/default_icon.png"
 DEFAULT_ICON = Document('0', DEFAULT_ICON_PATH, 'image/png')
 
 schema = {
@@ -185,7 +185,7 @@ class Datastore:
             Returns with user obj base on given ID, or None if cannot find user
         '''
         for item in self.__store['docs']:
-            # print(item.get_id(), type(item.get_id()), eid, type(eid), item.get_id() == eid)
+            print(item.get_id(), type(item.get_id()), eid, type(eid), item.get_id() == eid)
             if item.get_id() == eid:
                 return item
 

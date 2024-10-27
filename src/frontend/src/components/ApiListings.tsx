@@ -21,11 +21,15 @@ const ApiListings: React.FC<ApiListingsProps> = ({
     const fetchApis = async () => {
       try {
         const data = isMyAPis ? await getMyApis() : await getApis(selectedTags);
-        console.log(data)
         setApis(data);
       } catch (error) {
         console.log("Error fetching data", error);
-        setError("Failed to load API data");
+        if (error instanceof Error && error.message === "Unauthorized") {
+          setError("Unauthorized")
+        }else{
+          setError("Failed to load API data");
+        }
+        
       } finally {
         setLoading(false);
       }

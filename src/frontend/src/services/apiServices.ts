@@ -1,38 +1,57 @@
-import { LoginModel, ServicePost, ServiceUpdate, TagData, UserCreate } from "../types/backendTypes";
+import { json } from "stream/consumers";
+import {
+  LoginModel,
+  ServiceIconInfo,
+  ServicePost,
+  ServiceUpdate,
+  ServiceUpload,
+  TagData,
+  UserCreate,
+} from "../types/backendTypes";
 import { Tag } from "../types/miscTypes";
-import { briefApiDataFormatter, detailedApiDataFormatter } from "../utils/dataFormatters";
+import {
+  briefApiDataFormatter,
+  detailedApiDataFormatter,
+} from "../utils/dataFormatters";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
 export const getApis = async (tags?: Tag[]) => {
-  const queryParams = tags && tags.length > 0 ? `?tags=${tags.join("&tags=")}` : "";
-  console.log(`${baseUrl}/service/filter${queryParams}`, {
-    method: "GET",
-  })
-  const res = await fetch(`${baseUrl}/service/filter${queryParams}`, {
+  const queryParams =
+    tags && tags.length > 0 ? `?tags=${tags.join("&tags=")}` : "";
+  const response = await fetch(`${baseUrl}/service/filter${queryParams}`, {
     method: "GET",
   });
-  const data = await res.json();
+  const data = await response.json();
   return data.map(briefApiDataFormatter);
 };
 
 export const getMyApis = async () => {
-  const res = await fetch(`${baseUrl}/service/my_services`, {
+  const response = await fetch(`${baseUrl}/service/my_services`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
     method: "GET",
   });
-  const data = await res.json();
+
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
+
+  const data = await response.json();
   return data;
 };
 
-export const getApi = async (id: number | string) => {
-  const res = await fetch(`${baseUrl}/service/get_service?sid=${id}`, {
+export const getApi = async (id: string) => {
+  const response = await fetch(`${baseUrl}/service/get_service?sid=${id}`, {
     method: "GET",
   });
-  const data = await res.json();
+  const data = await response.json();
+  if (response.status === 404) {
+    throw new Error("Service Not Found");
+  }
+
   return detailedApiDataFormatter(data);
 };
 
@@ -44,7 +63,7 @@ export const deleteApi = async (id: string) => {
 };
 
 export const addApi = async (service: ServicePost) => {
-  const res = await fetch(`${baseUrl}/service/add`, {
+  const response = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -52,12 +71,17 @@ export const addApi = async (service: ServicePost) => {
     },
     body: JSON.stringify(service),
   });
-  const data = await res.json();
+
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
+
+  const data = await response.json();
   return data.id;
 };
 
 export const updateApi = async (api: ServiceUpdate) => {
-  await fetch(`${baseUrl}/service/update`, {
+  const response = await fetch(`${baseUrl}/service/update`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -65,12 +89,16 @@ export const updateApi = async (api: ServiceUpdate) => {
     },
     body: JSON.stringify(api),
   });
+
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
   return;
 };
 
 /*        Auth Services       */
 export const userLogin = async (credentials: LoginModel) => {
-  const res = await fetch(`${baseUrl}/auth/login`, {
+  const response = await fetch(`${baseUrl}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -78,13 +106,13 @@ export const userLogin = async (credentials: LoginModel) => {
     body: JSON.stringify(credentials),
   });
 
-  if (!res.ok) {
-    const errorDetails = await res.text();
+  if (!response.ok) {
+    const errorDetails = await response.text();
     console.error("Error:", errorDetails);
-    throw new Error(`Request failed with status ${res.status}`);
+    throw new Error(`Request failed with status ${response.status}`);
   }
 
-  const data = await res.json();
+  const data = await response.json();
   return data.access_token;
 };
 
@@ -99,18 +127,17 @@ export const userRegister = async (user: UserCreate) => {
   return;
 };
 
-
 /*        Tag Services       */
 export const getTags = async () => {
-  const res = await fetch(`${baseUrl}/tags/get`, {
+  const response = await fetch(`${baseUrl}/tags/get`, {
     method: "GET",
   });
-  const data = await res.json();
+  const data = await response.json();
   return data.tags;
 };
 
 export const addTag = async (tag: TagData) => {
-  await fetch(`${baseUrl}/tag/add`, {
+  const response = await fetch(`${baseUrl}/tag/add`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -118,5 +145,80 @@ export const addTag = async (tag: TagData) => {
     },
     body: JSON.stringify(tag),
   });
+
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
   return;
 };
+
+/*        Image Services       */
+
+// Upload image to database
+export const uploadImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch(`${baseUrl}/upload/imgs`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await response.json();
+  return data.doc_id;
+};
+
+// Link icon with service
+export const apiAddIcon = async (info: ServiceIconInfo) => {
+  const response = await fetch(`${baseUrl}/service/add_icon`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(info),
+  });
+};
+
+export const apiGetIcon = async (sid: string) => {
+  const response = await fetch(`${baseUrl}/service/get/icon?sid=${sid}`, {
+    method: "GET",
+  });
+  const blob = await response.blob(); // Get the Blob data
+  const url = URL.createObjectURL(blob); // Create a URL for the Blob
+  return url
+};
+
+/*        Document Services       */
+
+// Upload service to database
+export const uploadPDF = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch(`${baseUrl}/upload/pdfs`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await response.json();
+  console.log(data)
+  return data.doc_id;
+}
+
+// Link service with documentation
+export const uploadDocs = async (info: ServiceUpload) => {
+  const response = await fetch(`${baseUrl}/service/upload_docs`, {
+    method: "POST",
+    headers: {  
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(info),
+  });
+}
+
+export const getDoc = async (doc_id: string) => {
+  const response = await fetch(`${baseUrl}/get/doc?doc_id=${doc_id}`, {
+    method: "GET",
+  });
+  const blob = await response.blob(); // Get the Blob data
+  const url = URL.createObjectURL(blob); // Create a URL for the Blob
+  return url
+}
