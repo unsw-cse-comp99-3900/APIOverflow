@@ -13,7 +13,7 @@ DEFAULT_TAGS = [
     "Recently Updated"
 ]
 
-DEFAULT_ICON_PATH = "/static/imgs/default_icon0.png"
+DEFAULT_ICON_PATH = "static/imgs/default_icon.png"
 DEFAULT_ICON = Document('0', DEFAULT_ICON_PATH, 'image/png')
 
 schema = {
