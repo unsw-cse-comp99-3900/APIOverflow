@@ -4,6 +4,7 @@ import ApiListing from "./ApiListing";
 import { getApis, getMyApis } from "../services/apiServices";
 import FetchStatus from "./FetchStatus";
 import { useSelectedTags } from "../contexts/SelectedTagsContext";
+import { useNavigate } from "react-router-dom";
 
 interface ApiListingsProps {
   isMyAPis: boolean;
@@ -16,6 +17,7 @@ const ApiListings: React.FC<ApiListingsProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { selectedTags} = useSelectedTags();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchApis = async () => {
@@ -24,6 +26,10 @@ const ApiListings: React.FC<ApiListingsProps> = ({
         setApis(data);
       } catch (error) {
         console.log("Error fetching data", error);
+        if (error instanceof Error && error.message === "Unauthorized") {
+          navigate('/login');
+          localStorage.removeItem("token");
+        }
         setError("Failed to load API data");
       } finally {
         setLoading(false);

@@ -95,7 +95,16 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
               type="button"
               className="rounded-full bg-white h-56 w-56 px-5 py-5 ring-2 ring-inset ring-gray-300 hover:bg-gray-50 flex justify-center items-center"
             >
-              <PhotoIcon className="h-32 w-32 text-gray-400" />
+              <label>
+                <PhotoIcon className="h-32 w-32 text-gray-400 cursor-pointer" />
+                <input
+                  id="file-upload"
+                  name="file-upload"
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                />
+              </label>
             </button>
           </div>
 
