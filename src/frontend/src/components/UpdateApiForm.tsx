@@ -14,7 +14,7 @@ import {
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { ServicePost, ServiceUpdate } from "../types/backendTypes";
-import { FaFilePdf, FaPlus, FaTrash } from "react-icons/fa";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import TagsOverlay from "./TagsOverlay";
 import { Tag } from "../types/miscTypes";
 import FileCard from "./FileCard";
@@ -60,7 +60,6 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
-      uploadPDF(e.target.files[0]); // Trigger upload immediately on selection
     }
   };
 
@@ -115,8 +114,9 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         });
       }
       if (selectedFile) {
+        console.log(selectedFile)
         const doc_id = await uploadPDF(selectedFile);
-        
+        console.log(doc_id);
         await uploadDocs({
           sid: apiId,
           doc_id,

@@ -48,8 +48,6 @@ export const getApi = async (id: string) => {
     method: "GET",
   });
   const data = await response.json();
-
-  console.log(data)
   if (response.status === 404) {
     throw new Error("Service Not Found");
   }
@@ -200,6 +198,7 @@ export const uploadPDF = async (file: File) => {
     body: formData,
   });
   const data = await response.json();
+  console.log(data)
   return data.doc_id;
 }
 
