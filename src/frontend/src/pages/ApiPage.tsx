@@ -33,7 +33,9 @@ const ApiPage: React.FC = () => {
         setIconURL(iconURL)
       } catch (error) {
         console.log("Error fetching data", error);
-        setError("Failed to load API data");
+        if (error instanceof Error) {
+          setError(error.message);
+        }
         toast.error("Error loading API data");
       } finally {
         setLoading(false);
@@ -81,7 +83,7 @@ const ApiPage: React.FC = () => {
               <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
                 <ApiReviews />
                 <ApiDescription api={api} />
-                <ApiDocs />
+                <ApiDocs doc_ids = {api.docs}/>
               </div>
             </div>
           )}

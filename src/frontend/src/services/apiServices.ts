@@ -48,6 +48,12 @@ export const getApi = async (id: string) => {
     method: "GET",
   });
   const data = await response.json();
+
+  console.log(data)
+  if (response.status === 404) {
+    throw new Error("Service Not Found");
+  }
+
   return detailedApiDataFormatter(data);
 };
 
@@ -187,7 +193,6 @@ export const apiGetIcon = async (sid: string) => {
 
 // Upload service to database
 export const uploadPDF = async (file: File) => {
-  console.log(file)
   const formData = new FormData();
   formData.append("file", file);
   const response = await fetch(`${baseUrl}/upload/pdfs`, {
@@ -208,4 +213,12 @@ export const uploadDocs = async (info: ServiceUpload) => {
     },
     body: JSON.stringify(info),
   });
+}
+
+export const getDoc = async (doc_id: string) => {
+  const response = await fetch(`${baseUrl}/service/get/doc?doc_id=${doc_id}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  return data;
 }

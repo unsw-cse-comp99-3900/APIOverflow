@@ -10,7 +10,7 @@ export interface BriefApi {
 }
 
 export type DetailedApi = BriefApi & {
-  documents: string[];
+  docs: string[];
   endpoint: string;
   reviews: Review[];
   upvotes: number;

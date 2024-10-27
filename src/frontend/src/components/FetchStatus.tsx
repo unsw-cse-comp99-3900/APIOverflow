@@ -21,6 +21,8 @@ const FetchStatus: React.FC<FetchStatusProps> = ({
     if (error === "Unauthorized") {
       localStorage.removeItem("token");
       navigate("/login");
+    } else if (error === "Service Not Found") {
+      navigate("/NotFound");
     }
   }, [error, navigate]);
   if (loading) {

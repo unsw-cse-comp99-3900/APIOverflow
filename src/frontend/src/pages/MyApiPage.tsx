@@ -34,10 +34,8 @@ const MyApiPage: React.FC = () => {
         setIconURL(iconURL)
       } catch (error) {
         console.log("Error fetching data", error);
-        if (error instanceof Error && error.message === "Unauthorized") {
-          setError("Unauthorized")
-        }else{
-          setError("Failed to load API data");
+        if (error instanceof Error) {
+          setError(error.message);
         }
         toast.error("Error loading API data");
       } finally {
@@ -101,7 +99,7 @@ const MyApiPage: React.FC = () => {
                 <ApiReviews />
                 <ApiDescription api={api} />{" "}
                 {/* Pass api only when it's not null */}
-                <ApiDocs />
+                <ApiDocs doc_ids = {api.docs}/>
               </div>
             </div>
           )}

@@ -17,6 +17,7 @@ import { ServicePost, ServiceUpdate } from "../types/backendTypes";
 import { FaFilePdf, FaPlus, FaTrash } from "react-icons/fa";
 import TagsOverlay from "./TagsOverlay";
 import { Tag } from "../types/miscTypes";
+import FileCard from "./FileCard";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const navigate = useNavigate();
@@ -340,16 +341,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                   </label>
                   {/* <p className="pl-1">or drag and drop</p>  Todo: Support drag and drop */}
 
-                  {selectedFile && (
-                    <div className="flex items-center mt-4 p-4 border border-gray-300 rounded-lg shadow-md bg-white">
-                      <FaFilePdf className="text-red-600 text-3xl mr-3" />
-                      <div>
-                        <p className="text-lg font-medium text-gray-800">
-                          {selectedFile.name}
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                  {selectedFile && FileCard({ fileName: selectedFile.name })}
                 </div>
                 <p className="text-xs leading-5 pt-1 text-gray-600">
                   PDF up to 10MB
