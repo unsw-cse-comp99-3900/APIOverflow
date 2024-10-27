@@ -217,6 +217,13 @@ async def api_get_reviews(sid: str, testing: bool = False):
         'reviews' : service_get_reviews_wrapper(sid, testing)
     } 
 
+@app.get("/get/doc")
+async def get_doc(doc_id: str):
+    '''
+        Endpoint which directly returns a file requested
+    '''
+    return get_doc_wrapper(doc_id)
+
 #####################################
 #   Review Paths
 #####################################

@@ -22,6 +22,8 @@ services:
       - 5001:5000
     environment:
       - MONGO_ENV=docker
+      - APP_HOST=localhost
+      - APP_PORT=5001
     depends_on:
       - mongodb
     links:
