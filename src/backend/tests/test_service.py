@@ -493,7 +493,7 @@ def test_update_api_documents(simple_user):
                         })
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['docs'] == ["static/docs/git_guide_1.pdf"]
+    assert response_info['docs'] == ["1"]
     database_object = db_get_service(sid)
 
     # path of file is accessible via get_service but internally
@@ -522,7 +522,7 @@ def test_update_api_documents(simple_user):
     assert response.status_code == SUCCESS
     response_info = response.json()
    
-    assert response_info['docs'] == ["static/docs/git_guide_1.pdf"]
+    assert response_info['docs'] == ["1"]
     database_object = db_get_service(sid)
     assert database_object['documents'] == [doc_id]
 

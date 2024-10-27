@@ -159,9 +159,6 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
     service = get_validate_service_id(sid)
     owner_id = service.get_owner()
     owner = data_store.get_user_by_id(owner_id)
-    doc_ids = service.get_docs()
-    docs = [data_store.get_doc_by_id(i) for i in doc_ids]
-    doc_paths = [i.get_path() for i in docs]
     return {
             'id' : service.get_id(),
             'name' : service.get_name(),
@@ -174,7 +171,7 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
             'icon_url': service.get_icon_url(),
             'tags' : service.get_tags(),
             'endpoint' : service.get_endpoint(),
-            'docs' : doc_paths,
+            'docs' : service.get_docs(),
             'icon' : service.get_icon()
     }
     
