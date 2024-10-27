@@ -34,7 +34,7 @@ APPLICATION_NAME = 'Gmail API Python Send Email'
 CLIENT_SECRET_FILE = os.path.join(current_dir, "secret.json")
 
 def get_credentials():
-    credential_dir = os.path.join(os.path.expanduser('~'), '.credentials')
+    credential_dir = os.path.join(current_dir, '.credentials')
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
     credential_path = os.path.join(credential_dir, 'api-overflow-gmail.json')
