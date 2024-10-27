@@ -238,7 +238,6 @@ def api_name_search(name) -> list:
             return_list.append(api)
     return return_list
 
-    
 async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
     '''
         Function which handles uploading docs to a service
@@ -264,7 +263,16 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
     # Add document to service
     service.add_docs([file.get_id()])
     db_add_document(sid, file.get_id())
+
+def get_doc_wrapper(doc_id: str) -> FileResponse:
+    '''
+        Wrapper which returns the given file
+    '''
+    doc = data_store.get_doc_by_id(doc_id)
+    if doc is None:
+        raise HTTPException(status_code=404, detail="No such document found")
     
+    return FileResponse(doc.get_path())
 
 def list_apis():
     return [api_into_json(api) for api in data_store.get_apis()]
@@ -400,7 +408,6 @@ def service_get_rating_wrapper(sid: str) -> dict[str, Union[int, float]]:
         raise HTTPException(status_code=404, detail="Service not found")
 
     return service.get_ratings()
-
 
 def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[str, str]]:
     '''
