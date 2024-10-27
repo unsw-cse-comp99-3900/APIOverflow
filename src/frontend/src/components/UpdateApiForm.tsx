@@ -149,12 +149,10 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
       if (selectedFile) {
         const doc_id = await uploadPDF(selectedFile);
-        console.log(`doc_id: ${doc_id}`);
         await uploadDocs({
           sid: newId,
           doc_id,
         });
-
       }
       navigate(`/profile/my-apis/${newId}`);
     }
