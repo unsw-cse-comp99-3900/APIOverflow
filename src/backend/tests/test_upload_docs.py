@@ -172,7 +172,7 @@ def test_no_perms(two_users):
     assert response.status_code == FORBIDDEN_ERROR
 
 
-# Success Cases (Cannot be tested)
+# Success Cases
 def test_successful_upload(two_users):
     '''
         Test whether upload is successful
@@ -184,8 +184,15 @@ def test_successful_upload(two_users):
     }
     response = client.post("/upload/pdfs", files=file)
     assert response.status_code == SUCCESS
- 
     doc_id = response.json()['doc_id']
+
+    response = client.get("/get/doc",
+                          params={
+                              'doc_id' : doc_id
+                          })
+    assert response.status_code == SUCCESS
+
+
     api_data = {
         'sid': data['sid'],
         'doc_id': doc_id
