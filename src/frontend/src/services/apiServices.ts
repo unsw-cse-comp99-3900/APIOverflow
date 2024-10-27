@@ -215,9 +215,10 @@ export const uploadDocs = async (info: ServiceUpload) => {
 }
 
 export const getDoc = async (doc_id: string) => {
-  const response = await fetch(`${baseUrl}/service/get/doc?doc_id=${doc_id}`, {
+  const response = await fetch(`${baseUrl}/get/doc?doc_id=${doc_id}`, {
     method: "GET",
   });
-  const data = await response.json();
-  return data;
+  const blob = await response.blob(); // Get the Blob data
+  const url = URL.createObjectURL(blob); // Create a URL for the Blob
+  return url
 }

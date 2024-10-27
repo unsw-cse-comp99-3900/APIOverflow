@@ -140,7 +140,6 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       const newId = await addApi(newApi);
       if (selectedImageData) {
         const doc_id = await uploadImage(selectedImageData);
-
         apiAddIcon({
           sid: newId,
           doc_id,

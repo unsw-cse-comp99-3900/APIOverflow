@@ -34,7 +34,6 @@ async def upload_file(file: UploadFile, path: str) -> str:
     
     finally:
         await file.close()
-        await f.close()
     
     return path
 

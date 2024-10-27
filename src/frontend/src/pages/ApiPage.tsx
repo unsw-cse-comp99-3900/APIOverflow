@@ -8,7 +8,6 @@ import Tag from "../components/Tag";
 import ApiReviews from "../components/ApiReviews";
 import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import ApiDescription from "../components/ApiDescription";
-import ApiDocs from "../components/ApiDocs";
 import BackButton from "../components/BackButton";
 
 const ApiPage: React.FC = () => {

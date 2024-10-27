@@ -11,39 +11,42 @@ interface ApiDescriptionProps {
 const ApiDescription: React.FC<ApiDescriptionProps> = ({ api }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [files, setFiles] = useState<File[]>([]);
-
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDocs = async () => {
       try {
-
-        const doc = await getDoc(api.docs[0]);
+        if (api.docs && api.docs.length > 0) {
+          const docURL = await getDoc(api.docs[0]);
+          setPdfUrl(docURL);
+        } else {
+          setError("No documentation available.");
+        }
       } catch (error) {
         console.log("Error fetching data", error);
         if (error instanceof Error) {
           setError(error.message);
         }
-        toast.error("Error loading API data");
+        toast.error("Error loading API documentation");
       } finally {
         setLoading(false);
       }
     };
 
     fetchDocs();
-  });
+  }, [api.docs]); // Only run when `api.docs` changes
 
   const textToCopy = api.endpoint;
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(textToCopy); // Write text to the clipboard
+      await navigator.clipboard.writeText(textToCopy);
       toast.success("Copied to clipboard!");
     } catch (err) {
       console.log("Failed to copy!");
+      toast.error("Failed to copy to clipboard");
     }
   };
 
-  
   return (
     <div className="w-2/3 bg-white rounded-2xl shadow-lg p-6">
       <h2 className="text-xl font-bold mb-4">Endpoint</h2>
@@ -56,14 +59,30 @@ const ApiDescription: React.FC<ApiDescriptionProps> = ({ api }) => {
           <FaRegCopy />
         </button>
       </div>
+
       <div className="border border-gray-100 w-full my-5"></div>
+
       <h2 className="text-xl font-bold mb-4">Description</h2>
       <p className="break-words text-justify">{api.description}</p>
 
-
       <div className="border border-gray-100 w-full my-5"></div>
+
       <h2 className="text-xl font-bold mb-4">Documentation</h2>
-      <p>Coming soon</p>
+      {loading ? (
+        <p>Loading documentation...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : pdfUrl ? (
+        <iframe
+          src={pdfUrl}
+          title="Documentation PDF"
+          width="100%"
+          height="600px"
+          className="border border-gray-300 rounded-lg"
+        ></iframe>
+      ) : (
+        <p>No documentation available</p>
+      )}
     </div>
   );
 };

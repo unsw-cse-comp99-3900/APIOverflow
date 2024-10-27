@@ -10,7 +10,6 @@ import DeleteApiButton from "../components/DeleteApiButton";
 import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import ApiReviews from "../components/ApiReviews";
 import ApiDescription from "../components/ApiDescription";
-import ApiDocs from "../components/ApiDocs";
 import BackButton from "../components/BackButton";
 
 const MyApiPage: React.FC = () => {
@@ -59,7 +58,7 @@ const MyApiPage: React.FC = () => {
       {/* Use FetchStatus for loading and error handling */}
       <FetchStatus loading={loading} error={error} data={api}>
         {api && (
-          <div className="px-10">
+          <div className="p-10">
             {/* Header Section */}
             <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
               <div className="flex items-center">
