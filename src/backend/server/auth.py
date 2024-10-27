@@ -52,7 +52,7 @@ def send_email(to_email: str, token: str, email_type: str = 'verification'):
     sender_email = "api.overflow6@gmail.com"
 
     if email_type == 'verification':
-        verification_link = f"http://localhost:8000/auth/verify-email/{token}"
+        verification_link = f"http://localhost:5000/auth/verify-email/{token}"
         subject = "Please Verify Your Email Address"
         msg_html = f"""
         Hi,<br/>
@@ -66,7 +66,7 @@ def send_email(to_email: str, token: str, email_type: str = 'verification'):
                     f"{verification_link}\nIf you did not create an account, please ignore this email.\nBest regards,\nAPI Overflow Team"
 
     elif email_type == 'password_reset':
-        reset_link = f"http://localhost:8000/auth/reset-password/{token}"
+        reset_link = f"http://localhost:5000/auth/reset-password/{token}"
         subject = "Password Reset Request"
         msg_html = f"""
         Hi,<br/>
