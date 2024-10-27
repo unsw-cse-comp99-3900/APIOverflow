@@ -1,4 +1,4 @@
-from typing import TypeVar
+from typing import TypeVar, List
 from fastapi import File, UploadFile, HTTPException
 from fastapi.responses import FileResponse
 from PIL import Image
@@ -65,3 +65,30 @@ def user_get_icon_wrapper(uid: str) -> FileResponse:
     icon_id = user.get_icon()
     icon = data_store.get_doc_by_id(icon_id)
     return FileResponse(icon.get_path())
+
+def user_get_reviews_wrapper(uid: str) -> List[dict[str, str]]:
+    '''
+        Wrapper which returns user's reviews
+    '''
+    # Grab user
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail="No such user found")
+
+    reviews = []
+    for rid in user.get_reviews():
+        review = data_store.get_review_by_id(rid)
+        reviews.append(review.to_json(brief=True))
+    return reviews
+
+def user_get_profile_wrapper(uid: str) -> dict[str, str]:
+    '''
+        Wrapper which returns profile information of user
+    '''
+
+    # Grab user
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail="No such user found")
+
+    return user.get_profile()
