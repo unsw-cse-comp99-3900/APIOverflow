@@ -1,4 +1,4 @@
-from typing import TypeVar
+from typing import TypeVar, List, Union
 from fastapi import File, UploadFile, HTTPException
 from fastapi.responses import FileResponse
 from PIL import Image
@@ -7,6 +7,8 @@ from urllib.error import HTTPError, URLError
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
+from src.backend.classes.models import ServiceReviewInfo
+from src.backend.classes.Review import Review, LIVE
 import re
 
 
@@ -340,3 +342,89 @@ def service_get_icon_wrapper(sid: str) -> FileResponse:
     icon_id = service.get_icon()
     icon = data_store.get_doc_by_id(icon_id)
     return FileResponse(icon.get_path())
+
+def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
+    '''
+        Wrapper which adds a review to a service
+    '''
+    data = info.model_dump()
+
+    # Grab server
+    sid = data['sid']
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Grab User
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check whether user attempting to review their own service
+    if service.get_owner() == user.get_id():
+         raise HTTPException(status_code=403, detail="Cannot review own service")
+
+    # Check whether user has already reviewed this service
+    for review in service.get_reviews():
+        if review in user.get_reviews():
+            raise HTTPException(status_code=403, detail="User already reviewed!")
+
+    # Validate Review
+    rating = data['rating']
+    title = data['title']
+    comment = data['comment']
+    if rating == '' or title == '' or comment == '':
+         raise HTTPException(status_code=400, detail="Rating/Title/Comment is empty")
+
+    if rating not in ['positive', 'negative']:
+         raise HTTPException(status_code=400, detail="Invalid rating given")
+
+    # Create and add review
+    review = Review(str(data_store.total_reviews()),
+                    user.get_id(),
+                    service.get_id(),
+                    title,
+                    rating,
+                    comment)
+    data_store.add_review(review)
+    service.add_review(review.get_id(), rating)
+    user.add_review(review.get_id())
+
+def service_get_rating_wrapper(sid: str) -> dict[str, Union[int, float]]:
+    '''
+        Wrapper which gets the rating of an existing service
+    '''
+    # Grab server
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+
+    return service.get_ratings()
+
+
+def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[str, str]]:
+    '''
+        Wrapper which grabs all reviews associated with the particular service
+    '''
+    # Grab server
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Grab reviews
+    reviews = []
+    for rid in service.get_reviews():
+        review = data_store.get_review_by_id(rid)
+        
+        # This should not trigger, but is there just in case
+        if review is None:
+            continue
+
+        # Ensure only live reviews are shown
+        if review.get_status() != LIVE and not testing:
+            continue
+
+        reviews.append(review.to_json())
+
+    return reviews
+
