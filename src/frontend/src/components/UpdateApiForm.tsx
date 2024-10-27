@@ -90,19 +90,27 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
       <form onSubmit={submitApiUpdate}>
         <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
+          
           <div className="col-span-full flex flex-col items-center py-6 mx-2">
             <button
               type="button"
               className="rounded-full bg-white h-56 w-56 px-5 py-5 ring-2 ring-inset ring-gray-300 hover:bg-gray-50 flex justify-center items-center"
             >
-              <label>
-                <PhotoIcon className="h-32 w-32 text-gray-400 cursor-pointer" />
+              <label className="flex items-center justify-center cursor-pointer">
+                <PhotoIcon className="h-32 w-32 text-gray-400" />
                 <input
                   id="file-upload"
                   name="file-upload"
                   type="file"
                   accept="image/*"
                   className="sr-only"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      console.log("Selected file:", file);
+                      // Add file upload logic here
+                    }
+                  }}
                 />
               </label>
             </button>
@@ -182,7 +190,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
           <div className="border border-gray-100 w-full my-3"></div>
           <div className="col-span-full">
             <label
-              htmlFor="apiName"
+              htmlFor="endpoint"
               className="block text-2xl font-semibold py-6 leading-6 text-blue-800"
             >
               Endpoint
