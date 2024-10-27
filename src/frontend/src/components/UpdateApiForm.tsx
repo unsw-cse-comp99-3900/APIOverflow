@@ -116,12 +116,14 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       }
       if (selectedFile) {
         const doc_id = await uploadPDF(selectedFile);
-        uploadDocs({
+        
+        await uploadDocs({
           sid: apiId,
           doc_id,
         });
       }
       navigate(`/profile/my-apis/${apiId}`);
+
       // Add new API
     } else {
       const newApi: ServicePost = {
@@ -138,6 +140,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       const newId = await addApi(newApi);
       if (selectedImageData) {
         const doc_id = await uploadImage(selectedImageData);
+
         apiAddIcon({
           sid: newId,
           doc_id,
@@ -146,10 +149,12 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
       if (selectedFile) {
         const doc_id = await uploadPDF(selectedFile);
-        uploadDocs({
+        console.log(`doc_id: ${doc_id}`);
+        await uploadDocs({
           sid: newId,
           doc_id,
         });
+
       }
       navigate(`/profile/my-apis/${newId}`);
     }

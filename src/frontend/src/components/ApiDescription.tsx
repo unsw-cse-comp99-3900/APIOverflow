@@ -19,7 +19,6 @@ const ApiDescription: React.FC<ApiDescriptionProps> = ({ api }) => {
       try {
 
         const doc = await getDoc(api.docs[0]);
-        console.log(doc)
       } catch (error) {
         console.log("Error fetching data", error);
         if (error instanceof Error) {
