@@ -4,10 +4,10 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from src.backend.classes.datastore import data_store
 from src.backend.classes.User import User
-from typing import Literal, TypeVar
+from typing import Literal, TypeVar, List
 from src.backend.database import *
 from src.backend.classes.Manager import manager
-
+from src.backend.classes.Review import LIVE, PENDING, REJECTED
 
 T = TypeVar("T")
 ADMIN = 'admin'
@@ -70,3 +70,20 @@ def get_all_users():
     users_json = [user.to_json() for user in users]
     return {"users": users_json, "user_count": data_store.num_users()}
     
+def admin_get_reviews_wrapper(status: str) -> List[dict[str, str]]:
+    '''
+        Wrapper which returns all reviews which are pending 
+    '''
+    reviews = []
+    statuses = [LIVE, PENDING, REJECTED]
+    if status not in statuses and status != '':
+        raise HTTPException(status_code=400, detail='Unknown status given')
+    
+    if status != '':
+        statuses = [status]
+
+    for review in data_store.get_reviews():
+        if review.get_status() in statuses:
+            reviews.append(review.to_json(brief=True))
+    
+    return reviews

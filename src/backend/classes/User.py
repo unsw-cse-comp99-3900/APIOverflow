@@ -22,6 +22,7 @@ class User:
             icon:       ID of image file serving as user's icon
             ---
             following:  List of services/users user is following
+            reviews:    List of reviews the user has posted
     
     '''
 
@@ -46,8 +47,10 @@ class User:
         # Default vars
         self._following = []
         self._num_following = 0
-        self._icon = None
+        self._icon = DEFAULT_ICON
         self._is_verified = False
+        self._reviews = []
+        self._num_reviews = 0
     
     ################################
     #   Add Methods
@@ -58,6 +61,13 @@ class User:
         '''
         self._following.append(uid)
         self._num_following += 1
+
+    def add_review(self, rid: str) -> None:
+        '''
+            Adds a review to the user's list
+        '''
+        self._reviews.append(rid)
+        self._num_reviews += 1
 
     ################################
     #  Modify Methods
@@ -120,6 +130,13 @@ class User:
         '''
         self._icon = DEFAULT_ICON
 
+    def remove_review(self, rid: str) -> None:
+        '''
+            Removes a review from the user's list
+        '''
+        self._reviews.remove(rid)
+        self._num_reviews -= 1
+
     ################################
     #  Get Methods
     ################################
@@ -146,7 +163,7 @@ class User:
             Return user password
         '''
         return self._password
-    
+
     def get_icon_url(self) -> str:
         '''
             Return icon url of user
@@ -189,6 +206,22 @@ class User:
         '''
         return self._is_verified
     
+    def get_reviews(self) -> List[str]:
+        '''
+            Return list of reviews
+        '''
+        return self._reviews
+    
+    def get_profile(self) -> dict[str, str]:
+        '''
+            Returns profile info of user
+        '''
+        return {
+            'email': self._email,
+            'username': self._name,
+            'icon': self._icon
+        }
+
     ################################
     #  Storage Methods
     ################################
@@ -205,5 +238,7 @@ class User:
             'is_admin' : self._is_admin,
             'is_super' : self._is_super,
             'following' : self._following,
-            'is_verified': self._is_verified
+            'is_verified': self._is_verified,
+            'reviews': self._reviews,
+            'icon' : self._icon
         }
