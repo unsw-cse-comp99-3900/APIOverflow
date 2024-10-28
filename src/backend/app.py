@@ -444,10 +444,17 @@ async def user_get_reviews(user: User=Depends(manager)):
         'reviews' : user_get_reviews_wrapper(user['id'])
     }
 
+@app.get("/user/get/profile")
+async def user_get_profile(user: User = Depends(manager)):
+    '''
+        Endpoint which retrieves profile information of user
+    '''
+    return user_get_profile_wrapper(user['id'])
+
 @app.delete("/user/delete/me")
 async def delete_user_self(user: User = Depends(manager)):
     '''
-        Endpoint which retrieves profile information of user
+        Endpoint which allows the user to un-register themselves
     '''
     return user_self_delete(user['id'])
 
