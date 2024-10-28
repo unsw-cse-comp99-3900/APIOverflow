@@ -469,6 +469,13 @@ async def user_get_profile(user: User = Depends(manager)):
     '''
     return user_get_profile_wrapper(user['id'])
 
+@app.delete("/user/delete/me")
+async def delete_user_self(user: User = Depends(manager)):
+    '''
+        Endpoint which allows the user to un-register themselves
+    '''
+    return user_self_delete(user['id'])
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host='0.0.0.0', port=5000)

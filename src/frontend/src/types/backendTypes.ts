@@ -1,3 +1,5 @@
+import { Rating } from "./miscTypes";
+
 export interface ServicePost {
     name: string;
     icon_url: string;
@@ -41,4 +43,11 @@ export interface ServiceIconInfo {
 export interface ServiceUpload {
     sid: string;
     doc_id: string;
+}
+
+export interface ServiceReviewInfo {
+    sid: string;
+    rating: Rating;
+    title: string;
+    comment: string;
 }

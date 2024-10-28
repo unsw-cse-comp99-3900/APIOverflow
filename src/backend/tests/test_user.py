@@ -106,3 +106,38 @@ def test_user_profile_success_custom_icon(simple_user):
     assert response.json()['email'] == data['email']
     assert response.json()['username'] == data['username'] 
     assert response.json()['icon'] == '1'
+
+def test_user_delete_self(simple_user):
+    data = simple_user
+    response = client.delete("/user/delete/me", 
+                        headers={"Authorization": f"Bearer {data['token']}"})
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": data['username'] , "deleted": True}
+
+    response = client.delete("/user/delete/me", 
+                        headers={"Authorization": f"Bearer {data['token']}"})
+    assert response.status_code == AUTHENTICATION_ERROR
+
+    response = client.post("/auth/login", json={
+        "username": data['username'],
+        "password": "password"
+    })
+    assert response.status_code == INPUT_ERROR
+
+    response = client.post("/auth/register", json={
+        "username": data['username'],
+        "password": "password",
+        "email" : "doxxed@gmail.com"
+    })
+    assert response.status_code == SUCCESS
+    response = client.post("/auth/login", json={
+        "username": data['username'],
+        "password": "password"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.delete("/user/delete/me", 
+                        headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": data['username'] , "deleted": True}

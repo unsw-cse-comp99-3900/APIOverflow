@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import Spinner from "./Spinner";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 interface FetchStatusProps {
   loading: boolean;
@@ -16,10 +17,12 @@ const FetchStatus: React.FC<FetchStatusProps> = ({
   children,
 }) => {
   const navigate = useNavigate();
+  const auth = useAuth();
 
+  const { logout } = auth!;
   useEffect(() => {
     if (error === "Unauthorized") {
-      localStorage.removeItem("token");
+      logout()
       navigate("/login");
     } else if (error === "Service Not Found") {
       navigate("/NotFound");
