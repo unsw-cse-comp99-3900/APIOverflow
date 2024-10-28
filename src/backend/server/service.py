@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse
 from PIL import Image
 import urllib.request
 from urllib.error import HTTPError, URLError
+from src.backend.classes.Service import ServiceStatus
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
@@ -67,13 +68,6 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
     if x_start < 0 or y_start < 0 or x_start > x_end or y_start > y_end:
         raise HTTPException(status_code=400,
                             detail="Invalid X/Y dimensions")
-
-    # Handle custom image
-    # TODO
-    #   Shrink images instead of cropping
-    #   Impose some sort of icon limit 
-
-    #image stuff left here for now until updated in next sprint
 
     if img_url != '':
         internal_url = f"{IMAGE_PATH}/image{data_store.num_imgs()}.jpg"
@@ -188,7 +182,7 @@ def api_into_json(api) -> dict:
 
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
-def api_tag_filter(tags, providers) -> list:
+def api_tag_filter(tags, providers, hide_pending: bool) -> list:
 
     api_list = data_store.get_apis()
     filtered_apis = []
@@ -220,18 +214,25 @@ def api_tag_filter(tags, providers) -> list:
         for api in filtered_apis:
             for provider in providers:
                 if provider in api.get_owner() and api not in return_list:
-                    return_list.append(api_into_json(api))
+                    return_list.append(api)
                     break
     else:
-        return [api_into_json(api) for api in filtered_apis]
-    return return_list
+        return_list = [api for api in filtered_apis]
+    
+    
+    return [api_into_json(api) for api in return_list if
+            api.get_status() == ServiceStatus.LIVE or
+            (not hide_pending and api.get_status() == ServiceStatus.PENDING)
+            ]
 
 # returns a list of regex matching services 
-def api_name_search(name) -> list: 
+def api_name_search(name, hide_pending: bool) -> list: 
     api_list = data_store.get_apis()
     return_list = []
     for api in api_list:
-        if re.search(name, api.get_name(), re.IGNORECASE) and api.get_status() == "LIVE":
+        if re.search(name, api.get_name(), re.IGNORECASE) and (api.get_status() == ServiceStatus.LIVE
+            or api.get_status() == ServiceStatus.PENDING and not hide_pending
+        ):
             return_list.append(api)
     return return_list
 
@@ -271,8 +272,11 @@ def get_doc_wrapper(doc_id: str) -> FileResponse:
     
     return FileResponse(doc.get_path())
 
-def list_apis():
-    return [api_into_json(api) for api in data_store.get_apis()]
+def list_pending_apis():
+    return [api_into_json(api) for api in data_store.get_apis() if api.get_status() == ServiceStatus.PENDING]
+
+def list_nonpending_apis():
+    return [api_into_json(api) for api in data_store.get_apis() if api.get_status == ServiceStatus.LIVE]
 
 def delete_service(sid: str):
     if sid == '':

@@ -1,9 +1,14 @@
 from typing import *
+from enum import Enum
+
+class ServiceStatus(Enum):
+    LIVE = 0
+    PENDING = 1
+    REJECTED = 2
 
 T = TypeVar("T")
 K = TypeVar("K")
 DEFAULT_ICON = '0'
-
 class Service:
 
     '''
@@ -68,7 +73,7 @@ class Service:
         self._upvotes = 0
         self._downvotes = 0
         # NEED TO CHANGE THIS TO PENDING INITIALISATION WHEN IMPLEMENTING ADMIN
-        self._status = "LIVE"
+        self._status = ServiceStatus.PENDING
         self._icon = icon
     
     ################################
@@ -248,7 +253,7 @@ class Service:
         '''
         return self._docs
     
-    def get_status(self) -> str:
+    def get_status(self) -> ServiceStatus:
         '''
             Returns status of service
         '''

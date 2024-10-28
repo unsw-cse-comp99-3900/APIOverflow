@@ -282,6 +282,14 @@ def test_create_api(simple_user):
     assert database_object['tags'] == api_info['tags']
     assert database_object['endpoint'] == api_info['endpoint']
 
+    # check that api is not live and is currently not searchable
+    response = client.get("/service/filter",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                          })
+    assert response.status_code == SUCCESS
+    assert len(response.json()) == 0
+
 def test_multiple_tags(simple_user):
     '''
         Test whether an API is correctly created where it has multiple tags

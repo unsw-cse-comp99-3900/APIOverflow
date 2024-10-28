@@ -129,7 +129,7 @@ async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
 
 @app.get("/service/apis")
 async def view_apis():
-    return list_apis()
+    return list_nonpending_apis()
 
 @app.post("/service/upload_docs")
 async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
@@ -155,15 +155,17 @@ async def get_user_apis(user: User = Depends(manager)):
 @app.get("/service/filter")
 async def filter(
     tags: Optional[List[str]] = Query(None), 
-    providers: Optional[List[str]] = Query(None)
+    providers: Optional[List[str]] = Query(None),
+    hide_pending: bool = True
 ):
-    return api_tag_filter(tags, providers)
+    return api_tag_filter(tags, providers, hide_pending)
 
 @app.get("/service/search")
 async def search(
     name: Optional[str] = Query(None),
+    hide_pending: bool = True,
 ):
-    return api_name_search(name)
+    return api_name_search(name, hide_pending)
 
 @app.delete("/service/delete")
 async def delete_api(sid: str):
