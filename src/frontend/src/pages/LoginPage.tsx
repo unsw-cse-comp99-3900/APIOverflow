@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation  } from "react-router-dom";
 
 // Import the blob SVG
 import Blob1 from "../assets/images/blobs/blob1.svg";
@@ -9,12 +9,14 @@ import { userLogin } from "../services/apiServices";
 import { LoginModel } from "../types/backendTypes";
 
 const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const auth = useAuth();
+  const location = useLocation();
+  const [username, setUsername] = useState(location.state ? location.state.username : "");
+  const [password, setPassword] = useState(location.state ? location.state.password : "");
   const [error, setError] = useState("");
+  const [warning, setWarning] = useState(location.state ? location.state.warning : "");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const auth = useAuth();
 
   const { login } = auth!;
 
@@ -79,7 +81,9 @@ const LoginPage: React.FC = () => {
                 className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
                 placeholder="Enter your username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setWarning("");
+                  setUsername(e.target.value)}}
                 required
               />
             </div>
@@ -98,11 +102,13 @@ const LoginPage: React.FC = () => {
                 className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
                 placeholder="Enter your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setWarning("");
+                  setPassword(e.target.value)}}
                 required
               />
             </div>
-
+            {warning && <p className="text-red-500 pb-3 text-sm">{warning}</p>}
             {isLoading ? (
               <div className="flex flex-col items-center text-center">
                 <div
@@ -126,6 +132,7 @@ const LoginPage: React.FC = () => {
               </Link>
             </div>
           </form>
+          
         </div>
       </div>
     </div>
