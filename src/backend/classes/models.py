@@ -101,5 +101,10 @@ class ServiceReviewAdminAction(BaseModel):
     rid: str
     reason: str
 
+class ServiceApprove(BaseModel):
+    sid: str
+    approved: bool
+    reason: str
+
 class AdminGetReviews(BaseModel):
     option: str = ''

@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse
 from PIL import Image
 import urllib.request
 from urllib.error import HTTPError, URLError
+from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
@@ -68,13 +69,6 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
         raise HTTPException(status_code=400,
                             detail="Invalid X/Y dimensions")
 
-    # Handle custom image
-    # TODO
-    #   Shrink images instead of cropping
-    #   Impose some sort of icon limit 
-
-    #image stuff left here for now until updated in next sprint
-
     if img_url != '':
         internal_url = f"{IMAGE_PATH}/image{data_store.num_imgs()}.jpg"
         try:
@@ -133,7 +127,8 @@ def update_service_wrapper(packet: dict[T, K], user: str) -> None:
     validate_api_fields(packet)
 
     # service is ref to API Obj in data store which gets updated
-    service.update_api_details(packet["name"], packet["description"], packet["tags"], packet["endpoint"])
+    service.create_pending_update(
+        packet["name"], packet["description"], packet["tags"], packet["endpoint"])
     
     db_update_service(sid, service.to_json())
     return None
@@ -172,7 +167,9 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
             'tags' : service.get_tags(),
             'endpoint' : service.get_endpoint(),
             'docs' : service.get_docs(),
-            'icon' : service.get_icon()
+            'icon' : service.get_icon(),
+            'status' : service.get_status().name,
+            'status_reason' : service.get_status_reason()
     }
     
 # function to match vincent's format, the one above is sid instead of id
@@ -188,7 +185,7 @@ def api_into_json(api) -> dict:
 
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
-def api_tag_filter(tags, providers) -> list:
+def api_tag_filter(tags, providers, hide_pending: bool) -> list:
 
     api_list = data_store.get_apis()
     filtered_apis = []
@@ -220,18 +217,26 @@ def api_tag_filter(tags, providers) -> list:
         for api in filtered_apis:
             for provider in providers:
                 if provider in api.get_owner() and api not in return_list:
-                    return_list.append(api_into_json(api))
+                    return_list.append(api)
                     break
     else:
-        return [api_into_json(api) for api in filtered_apis]
-    return return_list
+        return_list = [api for api in filtered_apis]
+    
+    
+    return [api_into_json(api) for api in return_list if
+            api.get_status().name in LIVE_OPTIONS or 
+            (not hide_pending and api.get_status() == ServiceStatus.PENDING)
+            ]
 
 # returns a list of regex matching services 
-def api_name_search(name) -> list: 
+def api_name_search(name, hide_pending: bool) -> list: 
     api_list = data_store.get_apis()
     return_list = []
     for api in api_list:
-        if re.search(name, api.get_name(), re.IGNORECASE) and api.get_status() == "LIVE":
+        if re.search(name, api.get_name(), re.IGNORECASE) and (
+            api.get_status().name in LIVE_OPTIONS or
+            api.get_status() == ServiceStatus.PENDING and not hide_pending
+        ):
             return_list.append(api)
     return return_list
 
@@ -271,8 +276,11 @@ def get_doc_wrapper(doc_id: str) -> FileResponse:
     
     return FileResponse(doc.get_path())
 
-def list_apis():
-    return [api_into_json(api) for api in data_store.get_apis()]
+def list_pending_apis():
+    return [api_into_json(api) for api in data_store.get_apis() if api.get_status() == ServiceStatus.PENDING]
+
+def list_nonpending_apis():
+    return [api_into_json(api) for api in data_store.get_apis() if api.get_status == ServiceStatus.LIVE]
 
 def delete_service(sid: str):
     if sid == '':
@@ -432,3 +440,19 @@ def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[st
 
     return reviews
 
+def approve_service_wrapper(sid: str, approved: bool, reason: str):
+
+    service = data_store.get_api_by_id(sid)
+
+    if service is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    if approved:
+        service.complete_update()
+        service.update_status(ServiceStatus.LIVE, reason)
+        db_update_service(sid, service.to_json())
+    elif service.get_status() == ServiceStatus.PENDING:
+        service.update_status(ServiceStatus.REJECTED, reason)
+    elif service.get_status() == ServiceStatus.UPDATE_PENDING:
+        service.update_status(ServiceStatus.UPDATE_REJECTED, reason)
+        

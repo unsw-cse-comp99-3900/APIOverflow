@@ -123,13 +123,13 @@ async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
 
     request = service.model_dump()
     uid = user['id']
-    # should this return any additional info?
+   
     update_service_wrapper(request, str(uid))
     return None
 
 @app.get("/service/apis")
 async def view_apis():
-    return list_apis()
+    return list_nonpending_apis()
 
 @app.post("/service/upload_docs")
 async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
@@ -155,15 +155,17 @@ async def get_user_apis(user: User = Depends(manager)):
 @app.get("/service/filter")
 async def filter(
     tags: Optional[List[str]] = Query(None), 
-    providers: Optional[List[str]] = Query(None)
+    providers: Optional[List[str]] = Query(None),
+    hide_pending: bool = True
 ):
-    return api_tag_filter(tags, providers)
+    return api_tag_filter(tags, providers, hide_pending)
 
 @app.get("/service/search")
 async def search(
     name: Optional[str] = Query(None),
+    hide_pending: bool = True,
 ):
-    return api_name_search(name)
+    return api_name_search(name, hide_pending)
 
 @app.delete("/service/delete")
 async def delete_api(sid: str):
@@ -402,6 +404,22 @@ async def admin_get_reviews(option: str = '', user: User = Depends(manager), rol
     return {
         'reviews': admin_get_reviews_wrapper(option)
     }
+
+@app.get("/admin/get/services")
+async def admin_get_services(option: str = "ALL_PENDING", user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint which retrieves all pending services
+    '''
+    return {
+        'services' : admin_get_pending_services(option)
+    }
+
+@app.post("/admin/service/approve")
+async def admin_service_approve(info: ServiceApprove, user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint which approves or disapproves a service
+    '''
+    approve_service_wrapper(info.sid, info.approved, info.reason)
 
 #####################################
 #   User Paths
