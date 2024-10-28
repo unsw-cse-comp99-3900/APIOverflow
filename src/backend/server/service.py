@@ -127,7 +127,9 @@ def update_service_wrapper(packet: dict[T, K], user: str) -> None:
     validate_api_fields(packet)
 
     # service is ref to API Obj in data store which gets updated
-    service.update_api_details(packet["name"], packet["description"], packet["tags"], packet["endpoint"])
+    service.update_status(ServiceStatus.PENDING, "")
+    service.create_pending_update(
+        packet["name"], packet["description"], packet["tags"], packet["endpoint"])
     
     db_update_service(sid, service.to_json())
     return None
@@ -166,7 +168,9 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
             'tags' : service.get_tags(),
             'endpoint' : service.get_endpoint(),
             'docs' : service.get_docs(),
-            'icon' : service.get_icon()
+            'icon' : service.get_icon(),
+            'status' : service.get_status().name,
+            'status_reason' : service.get_status_reason()
     }
     
 # function to match vincent's format, the one above is sid instead of id
@@ -436,3 +440,17 @@ def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[st
 
     return reviews
 
+def approve_service_wrapper(sid: str, approved: bool, reason: str):
+
+    service = data_store.get_api_by_id(sid)
+
+    if service is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    if approved:
+        service.update_status(ServiceStatus.LIVE, reason)
+        service.complete_update()
+    
+        db_update_service(sid, service.to_json())
+    else:
+        service.update_status(ServiceStatus.REJECTED, reason)

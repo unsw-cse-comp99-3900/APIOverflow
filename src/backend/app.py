@@ -123,7 +123,7 @@ async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
 
     request = service.model_dump()
     uid = user['id']
-    # should this return any additional info?
+   
     update_service_wrapper(request, str(uid))
     return None
 
@@ -404,6 +404,22 @@ async def admin_get_reviews(option: str = '', user: User = Depends(manager), rol
     return {
         'reviews': admin_get_reviews_wrapper(option)
     }
+
+@app.get("/admin/get/services")
+async def admin_get_services(option: str = '', user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint which retrieves all pending services
+    '''
+    return {
+        'services' : admin_get_pending_services(option)
+    }
+
+@app.post("/admin/service/approve")
+async def admin_service_approve(info: ServiceApprove, user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint which approves or disapproves a service
+    '''
+    approve_service_wrapper(info.sid, info.approved, info.reason)
 
 #####################################
 #   User Paths

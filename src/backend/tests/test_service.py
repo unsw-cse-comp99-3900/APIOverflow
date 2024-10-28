@@ -7,6 +7,7 @@ from src.backend.classes import Service
 from src.backend.app import app
 from src.backend.classes.models import User
 from src.backend.database import *
+from src.backend.classes.Service import ServiceStatus
 
 
 # Create a test client
@@ -364,63 +365,6 @@ def test_custom_icon(simple_user):
     assert response_info['tags'] == api_info['tags']
     assert response_info['endpoint'] == api_info['endpoint']
 
-def test_update_api(simple_user):
-    '''
-        Test whether an API is correctly created then updated
-    '''
-    api_info = {
-                'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
-                'description' : 'This is a test API',
-                'tags' : ['API'],
-                'endpoint': 'https://api.example.com/users/12345'
-                }
-
-    response = client.post("/service/add",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api_info)
-    assert response.status_code == SUCCESS
-    sid = response.json()['id']
-
-    update_request_info = {
-        'sid' : sid,
-        'name' : 'new name',
-        'description' : 'new description',
-        'tags' : ['new', 'tag'],
-        'endpoint': 'https://api.example.com/users/12345'
-    }
-
-    response = client.put("/service/update",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=update_request_info)
-    assert response.status_code == SUCCESS
-    
-    response = client.get("/service/get_service",
-                          headers={"Authorization": f"Bearer {simple_user['token']}"},
-                          params={
-                              'sid' : sid
-                          })
-    
-    assert response.status_code == SUCCESS
-    response_info = response.json()
-   
-    assert response_info['id'] == sid
-    assert response_info['name'] == update_request_info['name']
-    assert response_info['description'] == update_request_info['description']
-    assert response_info['tags'] == update_request_info['tags']
-    assert response_info['endpoint'] == update_request_info['endpoint']
-
-    database_object = db_get_service(sid)
-    assert database_object['id'] == sid
-    assert database_object['name'] == update_request_info['name']
-    assert database_object['description'] == update_request_info['description']
-    assert database_object['tags'] == update_request_info['tags']
-    assert database_object['endpoint'] == update_request_info['endpoint']
-
 def test_update_api_invalid_sid(simple_user):
     '''
         Tests error received when sid is not valid
@@ -735,3 +679,317 @@ def test_get_apis(simple_user):
     assert response_info['name'] == api_info2['name']
     assert response_info['description'] == api_info2['description']
     assert response_info['tags'] == api_info2['tags']
+
+
+
+def test_admin_get_pending_services(simple_user):
+    api_info = {
+                'name' : 'Test API 1',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API 1',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/1'
+                }
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+    sid = response.json()['id']
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+
+    response = client.get("/admin/get/services",
+                          headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+    response_info = response.json()["services"]
+    
+
+    assert len(response_info) == 1
+    assert response_info[0]['id'] == sid
+    assert response_info[0]['name'] == api_info['name']
+    assert response_info[0]['description'] == api_info['description']
+    assert response_info[0]['tags'] == api_info['tags']
+    assert response_info[0]['endpoint'] == api_info['endpoint']
+
+def test_admin_approve(simple_user):
+    api_info = {
+                'name' : 'Test API 1',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API 1',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/1'
+                }
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+    sid = response.json()['id']
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+    reason = 'very pog service'
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': reason,
+                                'approved': True
+                            })
+
+    response = client.get("/admin/get/services",
+                          headers={"Authorization": f"Bearer {access_token}"},
+                          params={
+                              'option': 'PENDING'
+                          })
+    assert response.status_code == SUCCESS
+    response_info = response.json()["services"]
+    assert len(response_info) == 0
+
+    response = client.get("/service/filter",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                          })
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+
+    assert response_info[0]['id'] == sid
+    assert response_info[0]['name'] == api_info['name']
+    assert response_info[0]['description'] == api_info['description']
+    assert response_info[0]['tags'] == api_info['tags']
+
+    response = client.get("/service/get_service",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        params={
+                            'token' : simple_user['token'],
+                            'sid' : sid
+                        })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    assert response_info['status'] == "LIVE"
+    assert response_info['status_reason'] == reason
+
+
+def test_admin_disapprove(simple_user):
+    api_info = {
+                'name' : 'Test API 1',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API 1',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/1'
+                }
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+    sid = response.json()['id']
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+    reason = 'very unpog service'
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': reason,
+                                'approved': False
+                            })
+
+    response = client.get("/admin/get/services",
+                          headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+    response_info = response.json()["services"]
+    assert len(response_info) == 1
+
+    response = client.get("/service/filter",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                          })
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    assert len(response_info) == 0
+
+    response = client.get("/service/get_service",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        params={
+                            'token' : simple_user['token'],
+                            'sid' : sid
+                        })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    assert response_info['status'] == "REJECTED"
+    assert response_info['status_reason'] == reason
+
+
+def test_update_api(simple_user):
+    '''
+        Test whether an API is correctly created then updated
+    '''
+    api_info = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoint': 'https://api.example.com/users/12345'
+                }
+    
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+    sid = response.json()['id']
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True
+                            })
+
+    update_request_info = {
+        'sid' : sid,
+        'name' : 'new name',
+        'description' : 'new description',
+        'tags' : ['new', 'tag'],
+        'endpoint': 'https://api.example.com/users/12345'
+    }
+
+    response = client.put("/service/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_request_info)
+    assert response.status_code == SUCCESS
+
+    # make sure pending update so details have not yet changed and status is pending
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+   
+    assert response_info['id'] == sid
+    assert response_info['name'] == api_info['name']
+    assert response_info['description'] == api_info['description']
+    assert response_info['tags'] == api_info['tags']
+    assert response_info['endpoint'] == api_info['endpoint']
+    assert response_info['status'] == "PENDING"
+
+    reason = 'unpog service'
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': reason,
+                                'approved': False
+                            })
+    
+    # check after rejection details have not changed
+
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+   
+    assert response_info['id'] == sid
+    assert response_info['name'] == api_info['name']
+    assert response_info['description'] == api_info['description']
+    assert response_info['tags'] == api_info['tags']
+    assert response_info['endpoint'] == api_info['endpoint']
+    assert response_info['status'] == "REJECTED"
+    assert response_info['status_reason'] == reason
+
+
+    response = client.put("/service/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_request_info)
+    assert response.status_code == SUCCESS
+
+    reason = "pog service"
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': reason,
+                                'approved': True
+                            })
+
+
+    # now approved, so check details have properly changed and status is LIVE
+    
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+   
+    assert response_info['id'] == sid
+    assert response_info['name'] == update_request_info['name']
+    assert response_info['description'] == update_request_info['description']
+    assert response_info['tags'] == update_request_info['tags']
+    assert response_info['endpoint'] == update_request_info['endpoint']
+    assert response_info['status'] == "LIVE"
+    assert response_info['status_reason'] == reason
+
+    database_object = db_get_service(sid)
+    assert database_object['id'] == sid
+    assert database_object['name'] == update_request_info['name']
+    assert database_object['description'] == update_request_info['description']
+    assert database_object['tags'] == update_request_info['tags']
+    assert database_object['endpoint'] == update_request_info['endpoint']

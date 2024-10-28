@@ -25,13 +25,3 @@ class API(Service):
             Returns 'api'
         '''
         return self._type
-
-    def update_api_details(self,
-                 name: str,
-                 description: str,
-                 tags: List[str],
-                 endpoint: str):
-        self._name = name
-        self._description = description
-        self._tags = tags
-        self._endpoint = endpoint

@@ -8,6 +8,7 @@ from typing import Literal, TypeVar, List
 from src.backend.database import *
 from src.backend.classes.Manager import manager
 from src.backend.classes.Review import LIVE, PENDING, REJECTED
+from src.backend.classes.Service import STATUS_STRINGS
 
 T = TypeVar("T")
 ADMIN = 'admin'
@@ -87,3 +88,24 @@ def admin_get_reviews_wrapper(status: str) -> List[dict[str, str]]:
             reviews.append(review.to_json(brief=True))
     
     return reviews
+
+def admin_get_pending_services(status: str) -> List[dict[str, str]]:
+    '''
+        Wrapper which returns all reviews which are pending 
+    '''
+    services = []
+    if status not in STATUS_STRINGS and status != '':
+        raise HTTPException(status_code=400, detail='Unknown status given')
+    
+    if status == '':
+        # default
+        statuses = STATUS_STRINGS
+    else:
+        statuses = [status]
+
+    for service in data_store.get_apis():
+        if service.get_status().name in statuses:
+            services.append(service.to_json())
+    
+    return services
+

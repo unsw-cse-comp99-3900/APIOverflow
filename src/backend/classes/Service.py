@@ -2,13 +2,44 @@ from typing import *
 from enum import Enum
 
 class ServiceStatus(Enum):
-    LIVE = 0
-    PENDING = 1
-    REJECTED = 2
+    LIVE = ""
+    PENDING = 0
+    REJECTED = -1
+
+STATUS_STRINGS = ["LIVE", "PENDING", "REJECTED"]
 
 T = TypeVar("T")
 K = TypeVar("K")
 DEFAULT_ICON = '0'
+
+
+      
+class ServicePendingUpdate:
+
+    def __init__(self,
+                 name: str,
+                 description: str, 
+                 tags: List[str],
+                 endpoint: str):
+        self._name = name
+        self._description = description
+        self._tags = tags
+        self._endpoint = endpoint
+
+    def get_name(self) -> str:
+        return self._name
+    
+    def get_description(self) -> str:
+        return self._description
+    
+    def get_tags(self) -> List[str]:
+        return self._tags
+    
+    def get_endpoint(self) -> str:
+        return self._endpoint
+    
+
+
 class Service:
 
     '''
@@ -37,7 +68,9 @@ class Service:
         downvotes:      Number of downvotes given to service
         type:           Type of service ['api', 'micro']
         status:         Status of service [LIVE, PENDING, REJECTED]
+        status_reason:  Reason for status
         reviews:        List of reviews (rid)
+        pending_update:  Pending update Details when waiting to approve an update
 
     '''
 
@@ -72,8 +105,10 @@ class Service:
         self._review_count = 0
         self._upvotes = 0
         self._downvotes = 0
-        # NEED TO CHANGE THIS TO PENDING INITIALISATION WHEN IMPLEMENTING ADMIN
+        self._pending_update = None
+
         self._status = ServiceStatus.PENDING
+        self._status_reason = ""
         self._icon = icon
     
     ################################
@@ -153,6 +188,26 @@ class Service:
             Update service icon
         '''
         self._icon = doc_id
+    
+    def update_status(self, status: ServiceStatus, reason: str):
+        self._status = status
+        self._status_reason = reason
+    
+    def create_pending_update(self,
+                name: str,
+                description: str,
+                tags: List[str],
+                endpoint: str):
+        
+        self._pending_update = ServicePendingUpdate(name, description, tags, endpoint)
+    
+    def complete_update(self):
+        if self._pending_update != None:
+            self._name = self._pending_update.get_name()
+            self._description = self._pending_update.get_description()
+            self._tags = self._pending_update.get_tags()
+            self._endpoint =  self._pending_update.get_endpoint()
+            self._pending_update = None
 
     ################################
     #   Delete Methods
@@ -258,6 +313,9 @@ class Service:
             Returns status of service
         '''
         return self._status
+    
+    def get_status_reason(self) -> ServiceStatus:
+        return self._status_reason
 
     def get_icon(self) -> str:
         '''
