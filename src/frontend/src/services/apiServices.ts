@@ -164,6 +164,7 @@ export const uploadImage = async (file: File) => {
     body: formData,
   });
   const data = await response.json();
+  console.log(data)
   return data.doc_id;
 };
 
@@ -199,7 +200,6 @@ export const uploadPDF = async (file: File) => {
     body: formData,
   });
   const data = await response.json();
-  console.log(data)
   return data.doc_id;
 }
 
@@ -226,7 +226,6 @@ export const getDoc = async (doc_id: string) => {
 
 /*        Review Services       */
 export const apiAddReview = async (info: ServiceReviewInfo) => {
-  console.log(`Adding review: ${JSON.stringify(info)}`);
   const response = await fetch(`${baseUrl}/service/review/add`, {
     method: "POST",
     headers: {  
@@ -243,11 +242,9 @@ export const apiAddReview = async (info: ServiceReviewInfo) => {
 }
 
 export const apiGetReviews = async (sid: string, testing:boolean=true) => {
-  console.log(`Getting reviews for service: ${sid}`);
   const response = await fetch(`${baseUrl}/service/get/reviews?sid=${sid}&testing=${testing}`, {
     method: "GET",
   });
   const data = await response.json();
-  console.log(data);
   return data.reviews;
 }
