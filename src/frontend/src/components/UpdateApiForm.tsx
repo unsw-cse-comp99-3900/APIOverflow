@@ -18,6 +18,7 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 import TagsOverlay from "./TagsOverlay";
 import { Tag } from "../types/miscTypes";
 import FileCard from "./FileCard";
+import { useAuth } from "../contexts/AuthContext";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const navigate = useNavigate();
@@ -45,6 +46,9 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   // operations for opening and closing the overlay
   const openOverlay = () => setIsOverlayOpen(true);
   const closeOverlay = () => setIsOverlayOpen(false);
+
+  const auth = useAuth();
+  const { logout } = auth!;
 
   const handleTagClick = (tag: Tag) => {
     if (
@@ -99,77 +103,86 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   // Submit the API update to the backend
   const submitApiUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // Add newly created tags to the database
-    for (const newTag of newTags) {
-      if (selectedTags.includes(newTag)) {
-        await addTag({
-          tag: newTag,
-        });
+    try {
+      // Add newly created tags to the database
+      for (const newTag of newTags) {
+        if (selectedTags.includes(newTag)) {
+          await addTag({
+            tag: newTag,
+          });
+        }
       }
-    }
 
-    // Edit existing API
-    if (apiId) {
-      const updatedApi: ServiceUpdate = {
-        sid: apiId,
-        name,
-        description,
-        endpoint,
-        tags: selectedTags,
-      };
-      await updateApi(updatedApi);
-      if (selectedImageData) {
-        const doc_id = await uploadImage(selectedImageData);
-        apiAddIcon({
+      // Edit existing API
+      if (apiId) {
+        const updatedApi: ServiceUpdate = {
           sid: apiId,
-          doc_id,
-        });
-      }
-      if (selectedFile) {
-        console.log(selectedFile);
-        const doc_id = await uploadPDF(selectedFile);
-        console.log(doc_id);
-        await uploadDocs({
-          sid: apiId,
-          doc_id,
-        });
-      }
-      navigate(`/profile/my-apis/${apiId}`);
+          name,
+          description,
+          endpoint,
+          tags: selectedTags,
+        };
+        await updateApi(updatedApi);
+        if (selectedImageData) {
+          const doc_id = await uploadImage(selectedImageData);
+          apiAddIcon({
+            sid: apiId,
+            doc_id,
+          });
+        }
+        if (selectedFile) {
+          console.log(selectedFile);
+          const doc_id = await uploadPDF(selectedFile);
+          console.log(doc_id);
+          await uploadDocs({
+            sid: apiId,
+            doc_id,
+          });
+        }
+        navigate(`/profile/my-apis/${apiId}`);
 
-      // Add new API
-    } else {
-      const newApi: ServicePost = {
-        name,
-        description,
-        endpoint,
-        x_start: 0,
-        x_end: 100,
-        y_start: 0,
-        y_end: 100,
-        icon_url: "",
-        tags: selectedTags,
-      };
-      const newId = await addApi(newApi);
-      if (selectedImageData) {
-        const doc_id = await uploadImage(selectedImageData);
-        apiAddIcon({
-          sid: newId,
-          doc_id,
-        });
+        // Add new API
+      } else {
+        const newApi: ServicePost = {
+          name,
+          description,
+          endpoint,
+          x_start: 0,
+          x_end: 100,
+          y_start: 0,
+          y_end: 100,
+          icon_url: "",
+          tags: selectedTags,
+        };
+        const newId = await addApi(newApi);
+        if (selectedImageData) {
+          const doc_id = await uploadImage(selectedImageData);
+          apiAddIcon({
+            sid: newId,
+            doc_id,
+          });
+        }
+
+        if (selectedFile) {
+          const doc_id = await uploadPDF(selectedFile);
+          await uploadDocs({
+            sid: newId,
+            doc_id,
+          });
+        }
+        navigate(`/profile/my-apis/${newId}`);
       }
 
-      if (selectedFile) {
-        const doc_id = await uploadPDF(selectedFile);
-        await uploadDocs({
-          sid: newId,
-          doc_id,
-        });
+      toast.success("Success!");
+    } catch (error) {
+      if (error instanceof Error && error.message === "Unauthorized") {
+        logout();
+        navigate("/login");
       }
-      navigate(`/profile/my-apis/${newId}`);
+
+      console.log("Error updating API", error);
+      toast.error("Error updating API");
     }
-
-    toast.success("Success!");
   };
 
   return (
