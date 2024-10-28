@@ -33,20 +33,21 @@ const RegisterPage: React.FC = () => {
     };
     await userRegister(newUser);
     setIsLoading(true);
-    try {
-      const credentials: LoginModel = {
-        username,
-        password,
-      };
-      const token = await userLogin(credentials);
-      login(token);
-      setIsLoading(false);
-      console.log("Login successful:", { username, password });
-      navigate("/apis");
-    } catch (error) {
-      setError("Invalid credentials");
-      setIsLoading(false);
-    }
+    navigate("/login");
+    // try {
+    //   const credentials: LoginModel = {
+    //     username,
+    //     password,
+    //   };
+    //   const token = await userLogin(credentials);
+    //   login(token);
+    //   setIsLoading(false);
+    //   console.log("Login successful:", { username, password });
+    //   navigate("/apis");
+    // } catch (error) {
+    //   setError("Invalid credentials");
+    //   setIsLoading(false);
+    // }
   };
 
   return (
