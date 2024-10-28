@@ -33,6 +33,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedImageData, setSelectedImageData] = useState<File | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [warning, setWarning] = useState<string>("");
   // const [selectedFileData, setSelectedFileData] = useState<File | null>(null);
 
   // whether the overlay window for adding new tags is open
@@ -44,6 +45,18 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   // operations for opening and closing the overlay
   const openOverlay = () => setIsOverlayOpen(true);
   const closeOverlay = () => setIsOverlayOpen(false);
+
+  const handleTagClick = (tag: Tag) => {
+    if (
+      selectedTags.includes("API") !== selectedTags.includes("Microservice") &&
+      (tag === "API" || tag === "Microservice")
+    ) {
+      setWarning("You must select either API or Microservice");
+      return;
+    }
+    setWarning("");
+    setSelectedTags(selectedTags.filter((t) => t !== tag));
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const iconImage = event.target.files?.[0];
@@ -114,7 +127,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         });
       }
       if (selectedFile) {
-        console.log(selectedFile)
+        console.log(selectedFile);
         const doc_id = await uploadPDF(selectedFile);
         console.log(doc_id);
         await uploadDocs({
@@ -232,9 +245,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                 <button
                   key={tag}
                   type="button" // Prevent form submission
-                  onClick={() =>
-                    setSelectedTags(selectedTags.filter((t) => t !== tag))
-                  }
+                  onClick={() => handleTagClick(tag)}
                   className="relative bg-blue-800 text-white flex items-center justify-center rounded-md text-sm font-semibold px-3 py-1 mx-1 my-1"
                 >
                   <span className="transition-opacity duration-200 hover:opacity-0">
@@ -246,16 +257,21 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                   </span>
                 </button>
               ))}
-
               {/* Overlay button for more tags */}
               <button
                 type="button" // Prevent form submission
-                onClick={openOverlay}
+                onClick={() => {
+                  setWarning("");
+                  openOverlay();
+                }}
                 className="border-blue-800 border-2 bg-white hover:bg-blue-800 hover:text-white text-blue-800 w-7 h-7 flex items-center justify-center rounded-md mx-1 my-1"
               >
                 <FaPlus className="text-sm" />
               </button>
             </div>
+            {warning && (
+              <p className="text-red-500 text-sm my-2 mx-2">{warning}</p>
+            )}
             {/* Overlay Window */}
             <TagsOverlay
               isOpen={isOverlayOpen}
