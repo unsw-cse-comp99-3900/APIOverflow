@@ -1,8 +1,49 @@
 from typing import *
+from enum import Enum
+
+class ServiceStatus(Enum):
+    UPDATE_REJECTED = 3
+    UPDATE_PENDING = 2
+    LIVE = 1
+    PENDING = 0
+    REJECTED = -1
+
+STATUS_STRINGS = ["LIVE", "PENDING", "REJECTED", "UPDATE_PENDING", "UPDATE_REJECTED"]
+STATUS_OPTIONS = ["LIVE", "PENDING", "REJECTED", "UPDATE_PENDING", "UPDATE_REJECTED", "ALL", "ALL_PENDING"]
+PENDING_OPTIONS = ["PENDING", "UPDATE_PENDING"]
+LIVE_OPTIONS = ["LIVE", "UPDATE_PENDING", "UPDATE_REJECTED"]
 
 T = TypeVar("T")
 K = TypeVar("K")
 DEFAULT_ICON = '0'
+
+
+      
+class ServicePendingUpdate:
+
+    def __init__(self,
+                 name: str,
+                 description: str, 
+                 tags: List[str],
+                 endpoint: str):
+        self._name = name
+        self._description = description
+        self._tags = tags
+        self._endpoint = endpoint
+
+    def get_name(self) -> str:
+        return self._name
+    
+    def get_description(self) -> str:
+        return self._description
+    
+    def get_tags(self) -> List[str]:
+        return self._tags
+    
+    def get_endpoint(self) -> str:
+        return self._endpoint
+    
+
 
 class Service:
 
@@ -32,7 +73,9 @@ class Service:
         downvotes:      Number of downvotes given to service
         type:           Type of service ['api', 'micro']
         status:         Status of service [LIVE, PENDING, REJECTED]
+        status_reason:  Reason for status
         reviews:        List of reviews (rid)
+        pending_update:  Pending update Details when waiting to approve an update
 
     '''
 
@@ -67,8 +110,10 @@ class Service:
         self._review_count = 0
         self._upvotes = 0
         self._downvotes = 0
-        # NEED TO CHANGE THIS TO PENDING INITIALISATION WHEN IMPLEMENTING ADMIN
-        self._status = "LIVE"
+        self._pending_update = None
+
+        self._status = ServiceStatus.PENDING
+        self._status_reason = ""
         self._icon = icon
     
     ################################
@@ -148,6 +193,27 @@ class Service:
             Update service icon
         '''
         self._icon = doc_id
+    
+    def update_status(self, status: ServiceStatus, reason: str):
+        self._status = status
+        self._status_reason = reason
+    
+    def create_pending_update(self,
+                name: str,
+                description: str,
+                tags: List[str],
+                endpoint: str
+                ):
+        self.update_status(ServiceStatus.UPDATE_PENDING, "")
+        self._pending_update = ServicePendingUpdate(name, description, tags, endpoint)
+    
+    def complete_update(self):
+        if self._status == ServiceStatus.UPDATE_PENDING:
+            self._name = self._pending_update.get_name()
+            self._description = self._pending_update.get_description()
+            self._tags = self._pending_update.get_tags()
+            self._endpoint =  self._pending_update.get_endpoint()
+            self._pending_update = None
 
     ################################
     #   Delete Methods
@@ -248,11 +314,14 @@ class Service:
         '''
         return self._docs
     
-    def get_status(self) -> str:
+    def get_status(self) -> ServiceStatus:
         '''
             Returns status of service
         '''
         return self._status
+    
+    def get_status_reason(self) -> ServiceStatus:
+        return self._status_reason
 
     def get_icon(self) -> str:
         '''
@@ -299,3 +368,28 @@ class Service:
             'icon': self._icon,
             'downvotes': self._downvotes
         }
+
+    def to_updated_json(self) -> dict[T, K]:
+        '''
+            Converts object into json, returning updated values for a pending
+            update
+        '''
+        if self._status == ServiceStatus.UPDATE_PENDING:
+            return {
+                'id': self._id,
+                'name' : self._pending_update.get_name(),
+                'owner' : self._owner,
+                'icon_url' : self._icon_url,
+                'description' : self._pending_update.get_description(),
+                'tags' : self._pending_update.get_tags(),
+                'endpoint': self._pending_update.get_endpoint(),
+                'documents' : self._docs,
+                'users' : self._users,
+                'reviews': self._reviews,
+                'upvotes': self._upvotes,
+                'type': self._type,
+                'icon': self._icon,
+                'downvotes': self._downvotes
+            }
+        else:
+            return self.to_json()

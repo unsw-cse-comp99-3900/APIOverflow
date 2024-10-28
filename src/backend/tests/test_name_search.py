@@ -84,7 +84,8 @@ def test_simple_search(simple_user):
 
     response = client.get("/service/search",
                           params={
-                              'name': "Google"
+                              'name': "Google",
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -124,7 +125,8 @@ def test_simple_search_2(simple_user):
 
     response = client.get("/service/search",
                           params={
-                              'name': "Goog"
+                              'name': "Goog",
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -166,7 +168,8 @@ def test_simple_empty(simple_user):
 
     response = client.get("/service/search",
                           params={
-                              'name': "dwae"
+                              'name': "dwae",
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -205,7 +208,8 @@ def test_simple_regex_search(simple_user):
 
     response = client.get("/service/search",
                           params={
-                              'name': "og"
+                              'name': "og",
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -247,7 +251,8 @@ def test_simple_regex_sensitivity(simple_user):
 
     response = client.get("/service/search",
                           params={
-                              'name': "LE"
+                              'name': "LE",
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
