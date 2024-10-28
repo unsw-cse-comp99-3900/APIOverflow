@@ -92,3 +92,16 @@ def user_get_profile_wrapper(uid: str) -> dict[str, str]:
         raise HTTPException(status_code=404, detail="No such user found")
 
     return user.get_profile()
+
+def user_self_delete(uid: str):
+    '''
+        Allows the user to delete their own account  
+    '''
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail="No such user found")
+    username = user.get_name()
+    data_store.delete_item(uid, 'user')
+    db_status = db_delete_user(username)
+
+    return {"name": username, "deleted": db_status}

@@ -183,15 +183,6 @@ def create_super_admin() -> None:
     db_add_user(super_admin.to_json())
     data_store.add_user(super_admin)
 
-def self_delete(uid: str) -> None:
-    '''
-        Allows the user to delete their own account  
-    '''
-    user = data_store.get_user_by_id(uid)
-    username = user.get_name()
-    data_store.delete_item(uid, 'user')
-    db_delete_user(username)
-
 def change_password(uid: str, newpass: str) -> None:
     '''
         Allows the user to change their own password  
