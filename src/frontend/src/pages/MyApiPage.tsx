@@ -95,7 +95,7 @@ const MyApiPage: React.FC = () => {
 
             <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
               <ApiDescription api={api} />
-              <ApiReviews />
+              <ApiReviews sid={api.id} />
             </div>
           </div>
         )}

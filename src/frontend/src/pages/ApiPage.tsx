@@ -56,7 +56,7 @@ const ApiPage: React.FC = () => {
       <BackButton toUrl="/apis" />
       <FetchStatus loading={loading} error={error} data={api}>
         {api && (
-          <div className="px-10">
+          <div className="p-10">
             <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
               <div className="flex items-center">
                 {/* Placeholder for API icon */}
@@ -80,7 +80,7 @@ const ApiPage: React.FC = () => {
             </div>
             <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
               <ApiDescription api={api} />
-              <ApiReviews />
+              <ApiReviews sid={api.id} />
             </div>
           </div>
         )}
