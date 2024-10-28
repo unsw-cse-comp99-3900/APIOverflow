@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from PIL import Image
 import urllib.request
 from urllib.error import HTTPError, URLError
-from src.backend.classes.Service import ServiceStatus
+from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
@@ -127,7 +127,6 @@ def update_service_wrapper(packet: dict[T, K], user: str) -> None:
     validate_api_fields(packet)
 
     # service is ref to API Obj in data store which gets updated
-    service.update_status(ServiceStatus.PENDING, "")
     service.create_pending_update(
         packet["name"], packet["description"], packet["tags"], packet["endpoint"])
     
@@ -225,7 +224,7 @@ def api_tag_filter(tags, providers, hide_pending: bool) -> list:
     
     
     return [api_into_json(api) for api in return_list if
-            api.get_status() == ServiceStatus.LIVE or
+            api.get_status().name in LIVE_OPTIONS or 
             (not hide_pending and api.get_status() == ServiceStatus.PENDING)
             ]
 
@@ -234,8 +233,9 @@ def api_name_search(name, hide_pending: bool) -> list:
     api_list = data_store.get_apis()
     return_list = []
     for api in api_list:
-        if re.search(name, api.get_name(), re.IGNORECASE) and (api.get_status() == ServiceStatus.LIVE
-            or api.get_status() == ServiceStatus.PENDING and not hide_pending
+        if re.search(name, api.get_name(), re.IGNORECASE) and (
+            api.get_status().name in LIVE_OPTIONS or
+            api.get_status() == ServiceStatus.PENDING and not hide_pending
         ):
             return_list.append(api)
     return return_list
@@ -448,9 +448,11 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str):
         raise HTTPException(status_code=404, detail="Service not found")
     
     if approved:
-        service.update_status(ServiceStatus.LIVE, reason)
         service.complete_update()
-    
+        service.update_status(ServiceStatus.LIVE, reason)
         db_update_service(sid, service.to_json())
-    else:
+    elif service.get_status() == ServiceStatus.PENDING:
         service.update_status(ServiceStatus.REJECTED, reason)
+    elif service.get_status() == ServiceStatus.UPDATE_PENDING:
+        service.update_status(ServiceStatus.UPDATE_REJECTED, reason)
+        

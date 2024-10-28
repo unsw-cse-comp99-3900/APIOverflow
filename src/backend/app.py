@@ -406,7 +406,7 @@ async def admin_get_reviews(option: str = '', user: User = Depends(manager), rol
     }
 
 @app.get("/admin/get/services")
-async def admin_get_services(option: str = '', user: User = Depends(manager), role: str = Depends(admin_required())):
+async def admin_get_services(option: str = "ALL_PENDING", user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which retrieves all pending services
     '''
