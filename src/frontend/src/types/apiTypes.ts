@@ -5,7 +5,6 @@ export interface BriefApi {
   name: string;
   description: string;
   owner: string;
-  iconUrl: string;
   tags: string[];
 }
 
