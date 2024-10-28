@@ -7,25 +7,28 @@ interface ReviewCardProps {
 }
 
 const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
-  const themeColor = review.type === "positive" ? "blue" : "red";
+  const bgColor50 = review.type === "positive" ? "bg-blue-50" : "bg-red-50";
+  const borderColor300 = review.type === "positive" ? "border-blue-300" : "border-red-300";
+  const textColor800 = review.type === "positive" ? "text-blue-800" : "text-red-800";
+  const textColor500 = review.type === "positive" ? "text-blue-500" : "text-red-500";
 
   return (
     <div
-      className={`p-3  bg-${themeColor}-100 border-2 border-${themeColor}-300 rounded-lg`}
+      className={`p-3 bg-white border-2 ${borderColor300} rounded-lg`}
     >
       <div className={`flex items-center justify-between`}>
-        <h2 className={`text-lg font-bold items-center justify-center text-${themeColor}-800`}>
+        <h2 className={`text-lg font-bold items-center justify-center ${textColor800}`}>
           ReviewerNamePlaceholder
         </h2>
         <div
-          className={`pr-3 flex items-center text-lg justify-center text-${themeColor}-500 rounded-xl`}
+          className={`pr-3 flex items-center text-lg justify-center ${textColor500} rounded-xl`}
         >
           {review.type === "positive" ? <FaThumbsUp /> : <FaThumbsDown />}
         </div>
       </div>
-      <div className={`border border-${themeColor}-300 w-full my-5`}></div>
+      <div className={`border ${borderColor300} w-full my-5`}></div>
       <div
-        className={` bg-${themeColor}-50  text-${themeColor}-800 font-semibold rounded-lg py-3 px-3`}
+        className={` ${bgColor50}  ${textColor800} font-semibold rounded-lg py-3 px-3`}
       >
         {review.comment}
       </div>
