@@ -8,7 +8,7 @@ interface BackButtonProps {
 
 const BackButton: React.FC<BackButtonProps> = ({ toUrl }) => {
   return (
-    <div className="container m-auto py-6 px-6">
+    <div className="container m-auto pt-6 px-6">
       <Link
         to={toUrl}
         className="text-blue-800 hover:text-indigo-500 hover:underline font-bold flex items-center"

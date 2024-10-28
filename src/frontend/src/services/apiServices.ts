@@ -3,6 +3,7 @@ import {
   LoginModel,
   ServiceIconInfo,
   ServicePost,
+  ServiceReviewInfo,
   ServiceUpdate,
   ServiceUpload,
   TagData,
@@ -51,7 +52,7 @@ export const getApi = async (id: string) => {
   if (response.status === 404) {
     throw new Error("Service Not Found");
   }
-
+  console.log(data)
   return detailedApiDataFormatter(data);
 };
 
@@ -221,4 +222,32 @@ export const getDoc = async (doc_id: string) => {
   const blob = await response.blob(); // Get the Blob data
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
   return url
+}
+
+/*        Review Services       */
+export const apiAddReview = async (info: ServiceReviewInfo) => {
+  console.log(`Adding review: ${JSON.stringify(info)}`);
+  const response = await fetch(`${baseUrl}/service/review/add`, {
+    method: "POST",
+    headers: {  
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    
+    body: JSON.stringify(info),
+  });
+  const data = await response.json();
+  if (response.status === 403) {
+    throw new Error(data.detail);
+  }
+}
+
+export const apiGetReviews = async (sid: string, testing:boolean=true) => {
+  console.log(`Getting reviews for service: ${sid}`);
+  const response = await fetch(`${baseUrl}/service/get/reviews?sid=${sid}&testing=${testing}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data.reviews;
 }
