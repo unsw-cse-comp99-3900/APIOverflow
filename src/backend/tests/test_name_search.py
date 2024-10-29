@@ -6,6 +6,9 @@ from fastapi.testclient import TestClient
 from src.backend.classes import Service
 from src.backend.app import app, register, add_service, login
 from src.backend.classes.models import User, db, UserCreate, LoginModel
+from src.backend.classes.Endpoint import Endpoint
+from src.backend.classes.Parameter import Parameter 
+from src.backend.classes.Response import Response
 
 # Create a test client
 client = TestClient(app)
@@ -13,6 +16,15 @@ client = TestClient(app)
 INPUT_ERROR = 400
 AUTHENTICATION_ERROR = 401
 SUCCESS = 200
+
+# test endpoint
+simple_parameter = Parameter(id="1", endpoint_link='https://api.example.com/users/12345', required=True, 
+                            type='HEADER', name='paramtest', value_type='int')
+simple_response = Response(code='404', description='not found', conditions=["site is down", "badtest"], 
+                            example="example...")
+simple_endpoint = Endpoint(link='https://api.example.com/users/12345', title_description='testTitle1', 
+                            main_description='tests endpoint', tab='tabTest', parameters=[simple_parameter], 
+                            method="POST", responses=[simple_response])
 
 def clear_all():
     ''' 
@@ -62,7 +74,7 @@ def test_simple_search(simple_user):
         'y_end' : 0,
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
-        'endpoint': 'https://api.example.com/users/12345'
+        'endpoints': [simple_endpoint.dict()]
         }
     response = client.post("/service/add",
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -76,7 +88,7 @@ def test_simple_search(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -102,7 +114,7 @@ def test_simple_search_2(simple_user):
         'y_end' : 0,
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
-        'endpoint': 'https://api.example.com/users/12345'
+        'endpoints': [simple_endpoint.dict()]
         }
     response = client.post("/service/add",
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -116,7 +128,7 @@ def test_simple_search_2(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -144,7 +156,7 @@ def test_simple_empty(simple_user):
         'y_end' : 0,
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
-        'endpoint': 'https://api.example.com/users/12345'
+        'endpoints': [simple_endpoint.dict()]
         }
     response = client.post("/service/add",
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -158,7 +170,7 @@ def test_simple_empty(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -183,7 +195,7 @@ def test_simple_regex_search(simple_user):
         'y_end' : 0,
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
-        'endpoint': 'https://api.example.com/users/12345'
+        'endpoints': [simple_endpoint.dict()]
         }
     response = client.post("/service/add",
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -197,7 +209,7 @@ def test_simple_regex_search(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -225,7 +237,7 @@ def test_simple_regex_sensitivity(simple_user):
         'y_end' : 0,
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
-        'endpoint': 'https://api.example.com/users/12345'
+        'endpoints': [simple_endpoint.dict()]
         }
     response = client.post("/service/add",
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -239,7 +251,7 @@ def test_simple_regex_sensitivity(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},

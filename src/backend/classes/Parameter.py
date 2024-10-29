@@ -1,49 +1,42 @@
-from typing import Optional
+from typing import Optional, List, ClassVar
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-class Parameter:
-    '''
+class Parameter(BaseModel):
+    """
     Parameter class which abstracts and contains information about
     parameters for endpoints.
 
-    Stores the following:
+    Attributes:
         id:             ID of parameter
         endpoint_link:  Link of the endpoint that this parameter is attached to
         required:       Whether the parameter is required or not
-        type:           Type of parameter (i.e. head, body, etc.)
+        type:           Type of parameter (i.e., header, body, etc.)
         name:           Name of the parameter
-        value_type:     Type of the given values (i.e. string, int, etc.)
-                        However, since this is for DISPLAY ONLY, we can just
-                        implement this as a string.
-        example:        Example of possible values.
-        
+        value_type:     Type of the given values (display-only as a string)
+        example:        Example of possible values
+    """
+    id: str
+    endpoint_link: str
+    required: bool
+    type: str
+    name: str
+    value_type: str
+    example: Optional[str] = None
 
-    '''
+    ALLOWED_TYPES: ClassVar[set] = {'HEADER', 'BODY', 'PATH', 'QUERY'}
 
-    # not sure if we need this...?
-    ALLOWED_TYPES = {"HEADER", "BODY", "QUERY", "PATH"}
+    @field_validator("type")
+    def validate_type(cls, value):
+        if value not in cls.ALLOWED_TYPES:
+            raise ValueError(f"Invalid type: {value}. Allowed types are: {cls.ALLOWED_TYPES}")
+        return value
 
-    def __init__(self,
-                id: str,
-                endpoint_link: str,
-                required: bool,
-                type: str,
-                name: str,
-                value_type: str,
-                example: Optional[str]) -> None:
+    @model_validator(mode='after')
+    def set_default_example(self) -> 'Parameter':
+        if self.example is None:  # Only set default if no example was provided
+            self.example = f"Any {self.value_type}"
+        return self
 
-        if type not in self.ALLOWED_TYPES:
-            raise ValueError(f"Invalid type: {type}. Allowed types are: {self.ALLOWED_TYPES}")
-        
-        self._id = id
-        self._endpoint_link = endpoint_link
-        self._required = required 
-        self._type = type
-        self._name = name
-        self._value_type = value_type
-        if example is not None:
-            self._example = example
-        else:
-            self._example = f"Any {value_type}"
 
     ################################
     #   Get Methods

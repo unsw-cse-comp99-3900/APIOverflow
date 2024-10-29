@@ -1,5 +1,5 @@
 from typing import *
-from Endpoint import *
+from src.backend.classes.Endpoint import Endpoint
 
 T = TypeVar("T")
 K = TypeVar("K")
@@ -192,12 +192,6 @@ class Service:
             Removes icon from service and restores to default
         '''
         self._icon = DEFAULT_ICON
-        
-    def remove_endpoint(self, endpoint: Endpoint) -> None:
-        '''
-            Removes specified endpoint 
-        '''
-        self._endpoints.remove(endpoint)
 
     def remove_endpoint(self, endpoint: Endpoint) -> None:
         '''
@@ -251,11 +245,11 @@ class Service:
         '''
         return self._icon_url
     
-    def get_endpoint(self) -> str:
+    def get_endpoint(self) -> list[Endpoint]:
         '''
-            Returns endpoint of service
+            Returns endpoints of service
         '''
-        return self._endpoint
+        return self._endpoints
     
     def get_docs(self) -> List[str]:
         '''
@@ -289,7 +283,7 @@ class Service:
             'icon_url' : self._icon_url,
             'description' : self._description,
             'tags' : self._tags,
-            'endpoint': self._endpoint,
+            'endpoints': self._endpoints,
             'documents' : self._docs,
             'users' : self._users,
             'reviews': self._reviews,

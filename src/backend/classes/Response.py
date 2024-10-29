@@ -1,32 +1,28 @@
-from typing import Optional
+from typing import Optional, List
+from pydantic import BaseModel, Field, model_validator
 
-class Response:
-    '''
+class Response(BaseModel):
+    """
     Response class which contains information about the responses of HTTP
-    requests and the conditions of which are met
+    requests and the conditions that need to be met.
 
-    Stores the following:
-        code:           The code of the request (i.e. 200, 401, 400)
-        description:    Description of the code (i.e. OK, Failed, etc.)
-        conditions:     List of conditions of the request (i.e. If any of the following are true:...) 
-                        Works as OR operator.  
-        example:        Example of success/failing values     
+    Attributes:
+        code:        The code of the request (i.e., 200, 401, 400)
+        description: Description of the code (i.e., OK, Failed, etc.)
+        conditions:  List of conditions for the request (OR logic between conditions)
+        example:     Example of success/failing values
+    """
+    code: str
+    description: str
+    conditions: List[str]
+    example: Optional[str] = None
 
-    '''
+    @model_validator(mode='after')
+    def set_default_example(self) -> 'Response':
+        if self.example is None:  # Only set default if no example was provided
+            self.example = f"No example given."
+        return self
 
-    def __init__(self,
-                code: str,
-                description: str,
-                conditions: list[str],
-                example: Optional[str]) -> None:
-        
-        self._code = code
-        self._description = description
-        self._conditions = conditions
-        if example is not None:
-            self._example = example
-        else:
-            self._example = "No example given."
 
     ################################
     #   Get Methods

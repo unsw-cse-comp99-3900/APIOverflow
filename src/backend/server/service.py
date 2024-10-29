@@ -33,7 +33,7 @@ def validate_api_fields(packet: dict[T, K]) -> None:
     if len(packet['tags']) == 0:
         raise HTTPException(status_code=400, detail='No service tags provided')
     
-    if packet['endpoint'] == '':
+    if packet['endpoints'] == []:
         raise HTTPException(status_code=400, detail='No service endpoint provided')
 
 def get_validate_service_id(sid: str) -> API:
@@ -113,7 +113,7 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
                     internal_url,
                     packet['description'],
                     packet['tags'],
-                    packet['endpoint'])
+                    packet['endpoints'])
     data_store.add_api(new_api)
     db_add_service(new_api.to_json())
     return str(new_api.get_id())
@@ -131,7 +131,7 @@ def update_service_wrapper(packet: dict[T, K], user: str) -> None:
     validate_api_fields(packet)
 
     # service is ref to API Obj in data store which gets updated
-    service.update_api_details(packet["name"], packet["description"], packet["tags"], packet["endpoint"])
+    service.update_api_details(packet["name"], packet["description"], packet["tags"], packet["endpoints"])
     
     db_update_service(sid, service.to_json())
     return None
@@ -171,7 +171,7 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
             'description': service.get_description(),
             'icon_url': service.get_icon_url(),
             'tags' : service.get_tags(),
-            'endpoint' : service.get_endpoint(),
+            'endpoints' : service.get_endpoint(),
             'docs' : doc_paths,
             'icon' : service.get_icon()
     }
