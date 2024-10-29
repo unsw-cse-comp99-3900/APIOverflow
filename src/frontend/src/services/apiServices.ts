@@ -18,13 +18,14 @@ import {
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (tags?: Tag[]) => {
+export const getApis = async (tags?: Tag[], hidePending : boolean = false) => {
   const queryParams =
-    tags && tags.length > 0 ? `?tags=${tags.join("&tags=")}` : "";
-  const response = await fetch(`${baseUrl}/service/filter${queryParams}`, {
+    tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
+  const response = await fetch(`${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`, {
     method: "GET",
   });
   const data = await response.json();
+  console.log(data)
   return data.map(briefApiDataFormatter);
 };
 
