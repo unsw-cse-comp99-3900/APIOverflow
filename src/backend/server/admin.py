@@ -77,17 +77,16 @@ def admin_filter_users(standard: bool, admin: bool, super: bool):
     if standard:
         for user in users:
             if not user.get_is_admin():
-                return_list.append(user)
+                return_list.append(user.to_json())
     if admin:
         for user in users:
-            if user.get_is_admin() and user not in return_list:
-                return_list.append(user)
+            if user.get_is_admin() and user.to_json() not in return_list:
+                return_list.append(user.to_json())
     if super:
         for user in users:
-            if user.get_is_super() and user not in return_list:
-                return_list.append(user)
-    json_list = [user.to_json() for user in return_list]
-    return json_list
+            if user.get_is_super() and user.to_json() not in return_list:
+                return_list.append(user.to_json())
+    return return_list
         
 def admin_get_reviews_wrapper(status: str) -> List[dict[str, str]]:
     '''
