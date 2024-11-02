@@ -681,7 +681,7 @@ def test_get_apis(simple_user):
     assert response_info['tags'] == api_info2['tags']
 
 
-@pytest.mark.skip("For purposes of demo, admin system doesn't exist yet")
+# @pytest.mark.skip("For purposes of demo, admin system doesn't exist yet")
 def test_admin_get_pending_services(simple_user):
     api_info = {
                 'name' : 'Test API 1',
@@ -721,7 +721,7 @@ def test_admin_get_pending_services(simple_user):
     assert response_info[0]['tags'] == api_info['tags']
     assert response_info[0]['endpoint'] == api_info['endpoint']
 
-@pytest.mark.skip("For purposes of demo, admin system doesn't exist yet")
+# @pytest.mark.skip("For purposes of demo, admin system doesn't exist yet")
 def test_admin_approve(simple_user):
     api_info = {
                 'name' : 'Test API 1',
@@ -794,7 +794,7 @@ def test_admin_approve(simple_user):
     response_info = response.json()["services"]
     assert len(response_info) == 0
 
-@pytest.mark.skip("For purposes of demo, admin system doesn't exist yet")
+# @pytest.mark.skip("For purposes of demo, admin system doesn't exist yet")
 def test_admin_disapprove(simple_user):
     api_info = {
                 'name' : 'Test API 1',
@@ -863,7 +863,7 @@ def test_admin_disapprove(simple_user):
     assert response_info['status'] == "REJECTED"
     assert response_info['status_reason'] == reason
 
-@pytest.mark.skip("For purposes of demo, admin system doesn't exist yet")
+# @pytest.mark.skip("For purposes of demo, admin system doesn't exist yet")
 def test_update_api(simple_user):
     '''
         Test whether an API is correctly created then updated
