@@ -9,7 +9,7 @@ from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
-from src.backend.classes.Review import Review, LIVE
+from src.backend.classes.Review import Review
 import re
 
 
@@ -430,10 +430,6 @@ def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[st
         
         # This should not trigger, but is there just in case
         if review is None:
-            continue
-
-        # Ensure only live reviews are shown
-        if review.get_status() != LIVE and not testing:
             continue
 
         reviews.append(review.to_json())

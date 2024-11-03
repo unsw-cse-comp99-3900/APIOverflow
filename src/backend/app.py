@@ -251,20 +251,6 @@ async def review_edit(info: ServiceReviewEditInfo, user: User = Depends(manager)
     '''
     review_edit_wrapper(info, user['id'], user['is_admin'])
 
-@app.post("/review/approve")
-async def review_approve(info: ServiceReviewAdminAction, user: User = Depends(manager), role: str = Depends(admin_required())):
-    '''
-        Endpoint which approves a review
-    '''
-    review_approve_wrapper(info.rid, info.reason)
-
-@app.post("/review/reject")
-async def review_reject(info: ServiceReviewAdminAction, user: User = Depends(manager), role: str = Depends(admin_required())):
-    '''
-        Endpoint which rejects a review
-    '''
-    review_reject_wrapper(info.rid, info.reason)
-
 #####################################
 #   Auth Paths
 #####################################
@@ -397,12 +383,12 @@ async def user_delete(uid: str, user: User = Depends(manager), role: str = Depen
     return delete_user(uid, user["is_super"])
 
 @app.get("/admin/get/reviews")
-async def admin_get_reviews(option: str = '', user: User = Depends(manager), role: str = Depends(admin_required())):
+async def admin_get_reviews(user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which retrieves all pending reviews
     '''
     return {
-        'reviews': admin_get_reviews_wrapper(option)
+        'reviews': admin_get_reviews_wrapper()
     }
 
 @app.get("/admin/get/services")

@@ -1,7 +1,3 @@
-LIVE = '1'
-PENDING = '0'
-REJECTED = '-1'
-
 class Review:
 
     '''
@@ -20,8 +16,8 @@ class Review:
     '''
 
     def __init__(self,
-                 rid: str, 
-                 reviewer: str, 
+                 rid: str,
+                 reviewer: str,
                  service: str,
                  title: str,
                  rating: str,
@@ -36,25 +32,13 @@ class Review:
         self._rating = rating
         self._body = body
 
-        # Other atributes
-        self._status = PENDING
-        self._status_reason = ''
-
     #############################
     #   Update methods
-    #############################
-    def update_status(self, status: str, reason: str = ''):
-        '''
-            Update status of review
-        '''
-        self._status = status
-        self._status_reason = reason
-    
+    #############################  
     def update_review(self, title: str, rating: str, body: str) -> None:
         '''
             Update the contents of the review
         '''
-        self.update_status(PENDING, '')
         self._title = title
         self._rating = rating
         self._body = body
@@ -97,12 +81,6 @@ class Review:
             Gets review's rating
         '''
         return self._rating
-
-    def get_status(self):
-        '''
-            Returns review's status
-        '''
-        return self._status
     
     #############################
     #   JSON methods
@@ -119,7 +97,6 @@ class Review:
                 'service': self._service,
                 'title': self._title,
                 'type': self._rating,
-                'status': self._status
             }
         
         return {
@@ -129,5 +106,4 @@ class Review:
                 'title': self._title,
                 'comment': self._body,
                 'type': self._rating,
-                'status': self._status
             }
