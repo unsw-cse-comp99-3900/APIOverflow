@@ -206,7 +206,8 @@ class Service:
                 ):
         self.update_status(ServiceStatus.UPDATE_PENDING, "")
         self._pending_update = ServicePendingUpdate(name, description, tags, endpoint)
-    
+        # self.complete_update()
+
     def complete_update(self):
         if self._status == ServiceStatus.UPDATE_PENDING:
             self._name = self._pending_update.get_name()
