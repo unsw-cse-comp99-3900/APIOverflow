@@ -33,6 +33,7 @@ def simple_user():
 
     # Register user
     user_creds = {
+        "displayname" : "Tester 1",
         "username" : "Tester 1",
         "password" : "password",
         "email" : "doxxed@gmail.com"
@@ -311,6 +312,7 @@ def test_admin_delete_admin(simple_user):
     assert response.json() == {"name": "Tester 1", "status": True}
 
     user_creds2 = {
+        "displayname" : "Tester 2",
         "username" : "Tester 2",
         "password" : "password22",
         "email": "doxx22ed@gmail.com"
@@ -350,6 +352,7 @@ def test_admin_demote_admin(simple_user):
     assert response.json() == {"name": "Tester 1", "status": True}
 
     user_creds2 = {
+        "displayname" : "Tester 2",
         "username" : "Tester 2",
         "password" : "password22",
         "email": "doxx22ed@gmail.com"
@@ -385,6 +388,7 @@ def test_admin_check_dashboard(simple_user):
     user0 = data_store.get_user_by_id("0")
     user1 = data_store.get_user_by_id(simple_user['uid'])
     user_creds2 = {
+        "displayname" : "Tester 2",
         "username" : "Tester 2",
         "password" : "password22",
         "email": "doxx22ed@gmail.com"
@@ -395,6 +399,7 @@ def test_admin_check_dashboard(simple_user):
     user2 = data_store.get_user_by_id(uid2)
 
     user_creds3 = {
+        "displayname" : "Tester 3",
         "username" : "Tester 3",
         "password" : "password33",
         "email": "doxx33ed@gmail.com"
@@ -426,6 +431,7 @@ def test_admin_filter_standard_users(simple_user):
     '''
 
     user_creds2 = {
+        "displayname" : "Tester 2",
         "username" : "Tester 2",
         "password" : "password22",
         "email": "doxx22ed@gmail.com"
@@ -458,6 +464,7 @@ def test_admin_filter_admin_users(simple_user):
     '''
 
     user_creds2 = {
+        "displayname" : "Tester 2",
         "username" : "Tester 2",
         "password" : "password22",
         "email": "doxx22ed@gmail.com"
@@ -490,6 +497,7 @@ def test_admin_filter_super_users(simple_user):
     '''
 
     user_creds2 = {
+        "displayname" : "Tester 2",
         "username" : "Tester 2",
         "password" : "password22",
         "email": "doxx22ed@gmail.com"
@@ -522,6 +530,7 @@ def test_admin_filter_duplicates(simple_user):
     '''
 
     user_creds2 = {
+        "displayname" : "Tester 2",
         "username" : "Tester 2",
         "password" : "password22",
         "email": "doxx22ed@gmail.com"
@@ -555,6 +564,7 @@ def test_admin_filter_overlapping_users(simple_user):
     '''
 
     user_creds2 = {
+        "displayname" : "Tester 2",
         "username" : "Tester 2",
         "password" : "password22",
         "email": "doxx22ed@gmail.com"

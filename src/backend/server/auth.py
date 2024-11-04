@@ -138,6 +138,8 @@ def login_wrapper(username: str, password: str, verify: bool = email) -> T:
     '''
         Wrapper used to handle logging in
     '''
+    if data_store.num_users() == 0:
+        create_super_admin()
     user = data_store.get_user_by_name(username)
     if not user or not manager.verify_password(password, user.get_password()):
         raise HTTPException(status_code=400, detail="Invalid username or password")
@@ -148,17 +150,20 @@ def login_wrapper(username: str, password: str, verify: bool = email) -> T:
 
     return manager.create_access_token(data={"sub": user.get_id()})
 
-def register_wrapper(name: str, password: str, email: str, is_admin: bool, verify: bool = email) -> str:
+def register_wrapper(displayname: str, name: str, password: str, email: str, verify: bool = email) -> str:
     '''
         Handles registering a new user    
     '''
+    if data_store.num_users() == 0:
+        create_super_admin()
     if data_store.get_user_by_name(name):
         raise HTTPException(status_code=400, detail="Username already taken")
     new_user = User(str(data_store.num_users()),
+                    displayname, 
                     name,
                     manager.hash_password(password),
                     email,
-                    is_admin,
+                    False,
                     False)
     db_add_user(new_user.to_json())
     data_store.add_user(new_user)
@@ -174,6 +179,7 @@ def create_super_admin() -> None:
         Creates a super admin at web-app creation   
     '''
     super_admin = User(str(data_store.num_users()),
+                    "superadmin",
                     "superadmin",
                     manager.hash_password("superadminpassword"),
                     "superadmin@gmail.com",

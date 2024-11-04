@@ -62,6 +62,7 @@ def test_send_pass_email(mock_email_setup):
 
 def test_send_ver_email_route():
     response = client.post("/auth/register", json={
+        "displayname" : "testuser",
         "username": "testuser",
         "password": "testpassword",
         "email" : "test@gmail.com"
@@ -70,6 +71,7 @@ def test_send_ver_email_route():
 
 def test_send_pass_email_route():
     response = client.post("/auth/register", json={
+        "displayname" : "testuser",
         "username": "testuser",
         "password": "testpassword",
         "email" : "test@gmail.com"
@@ -94,6 +96,7 @@ def test_verify_email():
 
     new_user = User("12",
                     "user",
+                    "user",
                     "what",
                     "huh",
                     False,
@@ -112,6 +115,7 @@ def test_verify_email():
 
 def test_reset_password():
     response = client.post("/auth/register", json={
+        "displayname": "testuser",
         "username": "testuser",
         "password": "testpassword",
         "email" : "test@gmail.com"

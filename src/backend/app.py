@@ -32,9 +32,6 @@ app.add_middleware(
 )
 
 manager = _manager.get_manager()
-user_count = db.users.count_documents({})
-if ds.num_users() == 0 and user_count == 0:
-    create_super_admin()
 
 #####################################
 #   Helper Functions
@@ -273,7 +270,7 @@ async def register(user: UserCreate):
     '''
         Register a user onto the platform
     '''
-    uid = register_wrapper(user.username, user.password, user.email, user.is_admin)
+    uid = register_wrapper(user.displayname, user.username, user.password, user.email)
     return {'uid' : uid}
 
 @app.post("/auth/login")
@@ -335,7 +332,7 @@ async def account_user_route(user: User = Depends(manager)):
     return {"message": "Welcome, Account User!"}
 
 @app.get("/auth/guest")
-async def guest_route(user: User = Depends(manager)):
+async def guest_route():
     return {"message": "Welcome, Guest!"}
 
 
@@ -485,6 +482,13 @@ async def delete_user_self(user: User = Depends(manager)):
         Endpoint which allows the user to un-register themselves
     '''
     return user_self_delete(user['id'])
+
+@app.post("/user/update/displayname")
+async def update_user_displayname(new_displayname: GeneralString, user: User = Depends(manager)):
+    '''
+        Endpoint which allows the user to update their displayname
+    '''
+    return user_update_displayname(user['id'], new_displayname.content)
 
 if __name__ == "__main__":
     import uvicorn

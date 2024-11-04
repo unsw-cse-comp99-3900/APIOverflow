@@ -31,12 +31,14 @@ def simple_user():
 
     # Register user
     user_creds = {
+        "displayname" : "Tester 1",
         "username" : "Tester 1",
         "password" : "password",
         "email" : "doxxed@gmail.com"
     }
 
     usable_data = {"token" : None,
+                   "displayname" : "Tester 1",
                    "username" : "Tester 1",
                    "email": "doxxed@gmail.com"}
 
@@ -125,6 +127,7 @@ def test_user_delete_self(simple_user):
     assert response.status_code == INPUT_ERROR
 
     response = client.post("/auth/register", json={
+        "displayname": data['displayname'],
         "username": data['username'],
         "password": "password",
         "email" : "doxxed@gmail.com"
@@ -141,3 +144,25 @@ def test_user_delete_self(simple_user):
                         headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == SUCCESS
     assert response.json() == {"name": data['username'] , "deleted": True}
+
+def test_user_update_displayname(simple_user):
+    '''
+        Test successful case
+    '''
+    new_display = "Cool Display Name"
+    data = simple_user
+    response = client.post("/user/update/displayname",
+                          headers={"Authorization": f"Bearer {data['token']}"},
+                            json={
+                                'content': "Cool Display Name"
+                            })
+    assert response.status_code == SUCCESS
+    assert response.json() == {"displayname": new_display, "updated": True}
+
+    response = client.get("/user/get/profile",
+                          headers={"Authorization": f"Bearer {data['token']}"})
+    assert response.status_code == SUCCESS
+    assert response.json()['email'] == data['email']
+    assert response.json()['displayname'] == new_display
+    assert response.json()['displayname'] != data['displayname']
+    assert response.json()['username'] == data['username']

@@ -13,7 +13,8 @@ class User:
         Stores the following:
 
             uid:        ID of user
-            username:   Username of user
+            displayname:Username of user (non-unique)
+            username:   Username of user (unique)
             password:   Hashed password for security
             email:      Email registered with user
             icon_url:   Path to image store on backend (todo)
@@ -28,6 +29,7 @@ class User:
 
     def __init__(self,
                  uid: str,
+                 displayname: str,
                  username: str,
                  password: str,
                  email: str,
@@ -37,6 +39,7 @@ class User:
         
         # Initialised vars
         self._id = uid
+        self._displayname = displayname
         self._name = username
         self._password = password
         self._email = email
@@ -72,6 +75,12 @@ class User:
     ################################
     #  Modify Methods
     ################################
+    def modify_displayname(self, new: str) -> None:
+        '''
+            Modifies user's displayname
+        '''
+        self._displayname = new
+
     def modify_username(self, new: str) -> None:
         '''
             Modifies user's username
@@ -218,9 +227,16 @@ class User:
         '''
         return {
             'email': self._email,
+            'displayname' : self._displayname,
             'username': self._name,
             'icon': self._icon
         }
+
+    def get_displayname(self) -> str:
+        '''
+            Return user's displayname
+        '''
+        return self._displayname
 
     ################################
     #  Storage Methods
@@ -231,6 +247,7 @@ class User:
         '''
         return {
             'id': self._id,
+            'displayname' : self._displayname,
             'username' : self._name,
             'password' : self._password,
             'email' : self._email,

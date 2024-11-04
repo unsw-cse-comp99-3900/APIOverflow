@@ -34,6 +34,7 @@ def simple_user():
 
     # Register user
     user_creds = {
+        "displayname": "Tester 1",
         "username" : "Tester 1",
         "password" : "password",
         "email" : "doxxed@gmail.com"
@@ -64,17 +65,15 @@ def admin_user():
 
     # Register user
     user_creds = {
-        "username" : "Tester 1",
-        "password" : "password",
-        "email" : "doxxed@gmail.com",
-        "is_admin" : True
+        "username" : "superadmin",
+        "password" : "superadminpassword"
     }
 
     usable_data = {"token" : None}
 
-    response = client.post("/auth/register",
-                            json=user_creds)
-    assert response.status_code == SUCCESS
+    # response = client.post("/auth/register",
+    #                         json=user_creds)
+    # assert response.status_code == SUCCESS
 
     # Log into account
     response = client.post("/auth/login",

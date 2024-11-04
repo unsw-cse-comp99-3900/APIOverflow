@@ -105,3 +105,15 @@ def user_self_delete(uid: str):
     db_status = db_delete_user(username)
 
     return {"name": username, "deleted": db_status}
+
+def user_update_displayname(uid: str, new: str) -> None:
+    '''
+        Allows the user to update their displayname
+    '''
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail="No such user found")
+    user.modify_displayname(new)
+    db_update_user(uid, user.to_json())
+
+    return {"displayname": new, "updated": True}
