@@ -421,6 +421,16 @@ async def admin_service_approve(info: ServiceApprove, user: User = Depends(manag
     '''
     approve_service_wrapper(info.sid, info.approved, info.reason)
 
+@app.get("/admin/filter_users")
+async def admin_user_filter(standard: bool, admin: bool, super: bool, user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint which filters users depending on standard users, admins, or supers
+    '''
+    print(standard)
+    print(admin)
+    print(super)
+    return admin_filter_users(standard, admin, super)
+
 #####################################
 #   User Paths
 #####################################

@@ -419,3 +419,164 @@ def test_admin_check_dashboard(simple_user):
     assert response.status_code == SUCCESS
     assert response.json()["user_count"] == 3
     assert response.json()["users"] == [user0.to_json(), user2.to_json(), user3.to_json()]
+
+def test_admin_filter_standard_users(simple_user):
+    '''
+        Testing standard user filter
+    '''
+
+    user_creds2 = {
+        "username" : "Tester 2",
+        "password" : "password22",
+        "email": "doxx22ed@gmail.com"
+    }
+    response = client.post("/auth/register", json=user_creds2)
+    assert response.status_code == SUCCESS
+    uid2 = response.json()['uid']
+    user2 = data_store.get_user_by_id(uid2)
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.get("admin/filter_users", headers={"Authorization": f"Bearer {access_token}"},
+                          params={
+                              'standard': True,
+                              'admin': False,
+                              'super': False
+                          })
+    
+    assert response.status_code == SUCCESS 
+    assert len(response.json()) == 2
+
+def test_admin_filter_admin_users(simple_user):
+    '''
+        Testing admin user filter
+    '''
+
+    user_creds2 = {
+        "username" : "Tester 2",
+        "password" : "password22",
+        "email": "doxx22ed@gmail.com"
+    }
+    response = client.post("/auth/register", json=user_creds2)
+    assert response.status_code == SUCCESS
+    uid2 = response.json()['uid']
+    user2 = data_store.get_user_by_id(uid2)
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.get("admin/filter_users", headers={"Authorization": f"Bearer {access_token}"},
+                          params={
+                              'standard': False,
+                              'admin': True,
+                              'super': False
+                          })
+    
+    assert response.status_code == SUCCESS 
+    assert len(response.json()) == 1
+
+def test_admin_filter_super_users(simple_user):
+    '''
+        Testing super user filter
+    '''
+
+    user_creds2 = {
+        "username" : "Tester 2",
+        "password" : "password22",
+        "email": "doxx22ed@gmail.com"
+    }
+    response = client.post("/auth/register", json=user_creds2)
+    assert response.status_code == SUCCESS
+    uid2 = response.json()['uid']
+    user2 = data_store.get_user_by_id(uid2)
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.get("admin/filter_users", headers={"Authorization": f"Bearer {access_token}"},
+                          params={
+                              'standard': False,
+                              'admin': False,
+                              'super': True
+                          })
+    
+    assert response.status_code == SUCCESS 
+    assert len(response.json()) == 1
+
+def test_admin_filter_duplicates(simple_user):
+    '''
+        Testing no duplicates
+    '''
+
+    user_creds2 = {
+        "username" : "Tester 2",
+        "password" : "password22",
+        "email": "doxx22ed@gmail.com"
+    }
+    response = client.post("/auth/register", json=user_creds2)
+    assert response.status_code == SUCCESS
+    uid2 = response.json()['uid']
+    user2 = data_store.get_user_by_id(uid2)
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.get("admin/filter_users", headers={"Authorization": f"Bearer {access_token}"},
+                          params={
+                              'standard': False,
+                              'admin': True,
+                              'super': True
+                          })
+    
+    assert response.status_code == SUCCESS 
+    print(response.json())
+    assert len(response.json()) == 1
+
+def test_admin_filter_overlapping_users(simple_user):
+    '''
+        Testing overlap
+    '''
+
+    user_creds2 = {
+        "username" : "Tester 2",
+        "password" : "password22",
+        "email": "doxx22ed@gmail.com"
+    }
+    response = client.post("/auth/register", json=user_creds2)
+    assert response.status_code == SUCCESS
+    uid2 = response.json()['uid']
+    user2 = data_store.get_user_by_id(uid2)
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.get("admin/filter_users", headers={"Authorization": f"Bearer {access_token}"},
+                          params={
+                              'standard': True,
+                              'admin': False,
+                              'super': True
+                          })
+    
+    assert response.status_code == SUCCESS 
+    assert len(response.json()) == 3

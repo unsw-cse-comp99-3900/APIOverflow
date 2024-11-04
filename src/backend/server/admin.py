@@ -70,7 +70,24 @@ def get_all_users():
     users = data_store.get_users()
     users_json = [user.to_json() for user in users]
     return {"users": users_json, "user_count": data_store.num_users()}
-    
+
+def admin_filter_users(standard: bool, admin: bool, super: bool):
+    users = data_store.get_users()
+    return_list = []
+    if standard:
+        for user in users:
+            if not user.get_is_admin():
+                return_list.append(user.to_json())
+    if admin:
+        for user in users:
+            if user.get_is_admin() and user.to_json() not in return_list:
+                return_list.append(user.to_json())
+    if super:
+        for user in users:
+            if user.get_is_super() and user.to_json() not in return_list:
+                return_list.append(user.to_json())
+    return return_list
+        
 def admin_get_reviews_wrapper(status: str) -> List[dict[str, str]]:
     '''
         Wrapper which returns all reviews which are pending 
@@ -111,4 +128,4 @@ def admin_get_pending_services(status: str) -> List[dict[str, str]]:
             services.append(service.to_updated_json())
     
     return services
-
+    
