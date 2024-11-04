@@ -11,7 +11,7 @@ from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
 from src.backend.classes.Review import Review, LIVE
 import re
-
+from src.backend.server.email import *
 
 # Ollama information
 OLLAMA_API_KEY = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBqE8KSc69XaJ4GwS37IXdk44ooXGidxNxeaKJNOUm4r'
@@ -443,7 +443,13 @@ def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[st
 def approve_service_wrapper(sid: str, approved: bool, reason: str):
 
     service = data_store.get_api_by_id(sid)
+    sname = service.get_name()
+    owner_id = service.get_owner()
+    owner = data_store.get_user_by_id(owner_id)
+    uname = owner.get_name()
+    uemail = owner.get_email()
 
+    action = "rejected"
     if service is None:
         raise HTTPException(status_code=404, detail="Service not found")
     
@@ -451,8 +457,13 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str):
         service.complete_update()
         service.update_status(ServiceStatus.LIVE, reason)
         db_update_service(sid, service.to_json())
+        action = "approved"
     elif service.get_status() == ServiceStatus.PENDING:
         service.update_status(ServiceStatus.REJECTED, reason)
     elif service.get_status() == ServiceStatus.UPDATE_PENDING:
         service.update_status(ServiceStatus.UPDATE_REJECTED, reason)
+
+    content = {'action': action, 'sname': sname, 'uname': uname}
+    send_email(uemail, '', 'service_approval', content)
+    
         
