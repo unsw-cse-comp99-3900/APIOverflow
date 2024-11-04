@@ -11,7 +11,7 @@ from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
 from src.backend.classes.Review import Review, LIVE
 import re
-from src.backend.server.email import *
+from src.backend.server.auth import send_email
 
 # Ollama information
 OLLAMA_API_KEY = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBqE8KSc69XaJ4GwS37IXdk44ooXGidxNxeaKJNOUm4r'
