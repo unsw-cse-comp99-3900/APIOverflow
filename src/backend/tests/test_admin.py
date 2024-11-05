@@ -580,3 +580,56 @@ def test_admin_filter_overlapping_users(simple_user):
     
     assert response.status_code == SUCCESS 
     assert len(response.json()) == 3
+
+def test_admin_check_user_is_admin(simple_user):
+    '''
+        Test promoting a user
+    '''
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.get("/admin/check_if_admin", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : "0"
+                            })
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": "superadmin", "is_admin": True, "is_super": True}
+
+    response = client.get("/admin/check_if_admin", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": "Tester 1", "is_admin": False, "is_super": False}
+
+    response = client.post("/admin/promote", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": "Tester 1", "status": True}
+
+    response = client.get("/admin/check_if_admin", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": "Tester 1", "is_admin": True, "is_super": False}
+
+    response = client.post("/admin/demote", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": "Tester 1", "status": True}
+
+    response = client.get("/admin/check_if_admin", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": "Tester 1", "is_admin": False, "is_super": False}
