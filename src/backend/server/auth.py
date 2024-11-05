@@ -18,18 +18,13 @@ import base64
 from dotenv import load_dotenv
 from pathlib import Path
 import os
-from src.backend.server.email import *
+from src.backend.server.email import send_email
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 T = TypeVar("T")
 ADMIN = 'admin'
 GENERAL = 'general'
-
-def load_email_setting():
-    load_dotenv(Path(__file__).parent.parent / '.env')
-    return os.getenv("EMAIL") == "True"
-email = load_email_setting()
 
 def load_email_setting():
     load_dotenv(Path(__file__).parent.parent / '.env')
