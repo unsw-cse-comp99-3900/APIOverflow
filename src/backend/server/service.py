@@ -101,6 +101,10 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
 
     else:
         internal_url = ""
+    
+    if len(packet['endpoints']) == 0:
+        raise HTTPException(status_code=400,
+                    detail="Must input at least 1 endpoint")
 
     # Create new API
     new_api = API(str(data_store.num_apis()),
@@ -190,6 +194,7 @@ def api_tag_filter(tags, providers, hide_pending: bool) -> list:
     api_list = data_store.get_apis()
     filtered_apis = []
 
+    print(api_list)
     #query = input("Search")
 
     #if query != "":
@@ -221,6 +226,9 @@ def api_tag_filter(tags, providers, hide_pending: bool) -> list:
                     break
     else:
         return_list = [api for api in filtered_apis]
+    
+    for api in return_list:
+        print(api.get_status().name)
     
     
     return [api_into_json(api) for api in return_list if

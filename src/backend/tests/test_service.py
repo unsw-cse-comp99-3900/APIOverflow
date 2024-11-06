@@ -504,7 +504,7 @@ def test_update_api_documents(simple_user):
                         })
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['docs'] == ["static/docs/git_guide_1.pdf"]
+    assert response_info['docs'] == ["1"]
     database_object = db_get_service(sid)
 
     # path of file is accessible via get_service but internally
@@ -533,7 +533,7 @@ def test_update_api_documents(simple_user):
     assert response.status_code == SUCCESS
     response_info = response.json()
    
-    assert response_info['docs'] == ["static/docs/git_guide_1.pdf"]
+    assert response_info['docs'] == ["1"]
     database_object = db_get_service(sid)
     assert database_object['documents'] == [doc_id]
 
@@ -934,7 +934,7 @@ def test_update_api(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoint': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.dict()]
                 }
     
     response = client.post("/auth/login", json={
@@ -964,7 +964,7 @@ def test_update_api(simple_user):
         'name' : 'new name',
         'description' : 'new description',
         'tags' : ['new', 'tag'],
-        'endpoint': [simple_endpoint.dict()]
+        'endpoints': [simple_endpoint.dict()]
     }
 
     response = client.put("/service/update",

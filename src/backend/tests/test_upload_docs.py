@@ -213,4 +213,4 @@ def test_successful_upload(two_users):
                           })
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['docs'] == ["static/docs/git_guide_1.pdf"]
+    assert response_info['docs'] == ["1"]

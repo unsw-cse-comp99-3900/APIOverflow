@@ -108,7 +108,8 @@ def test_simple_filter(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['Private'],
-                              'providers': []
+                              'providers': [],
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -164,7 +165,8 @@ def test_simple_filter_multiple(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['API'],
-                              'providers': []
+                              'providers': [],
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -228,7 +230,8 @@ def test_providers(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': [],
-                              'providers': [simple_user['uid']]
+                              'providers': [simple_user['uid']],
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -292,7 +295,8 @@ def test_providers_with_tags(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['Private'],
-                              'providers': [simple_user['uid']]
+                              'providers': [simple_user['uid']],
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -356,7 +360,8 @@ def test_invalid_providers(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['Private'],
-                              'providers': ['5']
+                              'providers': ['5'],
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -420,7 +425,8 @@ def test_providers_with_tags2(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['API'],
-                              'providers': [simple_user['uid']]
+                              'providers': [simple_user['uid']],
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -504,7 +510,8 @@ def test_providers_with_tags_multiple(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['API'],
-                              'providers': [simple_user['uid'], user2_id]
+                              'providers': [simple_user['uid'], user2_id],
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -593,7 +600,8 @@ def test_providers_with_tags_multiple2(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['NOT API'],
-                              'providers': [simple_user['uid']]
+                              'providers': [simple_user['uid']],
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
@@ -667,7 +675,8 @@ def test_duplicate_apis(simple_user):
     response = client.get("/service/filter",
                           params={
                               'tags': ['API', 'Private'],
-                              'provicers': []
+                              'provicers': [],
+                              'hide_pending': False
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
