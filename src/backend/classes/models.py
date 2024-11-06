@@ -1,10 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from passlib.context import CryptContext
 from pymongo import MongoClient
 from typing import *
 from bson import ObjectId
 from src.backend.database import db
+from src.backend.classes.Endpoint import Endpoint
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -56,14 +57,20 @@ class ServicePost(BaseModel):
     y_end: int                      # Ending y-coord of img crop
     description: str                # Descrtipion of service
     tags: List[str]                 # List of tags assigned to the service
-    endpoint: str                   # Endpoint of the service uploaded
+    endpoints: List[Endpoint]                   # Endpoint of the service uploaded
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class ServiceUpdate(BaseModel):
     name: str                       # Name of service
     description: str                # Descrtipion of service
     tags: List[str]                 # List of tags assigned to the service
-    endpoint: str                   # Endpoint of the service uploaded
+    endpoints: List[Endpoint]                   # Endpoint of the service uploaded
     sid: str
+    class Config:
+        arbitrary_types_allowed = True
+
 class ServiceUpload(BaseModel):
 
     sid: str

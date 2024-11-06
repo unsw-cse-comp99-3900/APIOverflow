@@ -1,5 +1,6 @@
 from typing import List
 from src.backend.classes.Service import Service
+from src.backend.classes.Endpoint import Endpoint
 
 class API(Service):
 
@@ -17,8 +18,8 @@ class API(Service):
                  icon_url: str,
                  description: str,
                  tags: List[str],
-                 endpoint: str) -> None:
-        super().__init__(sid, name, owner, icon_url, description, tags, endpoint, 'api')
+                 endpoints: List[Endpoint]) -> None:
+        super().__init__(sid, name, owner, icon_url, description, tags, endpoints, 'api')
     
     def get_type(self):
         '''

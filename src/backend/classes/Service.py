@@ -1,5 +1,6 @@
 from typing import *
 from enum import Enum
+from src.backend.classes.Endpoint import Endpoint
 
 class ServiceStatus(Enum):
     UPDATE_REJECTED = 3
@@ -25,11 +26,11 @@ class ServicePendingUpdate:
                  name: str,
                  description: str, 
                  tags: List[str],
-                 endpoint: str):
+                 endpoints: List[Endpoint]):
         self._name = name
         self._description = description
         self._tags = tags
-        self._endpoint = endpoint
+        self._endpoints = endpoints
 
     def get_name(self) -> str:
         return self._name
@@ -40,8 +41,8 @@ class ServicePendingUpdate:
     def get_tags(self) -> List[str]:
         return self._tags
     
-    def get_endpoint(self) -> str:
-        return self._endpoint
+    def get_endpoints(self) -> str:
+        return self._endpoints
     
 
 
@@ -58,7 +59,7 @@ class Service:
         icon_url:       Path to image store on backend
         description:    User-given description of service
         tags:           List of tags given to service
-        endpoint:       Endpoint of the service
+        endpoints:       List of Endpoint of the service
         
         ----
         icon            Doc_ID of service icon. Has a default icon
@@ -86,7 +87,7 @@ class Service:
                  icon_url: str,
                  description: str,
                  tags: List[str],
-                 endpoint: str,
+                 endpoints: List[Endpoint],
                  stype: str,
                  icon: str = DEFAULT_ICON) -> None:
         
@@ -98,7 +99,7 @@ class Service:
         self._icon_url= icon_url
         self._description = description
         self._tags = tags
-        self._endpoint = endpoint
+        self._endpoints = endpoints
         self._type = stype
 
         # Default vars
@@ -159,6 +160,16 @@ class Service:
         '''
         self._tags.append(tag)
 
+    def add_endpoint(self, tab, parameters, method) -> None:
+        '''
+            Adds an endpoint to the service
+        '''
+        try: 
+            new_endpoint = Endpoint(tab, parameters, method)
+            self._endpoints.append(new_endpoint)
+        except ValueError as e:
+            print(e)
+
     # def add_owner(self, owner: str) -> None:
     #     '''
     #         Adds owner to service
@@ -202,17 +213,17 @@ class Service:
                 name: str,
                 description: str,
                 tags: List[str],
-                endpoint: str
+                endpoints: List[Endpoint]
                 ):
         self.update_status(ServiceStatus.UPDATE_PENDING, "")
-        self._pending_update = ServicePendingUpdate(name, description, tags, endpoint)
+        self._pending_update = ServicePendingUpdate(name, description, tags, endpoints)
     
     def complete_update(self):
         if self._status == ServiceStatus.UPDATE_PENDING:
             self._name = self._pending_update.get_name()
             self._description = self._pending_update.get_description()
             self._tags = self._pending_update.get_tags()
-            self._endpoint =  self._pending_update.get_endpoint()
+            self._endpoints =  self._pending_update.get_endpoints()
             self._pending_update = None
 
     ################################
@@ -256,6 +267,12 @@ class Service:
         '''
         self._icon = DEFAULT_ICON
 
+    def remove_endpoint(self, endpoint: Endpoint) -> None:
+        '''
+            Removes specified endpoint 
+        '''
+        self._endpoints.remove(endpoint)
+
     # def remove_owner(self, uid: str) -> None:
     #     '''
     #         Remove owner from ownership list
@@ -289,6 +306,12 @@ class Service:
             Returns owner of service
         '''
         return self._owner
+    
+    def get_endpoints(self) -> list[Endpoint]:
+        '''
+            Returns endpoints of service
+        '''
+        return self._endpoints
 
     def get_tags(self) -> List[str]:
         '''
@@ -301,12 +324,6 @@ class Service:
             Returns icon_url of service
         '''
         return self._icon_url
-    
-    def get_endpoint(self) -> str:
-        '''
-            Returns endpoint of service
-        '''
-        return self._endpoint
     
     def get_docs(self) -> List[str]:
         '''
@@ -359,7 +376,7 @@ class Service:
             'icon_url' : self._icon_url,
             'description' : self._description,
             'tags' : self._tags,
-            'endpoint': self._endpoint,
+            'endpoints': self._endpoints,
             'documents' : self._docs,
             'users' : self._users,
             'reviews': self._reviews,
@@ -382,7 +399,7 @@ class Service:
                 'icon_url' : self._icon_url,
                 'description' : self._pending_update.get_description(),
                 'tags' : self._pending_update.get_tags(),
-                'endpoint': self._pending_update.get_endpoint(),
+                'endpoints': self._pending_update.get_endpoints(),
                 'documents' : self._docs,
                 'users' : self._users,
                 'reviews': self._reviews,

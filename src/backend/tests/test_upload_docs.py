@@ -3,6 +3,9 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from src.backend.app import app 
 from src.backend.classes.models import db
+from src.backend.classes.Endpoint import Endpoint
+from src.backend.classes.Parameter import Parameter 
+from src.backend.classes.Response import Response
 
 # Create a test client
 client = TestClient(app)
@@ -11,6 +14,15 @@ INPUT_ERROR = 400
 MISSING_ERROR = 404
 FORBIDDEN_ERROR = 403
 SUCCESS = 200
+
+# test endpoint
+simple_parameter = Parameter(id="1", endpoint_link='https://api.example.com/users/12345', required=True, 
+                            type='HEADER', name='paramtest', value_type='int')
+simple_response = Response(code='404', description='not found', conditions=["site is down", "badtest"], 
+                            example="example...")
+simple_endpoint = Endpoint(link='https://api.example.com/users/12345', title_description='testTitle1', 
+                            main_description='tests endpoint', tab='tabTest', parameters=[simple_parameter], 
+                            method="POST", responses=[simple_response])
 
 def clear_all():
     '''
@@ -75,7 +87,7 @@ def two_users():
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoint': 'https://api.example.com/users/12345'
+                'endpoints': [simple_endpoint.dict()]
                 }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {usable_data['creator']}"},
@@ -201,4 +213,4 @@ def test_successful_upload(two_users):
                           })
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['docs'] == ["1"]
+    assert response_info['docs'] == ["static/docs/git_guide_1.pdf"]
