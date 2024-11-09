@@ -8,6 +8,7 @@ from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
 import re
+from src.backend.server.email import send_email
 
 def user_add_icon_wrapper(uid: str, doc_id: str) -> None:
     '''
@@ -103,6 +104,12 @@ def user_self_delete(uid: str):
     username = user.get_name()
     data_store.delete_item(uid, 'user')
     db_status = db_delete_user(username)
+
+    action = "self"
+    uname = username
+    uemail = user.get_email()
+    content = {'action': action, 'uname': uname}
+    send_email(uemail, '', 'account_deleted', content)
 
     return {"name": username, "deleted": db_status}
 

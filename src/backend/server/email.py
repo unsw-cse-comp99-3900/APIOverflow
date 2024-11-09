@@ -81,7 +81,7 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
             tone = 'pleased'
         else:
             tone = 'regret'
-        subject = "Service Approval Notification"
+        subject = "Service Upload Outcome"
         msg_html = f"""
         Hi {user_name},<br/>
         We are {tone} to inform you that your service - {service_name} has been {action}.<br/>
@@ -110,8 +110,27 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
         msg_plain = f"Hi {user_name},\nYour account has been deleted {outcome}." \
         f"Please contact this email if you think there has been an error.\nBest regards,\nAPI Overflow Team"
 
+    elif email_type == 'reivew_reply':
+        action = content['action']
+        msg = content['msg']
+        if len(msg) > 80:
+            msg = msg[:80] + "..."
+        subject_name = content['subname']
+        related_name = content['rname']
+        service_name = content['sname']
+        subject = "Service Review Update"
+        msg_html = f"""
+        Hi {subject_name},<br/>
+        You have recieved a {action} from {related_name} regarding {service_name}:<br/>
+        {msg}.<br/>
+        Best regards,<br/>
+        API Overflow Team
+        """
+        msg_plain = f"Hi {subject_name},\nYou have recieved a {action} from {related_name} regarding {service_name}:" \
+        f"{msg}.\nBest regards,\nAPI Overflow Team"
+
     else:
-        raise ValueError("Invalid email type specified. Use 'verification' or 'password_reset'.")
+        raise ValueError("Invalid email type specified.")
 
     try:
         credentials = get_credentials()

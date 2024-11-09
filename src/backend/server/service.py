@@ -403,6 +403,17 @@ def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
     service.add_review(review.get_id(), rating)
     user.add_review(review.get_id())
 
+    owner_id = service.get_owner()
+    owner = data_store.get_user_by_id(owner_id)
+    action = "comment"
+    msg = comment
+    subname = owner.get_name()
+    rname = user.get_name()
+    sname = service.get_name()
+    uemail = owner.get_email()
+    content = {'action': action, 'msg': msg, 'subname': subname, 'rname': rname, 'sname': sname}
+    send_email(uemail, '', 'reivew_reply', content)
+
 def service_get_rating_wrapper(sid: str) -> dict[str, Union[int, float]]:
     '''
         Wrapper which gets the rating of an existing service
