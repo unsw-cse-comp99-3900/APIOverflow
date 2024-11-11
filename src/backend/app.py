@@ -182,8 +182,17 @@ async def delete_api(sid: str):
     """
     return delete_service(sid)
 
+@app.delete("/service/version/delete")
+async def add_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
+    '''
+        Method used to delete a specific version from a service
+    '''
+    # Unpack request body
+    delete_service_version_wrapper(sid, version_name)
+
 @app.post("/service/add_icon")
 async def api_add_icon(info: ServiceIconInfo, user: User = Depends(manager)):
+
     '''
         Adds an icon to the service
     '''

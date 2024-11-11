@@ -26,6 +26,7 @@ DEFAULT_ICON = '0'
 # /service/add: added "version_name" and "version_description" fields
 #  - currently these give a default value to break existing things
 #  - but pls change so users must provide these strings
+#  - throws error if version_name is ""
 #
 # /service/get: 
 #  - REMOVED FIELDS endpoints and docs
@@ -56,7 +57,12 @@ DEFAULT_ICON = '0'
 #  - version_name: str               # name of new version
 #  - endpoints: List[Endpoint]       # endpoints of new version
 #  - version_description: str        # Additional details pertaining new version   
+# - throws error if invalid sid, version_name same as existing version_name or
+#   version_name == ""
 
+# /service/version/delete : DELETE
+# Fields: sid and version_name
+# throws error if invlaid sid, invalid version_name or service contains only one version
 
 
 # TODOs
@@ -539,7 +545,18 @@ class Service:
         if len(versions) == 0:
             raise HTTPException(status_code=404, detail="Service version {version} not found in service")
         return versions[0]
+    
+    def remove_version(self, version_name: str) -> None:
+        if len(self._version_info) == 1:
+            raise HTTPException(status_code=404, detail="Cannot Delete last version of service")
+
+        versions = [ver for ver in self._version_info if ver._version_name != version_name]
+
+        if len(versions) == len(self._version_info):
+            raise HTTPException(status_code=404, detail="Service version {version_name} not found in service")
         
+        assert len(versions) + 1 == len(self._version_info)
+        self._version_info = versions
 
 
     ################################

@@ -158,12 +158,10 @@ def add_new_service_version_wrapper(request):
                                 request["endpoints"],
                                 request["version_description"])
 
-
-    # TODO: add new service version
+def delete_service_version_wrapper(sid: str, version_name: str):
+    service: Service = get_validate_service_id(sid)
+    service.remove_version(version_name)
     
-
-
-
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
 def api_tag_filter(tags, providers, hide_pending: bool) -> list:
