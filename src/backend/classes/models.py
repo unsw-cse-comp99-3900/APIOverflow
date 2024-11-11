@@ -73,11 +73,10 @@ class ServiceAddVersion(BaseModel):
 
 
 
-class ServiceUpdate(BaseModel):
+class ServiceGlobalUpdate(BaseModel):
     name: str                       # Name of service
     description: str                # Descrtipion of service
     tags: List[str]                 # List of tags assigned to the service
-    endpoints: List[Endpoint]                   # Endpoint of the service uploaded
     sid: str
     class Config:
         arbitrary_types_allowed = True

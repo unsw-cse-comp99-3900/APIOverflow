@@ -35,8 +35,9 @@ DEFAULT_ICON = '0'
             # "endpoints": list of endpoints (whatever it was before),
             # "version_description": Additional description for version(str),
             # "docs": documents (whatever it was before)
-#
 # }
+#
+# /service/update: No longer contains endpoints field (only updates global fields)
 
 #    
 # for simplicity / to avoid a bunch of funky edge cases, we can only perform
@@ -44,20 +45,21 @@ DEFAULT_ICON = '0'
 # trying to make second update will automatically ovewrite first
 
 
+
+
 # TODOs
+# 4. New service Version
+# Test get service returns all versions in reverse order
+# 5. Delete service version
 # 7. Updating a Service 
-# -- name, tags, description are service global and do not require a version name
-# -- version_name, endpoints, version_description require version_name to update
-# -- up to frontend to ensure that these fields are updates separately
+# [X] existing update API no longer updates endpoint
+# -- create new endpoint for updating specific version
+# -- separate pending between versions and global
+
 # -- get pending must return a version as well
 # -- admin service approval must provide a version
 # -- a) remove endpoint from service update
 # -- b) create new endpoint 
-# 4. New service Version
-# 5. Delete service version
-# 3. Getting a Service returns all versions
-#    - returns a list of versions, in reverse order 
-#    - Test
 # 6. Add docs now requires a version name
 #     - currently only supports 1 doc, should it support more?
 #     - currently cannot delete a doc  
@@ -92,7 +94,30 @@ class ServiceVersionInfo:
         }
         
 
-class ServicePendingUpdate:
+
+
+class ServicePendingVersionUpdate:
+    '''
+        stores the updates related to a specific version of a service
+    '''
+    def __init__(self,
+                 version_name: str,
+                 endpoints: List[Endpoint],
+                 version_description: str):
+        self._version_name: str = version_name
+        self._endpoints: List[Endpoint] = endpoints
+        self._version_description: str = version_description
+
+    def get_version_name(self) -> str:
+        return self._version_name
+    
+    def get_endpoints(self) -> List[Endpoint]:
+        return self._endpoints
+    
+    def get_version_description(self) -> str:
+        return self._version_description
+
+class ServicePendingGlobalUpdate:
     '''
         Stores the updates related to the global fields of a service
     '''
@@ -100,22 +125,13 @@ class ServicePendingUpdate:
     def __init__(self,
                  name: str,
                  description: str, 
-                 tags: List[str],
-                 endpoints: List[Endpoint],
-                 version: str
+                 tags: List[str]
                  ):
         
         # these fields don't require a version to update
         self._name = name
         self._description = description
         self._tags = tags
-
-        # these fields require a version to update
-        self._version = version
-        self._endpoints = endpoints
-
-    def get_version(self) -> str:
-        return self._version
 
     def get_name(self) -> str:
         return self._name
@@ -125,9 +141,6 @@ class ServicePendingUpdate:
     
     def get_tags(self) -> List[str]:
         return self._tags
-    
-    def get_endpoints(self) -> str:
-        return self._endpoints
     
 
 
@@ -294,30 +307,26 @@ class Service:
         self._status = status
         self._status_reason = reason
     
-    def create_pending_update(self,
+    def create_pending_global_update(self,
                 name: str,
                 description: str,
-                tags: List[str],
-                endpoints: List[Endpoint],
-                version: Optional[str] = None # todo: fix at endpoint level
+                tags: List[str]
                 ):
         
-        # will automatically throw if version does not exist
-        version_name = self.get_version_info(version)._version_name
-
         self.update_status(ServiceStatus.UPDATE_PENDING, "")
 
-        self._pending_update = ServicePendingUpdate(name, description, tags, endpoints, version_name)
+        self._pending_update = ServicePendingGlobalUpdate(name, description, tags)
     
     def complete_update(self):
         if self._status == ServiceStatus.UPDATE_PENDING:
+            print("updating to {}", self._pending_update)
             self._name = self._pending_update.get_name()
             self._description = self._pending_update.get_description()
             self._tags = self._pending_update.get_tags()
 
-            if self._pending_update.get_version() is not None:
-                version_details = self.get_version_info(self._pending_update.get_version())
-                version_details._endpoints = self._pending_update.get_endpoints()
+            # if self._pending_update.get_version() is not None:
+            #     version_details = self.get_version_info(self._pending_update.get_version())
+            #     version_details._endpoints = self._pending_update.get_endpoints()
 
             self._pending_update = None
 
@@ -526,7 +535,8 @@ class Service:
         '''
 
         if self._status == ServiceStatus.UPDATE_PENDING:
-            version = self._pending_update.get_version()
+            # version = self._pending_update.get_version()
+            version = self.get_version_info(None)
             return {
                 'id': self._id,
                 'name' : self._pending_update.get_name(),
@@ -534,8 +544,10 @@ class Service:
                 'icon_url' : self._icon_url,
                 'description' : self._pending_update.get_description(),
                 'tags' : self._pending_update.get_tags(),
-                'endpoints': self._pending_update.get_endpoints(),
-                'docs' : self.get_version_info(version)._docs,
+                'endpoints' : version._endpoints,
+                # TODO: endpoints and docs update
+                # 'endpoints': self._pending_update.get_endpoints(), 
+                'docs' : version._docs,
                 'users' : self._users,
                 'reviews': self._reviews,
                 'upvotes': self._upvotes,

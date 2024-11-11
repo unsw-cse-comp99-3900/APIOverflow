@@ -37,9 +37,6 @@ def validate_api_fields(packet: dict[T, K]) -> None:
     
     if len(packet['tags']) == 0:
         raise HTTPException(status_code=400, detail='No service tags provided')
-    
-    if packet['endpoints'] == '':
-        raise HTTPException(status_code=400, detail='No service endpoint provided')
 
 def get_validate_service_id(sid: str) -> API:
     if sid == '':
@@ -123,7 +120,7 @@ def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
     db_add_service(new_api.to_json())
     return str(new_api.get_id())
 
-def update_service_wrapper(packet: dict[T, K], user: str) -> None:
+def update_service_wrapper(packet: dict[T, K]) -> None:
     '''
         Updates a service by sid
 
@@ -136,8 +133,8 @@ def update_service_wrapper(packet: dict[T, K], user: str) -> None:
     validate_api_fields(packet)
 
     # service is ref to API Obj in data store which gets updated
-    service.create_pending_update(
-        packet["name"], packet["description"], packet["tags"], packet["endpoints"])
+    service.create_pending_global_update(
+        packet["name"], packet["description"], packet["tags"])
     
     db_update_service(sid, service.to_json())
     return None
@@ -427,7 +424,7 @@ def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[st
 
 def approve_service_wrapper(sid: str, approved: bool, reason: str):
 
-    service = data_store.get_api_by_id(sid)
+    service : API = data_store.get_api_by_id(sid)
 
     if service is None:
         raise HTTPException(status_code=404, detail="Service not found")

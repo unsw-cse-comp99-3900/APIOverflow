@@ -367,63 +367,6 @@ def test_custom_icon(simple_user):
     assert response_info['tags'] == api_info['tags']
     assert response_info['endpoints'] == api_info['endpoints']
 
-def test_update_api(simple_user):
-    '''
-        Test whether an API is correctly created then updated
-    '''
-    api_info = {
-                'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
-                'description' : 'This is a test API',
-                'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
-                }
-
-    response = client.post("/service/add",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api_info)
-    assert response.status_code == SUCCESS
-    sid = response.json()['id']
-
-    update_request_info = {
-        'sid' : sid,
-        'name' : 'new name',
-        'description' : 'new description',
-        'tags' : ['new', 'tag'],
-        'endpoints': [simple_endpoint.dict()]
-    }
-
-    response = client.put("/service/update",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=update_request_info)
-    assert response.status_code == SUCCESS
-    
-    response = client.get("/service/get_service",
-                          headers={"Authorization": f"Bearer {simple_user['token']}"},
-                          params={
-                              'sid' : sid
-                          })
-    
-    assert response.status_code == SUCCESS
-    response_info = response.json()
-   
-    assert response_info['id'] == sid
-    assert response_info['name'] == update_request_info['name']
-    assert response_info['description'] == update_request_info['description']
-    assert response_info['tags'] == update_request_info['tags']
-    assert response_info['endpoints'] == update_request_info['endpoints']
-
-    database_object = db_get_service(sid)
-    assert database_object['id'] == sid
-    assert database_object['name'] == update_request_info['name']
-    assert database_object['description'] == update_request_info['description']
-    assert database_object['tags'] == update_request_info['tags']
-    assert database_object['endpoints'] == update_request_info['endpoints']
-
 def test_update_api_invalid_sid(simple_user):
     '''
         Tests error received when sid is not valid
@@ -921,7 +864,7 @@ def test_admin_disapprove(simple_user):
     assert response_info['status_reason'] == reason
 
 
-def test_update_api(simple_user):
+def test_update_global_api(simple_user):
     '''
         Test whether an API is correctly created then updated
     '''
@@ -934,7 +877,7 @@ def test_update_api(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
     
     response = client.post("/auth/login", json={
@@ -964,7 +907,6 @@ def test_update_api(simple_user):
         'name' : 'new name',
         'description' : 'new description',
         'tags' : ['new', 'tag'],
-        'endpoints': [simple_endpoint.dict()]
     }
 
     response = client.put("/service/update",
@@ -983,7 +925,6 @@ def test_update_api(simple_user):
     assert response_info[0]['name'] == update_request_info['name']
     assert response_info[0]['description'] == update_request_info['description']
     assert response_info[0]['tags'] == update_request_info['tags']
-    assert response_info[0]['endpoints'] == update_request_info['endpoints']
 
     # make sure pending update so details have not yet changed and status is pending
     response = client.get("/service/get_service",
@@ -1081,7 +1022,6 @@ def test_update_api(simple_user):
     assert response_info['name'] == update_request_info['name']
     assert response_info['description'] == update_request_info['description']
     assert response_info['tags'] == update_request_info['tags']
-    assert response_info['endpoints'] == update_request_info['endpoints']
     assert response_info['status'] == "LIVE"
     assert response_info['status_reason'] == reason
 
@@ -1090,7 +1030,6 @@ def test_update_api(simple_user):
     assert database_object['name'] == update_request_info['name']
     assert database_object['description'] == update_request_info['description']
     assert database_object['tags'] == update_request_info['tags']
-    assert database_object['endpoints'] == update_request_info['endpoints']
 
     response = client.get("/service/filter",
                           headers={"Authorization": f"Bearer {simple_user['token']}"})

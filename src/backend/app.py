@@ -125,15 +125,14 @@ async def get_service(sid: str):
     return response
 
 @app.put("/service/update")
-async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
+async def update_service(service: ServiceGlobalUpdate, user: User = Depends(manager)):
     '''
         Method used to update service to platform
     '''
 
     request = service.model_dump()
-    uid = user['id']
    
-    update_service_wrapper(request, str(uid))
+    update_service_wrapper(request)
     return None
 
 @app.get("/service/apis")
