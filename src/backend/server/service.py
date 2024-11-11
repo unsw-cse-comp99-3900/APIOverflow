@@ -8,6 +8,7 @@ from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.classes.Service import Service
+from src.backend.classes.User import User
 from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
 from src.backend.classes.Review import Review, LIVE
@@ -51,7 +52,7 @@ def get_validate_service_id(sid: str) -> API:
     return service
 
 # Endpoint Wrappers
-def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
+def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
     '''
         Adds a Service (default to API) to the platform
 
@@ -147,40 +148,11 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
 
         Raises:     HTTP Error 400 if missing info/bad request
                     HTTP Error 404 if no such sid found
-        Returns:    {
-                        sid
-                        name
-                        owner
-                        description
-                        icon_url
-                        tags
-                        endpoint,
-                        icon (doc_id)
-                    }
+        Returns:    Service details
     '''
-
     service = get_validate_service_id(sid)
-    owner_id = service.get_owner()
-    owner = data_store.get_user_by_id(owner_id)
+    return service.to_json()
 
-    # TODO: clean this up to unify with to_json()
-    return {
-            'id' : service.get_id(),
-            'name' : service.get_name(),
-            'owner' : {
-                'id' : owner.get_id(),
-                'name' : owner.get_name(),
-                'email' : owner.get_email()
-            },
-            'description': service.get_description(),
-            'icon_url': service.get_icon_url(),
-            'tags' : service.get_tags(),
-            'endpoints' : service.get_endpoints(),
-            'docs' : service.get_docs(),
-            'icon' : service.get_icon(),
-            'status' : service.get_status().name,
-            'status_reason' : service.get_status_reason()
-    }
 
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
@@ -216,7 +188,9 @@ def api_tag_filter(tags, providers, hide_pending: bool) -> list:
         # if providers list is not empty
         for api in filtered_apis:
             for provider in providers:
-                if provider in api.get_owner() and api not in return_list:
+                # I refactored get_owner so that it now returns the User object
+                # I've fixed this to what it was before (which is bugged)
+                if provider in api.get_owner().get_id() and api not in return_list:
                     return_list.append(api)
                     break
     else:
@@ -262,7 +236,7 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
         raise HTTPException(status_code=404, detail="Service not found")
     
     # Check if user is owner
-    if service.get_owner() != uid:
+    if service.get_owner().get_id() != uid:
         raise HTTPException(status_code=403, detail="User is not service owner")
 
     # Add document to service
@@ -319,7 +293,7 @@ def service_add_icon_wrapper(uid: str, sid: str, doc_id: str) -> None:
         raise HTTPException(status_code=404, detail='Icon not found')
 
     # Check whether user is allowed to modify icon
-    if service.get_owner() != user.get_id():
+    if service.get_owner().get_id() != user.get_id():
         raise HTTPException(status_code=403, detail='User not service owner')
 
     service.update_icon_id(doc_id)
@@ -340,7 +314,7 @@ def service_delete_icon_wrapper(uid: str, sid: str) -> None:
         raise HTTPException(status_code=404, detail='Service not found')
     
     # Check whether user is allowed to modify icon
-    if service.get_owner() != user.get_id():
+    if service.get_owner().get_id() != user.get_id():
         raise HTTPException(status_code=403, detail='User not service owner')
 
     service.remove_icon()
@@ -377,7 +351,7 @@ def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
         raise HTTPException(status_code=404, detail="User not found")
     
     # Check whether user attempting to review their own service
-    if service.get_owner() == user.get_id():
+    if service.get_owner().get_id() == user.get_id():
          raise HTTPException(status_code=403, detail="Cannot review own service")
 
     # Check whether user has already reviewed this service

@@ -30,4 +30,5 @@ ENV TEST ${TEST}
 # normally and running pytest
 # todo: figure out how to silence specific service output?
 
-CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv; fi
+# -x flag to exit on first test fail
+CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv -x; fi

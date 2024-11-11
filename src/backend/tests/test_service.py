@@ -509,7 +509,7 @@ def test_update_api_documents(simple_user):
 
     # path of file is accessible via get_service but internally
     # stored by document id instead of path
-    assert database_object['documents'] == [doc_id]
+    assert database_object['docs'] == [doc_id]
 
     update_request_info = {
         'sid' : sid,
@@ -535,7 +535,7 @@ def test_update_api_documents(simple_user):
    
     assert response_info['docs'] == ["1"]
     database_object = db_get_service(sid)
-    assert database_object['documents'] == [doc_id]
+    assert database_object['docs'] == [doc_id]
 
 # Delete non-existing service
 def test_delete_non_api(simple_user):

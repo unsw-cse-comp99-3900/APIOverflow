@@ -2,6 +2,8 @@ from typing import *
 from enum import Enum
 from src.backend.classes.Endpoint import Endpoint
 from src.backend.classes.Document import Document
+from src.backend.classes.User import User
+
 from fastapi import HTTPException
 
 class ServiceStatus(Enum):
@@ -24,6 +26,9 @@ DEFAULT_ICON = '0'
 # /service/add: added version_name and version_description fields
 #  - currently these give a default value to break existing things
 #  - but pls change so users must provide these strings
+#
+# /service/get: 
+# 
 #    
 # for simplicity / to avoid a bunch of funky edge cases, we can only perform
 # one update at once
@@ -32,7 +37,7 @@ DEFAULT_ICON = '0'
 
 # TODOs
 # Refactor Service.py
-# 2. Create Service Requires Version Name and description
+# Create Service Requires Version Name and description
 # 3. Getting a Service returns all versions
 #    - returns a list of versions, in reverse order 
 # 4. New service Version
@@ -173,7 +178,7 @@ class Service:
     def __init__(self,
                  sid: str,
                  name: str,
-                 owner: str,
+                 owner: User,
                  icon_url: str,
                  description: str,
                  tags: List[str],
@@ -400,7 +405,7 @@ class Service:
         '''
         return self._description
     
-    def get_owner(self) -> str:
+    def get_owner(self) -> User:
         '''
             Returns owner of service
         '''
@@ -494,18 +499,24 @@ class Service:
         return {
             'id': self._id,
             'name' : self._name,
-            'owner' : self._owner,
+            'owner' : {
+                'id' : self._owner.get_id(),
+                'name' : self._owner.get_name(),
+                'email' : self._owner.get_email()
+            },
             'icon_url' : self._icon_url,
             'description' : self._description,
             'tags' : self._tags,
             'endpoints': version_details._endpoints,
-            'documents' : version_details._docs,
+            'docs' : version_details._docs,
             'users' : self._users,
             'reviews': self._reviews,
             'upvotes': self._upvotes,
             'type': self._type,
             'icon': self._icon,
-            'downvotes': self._downvotes
+            'downvotes': self._downvotes,
+            'status': self._status.name,
+            'status_reason': self._status_reason
         }
 
     def to_updated_json(self) -> dict[T, K]:
@@ -524,7 +535,7 @@ class Service:
                 'description' : self._pending_update.get_description(),
                 'tags' : self._pending_update.get_tags(),
                 'endpoints': self._pending_update.get_endpoints(),
-                'documents' : self.get_version_info(version)._docs,
+                'docs' : self.get_version_info(version)._docs,
                 'users' : self._users,
                 'reviews': self._reviews,
                 'upvotes': self._upvotes,

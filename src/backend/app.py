@@ -102,8 +102,8 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
     '''
     # Unpack request body
     request = service.model_dump()
-    uid = user['id']
-    id = add_service_wrapper(request, str(uid))
+    user = data_store.get_user_by_id(user['id'])
+    id = add_service_wrapper(request, user)
     return {'id' : id}
 
 
