@@ -23,12 +23,21 @@ K = TypeVar("K")
 DEFAULT_ICON = '0'
 
 # API Changes
-# /service/add: added version_name and version_description fields
+# /service/add: added "version_name" and "version_description" fields
 #  - currently these give a default value to break existing things
 #  - but pls change so users must provide these strings
 #
 # /service/get: 
-# 
+#  - Added fields: "version_name", "version_description"
+#  - Note that all first level fields refer to values of most recent version
+#  - Added field: versions: {
+            # "version_name": name of version(str)
+            # "endpoints": list of endpoints (whatever it was before),
+            # "version_description": Additional description for version(str),
+            # "docs": documents (whatever it was before)
+#
+# }
+
 #    
 # for simplicity / to avoid a bunch of funky edge cases, we can only perform
 # one update at once
@@ -36,8 +45,6 @@ DEFAULT_ICON = '0'
 
 
 # TODOs
-# Refactor Service.py
-# Create Service Requires Version Name and description
 # 3. Getting a Service returns all versions
 #    - returns a list of versions, in reverse order 
 # 4. New service Version
@@ -49,21 +56,20 @@ DEFAULT_ICON = '0'
 # -- name, tags, description are service global and do not require a version name
 # -- version_name, endpoints, version_description require version_name to update
 # -- up to frontend to ensure that these fields are updates separately
-# -- admin service approval must provide a version
 # -- get pending must return a version as well
+# -- admin service approval must provide a version
 # -- a) remove endpoint from service update
 # -- b) create new endpoint 
+
 
 class ServiceVersionInfo:
     '''
         Information about a service which is version specific
+
         version_name:  name of version
         endpoints: list of endpoints
         version_description: additional version specific details
         documents: List of documents
-        status: Status of service [LIVE, PENDING, REJECTED]
-        status_reason:  Reason for status
-        pending_update:  Pending update Details when waiting to approve an update
     '''
 
     def __init__(self,
@@ -75,30 +81,14 @@ class ServiceVersionInfo:
         self._version_description: str = version_description
         
         self._docs: List[Document] = []
-        # self._pending_update = None
 
-        # self._status: ServiceStatus = ServiceStatus.PENDING
-        # self._status_reason: str = ""
-
-        # def get_version_name(self) -> str:
-        #     return self._version_name
-        
-        # def get_endpoints(self) -> List[Endpoint]:
-        #     return self._endpoints
-        
-        # def get_version_description(self) -> str:
-        #     return self._version_description
-        
-        # def get_docs(self) -> List[Document]:
-        #     return self._docs
-        
-        # def get_status(self) -> ServiceStatus:
-        #     return self._status
-
-        # def get_status_reason(self) -> str:
-        #     return self._status_reason
-        
-        #TODO: handle pending update
+    def to_json(self):
+        return {
+            "version_name": self._version_name,
+            "endpoints": self._endpoints,
+            "version_description": self._version_description,
+            "docs": self._docs
+        }
         
 
 class ServicePendingUpdate:
@@ -491,11 +481,10 @@ class Service:
     ################################
     #  Storage Methods
     ################################
-    def to_json(self, version: Optional[str] = None) -> dict[T, K]:
+    def to_json(self) -> dict[T, K]:
         '''
             Converts object into json
         '''
-        version_details: ServiceVersionInfo = self.get_version_info(version)
         return {
             'id': self._id,
             'name' : self._name,
@@ -507,8 +496,6 @@ class Service:
             'icon_url' : self._icon_url,
             'description' : self._description,
             'tags' : self._tags,
-            'endpoints': version_details._endpoints,
-            'docs' : version_details._docs,
             'users' : self._users,
             'reviews': self._reviews,
             'upvotes': self._upvotes,
@@ -516,13 +503,25 @@ class Service:
             'icon': self._icon,
             'downvotes': self._downvotes,
             'status': self._status.name,
-            'status_reason': self._status_reason
+            'status_reason': self._status_reason,
+            # fields denoting most current service version
+            "version_name": self._version_info[0]._version_name,
+            "endpoints": self._version_info[0]._endpoints,
+            "version_description": self._version_info[0]._version_description,
+            "docs": self._version_info[0]._docs,
+
+            "versions": [version.to_json() for version in self._version_info[1::]]
         }
+    
+            
 
     def to_updated_json(self) -> dict[T, K]:
         '''
             Converts object into json, returning updated values for a pending
             update
+
+            Notably only returns a single version - the version being updated
+            and not the rest
         '''
 
         if self._status == ServiceStatus.UPDATE_PENDING:
