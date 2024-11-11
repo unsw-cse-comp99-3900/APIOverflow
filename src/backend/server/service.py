@@ -114,7 +114,10 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
                     internal_url,
                     packet['description'],
                     packet['tags'],
-                    packet['endpoints'])
+                    packet['endpoints'],
+                    packet['version_name'],
+                    packet['version_description']
+                    )
     data_store.add_api(new_api)
     db_add_service(new_api.to_json())
     return str(new_api.get_id())

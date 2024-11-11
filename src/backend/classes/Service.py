@@ -21,13 +21,17 @@ K = TypeVar("K")
 DEFAULT_ICON = '0'
 
 # API Changes
-# create_service: optional version_name and version_description fielsds 
+# /service/add: added version_name and version_description fields
+#  - currently these give a default value to break existing things
+#  - but pls change so users must provide these strings
+#    
 # for simplicity / to avoid a bunch of funky edge cases, we can only perform
 # one update at once
+# trying to make second update will automatically ovewrite first
 
 
 # TODOs
-# 1. Refactor Service.py
+# Refactor Service.py
 # 2. Create Service Requires Version Name and description
 # 3. Getting a Service returns all versions
 #    - returns a list of versions, in reverse order 
@@ -44,7 +48,6 @@ DEFAULT_ICON = '0'
 # -- get pending must return a version as well
 # -- a) remove endpoint from service update
 # -- b) create new endpoint 
-# 8. Merge and deal with endpoint objects, adding endpoint requires version_name
 
 class ServiceVersionInfo:
     '''
@@ -176,9 +179,9 @@ class Service:
                  tags: List[str],
                  endpoints: List[Endpoint],
                  stype: str,
-                 icon: str = DEFAULT_ICON,
-                 version_name: str = "version 1",
-                 version_description: str = "") -> None:
+                 version_name: str,
+                 version_description: str,
+                 icon: str = DEFAULT_ICON) -> None:
         
         # Initialised vars
         self._id = sid

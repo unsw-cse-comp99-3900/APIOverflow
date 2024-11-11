@@ -18,8 +18,13 @@ class API(Service):
                  icon_url: str,
                  description: str,
                  tags: List[str],
-                 endpoints: List[Endpoint]) -> None:
-        super().__init__(sid, name, owner, icon_url, description, tags, endpoints, 'api')
+                 endpoints: List[Endpoint],
+                 version_name: str,
+                 version_description: str
+                 ) -> None:
+        super().__init__(
+            sid, name, owner, icon_url, description, tags, endpoints, 'api',
+            version_name, version_description)
     
     def get_type(self):
         '''

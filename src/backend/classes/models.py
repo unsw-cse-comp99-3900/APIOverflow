@@ -49,15 +49,17 @@ class FilterRequest(BaseModel):
 # Request body for POST methods relating to services
 class ServicePost(BaseModel):
 
-    name: str                       # Name of service
-    icon_url: str                   # URL of service icon uploaded
-    x_start: int                    # Starting x-coord of img crop
-    x_end: int                      # Ending x-coord of img crop
-    y_start: int                    # Starting y-coord of img crop
-    y_end: int                      # Ending y-coord of img crop
-    description: str                # Descrtipion of service
-    tags: List[str]                 # List of tags assigned to the service
-    endpoints: List[Endpoint]                   # Endpoint of the service uploaded
+    name: str                           # Name of service
+    icon_url: str                       # URL of service icon uploaded
+    x_start: int                        # Starting x-coord of img crop
+    x_end: int                          # Ending x-coord of img crop
+    y_start: int                        # Starting y-coord of img crop
+    y_end: int                          # Ending y-coord of img crop
+    description: str                    # Descrtipion of service
+    tags: List[str]                     # List of tags assigned to the service
+    endpoints: List[Endpoint]           # Endpoint of the service uploaded
+    version_name: str = "version 1"     # name of service version
+    version_description: str = "No version description provided" # description
 
     class Config:
         arbitrary_types_allowed = True
