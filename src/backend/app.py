@@ -96,7 +96,7 @@ async def upload_image(file: UploadFile = File(...)):
 #   Service Paths
 #####################################
 @app.post("/service/add")
-async def add_service(service: ServicePost, user: User = Depends(manager)):
+async def add_service(service: ServiceAdd, user: User = Depends(manager)):
     '''
         Method used to add service to platform
     '''
@@ -105,6 +105,15 @@ async def add_service(service: ServicePost, user: User = Depends(manager)):
     user = data_store.get_user_by_id(user['id'])
     id = add_service_wrapper(request, user)
     return {'id' : id}
+
+@app.post("/service/version/add")
+async def add_service_version(service: ServiceAddVersion, user: User = Depends(manager)):
+    '''
+        Method used to add new version to existing 
+    '''
+    # Unpack request body
+    request = service.model_dump()
+    add_new_service_version_wrapper(request)
 
 
 @app.get("/service/get_service")

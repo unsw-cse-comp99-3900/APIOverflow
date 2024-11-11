@@ -40,18 +40,11 @@ DEFAULT_ICON = '0'
 
 #    
 # for simplicity / to avoid a bunch of funky edge cases, we can only perform
-# one update at once
+# one update at once, adding a new version is considered an update
 # trying to make second update will automatically ovewrite first
 
 
 # TODOs
-# 3. Getting a Service returns all versions
-#    - returns a list of versions, in reverse order 
-# 4. New service Version
-# 5. Delete service version
-# 6. Add docs now requires a version name
-#     - currently only supports 1 doc, should it support more
-#     - currently cannot delete a doc  
 # 7. Updating a Service 
 # -- name, tags, description are service global and do not require a version name
 # -- version_name, endpoints, version_description require version_name to update
@@ -60,6 +53,14 @@ DEFAULT_ICON = '0'
 # -- admin service approval must provide a version
 # -- a) remove endpoint from service update
 # -- b) create new endpoint 
+# 4. New service Version
+# 5. Delete service version
+# 3. Getting a Service returns all versions
+#    - returns a list of versions, in reverse order 
+#    - Test
+# 6. Add docs now requires a version name
+#     - currently only supports 1 doc, should it support more?
+#     - currently cannot delete a doc  
 
 
 class ServiceVersionInfo:

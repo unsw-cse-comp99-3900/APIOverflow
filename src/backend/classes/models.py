@@ -47,7 +47,7 @@ class FilterRequest(BaseModel):
     providers: List[str]
 
 # Request body for POST methods relating to services
-class ServicePost(BaseModel):
+class ServiceAdd(BaseModel):
 
     name: str                           # Name of service
     icon_url: str                       # URL of service icon uploaded
@@ -63,6 +63,15 @@ class ServicePost(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+class ServiceAddVersion(BaseModel):
+
+    sid: str                        # id of service 
+    version_name: str               # name of new version
+    endpoints: List[Endpoint]       # endpoints of new version
+    version_description: str        # Additional details pertaining new version   
+
+
 
 class ServiceUpdate(BaseModel):
     name: str                       # Name of service

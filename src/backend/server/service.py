@@ -153,6 +153,14 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
     service = get_validate_service_id(sid)
     return service.to_json()
 
+def add_new_service_version_wrapper(request):
+
+    service: API = get_validate_service_id(request["sid"])
+
+    # TODO: add new service version
+    
+
+
 
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
