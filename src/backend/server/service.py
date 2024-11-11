@@ -7,6 +7,7 @@ from urllib.error import HTTPError, URLError
 from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
+from src.backend.classes.Service import Service
 from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
 from src.backend.classes.Review import Review, LIVE
@@ -158,6 +159,8 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
     service = get_validate_service_id(sid)
     owner_id = service.get_owner()
     owner = data_store.get_user_by_id(owner_id)
+
+    # TODO: clean this up to unify with to_json()
     return {
             'id' : service.get_id(),
             'name' : service.get_name(),
@@ -174,17 +177,6 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
             'icon' : service.get_icon(),
             'status' : service.get_status().name,
             'status_reason' : service.get_status_reason()
-    }
-    
-# function to match vincent's format, the one above is sid instead of id
-def api_into_json(api) -> dict:
-    return {
-        'id': api.get_id(),
-        'name': api.get_name(),
-        'owner': api.get_owner(),
-        'description': api.get_description(),
-        'icon_url': api.get_icon_url(),
-        'tags': api.get_tags()
     }
 
 # filter through database to find APIs that are fitted to the selected tags
@@ -216,7 +208,7 @@ def api_tag_filter(tags, providers, hide_pending: bool) -> list:
                 if tag in api.get_tags() and api not in filtered_apis:
                         filtered_apis.append(api)
 
-    return_list = []
+    return_list: List[Service] = []
     if providers:
         # if providers list is not empty
         for api in filtered_apis:
@@ -231,7 +223,7 @@ def api_tag_filter(tags, providers, hide_pending: bool) -> list:
         print(api.get_status().name)
     
     
-    return [api_into_json(api) for api in return_list if
+    return [api.to_summary_json() for api in return_list if
             api.get_status().name in LIVE_OPTIONS or 
             (not hide_pending and api.get_status() == ServiceStatus.PENDING)
             ]
@@ -285,10 +277,10 @@ def get_doc_wrapper(doc_id: str) -> FileResponse:
     return FileResponse(doc.get_path())
 
 def list_pending_apis():
-    return [api_into_json(api) for api in data_store.get_apis() if api.get_status() == ServiceStatus.PENDING]
+    return [api.to_summary_json() for api in data_store.get_apis() if api.get_status() == ServiceStatus.PENDING]
 
 def list_nonpending_apis():
-    return [api_into_json(api) for api in data_store.get_apis() if api.get_status == ServiceStatus.LIVE]
+    return [api.to_summary_json() for api in data_store.get_apis() if api.get_status == ServiceStatus.LIVE]
 
 def delete_service(sid: str):
     if sid == '':

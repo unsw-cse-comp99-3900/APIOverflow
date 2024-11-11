@@ -1,5 +1,8 @@
 from typing import *
 from src.backend.classes.Document import Document
+from src.backend.classes.Service import Service
+from src.backend.classes.User import User
+
 
 T = TypeVar("T")
 DEFAULT_TAGS = [
@@ -125,13 +128,13 @@ class Datastore:
     ################################
     #   Datastore Search Methods
     ################################
-    def get_users(self) -> List[T]:
+    def get_users(self) -> List[User]:
         '''
             Returns a list of all users
         '''
         return self.__store['users']
     
-    def get_apis(self) -> List[T]:
+    def get_apis(self) -> List[Service]:
         '''
             Returns a list of all apis
         '''

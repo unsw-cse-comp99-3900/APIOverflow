@@ -1,6 +1,8 @@
 from typing import *
 from enum import Enum
 from src.backend.classes.Endpoint import Endpoint
+from src.backend.classes.Document import Document
+from fastapi import HTTPException
 
 class ServiceStatus(Enum):
     UPDATE_REJECTED = 3
@@ -18,19 +20,103 @@ T = TypeVar("T")
 K = TypeVar("K")
 DEFAULT_ICON = '0'
 
+# API Changes
+# create_service: optional version_name and version_description fielsds 
+# for simplicity / to avoid a bunch of funky edge cases, we can only perform
+# one update at once
 
-      
+
+# TODOs
+# 1. Refactor Service.py
+# 2. Create Service Requires Version Name and description
+# 3. Getting a Service returns all versions
+#    - returns a list of versions, in reverse order 
+# 4. New service Version
+# 5. Delete service version
+# 6. Add docs now requires a version name
+#     - currently only supports 1 doc, should it support more
+#     - currently cannot delete a doc  
+# 7. Updating a Service 
+# -- name, tags, description are service global and do not require a version name
+# -- version_name, endpoints, version_description require version_name to update
+# -- up to frontend to ensure that these fields are updates separately
+# -- admin service approval must provide a version
+# -- get pending must return a version as well
+# -- a) remove endpoint from service update
+# -- b) create new endpoint 
+# 8. Merge and deal with endpoint objects, adding endpoint requires version_name
+
+class ServiceVersionInfo:
+    '''
+        Information about a service which is version specific
+        version_name:  name of version
+        endpoints: list of endpoints
+        version_description: additional version specific details
+        documents: List of documents
+        status: Status of service [LIVE, PENDING, REJECTED]
+        status_reason:  Reason for status
+        pending_update:  Pending update Details when waiting to approve an update
+    '''
+
+    def __init__(self,
+                 version_name: str,
+                 endpoints: List[Endpoint],
+                 version_description: str):
+        self._version_name: str = version_name
+        self._endpoints: List[Endpoint] = endpoints
+        self._version_description: str = version_description
+        
+        self._docs: List[Document] = []
+        # self._pending_update = None
+
+        # self._status: ServiceStatus = ServiceStatus.PENDING
+        # self._status_reason: str = ""
+
+        # def get_version_name(self) -> str:
+        #     return self._version_name
+        
+        # def get_endpoints(self) -> List[Endpoint]:
+        #     return self._endpoints
+        
+        # def get_version_description(self) -> str:
+        #     return self._version_description
+        
+        # def get_docs(self) -> List[Document]:
+        #     return self._docs
+        
+        # def get_status(self) -> ServiceStatus:
+        #     return self._status
+
+        # def get_status_reason(self) -> str:
+        #     return self._status_reason
+        
+        #TODO: handle pending update
+        
+
 class ServicePendingUpdate:
+    '''
+        Stores the updates related to the global fields of a service
+    '''
 
     def __init__(self,
                  name: str,
                  description: str, 
                  tags: List[str],
-                 endpoints: List[Endpoint]):
+                 endpoints: List[Endpoint],
+                 version: str
+                 ):
+        
+        # these fields don't require a version to update
         self._name = name
         self._description = description
         self._tags = tags
+
+        # these fields require a version to update
+        self._version = version
         self._endpoints = endpoints
+
+    def get_version(self) -> str:
+        return self._version
 
     def get_name(self) -> str:
         return self._name
@@ -62,6 +148,7 @@ class Service:
         endpoints:       List of Endpoint of the service
         
         ----
+        version_info    List of all versions of service, with most recently created first
         icon            Doc_ID of service icon. Has a default icon
         owner_count:    Number of owners for this service
         documents:      List of paths to documents uploaded by user re service
@@ -89,7 +176,9 @@ class Service:
                  tags: List[str],
                  endpoints: List[Endpoint],
                  stype: str,
-                 icon: str = DEFAULT_ICON) -> None:
+                 icon: str = DEFAULT_ICON,
+                 version_name: str = "version 1",
+                 version_description: str = "") -> None:
         
         # Initialised vars
         self._id = sid
@@ -99,12 +188,11 @@ class Service:
         self._icon_url= icon_url
         self._description = description
         self._tags = tags
-        self._endpoints = endpoints
         self._type = stype
+        self._version_info : List[ServiceVersionInfo] = [
+            ServiceVersionInfo(version_name, endpoints, version_description)]
 
         # Default vars
-        self._docs = []
-        self._doc_count = 0
         self._users = []
         self._user_count = 0
         self._reviews = []
@@ -121,14 +209,13 @@ class Service:
     #   Add Methods
     ################################
 
-    def add_docs(self, docs: List[int]) -> None:
+    def add_docs(self, docs: List[int], version: Optional[str] = None) -> None:
         '''
             Adds paths to documentation
         '''
+        version: ServiceVersionInfo = self.get_version_info(version)
         for doc in docs:
-            self._docs.append(doc)
-            self._doc_count += 1
-
+            version._docs.append(doc)
     def add_user(self, uid: str) -> None:
         '''
             Adds user to subscription/usage list
@@ -160,15 +247,14 @@ class Service:
         '''
         self._tags.append(tag)
 
-    def add_endpoint(self, tab, parameters, method) -> None:
+    def add_endpoint(self, tab, parameters, method, version: Optional[str] = None) -> None:
         '''
             Adds an endpoint to the service
         '''
-        try: 
-            new_endpoint = Endpoint(tab, parameters, method)
-            self._endpoints.append(new_endpoint)
-        except ValueError as e:
-            print(e)
+        
+        new_endpoint = Endpoint(tab, parameters, method)
+        self.get_version_info(version)._endpoints.append(new_endpoint)
+        
 
     # def add_owner(self, owner: str) -> None:
     #     '''
@@ -199,11 +285,11 @@ class Service:
         '''
         self._description = desc
 
-    def update_icon_id(self, doc_id: str) -> None:
+    def update_icon_id(self, icon_id: str) -> None:
         '''
             Update service icon
         '''
-        self._icon = doc_id
+        self._icon = icon_id
     
     def update_status(self, status: ServiceStatus, reason: str):
         self._status = status
@@ -213,28 +299,38 @@ class Service:
                 name: str,
                 description: str,
                 tags: List[str],
-                endpoints: List[Endpoint]
+                endpoints: List[Endpoint],
+                version: Optional[str] = None # todo: fix at endpoint level
                 ):
+        
+        # will automatically throw if version does not exist
+        version_name = self.get_version_info(version)._version_name
+
         self.update_status(ServiceStatus.UPDATE_PENDING, "")
-        self._pending_update = ServicePendingUpdate(name, description, tags, endpoints)
+
+        self._pending_update = ServicePendingUpdate(name, description, tags, endpoints, version_name)
     
     def complete_update(self):
         if self._status == ServiceStatus.UPDATE_PENDING:
             self._name = self._pending_update.get_name()
             self._description = self._pending_update.get_description()
             self._tags = self._pending_update.get_tags()
-            self._endpoints =  self._pending_update.get_endpoints()
+
+            if self._pending_update.get_version() is not None:
+                version_details = self.get_version_info(self._pending_update.get_version())
+                version_details._endpoints = self._pending_update.get_endpoints()
+
             self._pending_update = None
 
     ################################
     #   Delete Methods
     ################################
-    def remove_doc(self, doc: str) -> None:
+    def remove_doc(self, doc: str, version: Optional[str] = None) -> None:
         '''
             Remove path to documentation
         '''
-        self._docs.remove(doc)
-        self._doc_count -= 1
+
+        self.get_version_info(version)._docs.remove(doc)
 
     def remove_user(self, uid: str) -> None:
         '''
@@ -267,11 +363,11 @@ class Service:
         '''
         self._icon = DEFAULT_ICON
 
-    def remove_endpoint(self, endpoint: Endpoint) -> None:
+    def remove_endpoint(self, endpoint: Endpoint, version: Optional[str] = None) -> None:
         '''
             Removes specified endpoint 
         '''
-        self._endpoints.remove(endpoint)
+        self.get_version_info(version)._endpoints.remove(endpoint)
 
     # def remove_owner(self, uid: str) -> None:
     #     '''
@@ -307,11 +403,11 @@ class Service:
         '''
         return self._owner
     
-    def get_endpoints(self) -> list[Endpoint]:
+    def get_endpoints(self, version: Optional[str] = None) -> list[Endpoint]:
         '''
-            Returns endpoints of service
+            Returns endpoints of service, returns latest version by default
         '''
-        return self._endpoints
+        return self.get_version_info(version)._endpoints
 
     def get_tags(self) -> List[str]:
         '''
@@ -325,11 +421,12 @@ class Service:
         '''
         return self._icon_url
     
-    def get_docs(self) -> List[str]:
+    def get_docs(self, version: Optional[str] = None) -> List[str]:
         '''
-            Returns icon_url of service
+            Returns docs
         '''
-        return self._docs
+
+        return self.get_version_info(version)._docs
     
     def get_status(self) -> ServiceStatus:
         '''
@@ -361,14 +458,36 @@ class Service:
             'negative': self._downvotes,
             'rating' : round(self._upvotes - self._downvotes, 2)
         }
+    
+    ################################
+    #  Version Methods
+    ################################
+
+    def get_version_info(self, version: Optional[str]) -> ServiceVersionInfo:
+        '''
+            gets info related to specific version of service
+            Returns latest version by default if no version is provided
+            throws error if version not found
+        '''
+        if version is None:
+            return self._version_info[0]
+        
+        versions = [ver for ver in self._version_info if ver._version_name == version]
+
+        if len(versions) == 0:
+            raise HTTPException(status_code=404, detail="Service version {version} not found in service")
+        return versions[0]
+        
+
 
     ################################
     #  Storage Methods
     ################################
-    def to_json(self) -> dict[T, K]:
+    def to_json(self, version: Optional[str] = None) -> dict[T, K]:
         '''
             Converts object into json
         '''
+        version_details: ServiceVersionInfo = self.get_version_info(version)
         return {
             'id': self._id,
             'name' : self._name,
@@ -376,8 +495,8 @@ class Service:
             'icon_url' : self._icon_url,
             'description' : self._description,
             'tags' : self._tags,
-            'endpoints': self._endpoints,
-            'documents' : self._docs,
+            'endpoints': version_details._endpoints,
+            'documents' : version_details._docs,
             'users' : self._users,
             'reviews': self._reviews,
             'upvotes': self._upvotes,
@@ -391,7 +510,9 @@ class Service:
             Converts object into json, returning updated values for a pending
             update
         '''
+
         if self._status == ServiceStatus.UPDATE_PENDING:
+            version = self._pending_update.get_version()
             return {
                 'id': self._id,
                 'name' : self._pending_update.get_name(),
@@ -400,7 +521,7 @@ class Service:
                 'description' : self._pending_update.get_description(),
                 'tags' : self._pending_update.get_tags(),
                 'endpoints': self._pending_update.get_endpoints(),
-                'documents' : self._docs,
+                'documents' : self.get_version_info(version)._docs,
                 'users' : self._users,
                 'reviews': self._reviews,
                 'upvotes': self._upvotes,
@@ -410,3 +531,13 @@ class Service:
             }
         else:
             return self.to_json()
+    
+    def to_summary_json(self) -> dict[T, K]:
+        return {
+            'id': self._id,
+            'name': self._name,
+            'owner': self._owner,
+            'description': self._description,
+            'icon_url': self._icon_url,
+            'tags': self._tags
+        }
