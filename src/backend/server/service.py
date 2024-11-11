@@ -7,7 +7,7 @@ from urllib.error import HTTPError, URLError
 from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
-from src.backend.classes.Service import Service
+from src.backend.classes.Service import Service, ServiceVersionInfo
 from src.backend.classes.User import User
 from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
@@ -37,6 +37,7 @@ def validate_api_fields(packet: dict[T, K]) -> None:
     
     if len(packet['tags']) == 0:
         raise HTTPException(status_code=400, detail='No service tags provided')
+    
 
 def get_validate_service_id(sid: str) -> API:
     if sid == '':
@@ -133,7 +134,7 @@ def update_service_wrapper(packet: dict[T, K]) -> None:
     validate_api_fields(packet)
 
     # service is ref to API Obj in data store which gets updated
-    service.create_pending_global_update(
+    service.create_pending_update(
         packet["name"], packet["description"], packet["tags"])
     
     db_update_service(sid, service.to_json())
@@ -153,6 +154,10 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
 def add_new_service_version_wrapper(request):
 
     service: API = get_validate_service_id(request["sid"])
+    service.add_service_version(request["version_name"], 
+                                request["endpoints"],
+                                request["version_description"])
+
 
     # TODO: add new service version
     
@@ -246,7 +251,9 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
 
     # Add document to service
     service.add_docs([file.get_id()])
-    db_add_document(sid, file.get_id())
+
+    # TODO: fix Documents
+    # db_add_document(sid, file.get_id())
 
 def get_doc_wrapper(doc_id: str) -> FileResponse:
     '''
@@ -422,19 +429,25 @@ def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[st
 
     return reviews
 
-def approve_service_wrapper(sid: str, approved: bool, reason: str):
+def approve_service_wrapper(sid: str, approved: bool, reason: str, version: Optional[str]):
 
     service : API = data_store.get_api_by_id(sid)
 
     if service is None:
         raise HTTPException(status_code=404, detail="Service not found")
     
+    pendingObject : Service | ServiceVersionInfo = service
+    if version is not None:
+        # global update, so we get ServiceVersionInfo object and update that version
+        pendingObject = service.get_version_info(version)
+
     if approved:
-        service.complete_update()
-        service.update_status(ServiceStatus.LIVE, reason)
+        pendingObject.complete_update()
+        pendingObject.update_status(ServiceStatus.LIVE, reason)
         db_update_service(sid, service.to_json())
-    elif service.get_status() == ServiceStatus.PENDING:
-        service.update_status(ServiceStatus.REJECTED, reason)
-    elif service.get_status() == ServiceStatus.UPDATE_PENDING:
-        service.update_status(ServiceStatus.UPDATE_REJECTED, reason)
-        
+    elif pendingObject.get_status() == ServiceStatus.PENDING:
+       pendingObject.update_status(ServiceStatus.REJECTED, reason)
+    elif pendingObject.get_status() == ServiceStatus.UPDATE_PENDING:
+       pendingObject.update_status(ServiceStatus.UPDATE_REJECTED, reason)
+
+            

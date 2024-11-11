@@ -28,14 +28,19 @@ DEFAULT_ICON = '0'
 #  - but pls change so users must provide these strings
 #
 # /service/get: 
-#  - Added fields: "version_name", "version_description"
-#  - Note that all first level fields refer to values of most recent version
-#  - Added field: versions: {
+#  - REMOVED FIELDS endpoints and docs
+#  - Added field: versions: [{
             # "version_name": name of version(str)
             # "endpoints": list of endpoints (whatever it was before),
             # "version_description": Additional description for version(str),
             # "docs": documents (whatever it was before)
-# }
+            # "status": name of status: 
+            # "status_reason": self._status_reason
+# }]
+# - It is important that FE does NOT display
+# - a status version if status == "PENDING" or "REJECTED"
+# - it should still display for UPDATE_PENDING and UPDATE_REJECTED
+# - since the pre-updated version should still be live
 #
 # /service/update: No longer contains endpoints field (only updates global fields)
 
@@ -44,25 +49,30 @@ DEFAULT_ICON = '0'
 # one update at once, adding a new version is considered an update
 # trying to make second update will automatically ovewrite first
 
+# Added Endpoints:
+# /service/version/add : POST
+# Fields:
+#  - sid: str                        # id of service 
+#  - version_name: str               # name of new version
+#  - endpoints: List[Endpoint]       # endpoints of new version
+#  - version_description: str        # Additional details pertaining new version   
 
 
 
 # TODOs
-# 4. New service Version
-# Test get service returns all versions in reverse order
 # 5. Delete service version
 # 7. Updating a Service 
 # [X] existing update API no longer updates endpoint
 # -- create new endpoint for updating specific version
-# -- separate pending between versions and global
-
-# -- get pending must return a version as well
-# -- admin service approval must provide a version
+# -- get pending returns more stuff
+# -- approve service must return a version as well, omitting field indicates global
+# -- create new  service version approval
 # -- a) remove endpoint from service update
 # -- b) create new endpoint 
 # 6. Add docs now requires a version name
 #     - currently only supports 1 doc, should it support more?
 #     - currently cannot delete a doc  
+# Consider problem of both global and local pending upon new creation
 
 
 class ServiceVersionInfo:
@@ -84,14 +94,50 @@ class ServiceVersionInfo:
         self._version_description: str = version_description
         
         self._docs: List[Document] = []
+        self._pending_update: Optional[ServicePendingVersionUpdate] = None
+        self._status : ServiceStatus = ServiceStatus.PENDING
+        self._status_reason : str = ""
+
+
+
 
     def to_json(self):
         return {
             "version_name": self._version_name,
             "endpoints": self._endpoints,
             "version_description": self._version_description,
-            "docs": self._docs
+            "docs": self._docs,
+            "status": self._status.name,
+            "status_reason": self._status_reason
+
         }
+    
+    def to_updated_json(self):
+        pass
+    
+    def update_status(self, status: ServiceStatus, reason: str):
+        self._status = status
+        self._status_reason = reason
+    
+    def get_status(self):
+        return self._status
+    
+    def create_pending_update(self,
+            version_name: str,
+            endpoints: List[Endpoint],
+            version_description: str
+            ):
+    
+        self.update_status(ServiceStatus.UPDATE_PENDING, "")
+        self._pending_update = ServicePendingVersionUpdate(version_name, endpoints, version_description)
+    
+    def complete_update(self):
+        if self._status == ServiceStatus.UPDATE_PENDING:
+            self._version_name = self._pending_update._version_name
+            self._endpoints = self._pending_update._endpoints
+            self._version_description = self._pending_update._version_description
+
+            self._pending_update = None
         
 
 
@@ -201,8 +247,8 @@ class Service:
         self._description = description
         self._tags = tags
         self._type = stype
-        self._version_info : List[ServiceVersionInfo] = [
-            ServiceVersionInfo(version_name, endpoints, version_description)]
+        self._version_info : List[ServiceVersionInfo] = []
+        self.add_service_version(version_name, endpoints, version_description)
 
         # Default vars
         self._users = []
@@ -266,7 +312,20 @@ class Service:
         
         new_endpoint = Endpoint(tab, parameters, method)
         self.get_version_info(version)._endpoints.append(new_endpoint)
+    
+    def add_service_version(self, version_name: str, endpoints: List[Endpoint], version_description: str):
+        if version_name == "":
+            raise HTTPException(status_code=400, detail='Version name cannot be empty')
+
+        if any(version._version_name == version_name for version in self._version_info):
+            raise HTTPException(status_code=404, detail='Version names must be Unique')
         
+        # maintain version_info has most recently added version at front of list
+        self._version_info.insert(0,
+            ServiceVersionInfo(version_name, endpoints, version_description)
+        )
+        
+
 
     # def add_owner(self, owner: str) -> None:
     #     '''
@@ -307,7 +366,7 @@ class Service:
         self._status = status
         self._status_reason = reason
     
-    def create_pending_global_update(self,
+    def create_pending_update(self,
                 name: str,
                 description: str,
                 tags: List[str]
@@ -319,14 +378,9 @@ class Service:
     
     def complete_update(self):
         if self._status == ServiceStatus.UPDATE_PENDING:
-            print("updating to {}", self._pending_update)
             self._name = self._pending_update.get_name()
             self._description = self._pending_update.get_description()
             self._tags = self._pending_update.get_tags()
-
-            # if self._pending_update.get_version() is not None:
-            #     version_details = self.get_version_info(self._pending_update.get_version())
-            #     version_details._endpoints = self._pending_update.get_endpoints()
 
             self._pending_update = None
 
@@ -493,7 +547,7 @@ class Service:
     ################################
     def to_json(self) -> dict[T, K]:
         '''
-            Converts object into json
+            Converts object into json,
         '''
         return {
             'id': self._id,
@@ -515,12 +569,8 @@ class Service:
             'status': self._status.name,
             'status_reason': self._status_reason,
             # fields denoting most current service version
-            "version_name": self._version_info[0]._version_name,
-            "endpoints": self._version_info[0]._endpoints,
-            "version_description": self._version_info[0]._version_description,
-            "docs": self._version_info[0]._docs,
 
-            "versions": [version.to_json() for version in self._version_info[1::]]
+            "versions": [version.to_json() for version in self._version_info]
         }
     
             

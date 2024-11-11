@@ -28,6 +28,10 @@ simple_endpoint = Endpoint(link='https://api.example.com/users/12345', title_des
                             main_description='tests endpoint', tab='tabTest', parameters=[simple_parameter], 
                             method="POST", responses=[simple_response])
 
+simple_endpoint2 = Endpoint(link='https://api.example.com/users/99999', title_description='testTitle2', 
+                            main_description='tests endpoint', tab='tabTest', parameters=[simple_parameter], 
+                            method="POST", responses=[simple_response])
+
 def clear_all():
     ''' 
         Method to reset local database for new test
@@ -264,7 +268,7 @@ def test_create_api(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
 
     response = client.post("/service/add",
@@ -284,14 +288,14 @@ def test_create_api(simple_user):
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
-    assert response_info['endpoints'] == api_info['endpoints']
+    assert response_info["versions"][0]["endpoints"] == api_info["endpoints"]
 
     database_object = db_get_service(sid)
     assert database_object['id'] == sid
     assert database_object['name'] == api_info['name']
     assert database_object['description'] == api_info['description']
     assert database_object['tags'] == api_info['tags']
-    assert database_object['endpoints'] == api_info['endpoints']
+    assert database_object["versions"][0]["endpoints"] == api_info["endpoints"]
 
 def test_multiple_tags(simple_user):
     '''
@@ -306,7 +310,7 @@ def test_multiple_tags(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API', 'Public', 'In Development'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
 
     response = client.post("/service/add",
@@ -327,7 +331,7 @@ def test_multiple_tags(simple_user):
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
-    assert response_info['endpoints'] == api_info['endpoints']
+    assert response_info["versions"][0]["endpoints"] == api_info["endpoints"]
     assert response_info['icon_url'] == ''
 
 def test_custom_icon(simple_user):
@@ -344,7 +348,7 @@ def test_custom_icon(simple_user):
                 'y_end' : 100,
                 'description' : 'This is a definitely... Google',
                 'tags' : ['API', 'Public', 'In Development'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
 
     response = client.post("/service/add",
@@ -365,7 +369,7 @@ def test_custom_icon(simple_user):
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
-    assert response_info['endpoints'] == api_info['endpoints']
+    assert response_info["versions"][0]["endpoints"] == api_info["endpoints"]
 
 def test_update_api_invalid_sid(simple_user):
     '''
@@ -381,7 +385,7 @@ def test_update_api_invalid_sid(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
 
     response = client.post("/service/add",
@@ -394,7 +398,7 @@ def test_update_api_invalid_sid(simple_user):
         'name' : 'new name',
         'description' : 'new name',
         'tags' : ['new', 'name'],
-        'endpoints': [simple_endpoint.dict()]
+        'endpoints': [simple_endpoint.model_dump()]
     }
 
     response = client.put("/service/update",
@@ -415,7 +419,7 @@ def test_update_api_documents(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
 
     response = client.post("/service/add",
@@ -447,19 +451,19 @@ def test_update_api_documents(simple_user):
                         })
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['docs'] == ["1"]
+    assert response_info["versions"][0]['docs'] == ["1"]
     database_object = db_get_service(sid)
 
     # path of file is accessible via get_service but internally
     # stored by document id instead of path
-    assert database_object['docs'] == [doc_id]
+    assert database_object["versions"][0]['docs'] == [doc_id]
 
     update_request_info = {
         'sid' : sid,
         'name' : 'new name',
         'description' : 'new description',
         'tags' : ['new', 'tag'],
-        'endpoints': [simple_endpoint.dict()]
+        'endpoints': [simple_endpoint.model_dump()]
     }
 
     response = client.put("/service/update",
@@ -476,9 +480,9 @@ def test_update_api_documents(simple_user):
     assert response.status_code == SUCCESS
     response_info = response.json()
    
-    assert response_info['docs'] == ["1"]
+    assert response_info["versions"][0]['docs'] == ["1"]
     database_object = db_get_service(sid)
-    assert database_object['docs'] == [doc_id]
+    assert database_object["versions"][0]['docs'] == [doc_id]
 
 # Delete non-existing service
 def test_delete_non_api(simple_user):
@@ -512,7 +516,7 @@ def test_delete_api(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
     
     response = client.post("/service/add",
@@ -559,7 +563,7 @@ def test_delete_apis(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
     
     api_info2 = {
@@ -571,7 +575,7 @@ def test_delete_apis(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
     
     response = client.post("/service/add",
@@ -640,7 +644,7 @@ def test_get_apis(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
     
     api_info2 = {
@@ -652,7 +656,7 @@ def test_get_apis(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
     
     response = client.post("/service/add",
@@ -693,7 +697,7 @@ def test_admin_get_pending_services(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
 
     response = client.post("/service/add",
@@ -716,11 +720,12 @@ def test_admin_get_pending_services(simple_user):
     response_info = response.json()["services"]
     
     assert len(response_info) == 1
-    assert response_info[0]['id'] == sid
-    assert response_info[0]['name'] == api_info['name']
-    assert response_info[0]['description'] == api_info['description']
-    assert response_info[0]['tags'] == api_info['tags']
-    assert response_info[0]['endpoints'] == api_info['endpoints']
+    response_info = response_info[0]
+    assert response_info['id'] == sid
+    assert response_info['name'] == api_info['name']
+    assert response_info['description'] == api_info['description']
+    assert response_info['tags'] == api_info['tags']
+    assert response_info['versions'][0]['endpoints'] == api_info["endpoints"]
 
 def test_admin_approve(simple_user):
     api_info = {
@@ -732,7 +737,7 @@ def test_admin_approve(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
 
     response = client.post("/service/add",
@@ -805,7 +810,7 @@ def test_admin_disapprove(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
 
     response = client.post("/service/add",
@@ -940,7 +945,7 @@ def test_update_global_api(simple_user):
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
-    assert response_info['endpoints'] == api_info['endpoints']
+    assert response_info["versions"][0]["endpoints"] == api_info["endpoints"]
     assert response_info['status'] == "UPDATE_PENDING"
 
     response = client.get("/service/filter",
@@ -978,7 +983,7 @@ def test_update_global_api(simple_user):
     assert response_info['name'] == api_info['name']
     assert response_info['description'] == api_info['description']
     assert response_info['tags'] == api_info['tags']
-    assert response_info['endpoints'] == api_info['endpoints']
+    assert response_info["versions"][0]["endpoints"] == api_info["endpoints"]
     assert response_info['status'] == "UPDATE_REJECTED"
     assert response_info['status_reason'] == reason
 
@@ -1040,3 +1045,103 @@ def test_update_global_api(simple_user):
     assert response_info[0]['name'] == update_request_info['name']
     assert response_info[0]['description'] == update_request_info['description']
     assert response_info[0]['tags'] == update_request_info['tags']
+
+def test_add_service_version(simple_user):
+    '''
+        Test whether an API is correctly created
+    '''
+    api_info = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                "version_name": "test version",
+                "version_description": "test description"
+                }
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+
+    sid = response.json()['id']
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+
+    response = client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True
+                            })
+    assert response.status_code == SUCCESS
+
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+
+    new_version = {
+        "sid" : sid,
+        "version_name" : "version 2",
+        "version_description" : "new description",
+        "endpoints" : [simple_endpoint2.model_dump()]
+    }
+
+    response = client.post("/service/version/add",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          json=new_version)
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+
+    # global fields should be unchanged
+    assert response_info['id'] == sid
+    assert response_info['name'] == api_info['name']
+    assert response_info['description'] == api_info['description']
+    assert response_info['tags'] == api_info['tags']
+    assert response_info['status'] == "LIVE"
+
+
+    most_recent_version = response_info["versions"][0]
+    assert most_recent_version["version_name"] == new_version["version_name"]
+    assert most_recent_version["version_description"] == new_version["version_description"]
+    assert most_recent_version["endpoints"] == new_version["endpoints"]
+    assert most_recent_version["status"] == "PENDING"
+    
+
+    original_version = response_info["versions"][1]
+    assert original_version["version_name"] == api_info["version_name"]
+    assert original_version["version_description"] == api_info["version_description"]
+    assert original_version["endpoints"] == api_info["endpoints"]
+    assert original_version['status'] == "LIVE"
+
+
+
+
+    
+

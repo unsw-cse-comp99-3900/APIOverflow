@@ -427,7 +427,8 @@ async def admin_service_approve(info: ServiceApprove, user: User = Depends(manag
     '''
         Endpoint which approves or disapproves a service
     '''
-    approve_service_wrapper(info.sid, info.approved, info.reason)
+    # TODO: give proper version
+    approve_service_wrapper(info.sid, info.approved, info.reason, None)
 
 @app.get("/admin/filter_users")
 async def admin_user_filter(standard: bool, admin: bool, super: bool, user: User = Depends(manager), role: str = Depends(admin_required())):
