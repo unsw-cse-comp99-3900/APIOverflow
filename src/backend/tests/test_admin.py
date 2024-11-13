@@ -615,11 +615,6 @@ def test_admin_check_unique_id(simple_user):
     assert response.status_code == SUCCESS
     uid3 = response.json()['uid']
 
-def test_admin_check_user_is_admin(simple_user):
-    '''
-        Test promoting a user
-    '''
-
     response = client.post("/auth/login", json={
         "username": "superadmin",
         "password": "superadminpassword"
@@ -646,6 +641,17 @@ def test_admin_check_user_is_admin(simple_user):
     assert uid4 != uid2
     assert uid4 != uid3
     assert uid4 == str(int(uid3) + 1)
+
+def test_admin_check_user_is_admin(simple_user):
+    '''
+        Test promoting a user
+    '''
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
 
     response = client.get("/admin/check_if_admin", headers={"Authorization": f"Bearer {access_token}"},
                             params={
