@@ -114,7 +114,7 @@ async def get_service(sid: str):
     response = get_service_wrapper(sid)
     return response
 
-@app.put("/service/update")
+@app.post("/service/update")
 async def update_service(service: ServiceGlobalUpdate, user: User = Depends(manager)):
     '''
         Method used to update service to platform
@@ -446,7 +446,13 @@ async def admin_service_approve(info: ServiceApprove, user: User = Depends(manag
         Endpoint which approves or disapproves a service
     '''
     # TODO: give proper version
-    approve_service_wrapper(info.sid, info.approved, info.reason, None)
+    request = info.model_dump()
+    approve_service_wrapper(request["sid"],
+                            request["approved"],
+                            request["reason"],
+                            request["service_global"],
+                            request["version_name"]
+                            )
 
 @app.get("/admin/filter_users")
 async def admin_user_filter(standard: bool, admin: bool, super: bool, user: User = Depends(manager), role: str = Depends(admin_required())):

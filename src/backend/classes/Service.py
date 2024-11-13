@@ -45,8 +45,24 @@ DEFAULT_ICON = '0'
 # has not yet been approved
 # - It is important that FE does NOT display a status version if newly_created == True
 # when displaying service details
-#
+# Status is one of ["LIVE", "PENDING", "REJECTED", "UPDATE_PENDING", "UPDATE_REJECTED"]
+# 
 # /service/update: No longer contains endpoints field (only updates global fields)
+# changed from put to POST request
+
+
+# /admin/service/approve: POST
+# - changed to take these fields:
+# {
+#     "sid" : str,
+#     "approved" : bool,
+#     "reason" : str,
+#     "service_global": bool, # if we are updating service_global fields
+#     "version" : Optional[str], # if we are updating version, provide name
+# }
+# IF updating new service: service_global == True && provide version
+# IF updating only service_global: service_global == True and don't provide version field
+# IF updating only version: service_global == False and provide version
 
 
 # Added Endpoints:
@@ -70,10 +86,10 @@ DEFAULT_ICON = '0'
 # TODOs
 # 7. Updating a Service 
 # [X] existing update API no longer updates endpoint
-# -- create new endpoint for updating specific version
-# -- change service version approval
-# -- Test update specific version
-# -- change what get pending returns
+# [X] create new endpoint for updating specific version
+# [X] change service version approval
+# -- Test update specific version approval and disapproval
+# -- change what get pending returns & Test
 # 6. Add docs now requires a version name
 #     - currently only supports 1 doc, should it support more?
 #     - currently cannot delete a doc  
@@ -91,18 +107,7 @@ DEFAULT_ICON = '0'
 #     ]
 # }
 
-# approve service:
 
-# {
-#     "sid" : str,
-#     "approved" : bool,
-#     "reason" : str,
-#     "global": bool, # if we are updating global fields
-#     "version" : Optional[str], # if we are updating version, provide name
-# }
-# IF updating new service: global == True && provide version
-# IF updating only global: global == True and don't provide version field
-# IF updating only versionL global == False and provide version
 
 
 
@@ -582,13 +587,13 @@ class Service:
         return versions[0]
     
     def update_service_version(self, version_name: str, new_version_name: Optional[str], endpoints: List[Endpoint], version_description: str):
-        version : ServiceVersionInfo = self.get_version_info()
+        version : ServiceVersionInfo = self.get_version_info(version_name)
 
         if new_version_name is not None:
             if new_version_name == "":
                 raise HTTPException(status_code=400, detail='new version name cannot be empty')
 
-            if new_version_name != version_name and self.contains_version(version_name):
+            if new_version_name != version_name and self.contains_version(new_version_name):
                 raise HTTPException(status_code=404, detail='Version names must be Unique')
 
             version_name = new_version_name

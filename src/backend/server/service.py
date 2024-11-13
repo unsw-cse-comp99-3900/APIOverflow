@@ -434,26 +434,30 @@ def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[st
 
     return reviews
 
-def approve_service_wrapper(sid: str, approved: bool, reason: str, version: Optional[str]):
+def approve_service_wrapper(sid: str, approved: bool, reason: str, service_global: bool, version: Optional[str], ):
 
     service : API = data_store.get_api_by_id(sid)
 
     if service is None:
         raise HTTPException(status_code=404, detail="Service not found")
     
-    pendingObject : Service | ServiceVersionInfo = service
+    approvalObjects : List[Service | ServiceVersionInfo] = [service]
     if version is not None:
-        # global update, so we get ServiceVersionInfo object and update that version
-        pendingObject = service.get_version_info(version)
+        # local update, so we get ServiceVersionInfo object and update that version
+        approvalObjects.append(service.get_version_info(version))
 
     if approved:
-        pendingObject.complete_update()
-        pendingObject.update_status(ServiceStatus.LIVE, reason)
-        pendingObject.update_newly_created()
-        db_update_service(sid, service.to_json())
-    elif pendingObject.get_status() == ServiceStatus.PENDING:
-       pendingObject.update_status(ServiceStatus.REJECTED, reason)
-    elif pendingObject.get_status() == ServiceStatus.UPDATE_PENDING:
-       pendingObject.update_status(ServiceStatus.UPDATE_REJECTED, reason)
+        for object in approvalObjects:
+            object.complete_update()
+            object.update_status(ServiceStatus.LIVE, reason)
+            object.update_newly_created()
+    else:
+        for object in approvalObjects:
+            if object.get_status() == ServiceStatus.PENDING:
+                object.update_status(ServiceStatus.REJECTED, reason)
+            elif object.get_status() == ServiceStatus.UPDATE_PENDING:
+                object.update_status(ServiceStatus.UPDATE_REJECTED, reason)
+    
+    db_update_service(sid, service.to_json())
 
             

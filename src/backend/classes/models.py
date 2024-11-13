@@ -128,6 +128,8 @@ class ServiceApprove(BaseModel):
     sid: str
     approved: bool
     reason: str
+    service_global: bool          # whether we are updating global fields
+    version_name: Optional[str] = None # approved version if applicable
 
 class AdminGetReviews(BaseModel):
     option: str = ''

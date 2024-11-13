@@ -32,6 +32,10 @@ simple_endpoint2 = Endpoint(link='https://api.example.com/users/99999', title_de
                             main_description='tests endpoint', tab='tabTest', parameters=[simple_parameter], 
                             method="POST", responses=[simple_response])
 
+simple_endpoint3 = Endpoint(link='https://api.example.com/users/1111', title_description='testTitle3', 
+                            main_description='tests', tab='tab', parameters=[simple_parameter], 
+                            method="POST", responses=[simple_response])
+
 def clear_all():
     ''' 
         Method to reset local database for new test
@@ -401,7 +405,7 @@ def test_update_api_invalid_sid(simple_user):
         'endpoints': [simple_endpoint.model_dump()]
     }
 
-    response = client.put("/service/update",
+    response = client.post("/service/update",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=update_request_info)
     assert response.status_code == 404
@@ -466,7 +470,7 @@ def test_update_api_documents(simple_user):
         'endpoints': [simple_endpoint.model_dump()]
     }
 
-    response = client.put("/service/update",
+    response = client.post("/service/update",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=update_request_info)
     assert response.status_code == SUCCESS
@@ -737,7 +741,8 @@ def test_admin_approve(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.model_dump()]
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name"
                 }
 
     response = client.post("/service/add",
@@ -766,8 +771,11 @@ def test_admin_approve(simple_user):
                             json={
                                 'sid': sid,
                                 'reason': reason,
-                                'approved': True
+                                'approved': True,
+                                'version_name': api_info["version_name"],
+                                'service_global': True
                             })
+    assert response.status_code == SUCCESS
 
     response = client.get("/service/filter",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -810,7 +818,8 @@ def test_admin_disapprove(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.model_dump()]
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name"
                 }
 
     response = client.post("/service/add",
@@ -839,7 +848,9 @@ def test_admin_disapprove(simple_user):
                             json={
                                 'sid': sid,
                                 'reason': reason,
-                                'approved': False
+                                'approved': False,
+                                'version_name': api_info["version_name"],
+                                'service_global': True
                             })
 
     response = client.get("/admin/get/services",
@@ -869,7 +880,7 @@ def test_admin_disapprove(simple_user):
     assert response_info['status_reason'] == reason
 
 
-def test_update_global_api(simple_user):
+def test_update_global_api_fields(simple_user):
     '''
         Test whether an API is correctly created then updated
     '''
@@ -882,7 +893,8 @@ def test_update_global_api(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.model_dump()]
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name"
                 }
     
     response = client.post("/auth/login", json={
@@ -904,7 +916,9 @@ def test_update_global_api(simple_user):
                             json={
                                 'sid': sid,
                                 'reason': "",
-                                'approved': True
+                                'approved': True,
+                                'version_name': api_info["version_name"],
+                                'service_global': True
                             })
 
     update_request_info = {
@@ -914,7 +928,7 @@ def test_update_global_api(simple_user):
         'tags' : ['new', 'tag'],
     }
 
-    response = client.put("/service/update",
+    response = client.post("/service/update",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=update_request_info)
     assert response.status_code == SUCCESS
@@ -965,7 +979,8 @@ def test_update_global_api(simple_user):
                             json={
                                 'sid': sid,
                                 'reason': reason,
-                                'approved': False
+                                'approved': False,
+                                'service_global': True
                             })
     
     # check after rejection details have not changed
@@ -997,7 +1012,7 @@ def test_update_global_api(simple_user):
     assert response_info[0]['description'] == api_info['description']
     assert response_info[0]['tags'] == api_info['tags']
 
-    response = client.put("/service/update",
+    response = client.post("/service/update",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=update_request_info)
     assert response.status_code == SUCCESS
@@ -1008,7 +1023,8 @@ def test_update_global_api(simple_user):
                             json={
                                 'sid': sid,
                                 'reason': reason,
-                                'approved': True
+                                'approved': True,
+                                'service_global': True
                             })
 
 
@@ -1084,7 +1100,9 @@ def test_service_version(simple_user):
                             json={
                                 'sid': sid,
                                 'reason': "",
-                                'approved': True
+                                'approved': True,
+                                'version_name': api_info["version_name"],
+                                'service_global': True
                             })
     assert response.status_code == SUCCESS
 
@@ -1164,12 +1182,262 @@ def test_service_version(simple_user):
     assert response_info['status'] == "LIVE"
 
     assert len(response_info["versions"]) == 1
-    
+
     original_version = response_info["versions"][0]
     assert original_version["version_name"] == api_info["version_name"]
     assert original_version["version_description"] == api_info["version_description"]
     assert original_version["endpoints"] == api_info["endpoints"]
-    # assert original_version['status'] == "LIVE" # TODO: Uncomment and fix
+    assert original_version['status'] == "LIVE"
+
+def test_update_version_api_fields(simple_user):
+    '''
+        Test whether an API is correctly created then updated for version specific fields
+    '''
+    api_info = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name"
+                }
+    
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    sid = response_info['id']
+
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+
+    assert response_info["newly_created"]
+    assert response_info["versions"][0]["newly_created"]
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True,
+                                'version_name': api_info["version_name"],
+                                'service_global': True
+                            })
+    
+    assert response.status_code == SUCCESS
+
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+    
+    assert not response_info["newly_created"]
+    assert not response_info["versions"][0]["newly_created"]
+
+    new_version = {
+        "sid" : sid,
+        "version_name" : "version 2",
+        "version_description" : "new description",
+        "endpoints" : [simple_endpoint2.model_dump()]
+    }
+
+    response = client.post("/service/version/add",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          json=new_version)
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+
+    assert response_info["versions"][0]["newly_created"]
+    assert not response_info["versions"][1]["newly_created"]
+    
+    reason = "good"
+    response = client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': reason,
+                                'approved': True,
+                                'service_global': False,
+                                "version_name": new_version["version_name"]
+                            })
+    assert response.status_code == SUCCESS
+
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+
+    assert response_info['status'] == "LIVE"
+    assert response_info['status_reason'] == reason
+    assert response_info["versions"][0]["status"] == "LIVE"
+    assert response_info["versions"][0]["status_reason"] == reason
+    assert not response_info["versions"][0]["newly_created"]
+    assert not response_info["versions"][1]["newly_created"]
+    
+    update_request_info = {
+        'sid' : sid,
+        'version_name': new_version["version_name"],
+        'new_version_name': "new version name",
+        'endpoints' : [simple_endpoint3.model_dump()],
+        'version_description': "new version description"
+    }
+
+    response = client.post("/service/version/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_request_info)
+    assert response.status_code == SUCCESS
+
+    # TODO:
+    # Information returned should be of updated service not original
+    # response = client.get("/admin/get/services",
+    #                       headers={"Authorization": f"Bearer {access_token}"})
+    # assert response.status_code == SUCCESS
+    # response_info = response.json()["services"]
+    # assert len(response_info) == 1
+
+    # assert response_info[0]['id'] == sid
+    # assert response_info[0]['name'] == update_request_info['name']
+    # assert response_info[0]['description'] == update_request_info['description']
+    # assert response_info[0]['tags'] == update_request_info['tags']
+
+    # make sure pending update so details have not yet changed and status is pending
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+   
+    assert response_info['status'] == "LIVE"
+    assert response_info['status_reason'] == reason
+    assert response_info["versions"][0]["status"] == "UPDATE_PENDING"
+    assert response_info["versions"][0]["status"] == "UPDATE_PENDING"
+
+    reason = 'unpog service'
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': reason,
+                                'approved': False,
+                                'service_global': False,
+                                'version_name': new_version["version_name"]
+                            })
+    
+    # check after rejection details have not changed
+
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+
+    assert response_info['status'] == "LIVE"
+    assert response_info['status_reason'] != reason
+    assert response_info["versions"][0]["status"] == "UPDATE_REJECTED"
+    assert response_info["versions"][0]["status_reason"] == reason
+
+    response = client.post("/service/version/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_request_info)
+    assert response.status_code == SUCCESS
+
+    reason = "pog service"
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': reason,
+                                'approved': True,
+                                'service_global': False,
+                                'version_name': new_version["version_name"]
+                            })
+
+
+    # now approved, so check details have properly changed and status is LIVE
+    
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    response_info = response.json()
+   
+    assert response_info['id'] == sid
+    assert response_info['name'] == api_info['name']
+    assert response_info['description'] == api_info['description']
+    assert response_info['tags'] == api_info['tags']
+    assert len(response_info["versions"]) == 2
+
+    original_version = response_info["versions"][1]
+    assert original_version["version_name"] == api_info["version_name"]
+    assert original_version["endpoints"] == api_info["endpoints"]
+    assert original_version["status"] == "LIVE"
+    assert not original_version["newly_created"]
+
+    new_version = response_info["versions"][0]
+    assert new_version["version_name"] == update_request_info["new_version_name"]
+    assert new_version["endpoints"] == update_request_info["endpoints"]
+    assert new_version["version_description"] == update_request_info["version_description"]
+    assert new_version["status"] == "LIVE"
+    assert new_version["status_reason"] == reason
+    assert not new_version["newly_created"]
+
+
+
+    #TODO: check newly created
+    # TODO: database tests
+    # database_object = db_get_service(sid)
+    # assert database_object['id'] == sid
+    # assert database_object['name'] == update_request_info['name']
+    # assert database_object['description'] == update_request_info['description']
+    # assert database_object['tags'] == update_request_info['tags']
 
 
 
