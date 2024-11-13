@@ -134,4 +134,12 @@ def admin_get_pending_services(status: str) -> List[dict[str, str]]:
             services.append(service.to_updated_json())
     
     return services
+
+def admin_check_if_admin(uid: str):
+    is_valid_user(uid)
+    user = data_store.get_user_by_id(uid)
+    username = user.get_name()
+    target_is_super = user.get_is_super()
+    target_is_admin = user.get_is_admin()
+    return {"name": username, "is_admin": target_is_admin, "is_super": target_is_super}
     
