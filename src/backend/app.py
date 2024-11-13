@@ -50,7 +50,7 @@ def purge_expired_tokens():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     '''
-        Lifespan context manager for FastAPI to manage background tasks.
+        Lifespan context manager for FastAPI to manage background tasks
     '''
     async def periodic_purge():
         '''
