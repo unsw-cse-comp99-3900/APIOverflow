@@ -6,7 +6,7 @@ from src.backend.classes.datastore import data_store
 from src.backend.classes.User import User
 from typing import Literal, TypeVar
 from src.backend.database import *
-from src.backend.classes.Manager import manager, SECRET
+from src.backend.classes.Manager import manager, SECRET, blacklisted_tokens
 import jwt
 from datetime import datetime, timedelta, timezone
 import os
@@ -60,7 +60,12 @@ def login_wrapper(username: str, password: str, verify: bool = email) -> T:
         if not user.get_is_verified():
             raise HTTPException(status_code=403, detail="Email not verified")
 
-    return manager.create_access_token(data={"sub": user.get_id()})
+    access_token = manager.create_access_token(data={"sub": user.get_id()})
+    user.update_token(access_token)
+
+    if access_token in blacklisted_tokens:
+        del blacklisted_tokens[access_token]
+    return access_token
 
 def register_wrapper(displayname: str, name: str, password: str, email: str, verify: bool = email) -> str:
     '''
@@ -70,7 +75,7 @@ def register_wrapper(displayname: str, name: str, password: str, email: str, ver
         create_super_admin()
     if data_store.get_user_by_name(name):
         raise HTTPException(status_code=400, detail="Username already taken")
-    new_user = User(str(data_store.num_users()),
+    new_user = User(str(data_store.max_num_users()),
                     displayname, 
                     name,
                     manager.hash_password(password),
@@ -90,7 +95,7 @@ def create_super_admin() -> None:
     '''
         Creates a super admin at web-app creation   
     '''
-    super_admin = User(str(data_store.num_users()),
+    super_admin = User(str(data_store.max_num_users()),
                     "superadmin",
                     "superadmin",
                     manager.hash_password("superadminpassword"),

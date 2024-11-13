@@ -7,7 +7,7 @@ from src.backend.classes.models import *
 from src.backend.server.service import *
 from src.backend.classes.datastore import data_store as ds
 from src.backend.server.auth import *
-from src.backend.classes.Manager import manager as _manager
+from src.backend.classes.Manager import manager as _manager, blacklisted_tokens, TOKEN_DURATION, clear_blacklist
 from src.backend.database import db
 from src.backend.server.tags import *
 from src.backend.server.admin import *
@@ -15,21 +15,9 @@ from src.backend.server.upload import *
 from src.backend.server.user import *
 from src.backend.server.review import *
 from json import dumps
-
-
-app = FastAPI()
-
-origins = [
-    "http://localhost:3000",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"], 
-    allow_headers=["*"],
-)
+import asyncio
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone, timedelta
 
 manager = _manager.get_manager()
 
@@ -48,6 +36,47 @@ def admin_required():
         return user
 
     return admin_checker
+
+def purge_expired_tokens():
+    '''
+        Used to purge expired tokens in blacklisted token
+    '''
+    current_time = datetime.now(timezone.utc)
+    expired_tokens = [token for token, expiry in blacklisted_tokens.items() if expiry < current_time]
+
+    for token in expired_tokens:
+        del blacklisted_tokens[token]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    '''
+        Lifespan context manager for FastAPI to manage background tasks
+    '''
+    async def periodic_purge():
+        '''
+            Process that runs in the background to call purge_expired_tokens()
+        '''
+        while True:
+            purge_expired_tokens()
+            await asyncio.sleep(1800)
+
+    task = asyncio.create_task(periodic_purge())
+    yield
+    task.cancel()
+
+app = FastAPI(lifespan=lifespan)
+
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], 
+    allow_headers=["*"],
+)
 
 #####################################
 #   Misc Paths
@@ -70,6 +99,7 @@ async def clear():
     clear_all_users()
     clear_all_services()
     create_super_admin()
+    clear_blacklist()
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
@@ -317,6 +347,17 @@ async def reset_password_form(token: str, password: Password):
         raise HTTPException(status_code=400, detail="User not found")
     change_password(uid, password.newpass)
     return {"message": "Password changed successfully."}
+
+@app.post("/auth/logout")
+async def logout(user: User = Depends(manager)):
+    '''
+        Blacklist a user's current token and logs them out
+    '''
+    user = data_store.get_user_by_id(user['id'])
+    token = user.get_token()
+    expiration_time = datetime.now(timezone.utc) + TOKEN_DURATION
+    blacklisted_tokens[token] = expiration_time
+    return {"message": "Successfully logged out"}
 
 # Example privileged routes
 @app.get("/auth/admin")
