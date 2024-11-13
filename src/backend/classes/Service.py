@@ -71,8 +71,9 @@ DEFAULT_ICON = '0'
 # 7. Updating a Service 
 # [X] existing update API no longer updates endpoint
 # -- create new endpoint for updating specific version
+# -- change service version approval
+# -- Test update specific version
 # -- change what get pending returns
-# -- change service version approva
 # 6. Add docs now requires a version name
 #     - currently only supports 1 doc, should it support more?
 #     - currently cannot delete a doc  
@@ -88,7 +89,6 @@ DEFAULT_ICON = '0'
 #             "version_updates":[{service details for only version specific fields}]
 #         }
 #     ]
-
 # }
 
 # approve service:
@@ -346,23 +346,6 @@ class Service:
         
         new_endpoint = Endpoint(tab, parameters, method)
         self.get_version_info(version)._endpoints.append(new_endpoint)
-    
-    def add_service_version(self, version_name: str, endpoints: List[Endpoint], version_description: str):
-        if version_name == "":
-            raise HTTPException(status_code=400, detail='Version name cannot be empty')
-
-        if any(version._version_name == version_name for version in self._version_info):
-            raise HTTPException(status_code=404, detail='Version names must be Unique')
-        
-        if len(self._version_info) > 0 and self._newly_created:
-            raise HTTPException(status_code=404, detail='Original Service must be approved before creating new version')
-        
-        # maintain version_info has most recently added version at front of list
-        self._version_info.insert(0,
-            ServiceVersionInfo(version_name, endpoints, version_description)
-        )
-        
-
 
     # def add_owner(self, owner: str) -> None:
     #     '''
@@ -565,6 +548,24 @@ class Service:
     #  Version Methods
     ################################
 
+    def add_service_version(self, version_name: str, endpoints: List[Endpoint], version_description: str):
+        if version_name == "":
+            raise HTTPException(status_code=400, detail='Version name cannot be empty')
+
+        if self.contains_version(version_name):
+            raise HTTPException(status_code=404, detail='Version names must be Unique')
+        
+        if len(self._version_info) > 0 and self._newly_created:
+            raise HTTPException(status_code=404, detail='Original Service must be approved before creating new version')
+        
+        # maintain version_info has most recently added version at front of list
+        self._version_info.insert(0,
+            ServiceVersionInfo(version_name, endpoints, version_description)
+        )
+    
+    def contains_version(self, version_name) -> bool:
+        return any(version._version_name == version_name for version in self._version_info)
+
     def get_version_info(self, version: Optional[str]) -> ServiceVersionInfo:
         '''
             gets info related to specific version of service
@@ -579,6 +580,20 @@ class Service:
         if len(versions) == 0:
             raise HTTPException(status_code=404, detail="Service version {version} not found in service")
         return versions[0]
+    
+    def update_service_version(self, version_name: str, new_version_name: Optional[str], endpoints: List[Endpoint], version_description: str):
+        version : ServiceVersionInfo = self.get_version_info()
+
+        if new_version_name is not None:
+            if new_version_name == "":
+                raise HTTPException(status_code=400, detail='new version name cannot be empty')
+
+            if new_version_name != version_name and self.contains_version(version_name):
+                raise HTTPException(status_code=404, detail='Version names must be Unique')
+
+            version_name = new_version_name
+        
+        version.create_pending_update(version_name, endpoints, version_description)
     
     def remove_version(self, version_name: str) -> None:
         if len(self._version_info) == 1:

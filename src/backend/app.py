@@ -106,16 +106,6 @@ async def add_service(service: ServiceAdd, user: User = Depends(manager)):
     id = add_service_wrapper(request, user)
     return {'id' : id}
 
-@app.post("/service/version/add")
-async def add_service_version(service: ServiceAddVersion, user: User = Depends(manager)):
-    '''
-        Method used to add new version to existing 
-    '''
-    # Unpack request body
-    request = service.model_dump()
-    add_new_service_version_wrapper(request)
-
-
 @app.get("/service/get_service")
 async def get_service(sid: str):
     '''
@@ -182,14 +172,6 @@ async def delete_api(sid: str):
     """
     return delete_service(sid)
 
-@app.delete("/service/version/delete")
-async def add_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
-    '''
-        Method used to delete a specific version from a service
-    '''
-    # Unpack request body
-    delete_service_version_wrapper(sid, version_name)
-
 @app.post("/service/add_icon")
 async def api_add_icon(info: ServiceIconInfo, user: User = Depends(manager)):
 
@@ -242,6 +224,33 @@ async def get_doc(doc_id: str):
         Endpoint which directly returns a file requested
     '''
     return get_doc_wrapper(doc_id)
+
+#####################################
+#   Service Version Paths
+#####################################
+
+@app.post("/service/version/add")
+async def add_service_version(service: ServiceAddVersion, user: User = Depends(manager)):
+    '''
+        Method used to add new version to existing 
+    '''
+    request = service.model_dump()
+    add_new_service_version_wrapper(request)
+
+@app.post("/service/version/update")
+async def add_service_version(service: ServiceUpdateVersion, user: User = Depends(manager)):
+    '''
+        Method used to update fields related to specific version
+    '''
+    request = service.model_dump()
+    update_new_service_version_wrapper(request)
+
+@app.delete("/service/version/delete")
+async def add_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
+    '''
+        Method used to delete a specific version from a service
+    '''
+    delete_service_version_wrapper(sid, version_name)
 
 #####################################
 #   Review Paths

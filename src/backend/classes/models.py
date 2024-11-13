@@ -71,6 +71,14 @@ class ServiceAddVersion(BaseModel):
     endpoints: List[Endpoint]       # endpoints of new version
     version_description: str        # Additional details pertaining new version   
 
+class ServiceUpdateVersion(BaseModel):
+
+    sid: str                        # id of service 
+    version_name: str               # name of new version
+    new_version_name: Optional[str] = None # if we are renaming version 
+    endpoints: List[Endpoint]       # endpoints of new version
+    version_description: str        # Additional details pertaining new version   
+
 class ServiceGlobalUpdate(BaseModel):
     name: str                       # Name of service
     description: str                # Descrtipion of service

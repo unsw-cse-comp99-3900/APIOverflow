@@ -158,6 +158,13 @@ def add_new_service_version_wrapper(request):
                                 request["endpoints"],
                                 request["version_description"])
 
+def update_new_service_version_wrapper(request):
+    service: API = get_validate_service_id(request["sid"])
+    service.update_service_version(request["version_name"],
+                                request["new_version_name"], 
+                                request["endpoints"],
+                                request["version_description"])
+
 def delete_service_version_wrapper(sid: str, version_name: str):
     service: Service = get_validate_service_id(sid)
     service.remove_version(version_name)
