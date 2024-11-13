@@ -442,6 +442,7 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str, version: Opti
     if approved:
         pendingObject.complete_update()
         pendingObject.update_status(ServiceStatus.LIVE, reason)
+        pendingObject.update_newly_created()
         db_update_service(sid, service.to_json())
     elif pendingObject.get_status() == ServiceStatus.PENDING:
        pendingObject.update_status(ServiceStatus.REJECTED, reason)

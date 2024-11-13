@@ -24,31 +24,30 @@ DEFAULT_ICON = '0'
 
 # API Changes
 # /service/add: added "version_name" and "version_description" fields
-#  - currently these give a default value to break existing things
+#  - currently these give a default value to not break existing things
 #  - but pls change so users must provide these strings
 #  - throws error if version_name is ""
 #
 # /service/get: 
 #  - REMOVED FIELDS endpoints and docs
+#  - Added Field "newly_created"
 #  - Added field: versions: [{
             # "version_name": name of version(str)
             # "endpoints": list of endpoints (whatever it was before),
             # "version_description": Additional description for version(str),
             # "docs": documents (whatever it was before)
             # "status": name of status: 
-            # "status_reason": self._status_reason
+            # "status_reason": reason for status
+            # "newly_created": bool for if newly created
 # }]
-# - It is important that FE does NOT display
-# - a status version if status == "PENDING" or "REJECTED"
-# - it should still display for UPDATE_PENDING and UPDATE_REJECTED
-# - since the pre-updated version should still be live
+# Notably returns everything even if they aren't LIVE so that you can say display it on someone's profile
+# newly_created refers to if service and/or service_version was just created and
+# has not yet been approved
+# - It is important that FE does NOT display a status version if newly_created == True
+# when displaying service details
 #
 # /service/update: No longer contains endpoints field (only updates global fields)
 
-#    
-# for simplicity / to avoid a bunch of funky edge cases, we can only perform
-# one update at once, adding a new version is considered an update
-# trying to make second update will automatically ovewrite first
 
 # Added Endpoints:
 # /service/version/add : POST
@@ -58,27 +57,53 @@ DEFAULT_ICON = '0'
 #  - endpoints: List[Endpoint]       # endpoints of new version
 #  - version_description: str        # Additional details pertaining new version   
 # - throws error if invalid sid, version_name same as existing version_name or
-#   version_name == ""
+#   version_name == "" or if you try to create a new version before a newly
+#  created service has been approved yet
 
 # /service/version/delete : DELETE
 # Fields: sid and version_name
 # throws error if invlaid sid, invalid version_name or service contains only one version
 
 
+
+
 # TODOs
-# 5. Delete service version
 # 7. Updating a Service 
 # [X] existing update API no longer updates endpoint
 # -- create new endpoint for updating specific version
-# -- get pending returns more stuff
-# -- approve service must return a version as well, omitting field indicates global
-# -- create new  service version approval
-# -- a) remove endpoint from service update
-# -- b) create new endpoint 
+# -- change what get pending returns
+# -- change service version approva
 # 6. Add docs now requires a version name
 #     - currently only supports 1 doc, should it support more?
 #     - currently cannot delete a doc  
-# Consider problem of both global and local pending upon new creation
+
+# For get pending: Flag that we are updating 
+# return: (details refers to the updated details)
+# { 
+#     "services": [
+#         {
+#             "sid": service id
+#             "new_services": [{service details including version details of first service}]
+#             "global_updates": [{service details for only global fields}]
+#             "version_updates":[{service details for only version specific fields}]
+#         }
+#     ]
+
+# }
+
+# approve service:
+
+# {
+#     "sid" : str,
+#     "approved" : bool,
+#     "reason" : str,
+#     "global": bool, # if we are updating global fields
+#     "version" : Optional[str], # if we are updating version, provide name
+# }
+# IF updating new service: global == True && provide version
+# IF updating only global: global == True and don't provide version field
+# IF updating only versionL global == False and provide version
+
 
 
 class ServiceVersionInfo:
@@ -103,9 +128,10 @@ class ServiceVersionInfo:
         self._pending_update: Optional[ServicePendingVersionUpdate] = None
         self._status : ServiceStatus = ServiceStatus.PENDING
         self._status_reason : str = ""
+        self._newly_created: bool = True
 
-
-
+    def update_newly_created(self):
+        self._newly_created = False
 
     def to_json(self):
         return {
@@ -114,7 +140,8 @@ class ServiceVersionInfo:
             "version_description": self._version_description,
             "docs": self._docs,
             "status": self._status.name,
-            "status_reason": self._status_reason
+            "status_reason": self._status_reason,
+            "newly_created": self._newly_created
 
         }
     
@@ -253,6 +280,7 @@ class Service:
         self._description = description
         self._tags = tags
         self._type = stype
+        self._newly_created: bool = True
         self._version_info : List[ServiceVersionInfo] = []
         self.add_service_version(version_name, endpoints, version_description)
 
@@ -326,6 +354,9 @@ class Service:
         if any(version._version_name == version_name for version in self._version_info):
             raise HTTPException(status_code=404, detail='Version names must be Unique')
         
+        if len(self._version_info) > 0 and self._newly_created:
+            raise HTTPException(status_code=404, detail='Original Service must be approved before creating new version')
+        
         # maintain version_info has most recently added version at front of list
         self._version_info.insert(0,
             ServiceVersionInfo(version_name, endpoints, version_description)
@@ -389,6 +420,9 @@ class Service:
             self._tags = self._pending_update.get_tags()
 
             self._pending_update = None
+    
+    def update_newly_created(self):
+        self._newly_created = False
 
     ################################
     #   Delete Methods
@@ -585,6 +619,7 @@ class Service:
             'downvotes': self._downvotes,
             'status': self._status.name,
             'status_reason': self._status_reason,
+            'newly_created': self._newly_created,
             # fields denoting most current service version
 
             "versions": [version.to_json() for version in self._version_info]
