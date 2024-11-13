@@ -17,6 +17,7 @@ def clear_database():
 def test_register_user():
     """Test user registration."""
     response = client.post("/auth/register", json={
+        "displayname": "testuser",
         "username": "testuser",
         "password": "testpassword",
         "email" : "doxxed@gmail.com"
@@ -27,11 +28,13 @@ def test_register_user():
 def test_register_duplicate_user():
     """Test registering a duplicate user."""
     client.post("/auth/register", json={
+        "displayname": "testuser",
         "username": "testuser",
         "password": "testpassword",
         "email" : "doxxed@gmail.com"
     })
     response = client.post("/auth/register", json={
+        "displayname": "testuser",
         "username": "testuser",
         "password": "newpassword",
         "email" : "doxxed@gmail.com"
@@ -42,6 +45,7 @@ def test_register_duplicate_user():
 def test_login_user():
     """Test user login."""
     client.post("/auth/register", json={
+        "displayname": "testuser",
         "username": "testuser",
         "password": "testpassword",
         "email" : "doxxed@gmail.com"
@@ -65,9 +69,9 @@ def test_login_invalid_user():
 def test_access_protected_route_as_user():
     """Test access to account route as a logged-in user."""
     client.post("/auth/register", json={
+        "displayname": "testuser",
         "username": "user",
         "password": "password",
-        "is_admin": False,
         "email" : "doxxed@gmail.com"
     })
     response = client.post("/auth/login", json={
@@ -86,15 +90,9 @@ def test_access_protected_route_as_user():
 def test_access_protected_route_as_admin():
     """Test access to admin route."""
     # Register and login as admin
-    client.post("/auth/register", json={
-        "username": "adminuser",
-        "password": "adminpassword",
-        "is_admin": True,
-        "email" : "doxxed@gmail.com"
-    })
     response = client.post("/auth/login", json={
-        "username": "adminuser",
-        "password": "adminpassword"
+        "username": "superadmin",
+        "password": "superadminpassword"
     })
     access_token = response.json()["access_token"]
 
@@ -107,6 +105,7 @@ def test_access_protected_route_as_non_admin():
     """Test access to admin route as non-admin user."""
     # Register and login as guest
     client.post("/auth/register", json={
+        "displayname": "guestuser",
         "username": "guestuser",
         "password": "guestpassword",
         "email" : "doxxed@gmail.com"
