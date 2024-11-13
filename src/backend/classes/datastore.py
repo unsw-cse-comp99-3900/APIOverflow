@@ -19,6 +19,7 @@ DEFAULT_ICON = Document('0', DEFAULT_ICON_PATH, 'image/png')
 schema = {
     'users' : [],
     'user_count' : 0,
+    'max_user_count' : 0,
     'apis' : [],
     'api_count' : 0,
     'tags' : DEFAULT_TAGS.copy(),
@@ -58,6 +59,7 @@ class Datastore:
         self.__store = {
                             'users' : [],
                             'user_count' : 0,
+                            'max_user_count' : 0,
                             'apis' : [],
                             'api_count' : 0,
                             'tags' : DEFAULT_TAGS.copy(),
@@ -79,6 +81,7 @@ class Datastore:
         '''
         self.__store['users'].append(user)
         self.__store['user_count'] += 1
+        self.__store['max_user_count'] += 1
     
     def add_api(self, api: T) -> None:
         '''
@@ -232,6 +235,12 @@ class Datastore:
             Returns number of users
         '''
         return self.__store['user_count']
+    
+    def max_num_users(self) -> int:
+        '''
+            Returns max number of users
+        '''
+        return self.__store['max_user_count']
 
     def num_apis(self) -> int:
         '''

@@ -9,6 +9,7 @@ from src.backend.database import *
 from src.backend.classes.Manager import manager
 from src.backend.classes.Review import LIVE, PENDING, REJECTED
 from src.backend.classes.Service import STATUS_STRINGS, STATUS_OPTIONS, PENDING_OPTIONS
+from src.backend.server.email import send_email
 
 T = TypeVar("T")
 ADMIN = 'admin'
@@ -64,6 +65,11 @@ def delete_user(uid: str, is_super: bool):
         else:
             data_store.delete_item(uid, 'user')
             db_status = db_delete_user(username)
+    action = "admin"
+    uname = username
+    uemail = user.get_email()
+    content = {'action': action, 'uname': uname}
+    send_email(uemail, '', 'account_deleted', content)
     return {"name": username, "deleted": db_status}
 
 def get_all_users():
@@ -128,4 +134,12 @@ def admin_get_pending_services(status: str) -> List[dict[str, str]]:
             services.append(service.to_updated_json())
     
     return services
+
+def admin_check_if_admin(uid: str):
+    is_valid_user(uid)
+    user = data_store.get_user_by_id(uid)
+    username = user.get_name()
+    target_is_super = user.get_is_super()
+    target_is_admin = user.get_is_admin()
+    return {"name": username, "is_admin": target_is_admin, "is_super": target_is_super}
     

@@ -53,6 +53,7 @@ def simple_user():
 
     # Register user
     user_creds = {
+        "displayname": "Tester 1",
         "username" : "Tester 1",
         "password" : "password",
         "email" : "doxxed@gmail.com"
@@ -445,6 +446,7 @@ def test_providers_with_tags2(simple_user):
 def test_providers_with_tags_multiple(simple_user):
 
     user_creds = {
+        "displayname": "Tester 2",
         "username" : "Tester 2",
         "password" : "passwordsad",
         "email" : "doxxed2@gmail.com"
@@ -535,6 +537,7 @@ def test_providers_with_tags_multiple(simple_user):
 def test_providers_with_tags_multiple2(simple_user):
 
     user_creds = {
+        "displayname": "Tester 1",
         "username" : "Tester 2",
         "password" : "passwordsad",
         "email" : "doxxed2@gmail.com"
@@ -625,6 +628,7 @@ def test_providers_with_tags_multiple2(simple_user):
 def test_duplicate_apis(simple_user):
 
     user_creds = {
+        "displayname": "Tester 1",
         "username" : "Tester 2",
         "password" : "passwordsad",
         "email" : "doxxed2@gmail.com"
