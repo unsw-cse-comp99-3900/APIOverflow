@@ -49,7 +49,13 @@ def purge_expired_tokens():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    '''
+        Lifespan context manager for FastAPI to manage background tasks.
+    '''
     async def periodic_purge():
+        '''
+            Process that runs in the background to call purge_expired_tokens()
+        '''
         while True:
             purge_expired_tokens()
             await asyncio.sleep(1800)
