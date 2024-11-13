@@ -590,3 +590,54 @@ def test_admin_filter_overlapping_users(simple_user):
     
     assert response.status_code == SUCCESS 
     assert len(response.json()) == 3
+
+def test_admin_check_unique_id(simple_user):
+    '''
+        Test id are unique even when users are deleted
+    '''
+    user_creds2 = {
+        "displayname" : "Tester 2",
+        "username" : "Tester 2",
+        "password" : "password22",
+        "email": "doxx22ed@gmail.com"
+    }
+    response = client.post("/auth/register", json=user_creds2)
+    assert response.status_code == SUCCESS
+    uid2 = response.json()['uid']
+
+    user_creds3 = {
+        "displayname" : "Tester 3",
+        "username" : "Tester 3",
+        "password" : "password33",
+        "email": "doxx33ed@gmail.com"
+    }
+    response = client.post("/auth/register", json=user_creds3)
+    assert response.status_code == SUCCESS
+    uid3 = response.json()['uid']
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.delete("/admin/delete/user", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : uid2
+                            })
+    assert response.status_code == SUCCESS
+
+    response = client.delete("/admin/delete/user", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : uid3
+                            })
+    assert response.status_code == SUCCESS
+
+    response = client.post("/auth/register", json=user_creds3)
+    assert response.status_code == SUCCESS
+    uid4 = response.json()['uid']
+
+    assert uid4 != uid2
+    assert uid4 != uid3
+    assert uid4 == str(int(uid3) + 1)

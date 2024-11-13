@@ -24,6 +24,7 @@ class User:
             ---
             following:  List of services/users user is following
             reviews:    List of reviews the user has posted
+            token:      Current token of the user
     
     '''
 
@@ -54,6 +55,7 @@ class User:
         self._is_verified = False
         self._reviews = []
         self._num_reviews = 0
+        self._token = None
     
     ################################
     #   Add Methods
@@ -122,6 +124,12 @@ class User:
             Changes the user password
         '''
         self._password = new
+    
+    def update_token(self, new:str) -> None:
+        '''
+            Updates the user token
+        '''
+        self._token = new
 
     ################################
     #  Delete Methods
@@ -237,6 +245,12 @@ class User:
             Return user's displayname
         '''
         return self._displayname
+
+    def get_token(self) -> str:
+        '''
+            Return user's current token
+        '''
+        return self._token
 
     ################################
     #  Storage Methods
