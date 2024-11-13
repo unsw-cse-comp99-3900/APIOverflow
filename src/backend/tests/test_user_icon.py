@@ -31,6 +31,7 @@ def simple_user():
 
     # Register user
     user_creds = {
+        "displayname": "Tester 1",
         "username" : "Tester 1",
         "password" : "password",
         "email" : "doxxed@gmail.com"

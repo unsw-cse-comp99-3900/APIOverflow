@@ -1,5 +1,6 @@
 import pytest
-from src.backend.server.auth import send_email, generate_verification_token
+from src.backend.server.auth import generate_verification_token
+from src.backend.server.email import *
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -23,8 +24,8 @@ def clear_database():
 def mock_email_setup():
     mock_credentials = MagicMock()
     mock_service = MagicMock()
-    with patch('src.backend.server.auth.build', return_value=mock_service) as mock_build, \
-         patch('src.backend.server.auth.get_credentials', return_value=mock_credentials) as mock_get_credentials:
+    with patch('src.backend.server.email.build', return_value=mock_service) as mock_build, \
+         patch('src.backend.server.email.get_credentials', return_value=mock_credentials) as mock_get_credentials:
         yield mock_get_credentials, mock_build, mock_service, mock_credentials
 
 email = os.getenv("EMAIL", "False")
@@ -62,6 +63,7 @@ def test_send_pass_email(mock_email_setup):
 
 def test_send_ver_email_route():
     response = client.post("/auth/register", json={
+        "displayname" : "testuser",
         "username": "testuser",
         "password": "testpassword",
         "email" : "test@gmail.com"
@@ -70,6 +72,7 @@ def test_send_ver_email_route():
 
 def test_send_pass_email_route():
     response = client.post("/auth/register", json={
+        "displayname" : "testuser",
         "username": "testuser",
         "password": "testpassword",
         "email" : "test@gmail.com"
@@ -94,6 +97,7 @@ def test_verify_email():
 
     new_user = User("12",
                     "user",
+                    "user",
                     "what",
                     "huh",
                     False,
@@ -112,6 +116,7 @@ def test_verify_email():
 
 def test_reset_password():
     response = client.post("/auth/register", json={
+        "displayname": "testuser",
         "username": "testuser",
         "password": "testpassword",
         "email" : "test@gmail.com"
