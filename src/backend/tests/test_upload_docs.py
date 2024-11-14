@@ -215,4 +215,4 @@ def test_successful_upload(two_users):
                           })
     assert response.status_code == SUCCESS
     response_info = response.json()
-    assert response_info['docs'] == ["1"]
+    assert response_info["versions"][0]['docs'] == ["1"]

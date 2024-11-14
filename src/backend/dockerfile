@@ -30,4 +30,6 @@ ENV TEST ${TEST}
 # normally and running pytest
 # todo: figure out how to silence specific service output?
 
-CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv -x; fi
+# for increased testing speed, can change below command to 
+# pytest tests/file_name.py -vv
+CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv; fi

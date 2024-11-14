@@ -219,12 +219,12 @@ class Datastore:
         '''
         user_apis = []
         for item in self.__store['apis']:
-            owners = item.get_owner()
-            if str(eid) in owners.get_id():
+            owner = item.get_owner()
+            if str(eid) in owner.get_id():
                 api_info = {
                     'id': item.get_id(),
                     'name': item.get_name(),
-                    'owner': item.get_owner(),
+                    'owner': owner.get_id(),
                     'description': item.get_description(),
                     'icon_url': item.get_icon_url(),
                     'tags': item.get_tags()

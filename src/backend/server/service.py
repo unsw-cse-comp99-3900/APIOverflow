@@ -398,8 +398,7 @@ def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
     service.add_review(review.get_id(), rating)
     user.add_review(review.get_id())
 
-    owner_id = service.get_owner()
-    owner = data_store.get_user_by_id(owner_id)
+    owner = service.get_owner()
     action = "comment"
     msg = comment
     subname = owner.get_name()
@@ -450,8 +449,7 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str, service_globa
 
     service : API = data_store.get_api_by_id(sid)
     sname = service.get_name()
-    owner_id = service.get_owner()
-    owner = data_store.get_user_by_id(owner_id)
+    owner = service.get_owner()
     uname = owner.get_name()
     uemail = owner.get_email()
 
@@ -469,6 +467,7 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str, service_globa
             object.complete_update()
             object.update_status(ServiceStatus.LIVE, reason)
             object.update_newly_created()
+        action = "approved"
     else:
         for object in approvalObjects:
             if object.get_status() == ServiceStatus.PENDING:
