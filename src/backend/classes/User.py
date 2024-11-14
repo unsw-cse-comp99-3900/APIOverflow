@@ -13,7 +13,8 @@ class User:
         Stores the following:
 
             uid:        ID of user
-            username:   Username of user
+            displayname:Username of user (non-unique)
+            username:   Username of user (unique)
             password:   Hashed password for security
             email:      Email registered with user
             icon_url:   Path to image store on backend (todo)
@@ -26,11 +27,13 @@ class User:
             num_reviews: Number of reviews made
             replies:    List of replies user has made
             num_replies: Number of replies made
+            token:      Current token of the user
     
     '''
 
     def __init__(self,
                  uid: str,
+                 displayname: str,
                  username: str,
                  password: str,
                  email: str,
@@ -40,6 +43,7 @@ class User:
         
         # Initialised vars
         self._id = uid
+        self._displayname = displayname
         self._name = username
         self._password = password
         self._email = email
@@ -54,6 +58,7 @@ class User:
         self._num_reviews = 0
         self._replies = []
         self._num_replies = 0
+        self._token = None
     
     ################################
     #   Add Methods
@@ -75,6 +80,12 @@ class User:
     ################################
     #  Modify Methods
     ################################
+    def modify_displayname(self, new: str) -> None:
+        '''
+            Modifies user's displayname
+        '''
+        self._displayname = new
+
     def modify_username(self, new: str) -> None:
         '''
             Modifies user's username
@@ -116,6 +127,12 @@ class User:
             Changes the user password
         '''
         self._password = new
+    
+    def update_token(self, new:str) -> None:
+        '''
+            Updates the user token
+        '''
+        self._token = new
 
     ################################
     #  Delete Methods
@@ -215,9 +232,22 @@ class User:
         '''
         return {
             'email': self._email,
+            'displayname' : self._displayname,
             'username': self._name,
             'icon': self._icon
         }
+
+    def get_displayname(self) -> str:
+        '''
+            Return user's displayname
+        '''
+        return self._displayname
+
+    def get_token(self) -> str:
+        '''
+            Return user's current token
+        '''
+        return self._token
 
     ################################
     #  Storage Methods
@@ -228,6 +258,7 @@ class User:
         '''
         return {
             'id': self._id,
+            'displayname' : self._displayname,
             'username' : self._name,
             'password' : self._password,
             'email' : self._email,

@@ -31,6 +31,7 @@ class User(BaseModel):
         return db.users.find_one({"username": username})
 
 class UserCreate(BaseModel):
+    displayname: str
     username: str
     password: str
     email: str
@@ -106,7 +107,8 @@ class ServiceApprove(BaseModel):
 
 class AdminGetReviews(BaseModel):
     option: str = ''
-
 class ReviewPackage(BaseModel):
     rid: str
     content: str = ''
+class GeneralString(BaseModel):
+    content: str

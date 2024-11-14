@@ -7,7 +7,12 @@ from src.backend.database import *
 from datetime import timedelta
 
 TOKEN_DURATION = timedelta(days=1)     # 1 day expiration
+blacklisted_tokens = {}
 
+def clear_blacklist():
+    blacklisted_tokens.clear()
+    print("Blacklist cleared.")
+    
 class Manager:
     '''
         Class which handles session-management and password security
@@ -60,8 +65,14 @@ def load_user(username: str):
         Grabs user for manager
     '''
     user = data_store.get_user_by_id(username)
+    
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
+
+    token = user.get_token()
+    if token in blacklisted_tokens:
+        raise HTTPException(status_code=401, detail="Current token is invalid")
+
     user_body = {
         'id' : user.get_id(),
         'username' : user.get_name(),

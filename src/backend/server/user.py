@@ -8,6 +8,7 @@ from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.database import *
 import re
+from src.backend.server.email import send_email
 
 def user_add_icon_wrapper(uid: str, doc_id: str) -> None:
     '''
@@ -103,8 +104,25 @@ def user_self_delete(uid: str):
     username = user.get_name()
     data_store.delete_item(uid, 'user')
     db_status = db_delete_user(username)
+    action = "self"
+    uname = username
+    uemail = user.get_email()
+    content = {'action': action, 'uname': uname}
+    send_email(uemail, '', 'account_deleted', content)
 
     return {"name": username, "deleted": db_status}
+
+def user_update_displayname(uid: str, new: str) -> None:
+    '''
+        Allows the user to update their displayname
+    '''
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail="No such user found")
+    user.modify_displayname(new)
+    db_update_user(uid, user.to_json())
+
+    return {"displayname": new, "updated": True}
 
 def user_get_replies_wrapper(uid: str) -> List[dict[str, str]]:
     '''

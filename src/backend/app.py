@@ -7,7 +7,7 @@ from src.backend.classes.models import *
 from src.backend.server.service import *
 from src.backend.classes.datastore import data_store as ds
 from src.backend.server.auth import *
-from src.backend.classes.Manager import manager as _manager
+from src.backend.classes.Manager import manager as _manager, blacklisted_tokens, TOKEN_DURATION, clear_blacklist
 from src.backend.database import db
 from src.backend.server.tags import *
 from src.backend.server.admin import *
@@ -15,26 +15,11 @@ from src.backend.server.upload import *
 from src.backend.server.user import *
 from src.backend.server.review import *
 from json import dumps
-
-
-app = FastAPI()
-
-origins = [
-    "http://localhost:3000",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"], 
-    allow_headers=["*"],
-)
+import asyncio
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone, timedelta
 
 manager = _manager.get_manager()
-user_count = db.users.count_documents({})
-if ds.num_users() == 0 and user_count == 0:
-    create_super_admin()
 
 #####################################
 #   Helper Functions
@@ -51,6 +36,47 @@ def admin_required():
         return user
 
     return admin_checker
+
+def purge_expired_tokens():
+    '''
+        Used to purge expired tokens in blacklisted token
+    '''
+    current_time = datetime.now(timezone.utc)
+    expired_tokens = [token for token, expiry in blacklisted_tokens.items() if expiry < current_time]
+
+    for token in expired_tokens:
+        del blacklisted_tokens[token]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    '''
+        Lifespan context manager for FastAPI to manage background tasks
+    '''
+    async def periodic_purge():
+        '''
+            Process that runs in the background to call purge_expired_tokens()
+        '''
+        while True:
+            purge_expired_tokens()
+            await asyncio.sleep(1800)
+
+    task = asyncio.create_task(periodic_purge())
+    yield
+    task.cancel()
+
+app = FastAPI(lifespan=lifespan)
+
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], 
+    allow_headers=["*"],
+)
 
 #####################################
 #   Misc Paths
@@ -73,6 +99,7 @@ async def clear():
     clear_all_users()
     clear_all_services()
     create_super_admin()
+    clear_blacklist()
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
@@ -308,7 +335,7 @@ async def register(user: UserCreate):
     '''
         Register a user onto the platform
     '''
-    uid = register_wrapper(user.username, user.password, user.email, user.is_admin)
+    uid = register_wrapper(user.displayname, user.username, user.password, user.email)
     return {'uid' : uid}
 
 @app.post("/auth/login")
@@ -356,6 +383,17 @@ async def reset_password_form(token: str, password: Password):
     change_password(uid, password.newpass)
     return {"message": "Password changed successfully."}
 
+@app.post("/auth/logout")
+async def logout(user: User = Depends(manager)):
+    '''
+        Blacklist a user's current token and logs them out
+    '''
+    user = data_store.get_user_by_id(user['id'])
+    token = user.get_token()
+    expiration_time = datetime.now(timezone.utc) + TOKEN_DURATION
+    blacklisted_tokens[token] = expiration_time
+    return {"message": "Successfully logged out"}
+
 # Example privileged routes
 @app.get("/auth/admin")
 async def admin_route(user: User = Depends(manager), role: str = Depends(admin_required())):
@@ -370,7 +408,7 @@ async def account_user_route(user: User = Depends(manager)):
     return {"message": "Welcome, Account User!"}
 
 @app.get("/auth/guest")
-async def guest_route(user: User = Depends(manager)):
+async def guest_route():
     return {"message": "Welcome, Guest!"}
 
 
@@ -466,6 +504,13 @@ async def admin_user_filter(standard: bool, admin: bool, super: bool, user: User
     print(super)
     return admin_filter_users(standard, admin, super)
 
+@app.get("/admin/check_if_admin")
+async def admin_check_user_role(uid: str, user: User = Depends(manager), role: str = Depends(admin_required())):
+    '''
+        Endpoint for internal use, check if a user is admin
+    '''
+    return admin_check_if_admin(uid)
+
 #####################################
 #   User Paths
 #####################################
@@ -527,6 +572,13 @@ async def user_get_replies(user: User = Depends(manager)):
         Endpoint which gets summary versions of all replies made by user
     '''
     return user_get_replies_wrapper(user['id'])
+
+@app.post("/user/update/displayname")
+async def update_user_displayname(new_displayname: GeneralString, user: User = Depends(manager)):
+    '''
+        Endpoint which allows the user to update their displayname
+    '''
+    return user_update_displayname(user['id'], new_displayname.content)
 
 if __name__ == "__main__":
     import uvicorn
