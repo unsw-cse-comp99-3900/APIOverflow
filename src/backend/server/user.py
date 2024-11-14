@@ -105,3 +105,9 @@ def user_self_delete(uid: str):
     db_status = db_delete_user(username)
 
     return {"name": username, "deleted": db_status}
+
+def user_get_replies_wrapper(uid: str) -> List[dict[str, str]]:
+    '''
+        Wrapper which returns a list of all replies made by the user
+    ''' 
+    pass

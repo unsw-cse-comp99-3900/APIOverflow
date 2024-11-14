@@ -211,12 +211,12 @@ async def api_get_rating(sid: str):
     return service_get_rating_wrapper(sid)
 
 @app.get("/service/get/reviews")
-async def api_get_reviews(sid: str, testing: bool = False):
+async def api_get_reviews(sid: str, testing: bool = False, filter: str = ''):
     '''
         Endpoint to retrieve a service's reviews
     '''
     return {
-        'reviews' : service_get_reviews_wrapper(sid, testing)
+        'reviews' : service_get_reviews_wrapper(sid, testing, filter)
     } 
 
 @app.get("/get/doc")
@@ -250,6 +250,55 @@ async def review_edit(info: ServiceReviewEditInfo, user: User = Depends(manager)
         Endpoint which edits a given review
     '''
     review_edit_wrapper(info, user['id'], user['is_admin'])
+
+@app.post("/review/upvote")
+async def review_upvote(rid: str, user: User = Depends(manager)):
+    '''
+        Endpoint which upvotes a given review
+    '''
+    review_vote_wrapper(rid, user['id'], 'positive')
+
+@app.post("/review/downvote")
+async def review_downvote(rid: str, user: User = Depends(manager)):
+    '''
+        Endpoint which downvotes a given review
+    '''
+    review_vote_wrapper(rid, user['id'], 'negative')
+
+@app.post("/review/remove_vote")
+async def review_remove_vote(rid: str, user: User = Depends(manager)):
+    '''
+        Endpoint which removes a vote from given review
+    '''
+    review_remove_vote_wrapper(rid, user['id'])
+
+@app.post("/review/reply")
+async def review_reply(rid: str, content: str, user: User = Depends(manager)):
+    '''
+        Endpoint which adds a reply to a review
+    '''
+    review_add_reply_wrapper(rid, user['id'], content)
+
+@app.delete("/review/reply/delete")
+async def review_reply_delete(rid: str, user: User = Depends(manager)):
+    '''
+        Endpoint which deletes a review reply
+    '''
+    review_delete_reply_wrapper(rid, user['id'])
+
+@app.post("/review/reply/edit")
+async def review_reply_edit(rid: str, content: str, user: User = Depends(manager)):
+    '''
+        Endpoint which edits a review reply
+    '''
+    review_edit_reply_wrapper(rid, user['id'], content)
+
+@app.get("/review/reply/get")
+async def review_reply_get(rid: str):
+    '''
+        Endpoint which retrieves a review reply given an id
+    '''
+    return review_get_reply_wrapper(rid)
 
 #####################################
 #   Auth Paths
@@ -471,6 +520,13 @@ async def delete_user_self(user: User = Depends(manager)):
         Endpoint which allows the user to un-register themselves
     '''
     return user_self_delete(user['id'])
+
+@app.get("/user/get/replies")
+async def user_get_replies(user: User = Depends(manager)):
+    '''
+        Endpoint which gets summary versions of all replies made by user
+    '''
+    return user_get_replies_wrapper(user['id'])
 
 if __name__ == "__main__":
     import uvicorn

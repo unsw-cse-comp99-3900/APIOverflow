@@ -208,7 +208,6 @@ def test_add_review_success(simple_user):
     assert len(response.json()['reviews']) == 1
     assert response.json()['reviews'][0]['reviewer'] == '2'
     assert response.json()['reviews'][0]['type'] == package['rating']
-    assert response.json()['reviews'][0]['title'] == package['title']
     assert response.json()['reviews'][0]['comment'] == package['comment']
     assert response.json()['reviews'][0]['service'] == package['sid']
 

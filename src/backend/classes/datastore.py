@@ -28,7 +28,10 @@ schema = {
     'docs': [DEFAULT_ICON],
     'reviews' : [],
     'review_count': 0,
-    'review_total': 0
+    'review_total': 0,
+    'replys' : [],          # Yes I know it's 'replies' but it's for delete_items
+    'reply_count': 0,
+    'reply_total': 0
 }
 
 class Datastore:
@@ -45,7 +48,7 @@ class Datastore:
         '''
             Constrcutor with default schema as initial store
         '''
-        self.__store = schema
+        self.__store = schema.copy()
 
     ######################################
     #   Loading and Saving Methods Methods
@@ -55,20 +58,7 @@ class Datastore:
         pass
 
     def clear_datastore(self) -> None:
-        self.__store = {
-                            'users' : [],
-                            'user_count' : 0,
-                            'apis' : [],
-                            'api_count' : 0,
-                            'tags' : DEFAULT_TAGS.copy(),
-                            'tag_count' : len(DEFAULT_TAGS),
-                            'img_count' : 0,
-                            'docs_count': 1,
-                            'docs': [DEFAULT_ICON],
-                            'reviews' : [],
-                            'review_count': 0,
-                            'review_total': 0
-                        }
+        self.__store = schema.copy()
 
     ##################################
     #   Datastore Insertion Methods
@@ -121,6 +111,14 @@ class Datastore:
         self.__store['reviews'].append(review)
         self.__store['review_count'] += 1
         self.__store['review_total'] += 1
+
+    def add_reply(self, reply: T) -> None:
+        '''
+            Adds a reply to the datastore
+        '''
+        self.__store['replys'].append(reply)
+        self.__store['reply_count'] += 1
+        self.__store['reply_total'] += 1
 
     ################################
     #   Datastore Search Methods
@@ -269,10 +267,32 @@ class Datastore:
         '''
         return self.__store['review_total']
 
+    def get_reply_by_id(self, rid: str) -> T | None:
+        '''
+            Retrieves a reply by id if it exists, else None
+        '''
+        for item in self.__store['replys']:
+            if item.get_id() == rid:
+                return item
+
+        return None
+
+    def get_replies(self) -> List[T]:
+        '''
+            Returns all replies made
+        '''
+        return self.__store['replys']
+    
+    def total_replies(self) -> int:
+        '''
+            Returns totla number of all replies
+        '''
+        return self.__store['reply_total']
+
     ################################
     #   Datastore Deletion Methods
     ################################
-    def delete_item(self, eid: int, i_type: Literal['user', 'api', 'review']) -> None:
+    def delete_item(self, eid: int, i_type: Literal['user', 'api', 'review', 'reply']) -> None:
         '''
             Deletes an item from the database (not tags)
         '''

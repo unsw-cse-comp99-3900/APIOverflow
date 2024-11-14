@@ -384,7 +384,6 @@ def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
 
     # Validate Review
     rating = data['rating']
-    title = data['title']
     comment = data['comment']
     if rating == '' or title == '' or comment == '':
          raise HTTPException(status_code=400, detail="Rating/Title/Comment is empty")
@@ -396,7 +395,6 @@ def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
     review = Review(str(data_store.total_reviews()),
                     user.get_id(),
                     service.get_id(),
-                    title,
                     rating,
                     comment)
     data_store.add_review(review)
@@ -414,7 +412,7 @@ def service_get_rating_wrapper(sid: str) -> dict[str, Union[int, float]]:
 
     return service.get_ratings()
 
-def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[str, str]]:
+def service_get_reviews_wrapper(sid: str, testing: bool = False, filter: str = '') -> List[dict[str, str]]:
     '''
         Wrapper which grabs all reviews associated with the particular service
     '''
@@ -432,9 +430,16 @@ def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[st
         if review is None:
             continue
 
-        reviews.append(review.to_json())
+        reviews.append(review)
 
-    return reviews
+    # Sorting the review list
+    if filter == 'best':
+        review.sort(reverse=True, key=lambda x : x.get_net_vote())
+    
+    if filter == 'worst':
+        review.sort(key=lambda x: x.get_net_vote())
+
+    return [review.to_json() for review in reviews]
 
 def approve_service_wrapper(sid: str, approved: bool, reason: str):
 
