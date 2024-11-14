@@ -145,7 +145,7 @@ class Review(Comment):
                 'e_timestamp': self.get_e_timestamp()
             }
         
-        reply = None if self._reply is None else self._reply.get_id()
+        reply = None if self._reply is None else self._reply
         voted = ''
         if uid != '':
             if uid in self._upvote:

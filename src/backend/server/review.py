@@ -33,11 +33,11 @@ def review_delete_wrapper(rid: str, uid: str, is_admin: bool) -> None:
         raise HTTPException(status_code=404, detail="Review not found")
 
     # Check permissions
-    if review.get_reviewer() != uid and not is_admin: 
+    if review.get_owner() != uid and not is_admin: 
         raise HTTPException(status_code=403, detail="No permission to delete review")
 
     # Delete review
-    user = data_store.get_user_by_id(review.get_reviewer())
+    user = data_store.get_user_by_id(review.get_owner())
     service = data_store.get_api_by_id(review.get_service())
     user.remove_review(rid)
     service.remove_review(rid, review.get_rating())
@@ -66,7 +66,7 @@ def review_edit_wrapper(info: ServiceReviewEditInfo, uid: str, is_admin: bool) -
         raise HTTPException(status_code=404, detail="Review not found")
 
      # Check permissions
-    if review.get_reviewer() != uid and not is_admin:
+    if review.get_owner() != uid and not is_admin:
         raise HTTPException(status_code=403, detail="No permission to edit review")
 
     # Check validity of input
@@ -87,7 +87,7 @@ def review_vote_wrapper(rid: str, uid: str, vote: str) -> None:
     if review is None:
         raise HTTPException(status_code=404, detail="Review not found")
     
-    if review.get_reviewer() == uid:
+    if review.get_owner() == uid:
         raise HTTPException(status_code=403, detail="User cannot vote on their own review")
 
     if review.update_vote(uid, vote) is None:
@@ -129,11 +129,13 @@ def review_add_reply_wrapper(rid: str, uid: str, comment: str) -> None:
         raise HTTPException(status_code=400, detail='Content cannot be empty')
 
     # Create and add reply
-    reply = ReviewReply(data_store.total_replies(),
+    reply = ReviewReply(str(data_store.total_replies()),
                         uid,
                         server.get_id(),
                         comment,
                         rid)
+    user = data_store.get_user_by_id(uid)
+    user.add_reply(reply.get_id())
     data_store.add_reply(reply)
     review.add_reply(reply.get_id())
 
@@ -151,7 +153,7 @@ def review_delete_reply_wrapper(rid: str, uid: str) -> None:
         raise HTTPException(status_code=403, detail="User not owner of reply")
     
     # Delete reply
-    review = data_store.get_review_by_id(reply.get_parent())
+    review = data_store.get_review_by_id(reply.get_review())
     user = data_store.get_user_by_id(reply.get_owner())
     user.remove_reply(rid)
     review.remove_reply()

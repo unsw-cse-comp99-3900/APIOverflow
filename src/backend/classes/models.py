@@ -106,3 +106,7 @@ class ServiceApprove(BaseModel):
 
 class AdminGetReviews(BaseModel):
     option: str = ''
+
+class ReviewPackage(BaseModel):
+    rid: str
+    content: str = ''

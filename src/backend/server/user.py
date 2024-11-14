@@ -110,4 +110,16 @@ def user_get_replies_wrapper(uid: str) -> List[dict[str, str]]:
     '''
         Wrapper which returns a list of all replies made by the user
     ''' 
-    pass
+    
+    # Check if user exists
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    replies = user.get_replies()
+    output = []
+    for reply in replies:
+        output.append(data_store.get_reply_by_id(reply).to_json())
+    return {
+        'replies' : output
+    }

@@ -103,7 +103,6 @@ def test_add_review_bad_api(simple_user):
     package = {
         'sid': '-1',
         'rating': 'positive',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -119,7 +118,6 @@ def test_add_review_owner_attempt(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'positive',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -129,27 +127,14 @@ def test_add_review_owner_attempt(simple_user):
 
 def test_add_review_bad_input(simple_user):
     '''
-        Test whether no title or comment, or invalid rating is caught
+        Test whether no comment, or invalid rating is caught
     '''
     data = simple_user
-
-    # Bad title
-    package = {
-        'sid': data['sid'],
-        'rating': 'positive',
-        'title': '',
-        'comment': 'Mid at best'
-    }
-    response = client.post("/service/review/add",
-                headers={"Authorization": f"Bearer {data['u_token']}"},
-                json=package)
-    assert response.status_code == INPUT_ERROR
 
     # Bad comment
     package = {
         'sid': data['sid'],
         'rating': 'positive',
-        'title': 'A review',
         'comment': ''
     }
     response = client.post("/service/review/add",
@@ -161,7 +146,6 @@ def test_add_review_bad_input(simple_user):
     package = {
         'sid': data['sid'],
         'rating': '',
-        'title': 'A review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -173,7 +157,6 @@ def test_add_review_bad_input(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'amazing!',
-        'title': 'A review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -190,7 +173,6 @@ def test_add_review_success(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'negative',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -217,7 +199,6 @@ def test_add_review_success(simple_user):
                           params = {'rid': rid})
     assert response.status_code == SUCCESS
     assert response.json()['rid'] == rid
-    assert response.json()['title'] == package['title']
     assert response.json()['type'] == package['rating']
     assert response.json()['comment'] == package['comment']
     assert response.json()['reviewer'] == "2"
@@ -267,7 +248,6 @@ def test_delete_review_not_reviewer(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'negative',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -292,7 +272,6 @@ def test_delete_review_success_reviewer(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'negative',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -330,7 +309,6 @@ def test_delete_review_success_admin(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'negative',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -373,7 +351,6 @@ def test_edit_review_guest():
     package = {
         'rid': '0',
         'rating' : 'positive',
-        'title': 'EDIT',
         'comment': "edited"
     }
     response = client.post("/review/edit",
@@ -389,7 +366,6 @@ def test_edit_review_bad_review(simple_user):
     package = {
         'rid': '0',
         'rating' : 'positive',
-        'title': 'EDIT',
         'comment': "edited"
     }
     response = client.post("/review/edit",
@@ -406,7 +382,6 @@ def test_edit_review_not_reviewer(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'negative',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -417,7 +392,6 @@ def test_edit_review_not_reviewer(simple_user):
     package = {
         'rid': '0',
         'rating' : 'positive',
-        'title': 'EDIT - It gets good!',
         'comment': "Way better than mid"
     }
     response = client.post("/review/edit",
@@ -434,7 +408,6 @@ def test_edit_review_successful(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'negative',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -445,7 +418,6 @@ def test_edit_review_successful(simple_user):
     package = {
         'rid': '0',
         'rating' : 'positive',
-        'title': 'EDIT - It gets good!',
         'comment': "Way better than mid"
     }
     response = client.post("/review/edit",
@@ -462,7 +434,6 @@ def test_edit_review_successful(simple_user):
     assert len(response.json()['reviews']) == 1
     assert response.json()['reviews'][0]['reviewer'] == '2'
     assert response.json()['reviews'][0]['type'] == package['rating']
-    assert response.json()['reviews'][0]['title'] == package['title']
     assert response.json()['reviews'][0]['comment'] == package['comment']
 
     rid = response.json()['reviews'][0]['rid']
@@ -470,7 +441,6 @@ def test_edit_review_successful(simple_user):
                           params = {'rid': rid})
     assert response.status_code == SUCCESS
     assert response.json()['rid'] == rid
-    assert response.json()['title'] == package['title']
     assert response.json()['type'] == package['rating']
     assert response.json()['comment'] == package['comment']
     assert response.json()['reviewer'] == "2"
@@ -484,7 +454,6 @@ def test_edit_review_successful_admin(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'negative',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -502,7 +471,6 @@ def test_edit_review_successful_admin(simple_user):
     package = {
         'rid': '0',
         'rating' : 'positive',
-        'title': 'EDIT - It gets good!',
         'comment': "Way better than mid"
     }
     response = client.post("/review/edit",
@@ -519,7 +487,6 @@ def test_edit_review_successful_admin(simple_user):
     assert len(response.json()['reviews']) == 1
     assert response.json()['reviews'][0]['reviewer'] == '2'
     assert response.json()['reviews'][0]['type'] == package['rating']
-    assert response.json()['reviews'][0]['title'] == package['title']
     assert response.json()['reviews'][0]['comment'] == package['comment']
 
     rid = response.json()['reviews'][0]['rid']
@@ -527,11 +494,9 @@ def test_edit_review_successful_admin(simple_user):
                           params = {'rid': rid})
     assert response.status_code == SUCCESS
     assert response.json()['rid'] == rid
-    assert response.json()['title'] == package['title']
     assert response.json()['type'] == package['rating']
     assert response.json()['comment'] == package['comment']
     assert response.json()['reviewer'] == "2"
-
 
 def test_service_rating_bad_api(simple_user):
     '''
@@ -569,7 +534,6 @@ def test_service_rating_negative(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'negative',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -596,7 +560,6 @@ def test_service_rating_positive(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'positive',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -651,7 +614,6 @@ def test_user_get_reviews_one(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'positive',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -668,7 +630,6 @@ def test_user_get_reviews_one(simple_user):
     assert len(response.json()['reviews']) == 1
     assert response.json()['reviews'][0]['rid'] == '0'
     assert response.json()['reviews'][0]['service'] == data['sid']
-    assert response.json()['reviews'][0]['title'] == 'A Review'
     assert response.json()['reviews'][0]['type'] == 'positive'
 
 def test_admin_get_reviews_user(simple_user):
@@ -680,7 +641,6 @@ def test_admin_get_reviews_user(simple_user):
                             headers={"Authorization": f"Bearer {data['u_token']}"})
     assert response.status_code == FORBIDDEN_ERROR
 
-
 def test_admin_get_reviews_wrong_filter(simple_user):
     '''
         Test whether positive review is registered
@@ -690,7 +650,6 @@ def test_admin_get_reviews_wrong_filter(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'positive',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -720,7 +679,6 @@ def test_admin_get_reviews(simple_user):
     package = {
         'sid': data['sid'],
         'rating': 'positive',
-        'title': 'A Review',
         'comment': 'Mid at best'
     }
     response = client.post("/service/review/add",
@@ -742,7 +700,6 @@ def test_admin_get_reviews(simple_user):
     assert len(response.json()['reviews']) == 1
     assert response.json()['reviews'][0]['rid'] == '0'
     assert response.json()['reviews'][0]['service'] == data['sid']
-    assert response.json()['reviews'][0]['title'] == 'A Review'
     assert response.json()['reviews'][0]['type'] == 'positive'
 
 def test_upvote_non_existent(simple_user):
@@ -756,147 +713,651 @@ def test_upvote_non_existent(simple_user):
     response = client.post("/review/upvote",
                            headers={"Authorization": f"Bearer {data['u_token']}"},
                            json=package)
+    assert response.status_code == MISSING_ERROR
 
 def test_upvote_self(simple_user):
     '''
         Test whether upvoting self-review is valid
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.post("/review/upvote",
+                           headers={"Authorization": f"Bearer {data['u_token']}"},
+                           json=package)
+    assert response.status_code == FORBIDDEN_ERROR
 
 def test_upvote_success(simple_user):
     '''
         Test whether upvoting a review works
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.post("/review/upvote",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
 
 def test_upvote_twice(simple_user):
     '''
         Test whether upvoting twice is disallowed
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.post("/review/upvote",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.post("/review/upvote",
+                        headers={"Authorization": f"Bearer {data['c_token']}"},
+                        json=package)
+    assert response.status_code == FORBIDDEN_ERROR
 
 def test_downvote_non_existent(simple_user):
     '''
         Test whether an downvote on a non-existent review is caught
     '''
-    pass
+    data = simple_user
+    package = {
+        'rid': '999'
+    }
+    response = client.post("/review/downvote",
+                           headers={"Authorization": f"Bearer {data['u_token']}"},
+                           json=package)
+    assert response.status_code == MISSING_ERROR
 
 def test_downvote_self(simple_user):
     '''
         Test whether downvoting self-review is valid
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.post("/review/downvote",
+                           headers={"Authorization": f"Bearer {data['u_token']}"},
+                           json=package)
+    assert response.status_code == FORBIDDEN_ERROR
 
 def test_downvote_success(simple_user):
     '''
         Test whether downvoting a review works
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.post("/review/downvote",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
 
 def test_downvote_twice(simple_user):
     '''
         Test whether downvoting twice is disallowed
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.post("/review/downvote",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.post("/review/downvote",
+                        headers={"Authorization": f"Bearer {data['c_token']}"},
+                        json=package)
+    assert response.status_code == FORBIDDEN_ERROR
+
+    # Try switch votes directly
+    response = client.post("/review/upvote",
+                    headers={"Authorization": f"Bearer {data['c_token']}"},
+                    json=package)
+    assert response.status_code == FORBIDDEN_ERROR
 
 def test_remove_vote_no_review(simple_user):
     '''
         Test removing vote from non-existent review
     '''
-    pass
+    data = simple_user
+    package = {
+        'rid': '999'
+    }
+    response = client.post("/review/remove_vote",
+                           headers={"Authorization": f"Bearer {data['u_token']}"},
+                           json=package)
+    assert response.status_code == MISSING_ERROR
 
 def test_remove_vote_not_voted(simple_user):
     '''
         Test removing vote when not voted
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.post("/review/remove_vote",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == INPUT_ERROR
 
 def test_remove_vote_success(simple_user):
     '''
         Test removing vote susccessfuly
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.post("/review/downvote",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.get("/review/get",
+                           params=package)
+    assert response.status_code == SUCCESS
+    assert response.json()['downvotes'] == 1
+
+    response = client.post("/review/remove_vote",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.get("/review/get",
+                           params=package)
+    assert response.status_code == SUCCESS
+    assert response.json()['downvotes'] == 0
 
 def test_reply_non_existent(simple_user):
     '''
         Test replying to non-existent review
     '''
-    pass
+    data = simple_user
+
+    package = {
+        'rid': '999',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['u_token']}"},
+                           json=package)
+    assert response.status_code == MISSING_ERROR
 
 def test_reply_not_owner(simple_user):
     '''
         Test replying to review not as owner
     '''
-    pass
+    data = simple_user
+
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['u_token']}"},
+                           json=package)
+    assert response.status_code == FORBIDDEN_ERROR
 
 def test_reply_blank_content(simple_user):
     '''
         Test replying with no content
     '''
-    pass
+    data = simple_user
+
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': ''
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == INPUT_ERROR
 
 def test_reply_successful(simple_user):
     '''
         Test successful review reply
     '''
-    pass
+    data = simple_user
+
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.get("/review/get",
+                           params={'rid' : 0})
+    assert response.status_code == SUCCESS
+    assert response.json()['reply'] == '0'
 
 def test_reply_twice(simple_user):
     '''
         Test trying to reply to review twice
     '''
-    pass
+    data = simple_user
+
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.get("/review/get",
+                           params={'rid' : 0})
+    assert response.status_code == SUCCESS
+    assert response.json()['reply'] == '0'
+
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == FORBIDDEN_ERROR
 
 def test_delete_reply_nonexistent(simple_user):
     '''
         Test trying to delete non-existent reply
     '''
-    pass
+    data = simple_user
+    package = {
+        'rid': '999'
+        }
+
+    response = client.delete("/review/reply/delete",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           params=package)
+    assert response.status_code == MISSING_ERROR
 
 def test_delete_reply_not_owner(simple_user):
     '''
         Test trying to delete reply not as owner
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.delete("/review/reply/delete",
+                            headers={"Authorization": f"Bearer {data['u_token']}"},
+                            params=package)
+    assert response.status_code == FORBIDDEN_ERROR
 
 def test_delete_reply_success(simple_user):
     '''
         Test trying to delete reply
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.delete("/review/reply/delete",
+                            headers={"Authorization": f"Bearer {data['c_token']}"},
+                            params=package)
+    assert response.status_code == SUCCESS
+    response = client.get("/review/get",
+                           params={'rid' : 0})
+    assert response.status_code == SUCCESS
+    assert response.json()['reply'] == None
 
 def test_edit_reply_no_reply(simple_user):
     '''
         Test editing a non-existent reply
     '''
-    pass
+    data = simple_user
+
+    package = {
+        'rid': '999',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply/edit",
+                           headers={"Authorization": f"Bearer {data['u_token']}"},
+                           json=package)
+    assert response.status_code == MISSING_ERROR
 
 def test_edit_reply_not_owner(simple_user):
     '''
         Test editing a reply not as owner
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'less less less'
+    }
+    response = client.post("/review/reply/edit",
+                            headers={"Authorization": f"Bearer {data['u_token']}"},
+                            json=package)
+    assert response.status_code == FORBIDDEN_ERROR
 
 def test_edit_reply_blank(simple_user):
     '''
         Test editing a reply with blank content
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': ''
+    }
+    response = client.post("/review/reply/edit",
+                            headers={"Authorization": f"Bearer {data['c_token']}"},
+                            json=package)
+    assert response.status_code == INPUT_ERROR
 
 def test_edit_reply_success(simple_user):
     '''
         Test editing a reply successfully
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'yada yada yada'
+    }
+    response = client.post("/review/reply/edit",
+                            headers={"Authorization": f"Bearer {data['c_token']}"},
+                            json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.get("/review/reply/get",
+                          params=package)
+    assert response.status_code == SUCCESS
+    assert response.json()['comment'] == 'yada yada yada'
 
 def test_get_reply_404(simple_user):
     '''
         Test reply not existing
     '''
-    pass
+    package = {
+        'rid': '0'
+    }
+    response = client.get("/review/reply/get",
+                          params=package)
+    assert response.status_code == MISSING_ERROR
 
 def test_get_reply_success(simple_user):
     '''
         Test getting a rpely successfully
     '''
-    pass
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0'
+    }
+    response = client.get("/review/reply/get",
+                          params=package)
+    assert response.status_code == SUCCESS
+    assert response.json()['comment'] == 'blah blah blah'
+
+def test_user_get_replies_success(simple_user):
+    '''
+        Test whether unknown user is caught
+    '''
+    data = simple_user
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    package = {
+        'rid': '0',
+        'content': 'blah blah blah'
+    }
+    response = client.post("/review/reply",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.get("/user/get/replies",
+                          headers={"Authorization": f"Bearer {data['c_token']}"})
+    assert response.status_code == SUCCESS
+    assert response.json()['replies'][0]['comment'] == 'blah blah blah'

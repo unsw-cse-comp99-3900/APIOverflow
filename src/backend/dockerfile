@@ -31,3 +31,5 @@ ENV TEST ${TEST}
 # todo: figure out how to silence specific service output?
 
 CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv; fi
+
+# pytest -vv tests/test.py::testfunc

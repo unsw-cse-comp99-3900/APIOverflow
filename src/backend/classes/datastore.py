@@ -58,7 +58,23 @@ class Datastore:
         pass
 
     def clear_datastore(self) -> None:
-        self.__store = schema.copy()
+        self.__store = {
+                    'users' : [],
+                    'user_count' : 0,
+                    'apis' : [],
+                    'api_count' : 0,
+                    'tags' : DEFAULT_TAGS.copy(),
+                    'tag_count' : len(DEFAULT_TAGS),
+                    'img_count' : 0,
+                    'docs_count': 1,
+                    'docs': [DEFAULT_ICON],
+                    'reviews' : [],
+                    'review_count': 0,
+                    'review_total': 0,
+                    'replys' : [],          # Yes I know it's 'replies' but it's for delete_items
+                    'reply_count': 0,
+                    'reply_total': 0
+                }
 
     ##################################
     #   Datastore Insertion Methods
