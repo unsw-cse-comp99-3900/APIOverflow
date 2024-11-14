@@ -90,7 +90,9 @@ class ServiceGlobalUpdate(BaseModel):
 class ServiceUpload(BaseModel):
 
     sid: str
+    version_name: Optional[str] = None
     doc_id: str
+    
 
 class TagData(BaseModel):
     tag: str

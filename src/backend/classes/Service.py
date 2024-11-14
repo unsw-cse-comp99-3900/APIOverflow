@@ -31,6 +31,12 @@ DEFAULT_ICON = '0'
 #  - currently these give a default value to not break existing things
 #  - but pls change so users must provide these strings
 #  - throws error if version_name is ""
+
+# /service/upload_docs : Added "version_name" field
+# similarly currently by default uploads doc to most recently created service version
+# to not break existing things
+# pls provide version_name field
+
 #
 # /service/get: 
 #  - REMOVED FIELDS endpoints and docs
@@ -93,7 +99,6 @@ DEFAULT_ICON = '0'
 # - "version_description":
 
 
-
 # New REST Endpoints:
 # /service/version/add : POST
 # Fields:
@@ -117,21 +122,6 @@ DEFAULT_ICON = '0'
 # /service/version/delete : DELETE
 # Fields: sid and version_name
 # throws error if invlaid sid, invalid version_name or service contains only one version
-
-
-
-
-# TODOs
-# 7. Updating a Service 
-# [X] existing update API no longer updates endpoint
-# [X] create new endpoint for updating specific version
-# [X] change service version approval
-# [X] Test update specific version approval and disapproval
-# -- change what get pending returns & Test
-# 6. Add docs now requires a version name
-#     - currently only supports 1 doc, should it support more?
-#     - currently cannot delete a doc  
-
 
 
 
@@ -352,7 +342,7 @@ class Service:
     #   Add Methods
     ################################
 
-    def add_docs(self, docs: List[int], version: Optional[str] = None) -> None:
+    def add_docs(self, docs: List[int], version) -> None:
         '''
             Adds paths to documentation
         '''

@@ -137,7 +137,7 @@ async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
     request = info.model_dump()
     sid = request['sid']
     doc_id = request['doc_id']
-    await upload_docs_wrapper(sid, user['id'], doc_id)
+    await upload_docs_wrapper(sid, user['id'], doc_id, request["version_name"])
     return 200
 
 @app.get("/service/my_services")

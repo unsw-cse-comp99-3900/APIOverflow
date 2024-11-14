@@ -232,7 +232,7 @@ def api_name_search(name, hide_pending: bool) -> list:
             return_list.append(api)
     return return_list
 
-async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
+async def upload_docs_wrapper(sid: str, uid: str, doc_id: str, version: Optional[str]) -> None:
     '''
         Function which handles uploading docs to a service
     '''
@@ -246,7 +246,7 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
         raise HTTPException(status_code=400, detail="File is not a pdf")
     
     # Get service
-    service = data_store.get_api_by_id(sid)
+    service : Service = data_store.get_api_by_id(sid)
     if service is None:
         raise HTTPException(status_code=404, detail="Service not found")
     
@@ -255,9 +255,10 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
         raise HTTPException(status_code=403, detail="User is not service owner")
 
     # Add document to service
-    service.add_docs([file.get_id()])
+    service.add_docs([file.get_id()], version)
 
-    # TODO: fix Documents
+    db_update_service(sid, service.to_json())
+
     # db_add_document(sid, file.get_id())
 
 def get_doc_wrapper(doc_id: str) -> FileResponse:
