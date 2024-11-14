@@ -701,7 +701,9 @@ def test_admin_get_pending_services(simple_user):
                 'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.model_dump()]
+                'endpoints': [simple_endpoint.model_dump()],
+                "version_name": "some name",
+                "version_description": "some description"
                 }
 
     response = client.post("/service/add",
@@ -721,15 +723,23 @@ def test_admin_get_pending_services(simple_user):
     response = client.get("/admin/get/services",
                           headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == SUCCESS
-    response_info = response.json()["services"]
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 1
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0
+
+    new_global_service = response_info["new_services"][0]
+    new_version_service = new_global_service["version_fields"]
     
-    assert len(response_info) == 1
-    response_info = response_info[0]
-    assert response_info['id'] == sid
-    assert response_info['name'] == api_info['name']
-    assert response_info['description'] == api_info['description']
-    assert response_info['tags'] == api_info['tags']
-    assert response_info['versions'][0]['endpoints'] == api_info["endpoints"]
+    assert new_global_service['id'] == sid
+    assert new_global_service['name'] == api_info['name']
+    assert new_global_service['description'] == api_info['description']
+    assert new_global_service['tags'] == api_info['tags']
+
+    assert new_version_service['endpoints'] == api_info["endpoints"]
+    assert new_version_service['version_name'] == api_info["version_name"]
+    assert new_version_service['version_description'] == api_info["version_description"]
 
 def test_admin_approve(simple_user):
     api_info = {
@@ -763,8 +773,11 @@ def test_admin_approve(simple_user):
     response = client.get("/admin/get/services",
                           headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == SUCCESS
-    response_info = response.json()["services"]
-    assert len(response_info) == 1
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 1
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0
 
     client.post("/admin/service/approve",
                            headers={"Authorization": f"Bearer {access_token}"},
@@ -804,8 +817,11 @@ def test_admin_approve(simple_user):
     response = client.get("/admin/get/services",
                           headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == SUCCESS
-    response_info = response.json()["services"]
-    assert len(response_info) == 0
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0
 
 
 def test_admin_disapprove(simple_user):
@@ -840,8 +856,11 @@ def test_admin_disapprove(simple_user):
     response = client.get("/admin/get/services",
                           headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == SUCCESS
-    response_info = response.json()["services"]
-    assert len(response_info) == 1
+    response_info = response.json()
+    
+    assert len(response_info["new_services"]) == 1
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0
 
     client.post("/admin/service/approve",
                            headers={"Authorization": f"Bearer {access_token}"},
@@ -856,8 +875,11 @@ def test_admin_disapprove(simple_user):
     response = client.get("/admin/get/services",
                           headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == SUCCESS
-    response_info = response.json()["services"]
-    assert len(response_info) == 0
+    response_info = response.json()
+    
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0
 
     response = client.get("/service/filter",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -937,13 +959,18 @@ def test_update_global_api_fields(simple_user):
     response = client.get("/admin/get/services",
                           headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == SUCCESS
-    response_info = response.json()["services"]
-    assert len(response_info) == 1
 
-    assert response_info[0]['id'] == sid
-    assert response_info[0]['name'] == update_request_info['name']
-    assert response_info[0]['description'] == update_request_info['description']
-    assert response_info[0]['tags'] == update_request_info['tags']
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 1
+    assert len(response_info["version_updates"]) == 0
+
+    global_fields = response_info["global_updates"][0]
+    
+    assert global_fields['id'] == sid
+    assert global_fields['name'] == update_request_info['name']
+    assert global_fields['description'] == update_request_info['description']
+    assert global_fields['tags'] == update_request_info['tags']
 
     # make sure pending update so details have not yet changed and status is pending
     response = client.get("/service/get_service",
@@ -1012,10 +1039,29 @@ def test_update_global_api_fields(simple_user):
     assert response_info[0]['description'] == api_info['description']
     assert response_info[0]['tags'] == api_info['tags']
 
+    response = client.get("/admin/get/services",
+                          headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0
+
     response = client.post("/service/update",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=update_request_info)
     assert response.status_code == SUCCESS
+
+    
+    response = client.get("/admin/get/services",
+                          headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 1
+    assert len(response_info["version_updates"]) == 0
 
     reason = "pog service"
     client.post("/admin/service/approve",
@@ -1061,6 +1107,21 @@ def test_update_global_api_fields(simple_user):
     assert response_info[0]['name'] == update_request_info['name']
     assert response_info[0]['description'] == update_request_info['description']
     assert response_info[0]['tags'] == update_request_info['tags']
+
+    response = client.get("/admin/get/services",
+                          headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    
+    response = client.get("/admin/get/services",
+                          headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0
+
 
 def test_service_version(simple_user):
     '''
@@ -1154,7 +1215,7 @@ def test_service_version(simple_user):
     assert original_version["version_name"] == api_info["version_name"]
     assert original_version["version_description"] == api_info["version_description"]
     assert original_version["endpoints"] == api_info["endpoints"]
-    # assert original_version['status'] == "LIVE" # TODO: Uncomment and fix
+    assert original_version['status'] == "LIVE"
 
 
     response = client.delete("/service/version/delete",
@@ -1265,6 +1326,16 @@ def test_update_version_api_fields(simple_user):
         "endpoints" : [simple_endpoint2.model_dump()]
     }
 
+    response = client.get("/admin/get/services",
+                          headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0
+
+
     response = client.post("/service/version/add",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           json=new_version)
@@ -1283,6 +1354,21 @@ def test_update_version_api_fields(simple_user):
 
     assert response_info["versions"][0]["newly_created"]
     assert not response_info["versions"][1]["newly_created"]
+
+    response = client.get("/admin/get/services",
+                        headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 1
+
+    new_version_service = response_info["version_updates"][0]
+
+    assert new_version_service['endpoints'] == new_version["endpoints"]
+    assert new_version_service['version_name'] == new_version["version_name"]
+    assert new_version_service['version_description'] == new_version["version_description"]
     
     reason = "good"
     response = client.post("/admin/service/approve",
@@ -1311,6 +1397,15 @@ def test_update_version_api_fields(simple_user):
     assert response_info["versions"][0]["status_reason"] == reason
     assert not response_info["versions"][0]["newly_created"]
     assert not response_info["versions"][1]["newly_created"]
+
+    response = client.get("/admin/get/services",
+                    headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0
     
     update_request_info = {
         'sid' : sid,
@@ -1325,18 +1420,20 @@ def test_update_version_api_fields(simple_user):
                            json=update_request_info)
     assert response.status_code == SUCCESS
 
-    # TODO:
-    # Information returned should be of updated service not original
-    # response = client.get("/admin/get/services",
-    #                       headers={"Authorization": f"Bearer {access_token}"})
-    # assert response.status_code == SUCCESS
-    # response_info = response.json()["services"]
-    # assert len(response_info) == 1
+    response = client.get("/admin/get/services",
+                    headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
 
-    # assert response_info[0]['id'] == sid
-    # assert response_info[0]['name'] == update_request_info['name']
-    # assert response_info[0]['description'] == update_request_info['description']
-    # assert response_info[0]['tags'] == update_request_info['tags']
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 1
+    
+    new_version_service = response_info["version_updates"][0]
+
+    assert new_version_service['endpoints'] == update_request_info["endpoints"]
+    assert new_version_service['version_name'] == update_request_info["new_version_name"]
+    assert new_version_service['version_description'] == update_request_info["version_description"]
 
     # make sure pending update so details have not yet changed and status is pending
     response = client.get("/service/get_service",
@@ -1381,10 +1478,28 @@ def test_update_version_api_fields(simple_user):
     assert response_info["versions"][0]["status"] == "UPDATE_REJECTED"
     assert response_info["versions"][0]["status_reason"] == reason
 
+    response = client.get("/admin/get/services",
+                    headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0
+
     response = client.post("/service/version/update",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=update_request_info)
     assert response.status_code == SUCCESS
+
+    response = client.get("/admin/get/services",
+                    headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 0
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 1
 
     reason = "pog service"
     client.post("/admin/service/approve",
@@ -1440,12 +1555,140 @@ def test_update_version_api_fields(simple_user):
     # assert database_object['tags'] == update_request_info['tags']
 
 
+def test_global_version_combination_updates(simple_user):
 
-
-
-
-
-
-
+    service1 = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name"
+                }
     
 
+    service2 = {
+        'name' : 'Test API 2',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This ',
+                'tags' : ['Service'],
+                'endpoints': [simple_endpoint2.model_dump()],
+                'version_name': "other version name"
+    }
+    
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=service1)
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    sid = response_info['id']
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True,
+                                'version_name': service1["version_name"],
+                                'service_global': True
+                            })
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=service2)
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    sid2 = response_info['id']
+
+    response = client.get("/admin/get/services",
+                    headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 1
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 0 
+
+    # perform local update
+    update_local_info = {
+        'sid' : sid,
+        'version_name': service1["version_name"],
+        'new_version_name': "new version name",
+        'endpoints' : [simple_endpoint3.model_dump()],
+        'version_description': "new version description"
+    }
+
+    response = client.post("/service/version/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_local_info)
+    assert response.status_code == SUCCESS
+
+    response = client.get("/admin/get/services",
+                    headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 1
+    assert len(response_info["global_updates"]) == 0
+    assert len(response_info["version_updates"]) == 1 
+
+    update_global_info = {
+        'sid' : sid,
+        'name' : 'new name',
+        'description' : 'new description',
+        'tags' : ['new', 'tag'],
+    }
+
+    response = client.post("/service/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=update_global_info)
+    assert response.status_code == SUCCESS
+
+    response = client.get("/admin/get/services",
+                    headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 1
+    assert len(response_info["global_updates"]) == 1
+    assert len(response_info["version_updates"]) == 1
+
+    new_version = {
+        "sid" : sid,
+        "version_name" : "version 2",
+        "version_description" : "new description",
+        "endpoints" : [simple_endpoint2.model_dump()]
+    }
+
+    response = client.post("/service/version/add",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          json=new_version)
+    
+    assert response.status_code == SUCCESS
+
+    response = client.get("/admin/get/services",
+                    headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    assert len(response_info["new_services"]) == 1
+    assert len(response_info["global_updates"]) == 1
+    assert len(response_info["version_updates"]) == 2

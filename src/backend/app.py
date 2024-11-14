@@ -432,20 +432,18 @@ async def admin_get_reviews(option: str = '', user: User = Depends(manager), rol
     }
 
 @app.get("/admin/get/services")
-async def admin_get_services(option: str = "ALL_PENDING", user: User = Depends(manager), role: str = Depends(admin_required())):
+async def admin_get_services(user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which retrieves all pending services
     '''
-    return {
-        'services' : admin_get_pending_services(option)
-    }
+    return admin_get_pending_services()
 
 @app.post("/admin/service/approve")
 async def admin_service_approve(info: ServiceApprove, user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which approves or disapproves a service
     '''
-    # TODO: give proper version
+    
     request = info.model_dump()
     approve_service_wrapper(request["sid"],
                             request["approved"],
