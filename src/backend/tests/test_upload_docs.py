@@ -44,11 +44,13 @@ def two_users():
 
     # Register users
     creator_creds = {
+        "displayname": "Creator",
         "username" : "Creator",
         "password" : "password",
         "email" : "doxxed@gmail.com"
     }
     user_creds = {
+        "displayname": "User",
         "username" : "User",
         "password" : "password",
         "email" : "doxxed2@gmail.com"

@@ -43,6 +43,7 @@ def simple_user():
 
     # Register user
     user_creds = {
+        "displayname" : "Tester 1",
         "username" : "Tester 1",
         "password" : "password",
         "email" : "doxxed@gmail.com"
@@ -62,6 +63,7 @@ def simple_user():
 
     # Generate imposter
     imp_creds = {
+        'displayname' : 'Sus Imposter 69420',
         'username' : 'Sus Imposter',
         'password': 'amogus',
         'email' : 'hackerman@gmail.com'
