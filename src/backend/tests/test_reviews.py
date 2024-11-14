@@ -745,3 +745,158 @@ def test_admin_get_reviews(simple_user):
     assert response.json()['reviews'][0]['title'] == 'A Review'
     assert response.json()['reviews'][0]['type'] == 'positive'
 
+def test_upvote_non_existent(simple_user):
+    '''
+        Test whether an upvote on a non-existent review is caught
+    '''
+    data = simple_user
+    package = {
+        'rid': '999'
+    }
+    response = client.post("/review/upvote",
+                           headers={"Authorization": f"Bearer {data['u_token']}"},
+                           json=package)
+
+def test_upvote_self(simple_user):
+    '''
+        Test whether upvoting self-review is valid
+    '''
+    pass
+
+def test_upvote_success(simple_user):
+    '''
+        Test whether upvoting a review works
+    '''
+    pass
+
+def test_upvote_twice(simple_user):
+    '''
+        Test whether upvoting twice is disallowed
+    '''
+    pass
+
+def test_downvote_non_existent(simple_user):
+    '''
+        Test whether an downvote on a non-existent review is caught
+    '''
+    pass
+
+def test_downvote_self(simple_user):
+    '''
+        Test whether downvoting self-review is valid
+    '''
+    pass
+
+def test_downvote_success(simple_user):
+    '''
+        Test whether downvoting a review works
+    '''
+    pass
+
+def test_downvote_twice(simple_user):
+    '''
+        Test whether downvoting twice is disallowed
+    '''
+    pass
+
+def test_remove_vote_no_review(simple_user):
+    '''
+        Test removing vote from non-existent review
+    '''
+    pass
+
+def test_remove_vote_not_voted(simple_user):
+    '''
+        Test removing vote when not voted
+    '''
+    pass
+
+def test_remove_vote_success(simple_user):
+    '''
+        Test removing vote susccessfuly
+    '''
+    pass
+
+def test_reply_non_existent(simple_user):
+    '''
+        Test replying to non-existent review
+    '''
+    pass
+
+def test_reply_not_owner(simple_user):
+    '''
+        Test replying to review not as owner
+    '''
+    pass
+
+def test_reply_blank_content(simple_user):
+    '''
+        Test replying with no content
+    '''
+    pass
+
+def test_reply_successful(simple_user):
+    '''
+        Test successful review reply
+    '''
+    pass
+
+def test_reply_twice(simple_user):
+    '''
+        Test trying to reply to review twice
+    '''
+    pass
+
+def test_delete_reply_nonexistent(simple_user):
+    '''
+        Test trying to delete non-existent reply
+    '''
+    pass
+
+def test_delete_reply_not_owner(simple_user):
+    '''
+        Test trying to delete reply not as owner
+    '''
+    pass
+
+def test_delete_reply_success(simple_user):
+    '''
+        Test trying to delete reply
+    '''
+    pass
+
+def test_edit_reply_no_reply(simple_user):
+    '''
+        Test editing a non-existent reply
+    '''
+    pass
+
+def test_edit_reply_not_owner(simple_user):
+    '''
+        Test editing a reply not as owner
+    '''
+    pass
+
+def test_edit_reply_blank(simple_user):
+    '''
+        Test editing a reply with blank content
+    '''
+    pass
+
+def test_edit_reply_success(simple_user):
+    '''
+        Test editing a reply successfully
+    '''
+    pass
+
+def test_get_reply_404(simple_user):
+    '''
+        Test reply not existing
+    '''
+    pass
+
+def test_get_reply_success(simple_user):
+    '''
+        Test getting a rpely successfully
+    '''
+    pass
