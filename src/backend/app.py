@@ -14,6 +14,7 @@ from src.backend.server.admin import *
 from src.backend.server.upload import *
 from src.backend.server.user import *
 from src.backend.server.review import *
+from src.backend.server.dummy import *
 from json import dumps
 import asyncio
 from contextlib import asynccontextmanager
@@ -102,6 +103,13 @@ async def clear():
     clear_blacklist()
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
+
+@app.post("/testing/dummy")
+async def add_dummy():
+    '''
+        Internal Testing function to add some data for testing
+    '''
+    import_dummy_data()
 
 @app.post("/upload/pdfs")
 async def upload_pdf(file: UploadFile = File(...)):
