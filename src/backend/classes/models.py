@@ -1,10 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from passlib.context import CryptContext
 from pymongo import MongoClient
 from typing import *
 from bson import ObjectId
 from src.backend.database import db
+from src.backend.classes.Endpoint import Endpoint
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -47,28 +48,52 @@ class FilterRequest(BaseModel):
     providers: List[str]
 
 # Request body for POST methods relating to services
-class ServicePost(BaseModel):
+class ServiceAdd(BaseModel):
 
+    name: str                           # Name of service
+    icon_url: str                       # URL of service icon uploaded
+    x_start: int                        # Starting x-coord of img crop
+    x_end: int                          # Ending x-coord of img crop
+    y_start: int                        # Starting y-coord of img crop
+    y_end: int                          # Ending y-coord of img crop
+    description: str                    # Descrtipion of service
+    tags: List[str]                     # List of tags assigned to the service
+    endpoints: List[Endpoint]           # Endpoint of the service uploaded
+    version_name: str = "version 1"     # name of service version
+    version_description: str = "No version description provided" # description
+
+    class Config:
+        arbitrary_types_allowed = True
+
+class ServiceAddVersion(BaseModel):
+
+    sid: str                        # id of service 
+    version_name: str               # name of new version
+    endpoints: List[Endpoint]       # endpoints of new version
+    version_description: str        # Additional details pertaining new version   
+
+class ServiceUpdateVersion(BaseModel):
+
+    sid: str                        # id of service 
+    version_name: str               # name of new version
+    new_version_name: Optional[str] = None # if we are renaming version 
+    endpoints: List[Endpoint]       # endpoints of new version
+    version_description: str        # Additional details pertaining new version   
+
+class ServiceGlobalUpdate(BaseModel):
     name: str                       # Name of service
-    icon_url: str                   # URL of service icon uploaded
-    x_start: int                    # Starting x-coord of img crop
-    x_end: int                      # Ending x-coord of img crop
-    y_start: int                    # Starting y-coord of img crop
-    y_end: int                      # Ending y-coord of img crop
     description: str                # Descrtipion of service
     tags: List[str]                 # List of tags assigned to the service
-    endpoint: str                   # Endpoint of the service uploaded
-
-class ServiceUpdate(BaseModel):
-    name: str                       # Name of service
-    description: str                # Descrtipion of service
-    tags: List[str]                 # List of tags assigned to the service
-    endpoint: str                   # Endpoint of the service uploaded
     sid: str
+    class Config:
+        arbitrary_types_allowed = True
+
 class ServiceUpload(BaseModel):
 
     sid: str
+    version_name: Optional[str] = None
     doc_id: str
+    
 
 class TagData(BaseModel):
     tag: str
@@ -104,6 +129,8 @@ class ServiceApprove(BaseModel):
     sid: str
     approved: bool
     reason: str
+    service_global: bool          # whether we are updating global fields
+    version_name: Optional[str] = None # approved version if applicable
 
 class AdminGetReviews(BaseModel):
     option: str = ''

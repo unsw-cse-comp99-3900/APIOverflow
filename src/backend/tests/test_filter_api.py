@@ -6,6 +6,9 @@ from fastapi.testclient import TestClient
 from src.backend.classes import Service
 from src.backend.app import app, register, add_service, login
 from src.backend.classes.models import User, db, UserCreate, LoginModel
+from src.backend.classes.Endpoint import Endpoint
+from src.backend.classes.Parameter import Parameter 
+from src.backend.classes.Response import Response
 
 # Create a test client
 client = TestClient(app)
@@ -13,6 +16,24 @@ client = TestClient(app)
 INPUT_ERROR = 400
 AUTHENTICATION_ERROR = 401
 SUCCESS = 200
+
+# endpoint1
+simple_parameter = Parameter(id="1", endpoint_link='https://api.example.com/users/12345', required=True, 
+                            type='HEADER', name='paramtest', value_type='int')
+simple_response = Response(code='404', description='not found', conditions=["site is down", "badtest"], 
+                            example="example...")
+simple_endpoint = Endpoint(link='https://api.example.com/users/12345', title_description='testTitle1', 
+                            main_description='tests endpoint', tab='tabTest', parameters=[simple_parameter], 
+                            method="POST", responses=[simple_response])
+
+# endpoint2
+simple_parameter2 = Parameter(id="2", endpoint_link='https://api.example.com/users/12345', required=True, 
+                            type='HEADER', name='paramtest2', value_type='string')
+simple_response2 = Response(code='404', description='not found', conditions=["site is down", "badtest"], 
+                            example="example...")
+simple_endpoint2 = Endpoint(link='https://api.example.com/users/12345', title_description='testTitle2', 
+                            main_description='tests endpoint', tab='tabTest', parameters=[simple_parameter2], 
+                            method="POST", responses=[simple_response2])
 
 def clear_all():
     ''' 
@@ -60,13 +81,15 @@ def test_simple_filter(simple_user):
                                 'name' : 'Googl3',
                                 'icon_url' : '',
                                 'x_start' : 0,
-                                'x_end' : 0,
+                                'x_end' : 100,
                                 'y_start' : 0,
-                                'y_end' : 0,
+                                'y_end' : 100,
                                 'description' : 'This is a test API',
                                 'tags' : ['API', 'Public'],
-                                'endpoint': 'https://api.example.com/users/12345'
+                                'endpoints': [simple_endpoint.dict()]
                            })
+    assert(response.status_code) == SUCCESS
+
     api2 = {
             'name' : 'Googl2',
             'icon_url' : '',
@@ -76,11 +99,12 @@ def test_simple_filter(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint2.dict()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api2)
+    assert(response.status_code) == SUCCESS
 
     response = client.get("/service/filter",
                           params={
@@ -104,7 +128,7 @@ def test_simple_filter_multiple(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     
     response = client.post("/service/add",
@@ -122,7 +146,7 @@ def test_simple_filter_multiple(simple_user):
                                     'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoint': 'https://api.example.com/users/12345'
+                                    'endpoints': [simple_endpoint2.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
@@ -133,7 +157,7 @@ def test_simple_filter_multiple(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     response = client.post("/service/add",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -169,7 +193,7 @@ def test_providers(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     
     response = client.post("/service/add",
@@ -187,7 +211,7 @@ def test_providers(simple_user):
                                     'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoint': 'https://api.example.com/users/12345'
+                                    'endpoints': [simple_endpoint2.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
@@ -198,7 +222,7 @@ def test_providers(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     response = client.post("/service/add",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -234,7 +258,7 @@ def test_providers_with_tags(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     
     response = client.post("/service/add",
@@ -252,7 +276,7 @@ def test_providers_with_tags(simple_user):
                                     'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoint': 'https://api.example.com/users/12345'
+                                    'endpoints': [simple_endpoint2.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
@@ -263,7 +287,7 @@ def test_providers_with_tags(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     response = client.post("/service/add",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -299,7 +323,7 @@ def test_invalid_providers(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     
     response = client.post("/service/add",
@@ -317,7 +341,7 @@ def test_invalid_providers(simple_user):
                                     'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoint': 'https://api.example.com/users/12345'
+                                    'endpoints': [simple_endpoint2.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
@@ -328,7 +352,7 @@ def test_invalid_providers(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     response = client.post("/service/add",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -364,7 +388,7 @@ def test_providers_with_tags2(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()] 
             }
     
     response = client.post("/service/add",
@@ -382,7 +406,7 @@ def test_providers_with_tags2(simple_user):
                                     'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoint': 'https://api.example.com/users/12345'
+                                    'endpoints': [simple_endpoint2.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
@@ -393,7 +417,7 @@ def test_providers_with_tags2(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['NOT API'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     response = client.post("/service/add",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -449,7 +473,7 @@ def test_providers_with_tags_multiple(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     
     response = client.post("/service/add",
@@ -467,7 +491,7 @@ def test_providers_with_tags_multiple(simple_user):
                                     'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoint': 'https://api.example.com/users/12345'
+                                    'endpoints': [simple_endpoint.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
@@ -478,7 +502,7 @@ def test_providers_with_tags_multiple(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     
     response = client.post("/service/add",
@@ -540,7 +564,7 @@ def test_providers_with_tags_multiple2(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     
     response = client.post("/service/add",
@@ -558,7 +582,7 @@ def test_providers_with_tags_multiple2(simple_user):
                                     'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['NOT API', 'Public'],
-                                    'endpoint': 'https://api.example.com/users/12345'
+                                    'endpoints': [simple_endpoint.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
@@ -569,7 +593,7 @@ def test_providers_with_tags_multiple2(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     
     response = client.post("/service/add",
@@ -631,7 +655,7 @@ def test_duplicate_apis(simple_user):
             'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoint': 'https://api.example.com/users/12345'
+            'endpoints': [simple_endpoint.dict()]
             }
     
     response = client.post("/service/add",
@@ -649,7 +673,7 @@ def test_duplicate_apis(simple_user):
                                     'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['Not API', 'Public'],
-                                    'endpoint': 'https://api.example.com/users/12345'
+                                    'endpoints': [simple_endpoint.dict()]
                             })
 
     response = client.get("/service/filter",

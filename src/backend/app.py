@@ -123,16 +123,15 @@ async def upload_image(file: UploadFile = File(...)):
 #   Service Paths
 #####################################
 @app.post("/service/add")
-async def add_service(service: ServicePost, user: User = Depends(manager)):
+async def add_service(service: ServiceAdd, user: User = Depends(manager)):
     '''
         Method used to add service to platform
     '''
     # Unpack request body
     request = service.model_dump()
-    uid = user['id']
-    id = add_service_wrapper(request, str(uid))
+    user = data_store.get_user_by_id(user['id'])
+    id = add_service_wrapper(request, user)
     return {'id' : id}
-
 
 @app.get("/service/get_service")
 async def get_service(sid: str):
@@ -142,16 +141,15 @@ async def get_service(sid: str):
     response = get_service_wrapper(sid)
     return response
 
-@app.put("/service/update")
-async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
+@app.post("/service/update")
+async def update_service(service: ServiceGlobalUpdate, user: User = Depends(manager)):
     '''
         Method used to update service to platform
     '''
 
     request = service.model_dump()
-    uid = user['id']
    
-    update_service_wrapper(request, str(uid))
+    update_service_wrapper(request)
     return None
 
 @app.get("/service/apis")
@@ -166,7 +164,7 @@ async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
     request = info.model_dump()
     sid = request['sid']
     doc_id = request['doc_id']
-    await upload_docs_wrapper(sid, user['id'], doc_id)
+    await upload_docs_wrapper(sid, user['id'], doc_id, request["version_name"])
     return 200
 
 @app.get("/service/my_services")
@@ -203,6 +201,7 @@ async def delete_api(sid: str):
 
 @app.post("/service/add_icon")
 async def api_add_icon(info: ServiceIconInfo, user: User = Depends(manager)):
+
     '''
         Adds an icon to the service
     '''
@@ -252,6 +251,33 @@ async def get_doc(doc_id: str):
         Endpoint which directly returns a file requested
     '''
     return get_doc_wrapper(doc_id)
+
+#####################################
+#   Service Version Paths
+#####################################
+
+@app.post("/service/version/add")
+async def add_service_version(service: ServiceAddVersion, user: User = Depends(manager)):
+    '''
+        Method used to add new version to existing 
+    '''
+    request = service.model_dump()
+    add_new_service_version_wrapper(request)
+
+@app.post("/service/version/update")
+async def add_service_version(service: ServiceUpdateVersion, user: User = Depends(manager)):
+    '''
+        Method used to update fields related to specific version
+    '''
+    request = service.model_dump()
+    update_new_service_version_wrapper(request)
+
+@app.delete("/service/version/delete")
+async def add_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
+    '''
+        Method used to delete a specific version from a service
+    '''
+    delete_service_version_wrapper(sid, version_name)
 
 #####################################
 #   Review Paths
@@ -479,20 +505,25 @@ async def admin_get_reviews(user: User = Depends(manager), role: str = Depends(a
     }
 
 @app.get("/admin/get/services")
-async def admin_get_services(option: str = "ALL_PENDING", user: User = Depends(manager), role: str = Depends(admin_required())):
+async def admin_get_services(user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which retrieves all pending services
     '''
-    return {
-        'services' : admin_get_pending_services(option)
-    }
+    return admin_get_pending_services()
 
 @app.post("/admin/service/approve")
 async def admin_service_approve(info: ServiceApprove, user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which approves or disapproves a service
     '''
-    approve_service_wrapper(info.sid, info.approved, info.reason)
+    
+    request = info.model_dump()
+    approve_service_wrapper(request["sid"],
+                            request["approved"],
+                            request["reason"],
+                            request["service_global"],
+                            request["version_name"]
+                            )
 
 @app.get("/admin/filter_users")
 async def admin_user_filter(standard: bool, admin: bool, super: bool, user: User = Depends(manager), role: str = Depends(admin_required())):

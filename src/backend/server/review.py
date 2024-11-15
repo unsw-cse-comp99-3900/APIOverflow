@@ -117,7 +117,8 @@ def review_add_reply_wrapper(rid: str, uid: str, comment: str) -> None:
 
     # Check for permission
     server = data_store.get_api_by_id(review.get_service())
-    if server.get_owner() != uid:
+    print(f"comparing Service Owner: {server.get_owner().get_id()} with requester: {uid}")
+    if server.get_owner().get_id() != uid:
         raise HTTPException(status_code=403, detail='User not owner of service')
 
     # Check if reply already made

@@ -1,5 +1,8 @@
 from typing import *
 from src.backend.classes.Document import Document
+from src.backend.classes.Service import Service
+from src.backend.classes.User import User
+
 
 T = TypeVar("T")
 DEFAULT_TAGS = [
@@ -142,13 +145,13 @@ class Datastore:
     ################################
     #   Datastore Search Methods
     ################################
-    def get_users(self) -> List[T]:
+    def get_users(self) -> List[User]:
         '''
             Returns a list of all users
         '''
         return self.__store['users']
     
-    def get_apis(self) -> List[T]:
+    def get_apis(self) -> List[Service]:
         '''
             Returns a list of all apis
         '''
@@ -191,7 +194,6 @@ class Datastore:
             Returns with user obj based on username, or None if cannot find user
         '''
         for item in self.__store['users']:
-            # print("Item's name: %s | Name wanted: %s", item.get_name(), name)
             if item.get_name() == name:
                 return item
             
@@ -231,12 +233,12 @@ class Datastore:
         '''
         user_apis = []
         for item in self.__store['apis']:
-            owners = item.get_owner()
-            if str(eid) in owners:
+            owner = item.get_owner()
+            if str(eid) in owner.get_id():
                 api_info = {
                     'id': item.get_id(),
                     'name': item.get_name(),
-                    'owner': item.get_owner(),
+                    'owner': owner.get_id(),
                     'description': item.get_description(),
                     'icon_url': item.get_icon_url(),
                     'tags': item.get_tags()

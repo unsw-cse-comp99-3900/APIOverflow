@@ -7,6 +7,8 @@ from urllib.error import HTTPError, URLError
 from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
+from src.backend.classes.Service import Service, ServiceVersionInfo
+from src.backend.classes.User import User
 from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
 from src.backend.classes.Review import Review
@@ -36,8 +38,6 @@ def validate_api_fields(packet: dict[T, K]) -> None:
     if len(packet['tags']) == 0:
         raise HTTPException(status_code=400, detail='No service tags provided')
     
-    if packet['endpoint'] == '':
-        raise HTTPException(status_code=400, detail='No service endpoint provided')
 
 def get_validate_service_id(sid: str) -> API:
     if sid == '':
@@ -50,7 +50,7 @@ def get_validate_service_id(sid: str) -> API:
     return service
 
 # Endpoint Wrappers
-def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
+def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
     '''
         Adds a Service (default to API) to the platform
 
@@ -101,6 +101,10 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
 
     else:
         internal_url = ""
+    
+    if len(packet['endpoints']) == 0:
+        raise HTTPException(status_code=400,
+                    detail="Must input at least 1 endpoint")
 
     # Create new API
     new_api = API(str(data_store.num_apis()),
@@ -109,12 +113,15 @@ def add_service_wrapper(packet: dict[T, K], user: str) -> dict[T, K]:
                     internal_url,
                     packet['description'],
                     packet['tags'],
-                    packet['endpoint'])
+                    packet['endpoints'],
+                    packet['version_name'],
+                    packet['version_description']
+                    )
     data_store.add_api(new_api)
     db_add_service(new_api.to_json())
     return str(new_api.get_id())
 
-def update_service_wrapper(packet: dict[T, K], user: str) -> None:
+def update_service_wrapper(packet: dict[T, K]) -> None:
     '''
         Updates a service by sid
 
@@ -128,7 +135,7 @@ def update_service_wrapper(packet: dict[T, K], user: str) -> None:
 
     # service is ref to API Obj in data store which gets updated
     service.create_pending_update(
-        packet["name"], packet["description"], packet["tags"], packet["endpoint"])
+        packet["name"], packet["description"], packet["tags"])
     
     db_update_service(sid, service.to_json())
     return None
@@ -139,50 +146,29 @@ def get_service_wrapper(sid: str) -> dict[T : K]:
 
         Raises:     HTTP Error 400 if missing info/bad request
                     HTTP Error 404 if no such sid found
-        Returns:    {
-                        sid
-                        name
-                        owner
-                        description
-                        icon_url
-                        tags
-                        endpoint,
-                        icon (doc_id)
-                    }
+        Returns:    Service details
     '''
-
     service = get_validate_service_id(sid)
-    owner_id = service.get_owner()
-    owner = data_store.get_user_by_id(owner_id)
-    return {
-            'id' : service.get_id(),
-            'name' : service.get_name(),
-            'owner' : {
-                'id' : owner.get_id(),
-                'name' : owner.get_name(),
-                'email' : owner.get_email()
-            },
-            'description': service.get_description(),
-            'icon_url': service.get_icon_url(),
-            'tags' : service.get_tags(),
-            'endpoint' : service.get_endpoint(),
-            'docs' : service.get_docs(),
-            'icon' : service.get_icon(),
-            'status' : service.get_status().name,
-            'status_reason' : service.get_status_reason()
-    }
-    
-# function to match vincent's format, the one above is sid instead of id
-def api_into_json(api) -> dict:
-    return {
-        'id': api.get_id(),
-        'name': api.get_name(),
-        'owner': api.get_owner(),
-        'description': api.get_description(),
-        'icon_url': api.get_icon_url(),
-        'tags': api.get_tags()
-    }
+    return service.to_json()
 
+def add_new_service_version_wrapper(request):
+
+    service: API = get_validate_service_id(request["sid"])
+    service.add_service_version(request["version_name"], 
+                                request["endpoints"],
+                                request["version_description"])
+
+def update_new_service_version_wrapper(request):
+    service: API = get_validate_service_id(request["sid"])
+    service.update_service_version(request["version_name"],
+                                request["new_version_name"], 
+                                request["endpoints"],
+                                request["version_description"])
+
+def delete_service_version_wrapper(sid: str, version_name: str):
+    service: Service = get_validate_service_id(sid)
+    service.remove_version(version_name)
+    
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
 def api_tag_filter(tags, providers, hide_pending: bool) -> list:
@@ -190,6 +176,7 @@ def api_tag_filter(tags, providers, hide_pending: bool) -> list:
     api_list = data_store.get_apis()
     filtered_apis = []
 
+    print(api_list)
     #query = input("Search")
 
     #if query != "":
@@ -211,19 +198,24 @@ def api_tag_filter(tags, providers, hide_pending: bool) -> list:
                 if tag in api.get_tags() and api not in filtered_apis:
                         filtered_apis.append(api)
 
-    return_list = []
+    return_list: List[Service] = []
     if providers:
         # if providers list is not empty
         for api in filtered_apis:
             for provider in providers:
-                if provider in api.get_owner() and api not in return_list:
+                # I refactored get_owner so that it now returns the User object
+                # I've fixed this to what it was before (which is bugged)
+                if provider in api.get_owner().get_id() and api not in return_list:
                     return_list.append(api)
                     break
     else:
         return_list = [api for api in filtered_apis]
     
+    for api in return_list:
+        print(api.get_status().name)
     
-    return [api_into_json(api) for api in return_list if
+    
+    return [api.to_summary_json() for api in return_list if
             api.get_status().name in LIVE_OPTIONS or 
             (not hide_pending and api.get_status() == ServiceStatus.PENDING)
             ]
@@ -240,7 +232,7 @@ def api_name_search(name, hide_pending: bool) -> list:
             return_list.append(api)
     return return_list
 
-async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
+async def upload_docs_wrapper(sid: str, uid: str, doc_id: str, version: Optional[str]) -> None:
     '''
         Function which handles uploading docs to a service
     '''
@@ -254,17 +246,20 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str) -> None:
         raise HTTPException(status_code=400, detail="File is not a pdf")
     
     # Get service
-    service = data_store.get_api_by_id(sid)
+    service : Service = data_store.get_api_by_id(sid)
     if service is None:
         raise HTTPException(status_code=404, detail="Service not found")
     
     # Check if user is owner
-    if service.get_owner() != uid:
+    if service.get_owner().get_id() != uid:
         raise HTTPException(status_code=403, detail="User is not service owner")
 
     # Add document to service
-    service.add_docs([file.get_id()])
-    db_add_document(sid, file.get_id())
+    service.add_docs([file.get_id()], version)
+
+    db_update_service(sid, service.to_json())
+
+    # db_add_document(sid, file.get_id())
 
 def get_doc_wrapper(doc_id: str) -> FileResponse:
     '''
@@ -277,10 +272,10 @@ def get_doc_wrapper(doc_id: str) -> FileResponse:
     return FileResponse(doc.get_path())
 
 def list_pending_apis():
-    return [api_into_json(api) for api in data_store.get_apis() if api.get_status() == ServiceStatus.PENDING]
+    return [api.to_summary_json() for api in data_store.get_apis() if api.get_status() == ServiceStatus.PENDING]
 
 def list_nonpending_apis():
-    return [api_into_json(api) for api in data_store.get_apis() if api.get_status == ServiceStatus.LIVE]
+    return [api.to_summary_json() for api in data_store.get_apis() if api.get_status == ServiceStatus.LIVE]
 
 def delete_service(sid: str):
     if sid == '':
@@ -316,7 +311,7 @@ def service_add_icon_wrapper(uid: str, sid: str, doc_id: str) -> None:
         raise HTTPException(status_code=404, detail='Icon not found')
 
     # Check whether user is allowed to modify icon
-    if service.get_owner() != user.get_id():
+    if service.get_owner().get_id() != user.get_id():
         raise HTTPException(status_code=403, detail='User not service owner')
 
     service.update_icon_id(doc_id)
@@ -337,7 +332,7 @@ def service_delete_icon_wrapper(uid: str, sid: str) -> None:
         raise HTTPException(status_code=404, detail='Service not found')
     
     # Check whether user is allowed to modify icon
-    if service.get_owner() != user.get_id():
+    if service.get_owner().get_id() != user.get_id():
         raise HTTPException(status_code=403, detail='User not service owner')
 
     service.remove_icon()
@@ -374,7 +369,7 @@ def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
         raise HTTPException(status_code=404, detail="User not found")
     
     # Check whether user attempting to review their own service
-    if service.get_owner() == user.get_id():
+    if service.get_owner().get_id() == user.get_id():
          raise HTTPException(status_code=403, detail="Cannot review own service")
 
     # Check whether user has already reviewed this service
@@ -401,8 +396,7 @@ def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
     service.add_review(review.get_id(), rating)
     user.add_review(review.get_id())
 
-    owner_id = service.get_owner()
-    owner = data_store.get_user_by_id(owner_id)
+    owner = service.get_owner()
     action = "comment"
     msg = comment
     subname = owner.get_name()
@@ -452,12 +446,11 @@ def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> Li
 
     return [review.to_json(uid) for review in reviews]
 
-def approve_service_wrapper(sid: str, approved: bool, reason: str):
+def approve_service_wrapper(sid: str, approved: bool, reason: str, service_global: bool, version: Optional[str]):
 
-    service = data_store.get_api_by_id(sid)
+    service : API = data_store.get_api_by_id(sid)
     sname = service.get_name()
-    owner_id = service.get_owner()
-    owner = data_store.get_user_by_id(owner_id)
+    owner = service.get_owner()
     uname = owner.get_name()
     uemail = owner.get_email()
 
@@ -465,15 +458,25 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str):
     if service is None:
         raise HTTPException(status_code=404, detail="Service not found")
     
+    approvalObjects : List[Service | ServiceVersionInfo] = [service]
+    if version is not None:
+        # local update, so we get ServiceVersionInfo object and update that version
+        approvalObjects.append(service.get_version_info(version))
+
     if approved:
-        service.complete_update()
-        service.update_status(ServiceStatus.LIVE, reason)
-        db_update_service(sid, service.to_json())
+        for object in approvalObjects:
+            object.complete_update()
+            object.update_status(ServiceStatus.LIVE, reason)
+            object.update_newly_created()
         action = "approved"
-    elif service.get_status() == ServiceStatus.PENDING:
-        service.update_status(ServiceStatus.REJECTED, reason)
-    elif service.get_status() == ServiceStatus.UPDATE_PENDING:
-        service.update_status(ServiceStatus.UPDATE_REJECTED, reason)
+    else:
+        for object in approvalObjects:
+            if object.get_status() == ServiceStatus.PENDING:
+                object.update_status(ServiceStatus.REJECTED, reason)
+            elif object.get_status() == ServiceStatus.UPDATE_PENDING:
+                object.update_status(ServiceStatus.UPDATE_REJECTED, reason)
+    
+    db_update_service(sid, service.to_json())
 
     content = {'action': action, 'sname': sname, 'uname': uname}
     send_email(uemail, '', 'service_approval', content)
