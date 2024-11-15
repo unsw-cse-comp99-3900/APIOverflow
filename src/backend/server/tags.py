@@ -1,8 +1,5 @@
 from fastapi import HTTPException
-from src.backend.classes.datastore import data_store, DEFAULT_TAGS
-from src.backend.classes.User import User
-from typing import Literal, TypeVar
-from src.backend.classes.Manager import manager
+from src.backend.classes.datastore import data_store, defaults
 
 def add_tag_wrapper(tag: str):
     '''
@@ -19,14 +16,14 @@ def get_tags_wrapper():
         Wrapper function which grabs all tags stored in the data_store
     
     '''
-    return {'tags' : data_store.get_tags()}
+    return {'tags' : [tag.get_tag() for tag in data_store.get_tags()]}
 
 def delete_tag_wrapper(tag: str):
     '''
         Wrapper function which deletes a tag from the data_store
     '''
 
-    if tag in DEFAULT_TAGS:
+    if tag in defaults:
         raise HTTPException(status_code=400, detail="Attempted to delete system tag")
 
     if data_store.delete_tag(tag) is None:

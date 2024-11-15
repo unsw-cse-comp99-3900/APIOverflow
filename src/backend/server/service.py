@@ -117,6 +117,7 @@ def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
                     packet['version_name'],
                     packet['version_description']
                     )
+    
     data_store.add_api(new_api)
     db_add_service(new_api.to_json())
     return str(new_api.get_id())
@@ -285,6 +286,12 @@ def delete_service(sid: str):
     if service is None:
         raise HTTPException(status_code=404, detail='No service found with given sid')
     service_name = service.get_name()
+    
+    # Disassociate server from tag
+    for _tag in service.get_tags():
+        tag = data_store.get_tag_by_name(_tag)
+        tag.remove_server(sid)
+
     data_store.delete_item(sid, 'api')
     db_status = db_delete_service(service_name)
 
@@ -469,6 +476,13 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str, service_globa
             object.update_status(ServiceStatus.LIVE, reason)
             object.update_newly_created()
         action = "approved"
+        
+        # Handle tag inclusions - ASSUMES THAT ALL TAGS HAVE BEEN ADDED PREVIOUSLY
+        for _tag in service.get_tags():
+            print(_tag)
+            tag = data_store.get_tag_by_name(_tag)
+            tag.add_server(service.get_id())
+
     else:
         for object in approvalObjects:
             if object.get_status() == ServiceStatus.PENDING:

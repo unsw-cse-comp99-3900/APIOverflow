@@ -2,10 +2,11 @@ from typing import *
 from src.backend.classes.Document import Document
 from src.backend.classes.Service import Service
 from src.backend.classes.User import User
+from src.backend.classes.Tag import Tag, SYSTEM, CUSTOM
 
 
 T = TypeVar("T")
-DEFAULT_TAGS = [
+defaults = [
     "API",
     "Microservice",
     "Productivity",
@@ -15,6 +16,8 @@ DEFAULT_TAGS = [
     "Published",
     "Recently Updated"
 ]
+
+DEFAULT_TAGS = [Tag(i, j, SYSTEM) for i, j in enumerate(defaults)]
 
 DEFAULT_ICON_PATH = "static/imgs/default_icon.png"
 DEFAULT_ICON = Document('0', DEFAULT_ICON_PATH, 'image/png')
@@ -27,6 +30,7 @@ schema = {
     'api_count' : 0,
     'tags' : DEFAULT_TAGS.copy(),
     'tag_count' : len(DEFAULT_TAGS),
+    'max_tag_count': len(DEFAULT_TAGS),
     'img_count' : 0,
     'docs_count': 1,
     'docs': [DEFAULT_ICON],
@@ -70,6 +74,7 @@ class Datastore:
                     'api_count' : 0,
                     'tags' : DEFAULT_TAGS.copy(),
                     'tag_count' : len(DEFAULT_TAGS),
+                    'max_tag_count': len(DEFAULT_TAGS),
                     'img_count' : 0,
                     'docs_count': 1,
                     'docs': [DEFAULT_ICON],
@@ -99,19 +104,21 @@ class Datastore:
         self.__store['apis'].append(api)
         self.__store['api_count'] += 1
 
-    def add_tag(self, tag: str) -> Union[None, bool]:
+    def add_tag(self, tag: T) -> Union[None, T]:
         '''
-            Adds a tag into the datastore
+            Adds a tag into the datastore | returns None if dupe, otherwise Tag obj
         '''    
 
         # Shield against duplicates
-        if tag in self.__store['tags']:
-            print(self.__store['tags'])
+        if tag in [tag.get_tag() for tag in self.__store['tags']]:
             return None
 
-        self.__store['tags'].append(tag)
+        # Create new tag
+        new_tag = Tag(self.__store['max_tag_count'], tag, CUSTOM)
+        self.__store['tags'].append(new_tag)
         self.__store['tag_count'] += 1
-        return True
+        self.__store['max_tag_count'] += 1
+        return new_tag
 
     def add_img_count(self) -> None:
         '''
@@ -157,11 +164,27 @@ class Datastore:
         '''
         return self.__store['apis']
     
-    def get_tags(self) -> List[str]:
+    def get_tags(self) -> List[T]:
         '''
             Returns a list of all tags
         '''
         return self.__store['tags']
+
+    def get_max_tags(self) -> int:
+        '''
+            Returns total number of tags created
+        '''
+        return self.__store['max_tag_count']
+
+    def get_tag_by_name(self, tag: str) -> T | None:
+        '''
+            Returns a tag given a tag-name, else None
+        '''
+        for item in self.__store['tags']:
+            if item.get_tag() == tag:
+                return item
+            
+        return None
 
     def get_docs(self) -> List[T]:
         '''
@@ -333,13 +356,20 @@ class Datastore:
 
     def delete_tag(self, tag: str) -> Union[None, bool]:
         ''''
-            Deletes a tag from the database
+            Deletes a tag from the database & corresponding servers
         '''
         for _tag in self.__store['tags']:
-            if _tag == tag:
-                self.__store['tags'].remove(tag)
+            if _tag.get_tag() == tag:
+
+                # Disassociate tag from each server
+                for server in _tag.get_servers():
+                    server.remove_tag(tag)
+
+                # Remove tag from store
+                self.__store['tags'].remove(_tag)
                 self.__store['tag_count'] -= 1
                 return True
+            
         return None
 
 print('Loading Datastore...')

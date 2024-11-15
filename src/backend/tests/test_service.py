@@ -951,6 +951,14 @@ def test_update_global_api_fields(simple_user):
         'tags' : ['new', 'tag'],
     }
 
+    response = client.post("/tag/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json={'tag': 'new'})
+    
+    response = client.post("/tag/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json={'tag': 'tag'})
+
     response = client.post("/service/update",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=update_request_info)

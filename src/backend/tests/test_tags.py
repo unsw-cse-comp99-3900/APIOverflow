@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from src.backend.classes import Service
 from src.backend.app import app
 from src.backend.classes.models import User
-from src.backend.classes.datastore import DEFAULT_TAGS
+from src.backend.classes.datastore import defaults
 
 
 # Create a test client
@@ -147,7 +147,7 @@ def test_get_tags(simple_user):
     '''
     response = client.get('/tags/get',
                            params={})
-    assert response.json()['tags'] == DEFAULT_TAGS
+    assert response.json()['tags'] == defaults
 
 def test_delete_tag_guest(admin_user):
     '''
@@ -189,7 +189,7 @@ def test_delete_default_tag(admin_user):
     response = client.delete('/tag/delete',
                            headers={"Authorization": f"Bearer {admin_user['token']}"},
                            params={
-                                'tag' : DEFAULT_TAGS[0]
+                                'tag' : defaults[0]
                            })
     assert response.status_code == INPUT_ERROR
 

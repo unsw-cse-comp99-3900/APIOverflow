@@ -376,6 +376,8 @@ class Service:
         '''
             Removes tag from service
         '''
+        if tag not in self._tags:
+            return
         self._tags.remove(tag)
 
     def remove_icon(self) -> None:
