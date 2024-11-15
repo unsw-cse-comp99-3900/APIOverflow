@@ -330,7 +330,6 @@ class Service:
                 ):
         
         self.update_status(ServiceStatus.UPDATE_PENDING, "")
-
         self._pending_update = ServicePendingGlobalUpdate(name, description, tags)
     
     def complete_update(self):

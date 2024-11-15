@@ -237,12 +237,12 @@ async def api_get_rating(sid: str):
     return service_get_rating_wrapper(sid)
 
 @app.get("/service/get/reviews")
-async def api_get_reviews(sid: str, testing: bool = False):
+async def api_get_reviews(sid: str, filter: str = '', uid: str = ''):
     '''
         Endpoint to retrieve a service's reviews
     '''
     return {
-        'reviews' : service_get_reviews_wrapper(sid, testing)
+        'reviews' : service_get_reviews_wrapper(sid, filter, uid)
     } 
 
 @app.get("/get/doc")
@@ -304,19 +304,54 @@ async def review_edit(info: ServiceReviewEditInfo, user: User = Depends(manager)
     '''
     review_edit_wrapper(info, user['id'], user['is_admin'])
 
-@app.post("/review/approve")
-async def review_approve(info: ServiceReviewAdminAction, user: User = Depends(manager), role: str = Depends(admin_required())):
+@app.post("/review/upvote")
+async def review_upvote(info: ReviewPackage, user: User = Depends(manager)):
     '''
-        Endpoint which approves a review
+        Endpoint which upvotes a given review
     '''
-    review_approve_wrapper(info.rid, info.reason)
+    review_vote_wrapper(info.rid, user['id'], 'positive')
 
-@app.post("/review/reject")
-async def review_reject(info: ServiceReviewAdminAction, user: User = Depends(manager), role: str = Depends(admin_required())):
+@app.post("/review/downvote")
+async def review_downvote(info: ReviewPackage, user: User = Depends(manager)):
     '''
-        Endpoint which rejects a review
+        Endpoint which downvotes a given review
     '''
-    review_reject_wrapper(info.rid, info.reason)
+    review_vote_wrapper(info.rid, user['id'], 'negative')
+
+@app.post("/review/remove_vote")
+async def review_remove_vote(info: ReviewPackage, user: User = Depends(manager)):
+    '''
+        Endpoint which removes a vote from given review
+    '''
+    review_remove_vote_wrapper(info.rid, user['id'])
+
+@app.post("/review/reply")
+async def review_reply(info: ReviewPackage, user: User = Depends(manager)):
+    '''
+        Endpoint which adds a reply to a review
+    '''
+    review_add_reply_wrapper(info.rid, user['id'], info.content)
+
+@app.delete("/review/reply/delete")
+async def review_reply_delete(rid: str, user: User = Depends(manager)):
+    '''
+        Endpoint which deletes a review reply
+    '''
+    review_delete_reply_wrapper(rid, user['id'])
+
+@app.post("/review/reply/edit")
+async def review_reply_edit(info: ReviewPackage, user: User = Depends(manager)):
+    '''
+        Endpoint which edits a review reply
+    '''
+    review_edit_reply_wrapper(info.rid, user['id'], info.content)
+
+@app.get("/review/reply/get")
+async def review_reply_get(rid: str):
+    '''
+        Endpoint which retrieves a review reply given an id
+    '''
+    return review_get_reply_wrapper(rid)
 
 #####################################
 #   Auth Paths
@@ -461,12 +496,12 @@ async def user_delete(uid: str, user: User = Depends(manager), role: str = Depen
     return delete_user(uid, user["is_super"])
 
 @app.get("/admin/get/reviews")
-async def admin_get_reviews(option: str = '', user: User = Depends(manager), role: str = Depends(admin_required())):
+async def admin_get_reviews(user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which retrieves all pending reviews
     '''
     return {
-        'reviews': admin_get_reviews_wrapper(option)
+        'reviews': admin_get_reviews_wrapper()
     }
 
 @app.get("/admin/get/services")
@@ -561,6 +596,13 @@ async def delete_user_self(user: User = Depends(manager)):
         Endpoint which allows the user to un-register themselves
     '''
     return user_self_delete(user['id'])
+
+@app.get("/user/get/replies")
+async def user_get_replies(user: User = Depends(manager)):
+    '''
+        Endpoint which gets summary versions of all replies made by user
+    '''
+    return user_get_replies_wrapper(user['id'])
 
 @app.post("/user/update/displayname")
 async def update_user_displayname(new_displayname: GeneralString, user: User = Depends(manager)):

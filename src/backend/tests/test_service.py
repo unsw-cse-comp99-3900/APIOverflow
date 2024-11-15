@@ -742,6 +742,7 @@ def test_admin_get_pending_services(simple_user):
     assert new_version_service['version_name'] == api_info["version_name"]
     assert new_version_service['version_description'] == api_info["version_description"]
 
+# @pytest.mark.skip("For purposes of demo, admin system doesn't exist yet")
 def test_admin_approve(simple_user):
     api_info = {
                 'name' : 'Test API 1',
@@ -824,7 +825,7 @@ def test_admin_approve(simple_user):
     assert len(response_info["global_updates"]) == 0
     assert len(response_info["version_updates"]) == 0
 
-
+# @pytest.mark.skip("For purposes of demo, admin system doesn't exist yet")
 def test_admin_disapprove(simple_user):
     api_info = {
                 'name' : 'Test API 1',
@@ -901,7 +902,6 @@ def test_admin_disapprove(simple_user):
     response_info = response.json()
     assert response_info['status'] == "REJECTED"
     assert response_info['status_reason'] == reason
-
 
 def test_update_global_api_fields(simple_user):
     '''

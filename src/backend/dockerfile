@@ -33,3 +33,5 @@ ENV TEST ${TEST}
 # for increased testing speed, can change below command to 
 # pytest tests/file_name.py -vv
 CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv; fi
+
+# pytest -vv tests/test.py::testfunc

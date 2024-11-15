@@ -114,13 +114,11 @@ class Password(BaseModel):
 class ServiceReviewInfo(BaseModel):
     sid: str
     rating: str
-    title: str
     comment: str
 
 class ServiceReviewEditInfo(BaseModel):
     rid: str
     rating: str
-    title: str
     comment: str
 
 class ServiceReviewAdminAction(BaseModel):
@@ -136,6 +134,8 @@ class ServiceApprove(BaseModel):
 
 class AdminGetReviews(BaseModel):
     option: str = ''
-
+class ReviewPackage(BaseModel):
+    rid: str
+    content: str = ''
 class GeneralString(BaseModel):
     content: str

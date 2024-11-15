@@ -51,3 +51,15 @@ export interface ServiceReviewInfo {
     title: string;
     comment: string;
 }
+
+export interface Review {
+    id: string;
+    rid: string; // Review ID
+    service: string;
+    title: string;
+    type: "positive" | "negative";
+    reviewer: string;
+    comment: string;
+    status: string;
+  }
+  

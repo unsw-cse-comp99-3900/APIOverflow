@@ -104,7 +104,6 @@ def user_self_delete(uid: str):
     username = user.get_name()
     data_store.delete_item(uid, 'user')
     db_status = db_delete_user(username)
-
     action = "self"
     uname = username
     uemail = user.get_email()
@@ -124,3 +123,21 @@ def user_update_displayname(uid: str, new: str) -> None:
     db_update_user(uid, user.to_json())
 
     return {"displayname": new, "updated": True}
+
+def user_get_replies_wrapper(uid: str) -> List[dict[str, str]]:
+    '''
+        Wrapper which returns a list of all replies made by the user
+    ''' 
+    
+    # Check if user exists
+    user = data_store.get_user_by_id(uid)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    replies = user.get_replies()
+    output = []
+    for reply in replies:
+        output.append(data_store.get_reply_by_id(reply).to_json())
+    return {
+        'replies' : output
+    }

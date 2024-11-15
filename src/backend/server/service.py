@@ -11,7 +11,7 @@ from src.backend.classes.Service import Service, ServiceVersionInfo
 from src.backend.classes.User import User
 from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
-from src.backend.classes.Review import Review, LIVE
+from src.backend.classes.Review import Review
 import re
 from src.backend.server.email import send_email
 
@@ -379,10 +379,9 @@ def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
 
     # Validate Review
     rating = data['rating']
-    title = data['title']
     comment = data['comment']
-    if rating == '' or title == '' or comment == '':
-         raise HTTPException(status_code=400, detail="Rating/Title/Comment is empty")
+    if rating == '' or comment == '':
+         raise HTTPException(status_code=400, detail="Rating/Comment is empty")
 
     if rating not in ['positive', 'negative']:
          raise HTTPException(status_code=400, detail="Invalid rating given")
@@ -391,7 +390,6 @@ def service_add_review_wrapper(uid: str, info: ServiceReviewInfo):
     review = Review(str(data_store.total_reviews()),
                     user.get_id(),
                     service.get_id(),
-                    title,
                     rating,
                     comment)
     data_store.add_review(review)
@@ -419,7 +417,7 @@ def service_get_rating_wrapper(sid: str) -> dict[str, Union[int, float]]:
 
     return service.get_ratings()
 
-def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[str, str]]:
+def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> List[dict[str, str]]:
     '''
         Wrapper which grabs all reviews associated with the particular service
     '''
@@ -437,13 +435,16 @@ def service_get_reviews_wrapper(sid: str, testing: bool = False) -> List[dict[st
         if review is None:
             continue
 
-        # Ensure only live reviews are shown
-        if review.get_status() != LIVE and not testing:
-            continue
+        reviews.append(review)
 
-        reviews.append(review.to_json())
+    # Sorting the review list
+    if filter == 'best':
+        review.sort(reverse=True, key=lambda x : x.get_net_vote())
+    
+    if filter == 'worst':
+        review.sort(key=lambda x: x.get_net_vote())
 
-    return reviews
+    return [review.to_json(uid) for review in reviews]
 
 def approve_service_wrapper(sid: str, approved: bool, reason: str, service_global: bool, version: Optional[str]):
 
