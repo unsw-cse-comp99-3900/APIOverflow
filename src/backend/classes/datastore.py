@@ -186,6 +186,16 @@ class Datastore:
             
         return None
 
+    def get_tag_ranking(self, num: int) -> list[dict[str, str | int]]:
+        '''
+            Returns a list of 'num' tags {tag: str, amt: int} in desc order
+        '''
+        # Sort list of tags 
+        tags = sorted(self.__store['tags'], key=lambda x : len(x.get_servers()), reverse=True)
+        return {
+            'tags': [tag.to_json() for tag in tags[:num]]
+        }
+
     def get_docs(self) -> List[T]:
         '''
             Returns a list of all users

@@ -74,3 +74,14 @@ class Tag:
         if sid not in self._servers:
             return
         self._servers.remove(sid)
+
+    def to_json(self) -> None:
+        '''
+            Converts tag to readable format
+        '''
+        return {
+            'tid': self._id,
+            'tag': self._tag,
+            'type': self._type,
+            'num': len(self._servers)
+        }

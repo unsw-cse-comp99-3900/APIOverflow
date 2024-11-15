@@ -16,6 +16,7 @@ class ServiceStatus(Enum):
 STATUS_STRINGS = ["LIVE", "PENDING", "REJECTED", "UPDATE_PENDING", "UPDATE_REJECTED"]
 PENDING_OPTIONS = ["PENDING", "UPDATE_PENDING"]
 LIVE_OPTIONS = ["LIVE", "UPDATE_PENDING", "UPDATE_REJECTED"]
+PAY_MODEL_OPTIONS = ["Free", "Freemium", "Premium"]
 
 T = TypeVar("T")
 K = TypeVar("K")
@@ -141,13 +142,15 @@ class ServicePendingGlobalUpdate:
     def __init__(self,
                  name: str,
                  description: str, 
-                 tags: List[str]
+                 tags: List[str],
+                 pay_model: str
                  ):
         
         # these fields don't require a version to update
         self._name = name
         self._description = description
         self._tags = tags
+        self._pay_model = pay_model
 
     def get_name(self) -> str:
         return self._name
@@ -158,6 +161,8 @@ class ServicePendingGlobalUpdate:
     def get_tags(self) -> List[str]:
         return self._tags
     
+    def get_pay_model(self) -> str:
+        return self._pay_model
 
 
 class Service:
@@ -174,6 +179,7 @@ class Service:
         description:    User-given description of service
         tags:           List of tags given to service
         endpoints:       List of Endpoint of the service
+        pay_model:      Whether the API is premium, freemium or free (default is free)
         
         ----
         version_info    List of all versions of service, with most recently created first
@@ -206,7 +212,8 @@ class Service:
                  stype: str,
                  version_name: str,
                  version_description: str,
-                 icon: str = DEFAULT_ICON) -> None:
+                 icon: str = DEFAULT_ICON,
+                 pay_model: str = 'Free') -> None:
         
         # Initialised vars
         self._id = sid
@@ -220,6 +227,7 @@ class Service:
         self._newly_created: bool = True
         self._version_info : List[ServiceVersionInfo] = []
         self.add_service_version(version_name, endpoints, version_description)
+        self._pay_model = pay_model
 
         # Default vars
         self._users = []
@@ -326,22 +334,26 @@ class Service:
     def create_pending_update(self,
                 name: str,
                 description: str,
-                tags: List[str]
+                tags: List[str],
+                pay_model: str
                 ):
         
         self.update_status(ServiceStatus.UPDATE_PENDING, "")
-        self._pending_update = ServicePendingGlobalUpdate(name, description, tags)
+        self._pending_update = ServicePendingGlobalUpdate(name, description, tags, pay_model)
     
     def complete_update(self):
         if self._status == ServiceStatus.UPDATE_PENDING:
             self._name = self._pending_update.get_name()
             self._description = self._pending_update.get_description()
             self._tags = self._pending_update.get_tags()
-
+            self._pay_model = self._pending_update.get_pay_model()
             self._pending_update = None
     
     def update_newly_created(self):
         self._newly_created = False
+
+    def update_pay_model(self, pay_model: str):
+        self._pay_model = pay_model
 
     ################################
     #   Delete Methods
@@ -485,6 +497,9 @@ class Service:
     def get_newly_created(self) -> bool:
         return self._newly_created
     
+    def get_pay_model(self) -> str:
+        return self._pay_model
+
     ################################
     #  Version Methods
     ################################
@@ -582,6 +597,7 @@ class Service:
             'status': self._status.name,
             'status_reason': self._status_reason,
             'newly_created': self._newly_created,
+            'pay_model': self._pay_model,
             # fields denoting most current service version
 
             "versions": [version.to_json() for version in self._version_info]
@@ -605,7 +621,8 @@ class Service:
                 "id": self._id,
                 "name": updated_fields.get_name(),
                 "description": updated_fields.get_description(),
-                "tags": updated_fields.get_tags()
+                "tags": updated_fields.get_tags(),
+                'pay_model': updated_fields.get_pay_model()
             }
  
         return None
@@ -617,5 +634,6 @@ class Service:
             'owner': self._owner,
             'description': self._description,
             'icon_url': self._icon_url,
-            'tags': self._tags
+            'tags': self._tags,
+            'pay_model': self._pay_model
         }

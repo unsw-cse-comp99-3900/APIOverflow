@@ -28,3 +28,9 @@ def delete_tag_wrapper(tag: str):
 
     if data_store.delete_tag(tag) is None:
         raise HTTPException(status_code=404, detail="Tag not found")
+
+def get_top_tags_wrapper(num: int):
+    '''
+        Wrapper function which grabs the top 'num' tags
+    '''
+    return data_store.get_tag_ranking(num)

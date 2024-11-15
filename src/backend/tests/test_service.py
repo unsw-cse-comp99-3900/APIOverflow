@@ -1701,3 +1701,53 @@ def test_global_version_combination_updates(simple_user):
     assert len(response_info["new_services"]) == 1
     assert len(response_info["global_updates"]) == 1
     assert len(response_info["version_updates"]) == 2
+
+def test_pay_model_display(simple_user):
+    '''
+        Test whether pay_model works
+    '''
+    pass
+    # service1 = {
+    #             'name' : 'Test API',
+    #             'icon_url' : '',
+    #             'x_start' : 0,
+    #             'x_end' : 0,
+    #             'y_start' : 0,
+    #             'y_end' : 0,
+    #             'description' : 'This is a test API',
+    #             'tags' : ['API'],
+    #             'endpoints': [simple_endpoint.model_dump()],
+    #             'version_name': "some_version_name",
+    #             'pay_model': 'Premium'
+    #             }
+
+    # response = client.post("/auth/login", json={
+    #     "username": "superadmin",
+    #     "password": "superadminpassword"
+    # })
+    # assert response.status_code == SUCCESS
+
+    # access_token = response.json()["access_token"]
+
+    # response = client.post("/service/add",
+    #                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+    #                        json=service1)
+    # assert response.status_code == SUCCESS
+
+    # response_info = response.json()
+    # sid = response_info['id']
+
+    # client.post("/admin/service/approve",
+    #                        headers={"Authorization": f"Bearer {access_token}"},
+    #                         json={
+    #                             'sid': sid,
+    #                             'reason': "",
+    #                             'approved': True,
+    #                             'version_name': service1["version_name"],
+    #                             'service_global': True
+    #                         })
+
+def test_pay_model_filter(simple_user):
+    pass
+def test_pay_model_update(simple_user):
+    pass

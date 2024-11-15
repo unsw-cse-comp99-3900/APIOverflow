@@ -5,7 +5,18 @@ from src.backend.classes import Service
 from src.backend.app import app
 from src.backend.classes.models import User
 from src.backend.classes.datastore import defaults
+from src.backend.classes.Endpoint import Endpoint
+from src.backend.classes.Parameter import Parameter 
+from src.backend.classes.Response import Response
 
+# test endpoint
+simple_parameter = Parameter(id="1", endpoint_link='https://api.example.com/users/12345', required=True, 
+                            type='HEADER', name='paramtest', value_type='int')
+simple_response = Response(code='404', description='not found', conditions=["site is down", "badtest"], 
+                            example="example...")
+simple_endpoint = Endpoint(link='https://api.example.com/users/12345', title_description='testTitle1', 
+                            main_description='tests endpoint', tab='tabTest', parameters=[simple_parameter], 
+                            method="POST", responses=[simple_response])
 
 # Create a test client
 client = TestClient(app)
@@ -214,3 +225,67 @@ def test_delete_tag_success(admin_user):
     response = client.get("/tags/get",
                           params={})
     assert 'testing' not in response.json()['tags']
+
+def test_get_top5(admin_user):
+    '''
+        Test whether get top 5 works
+    '''   
+    custom = [
+        {'tag': 'custom1'},
+        {'tag': 'custom2'},
+        {'tag': 'custom3'},
+        {'tag': 'custom4'},
+        {'tag': 'custom5'},
+    ]
+    customs = ['custom1', 'custom2', 'custom3', 'custom4', 'custom5']
+    sid = []
+    for tag in custom:
+        response = client.post("/tag/add",
+                            headers={"Authorization": f"Bearer {admin_user['token']}"},
+                            json=tag)
+        assert response.status_code == SUCCESS
+    for i in range(4):
+        api_info = {
+                    'name' : f'Test API{i}',
+                    'icon_url' : '',
+                    'x_start' : 0,
+                    'x_end' : 0,
+                    'y_start' : 0,
+                    'y_end' : 0,
+                    'description' : 'This is a test API',
+                    'tags' : ['API', 'Microservice'] + customs[:(i + 1)],
+                    'endpoints': [simple_endpoint.model_dump()],
+                    'version_name': "some_version_name"
+                    }
+        response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {admin_user['token']}"},
+                           json=api_info)
+        assert response.status_code == SUCCESS
+        sid.append(response.json()['id'])
+
+    reason = 'very pog service'
+    for i in range(4):
+        response = client.post("/admin/service/approve",
+                            headers={"Authorization": f"Bearer {admin_user['token']}"},
+                                json={
+                                    'sid': sid[i],
+                                    'reason': reason,
+                                    'approved': True,
+                                    'version_name': api_info["version_name"],
+                                    'service_global': True
+                                })
+        assert response.status_code == SUCCESS
+
+    response = client.get("/tags/get/ranked",
+                          params={'num': 5})
+    assert response.status_code == SUCCESS
+    assert response.json()['tags'][0]['tag'] == 'API'
+    assert response.json()['tags'][0]['num'] == 4
+    assert response.json()['tags'][1]['tag'] == 'Microservice'
+    assert response.json()['tags'][1]['num'] == 4
+    assert response.json()['tags'][2]['tag'] == 'custom1'
+    assert response.json()['tags'][2]['num'] == 4
+    assert response.json()['tags'][3]['tag'] == 'custom2'
+    assert response.json()['tags'][3]['num'] == 3
+    assert response.json()['tags'][4]['tag'] == 'custom3'
+    assert response.json()['tags'][4]['num'] == 2

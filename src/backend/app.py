@@ -181,9 +181,10 @@ async def get_user_apis(user: User = Depends(manager)):
 async def filter(
     tags: Optional[List[str]] = Query(None), 
     providers: Optional[List[str]] = Query(None),
+    pay_models: Optional[List[str]] = Query(None),
     hide_pending: bool = True
 ):
-    return api_tag_filter(tags, providers, hide_pending)
+    return api_tag_filter(tags, providers, pay_models, hide_pending)
 
 @app.get("/service/search")
 async def search(
@@ -462,6 +463,13 @@ async def get_tags():
         Endpoint to grab all tags
     '''
     return get_tags_wrapper()
+
+@app.get("/tags/get/ranked")
+async def get_tags_ranked(num: int):
+    '''
+        Endpoint to get ranked number of tags
+    '''
+    return get_top_tags_wrapper(num)
 
 #####################################
 #   Admin Paths

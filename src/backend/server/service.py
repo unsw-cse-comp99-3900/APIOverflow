@@ -115,7 +115,8 @@ def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
                     packet['tags'],
                     packet['endpoints'],
                     packet['version_name'],
-                    packet['version_description']
+                    packet['version_description'],
+                    packet['pay_model']
                     )
     
     data_store.add_api(new_api)
@@ -136,7 +137,7 @@ def update_service_wrapper(packet: dict[T, K]) -> None:
 
     # service is ref to API Obj in data store which gets updated
     service.create_pending_update(
-        packet["name"], packet["description"], packet["tags"])
+        packet["name"], packet["description"], packet["tags"], packet['pay_model'])
     
     db_update_service(sid, service.to_json())
     return None
@@ -172,12 +173,12 @@ def delete_service_version_wrapper(sid: str, version_name: str):
     
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
-def api_tag_filter(tags, providers, hide_pending: bool) -> list:
+def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
 
     api_list = data_store.get_apis()
     filtered_apis = []
 
-    print(api_list)
+    # print(api_list)
     #query = input("Search")
 
     #if query != "":
@@ -199,22 +200,32 @@ def api_tag_filter(tags, providers, hide_pending: bool) -> list:
                 if tag in api.get_tags() and api not in filtered_apis:
                         filtered_apis.append(api)
 
-    return_list: List[Service] = []
+    secondary_list: List[Service] = []
     if providers:
         # if providers list is not empty
         for api in filtered_apis:
             for provider in providers:
                 # I refactored get_owner so that it now returns the User object
                 # I've fixed this to what it was before (which is bugged)
-                if provider in api.get_owner().get_id() and api not in return_list:
+                if provider in api.get_owner().get_id() and api not in secondary_list:
+                    secondary_list.append(api)
+                    break
+
+    else:
+        secondary_list = [api for api in filtered_apis]
+    
+    return_list: List[Service] = []
+    if pay_models:
+        for api in secondary_list:
+            for pay_model in pay_models:
+                if pay_model in api.get_pay_model() and api not in return_list:
                     return_list.append(api)
                     break
     else:
-        return_list = [api for api in filtered_apis]
-    
+        return_list = [api for api in secondary_list]
+
     for api in return_list:
         print(api.get_status().name)
-    
     
     return [api.to_summary_json() for api in return_list if
             api.get_status().name in LIVE_OPTIONS or 
