@@ -26,12 +26,32 @@ import ServiceManagement from "./pages/ServiceManagement";
 import UserManagement from "./pages/UserManagement";
 import MyProfilePage from "./pages/UserProfilePage";
 
-const ProtectedRoute = () => {
+const UserProtectedRoute = () => {
   const auth = useAuth();
   const { isLoggedIn } = auth!;
 
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
+  }
+  return <Outlet />;
+};
+
+const AdminProtectedRoute = () => {
+  const auth = useAuth();
+  const { isAdmin } = auth!;
+
+  if (!isAdmin) {
+    return <Navigate to="/profile/my-profile" replace />;
+  }
+  return <Outlet />;
+};
+
+const SuperAdminProtectedRoute = () => {
+  const auth = useAuth();
+  const { isSuperAdmin } = auth!;
+
+  if (!isSuperAdmin) {
+    return <Navigate to="/profile/my-profile" replace />;
   }
   return <Outlet />;
 };
@@ -54,25 +74,20 @@ const App = () => {
             <Route path="/apis" element={<APIsPage />} />
           </Route>
 
-          <Route element={<ProtectedRoute />}>
+          <Route element={<UserProtectedRoute />}>
             <Route path="/profile" element={<UserSidebarLayout />}>
-              <Route
-                path="/profile/admin/reviews"
-                element={<ReviewManagement />}
-              />
-              <Route
-                path="/profile/admin/services"
-                element={<ServiceManagement />}
-              />
-              <Route path="/profile/admin/users" element={<UserManagement />} />
+              <Route element={<AdminProtectedRoute />}>
+                <Route path="/profile/admin/reviews" element={<ReviewManagement />}/>
+                <Route path="/profile/admin/services" element={<ServiceManagement />} />
+                <Route element={<SuperAdminProtectedRoute />}>
+                  <Route path="/profile/admin/users" element={<UserManagement />} />
+                </Route>
+              </Route>
               <Route path="/profile/my-profile" element={<MyProfilePage />} />
               <Route path="/profile/my-apis" element={<MyApisPage />} />
               <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
               <Route path="/profile/add-api" element={<AddApiPage />} />
-              <Route
-                path="/profile/my-apis/:id/edit"
-                element={<EditApiPage />}
-              />
+              <Route path="/profile/my-apis/:id/edit" element={<EditApiPage />}/>
             </Route>
           </Route>
           <Route path="/*" element={<NotFoundPage />} />

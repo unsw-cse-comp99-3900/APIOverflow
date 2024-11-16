@@ -36,7 +36,7 @@ const Navbar = () => {
                   <strong>Add API</strong>
                 </NavLink>
                 <NavLink
-                  to={loggedIn ? "/profile/my-apis" : "/login"}
+                  to={loggedIn ? "/profile/my-profile" : "/login"}
                   className={linkClass}
                 >
                   <span className="flex items-center space-x-2">

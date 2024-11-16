@@ -32,7 +32,7 @@ const UserSideBar = () => {
   };
 
   return (
-    <aside className="fixed left-0 w-80 h-full px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
+    <aside className="fixed left-0 w-80 h-full px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700 flex flex-col justify-between">
       <div className="flex flex-col items-center mt-6 -mx-2">
         <img
           className="object-cover w-40 h-40 mx-2 rounded-full border-2 border-gray-300"
@@ -99,7 +99,7 @@ const UserSideBar = () => {
           {/* Setting tabs */}
           <div className="border border-gray-100 mb-5 mt-5"></div>
           <button
-            className="flex w-full items-center px-4 py-2 text-gray-900 bg-white rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3"
+            className="flex w-full items-center px-4 py-2 text-white bg-red-500 rounded-lg  hover:bg-red-600 group mt-3"
             onClick={onLogOutClick}
           >
             <span className="ml-3 font-medium flex items-center ">
