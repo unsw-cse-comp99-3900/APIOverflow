@@ -5,8 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Blob1 from "../assets/images/blobs/blob1.svg";
 import Blob2 from "../assets/images/blobs/blob2.svg";
 import { useAuth } from "../contexts/AuthContext";
-import { userLogin, userRegister } from "../services/apiServices";
-import { LoginModel, UserCreate } from "../types/backendTypes";
+import { userRegister } from "../services/apiServices";
+import { UserCreate } from "../types/backendTypes";
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -15,9 +15,6 @@ const RegisterPage: React.FC = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const auth = useAuth();
-
-  const { login } = auth!;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,14 +23,15 @@ const RegisterPage: React.FC = () => {
       setError("Please fill in both fields.");
       return;
     }
-    const newUser: UserCreate = {
-      email,
-      username,
-      password,
-    };
-    await userRegister(newUser);
+    await userRegister(email, username, password);
     setIsLoading(true);
-    navigate("/login", { state: { username: username, password: password, warning:"Please verify your email first" } });
+    navigate("/login", {
+      state: {
+        username: username,
+        password: password,
+        warning: "Please verify your email first",
+      },
+    });
   };
 
   return (

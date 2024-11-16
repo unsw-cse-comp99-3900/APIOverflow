@@ -9,23 +9,27 @@ import {
   TagData,
   UserCreate,
 } from "../types/backendTypes";
-import { Tag } from "../types/miscTypes";
+import { Rating, Tag } from "../types/miscTypes";
 import {
   briefApiDataFormatter,
   detailedApiDataFormatter,
 } from "../utils/dataFormatters";
+import { info } from "console";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (tags?: Tag[], hidePending : boolean = false) => {
+export const getApis = async (tags?: Tag[], hidePending: boolean = false) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
-  const response = await fetch(`${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`, {
-    method: "GET",
-  });
+  const response = await fetch(
+    `${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`,
+    {
+      method: "GET",
+    }
+  );
   const data = await response.json();
-  console.log(data)
+  console.log(data);
   return data.map(briefApiDataFormatter);
 };
 
@@ -53,7 +57,7 @@ export const getApi = async (id: string) => {
   if (response.status === 404) {
     throw new Error("Service Not Found");
   }
-  console.log(data)
+  console.log(data);
   return detailedApiDataFormatter(data);
 };
 
@@ -64,14 +68,31 @@ export const deleteApi = async (id: string) => {
   return;
 };
 
-export const addApi = async (service: ServicePost) => {
+export const addApi = async (
+  name: string,
+  description: string,
+  tags: string[],
+  endpoint: string
+) => {
+  const api: ServicePost = {
+    name,
+    description,
+    endpoint,
+    x_start: 0,
+    x_end: 100,
+    y_start: 0,
+    y_end: 100,
+    icon_url: "",
+    tags,
+  };
+
   const response = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(service),
+    body: JSON.stringify(api),
   });
 
   if (response.status === 401) {
@@ -82,7 +103,20 @@ export const addApi = async (service: ServicePost) => {
   return data.id;
 };
 
-export const updateApi = async (api: ServiceUpdate) => {
+export const updateApi = async (
+  name: string,
+  description: string,
+  tags: string[],
+  endpoint: string,
+  sid: string
+) => {
+  const api: ServiceUpdate = {
+    sid,
+    name,
+    description,
+    endpoint,
+    tags: tags,
+  };
   const response = await fetch(`${baseUrl}/service/update`, {
     method: "PUT",
     headers: {
@@ -118,13 +152,22 @@ export const userLogin = async (credentials: LoginModel) => {
   return data.access_token;
 };
 
-export const userRegister = async (user: UserCreate) => {
+export const userRegister = async (
+  email: string,
+  username: string,
+  password: string
+) => {
+  const newUser: UserCreate = {
+    email,
+    username,
+    password,
+  };
   await fetch(`${baseUrl}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(user),
+    body: JSON.stringify(newUser),
   });
   return;
 };
@@ -138,7 +181,10 @@ export const getTags = async () => {
   return data.tags;
 };
 
-export const addTag = async (tag: TagData) => {
+export const addTag = async (tagName: string) => {
+  const tag: TagData = {
+    tag: tagName,
+  };
   const response = await fetch(`${baseUrl}/tag/add`, {
     method: "POST",
     headers: {
@@ -165,12 +211,15 @@ export const uploadImage = async (file: File) => {
     body: formData,
   });
   const data = await response.json();
-  console.log(data)
   return data.doc_id;
 };
 
 // Link icon with service
-export const apiAddIcon = async (info: ServiceIconInfo) => {
+export const apiAddIcon = async (sid: string, docId: string) => {
+  const info: ServiceIconInfo = {
+    sid,
+    doc_id: docId,
+  };
   const response = await fetch(`${baseUrl}/service/add_icon`, {
     method: "POST",
     headers: {
@@ -182,7 +231,7 @@ export const apiAddIcon = async (info: ServiceIconInfo) => {
 };
 
 export const apiGetIcon = async (sid: string) => {
-  console.log(sid)
+  console.log(sid);
   const response = await fetch(`${baseUrl}/service/get/icon?sid=${sid}`, {
     headers: {
       "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
@@ -193,17 +242,7 @@ export const apiGetIcon = async (sid: string) => {
   });
   const blob = await response.blob(); // Get the Blob data
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
-  if(blob.size === 62114){
-    console.log(`icon for sid ${sid}: lmao`)
-  }else if (blob.size === 29457){
-    console.log(`icon for sid ${sid}: flooshed`)
-  }else if (blob.size === 8255){
-    console.log(`icon for sid ${sid}: default`)
-  }else{
-    console.log("icon: WTF IS HAPPENING")
-  }
-  console.log(blob.size)
-  return url
+  return url;
 };
 
 /*        Document Services       */
@@ -218,19 +257,23 @@ export const uploadPDF = async (file: File) => {
   });
   const data = await response.json();
   return data.doc_id;
-}
+};
 
 // Link service with documentation
-export const uploadDocs = async (info: ServiceUpload) => {
+export const uploadDocs = async (sid: string, docId: string) => {
+  const info: ServiceUpload = {
+    sid,
+    doc_id: docId,
+  };
   const response = await fetch(`${baseUrl}/service/upload_docs`, {
     method: "POST",
-    headers: {  
+    headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(info),
   });
-}
+};
 
 export const getDoc = async (doc_id: string) => {
   const response = await fetch(`${baseUrl}/get/doc?doc_id=${doc_id}`, {
@@ -238,30 +281,44 @@ export const getDoc = async (doc_id: string) => {
   });
   const blob = await response.blob(); // Get the Blob data
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
-  return url
-}
+  return url;
+};
 
 /*        Review Services       */
-export const apiAddReview = async (info: ServiceReviewInfo) => {
+export const apiAddReview = async (
+  sid: string,
+  rating: Rating,
+  title: string,
+  comment: string
+) => {
+  const info: ServiceReviewInfo = {
+    sid,
+    rating,
+    title,
+    comment,
+  };
   const response = await fetch(`${baseUrl}/service/review/add`, {
     method: "POST",
-    headers: {  
+    headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
-    
+
     body: JSON.stringify(info),
   });
   const data = await response.json();
   if (response.status === 403) {
     throw new Error(data.detail);
   }
-}
+};
 
-export const apiGetReviews = async (sid: string, testing:boolean=true) => {
-  const response = await fetch(`${baseUrl}/service/get/reviews?sid=${sid}&testing=${testing}`, {
-    method: "GET",
-  });
+export const apiGetReviews = async (sid: string, testing: boolean = true) => {
+  const response = await fetch(
+    `${baseUrl}/service/get/reviews?sid=${sid}&testing=${testing}`,
+    {
+      method: "GET",
+    }
+  );
   const data = await response.json();
   return data.reviews;
-}
+};

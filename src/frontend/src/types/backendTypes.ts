@@ -57,7 +57,7 @@ export interface Review {
     rid: string; // Review ID
     service: string;
     title: string;
-    type: "positive" | "negative";
+    type: Rating;
     reviewer: string;
     comment: string;
     status: string;
