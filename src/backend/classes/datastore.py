@@ -253,7 +253,7 @@ class Datastore:
                 api_info = {
                     'id': item.get_id(),
                     'name': item.get_name(),
-                    'owner': owner.get_id(),
+                    'owner': owner.get_displayname(),
                     'description': item.get_description(),
                     'icon_url': item.get_icon_url(),
                     'tags': item.get_tags()
