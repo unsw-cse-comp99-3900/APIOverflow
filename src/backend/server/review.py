@@ -12,7 +12,7 @@ from src.backend.classes.Review import *
 from src.backend.classes.ReviewReply import *
 from src.backend.server.email import send_email
 
-def review_get_wrapper(rid: str) -> dict[str, str]:
+def review_get_wrapper(rid: str, uid: str = '') -> dict[str, str]:
     '''
         Wrapper which retrieves a review
     '''
@@ -22,7 +22,7 @@ def review_get_wrapper(rid: str) -> dict[str, str]:
     if review is None:
         raise HTTPException(status_code=404, detail="Review not found")
     
-    return review.to_json()
+    return review.to_json(uid=uid)
 
 def review_delete_wrapper(rid: str, uid: str, is_admin: bool) -> None:
     '''

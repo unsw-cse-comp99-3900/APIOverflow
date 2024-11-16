@@ -420,7 +420,7 @@ def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> Li
     if filter == 'worst':
         review.sort(key=lambda x: x.get_net_vote())
 
-    return [review.to_json(uid) for review in reviews]
+    return [review.to_json(uid=uid) for review in reviews]
 
 def approve_service_wrapper(sid: str, approved: bool, reason: str, service_global: bool, version: Optional[str]):
 

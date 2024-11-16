@@ -293,11 +293,11 @@ async def delete_service_version(sid: str, version_name: str,  user: User = Depe
 #####################################
 
 @app.get("/review/get")
-async def review_get(rid: str):
+async def review_get(rid: str, uid: str = ''):
     '''
         Endpoint which directly retrieves a review
     '''
-    return review_get_wrapper(rid)
+    return review_get_wrapper(rid, uid=uid)
 
 @app.delete("/review/delete")
 async def review_delete(rid: str, user: User = Depends(manager)):
