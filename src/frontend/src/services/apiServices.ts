@@ -1,12 +1,15 @@
 import {
+  Endpoint,
   LoginModel,
+  EndpointParameter,
   ServiceIconInfo,
-  ServicePost,
+  ServiceAdd,
   ServiceReviewInfo,
   ServiceUpdate,
   ServiceUpload,
   TagData,
   UserCreate,
+  EndpointResponse,
 } from "../types/backendTypes";
 import { Rating, Tag } from "../types/miscTypes";
 import {
@@ -70,17 +73,40 @@ export const addApi = async (
   name: string,
   description: string,
   tags: string[],
-  endpoint: string
+  endpointLink: string,
 ) => {
-  const api: ServicePost = {
+
+  const ParameterPlaceholder : EndpointParameter = {
+    id: "1",
+    endpoint_link: endpointLink,
+    required: false,
+    type: "BODY",
+    name: "Parameter Placeholder",
+    value_type: "string",
+    example: "Example Placeholder",
+  }
+
+  const ResponsePlaceholder : EndpointResponse = {
+    code: "1",
+    description: "Description Placeholder",
+    conditions: ["Condition Placeholder"],
+    example: "Example Placeholder",
+  }
+
+  const endpoint: Endpoint = {
+    link: endpointLink,
+    title_description: "Title Description Placeholder",
+    main_description: "Main Description Placeholder",
+    tab: "Tab Placeholder",
+    parameters: [ParameterPlaceholder],
+    method: "GET",
+    responses: [ResponsePlaceholder]
+  }
+
+  const api: ServiceAdd = {
     name,
     description,
-    endpoint,
-    x_start: 0,
-    x_end: 100,
-    y_start: 0,
-    y_end: 100,
-    icon_url: "",
+    endpoints: [endpoint],
     tags,
   };
 

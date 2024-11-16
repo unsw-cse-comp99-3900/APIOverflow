@@ -1,15 +1,10 @@
-import { Rating } from "./miscTypes";
+import { AllowedEndpointTypes, AllowedParameterTypes, Rating } from "./miscTypes";
 
-export interface ServicePost {
+export interface ServiceAdd {
     name: string;
-    icon_url: string;
     description: string;
-    x_start:number;
-    x_end: number;
-    y_start: number;
-    y_end: number;
     tags: string[];
-    endpoint:string
+    endpoints: Endpoint[];
 }
 
 export interface ServiceUpdate{
@@ -63,4 +58,30 @@ export interface Review {
     comment: string;
     status: string;
   }
-  
+
+export interface Endpoint{
+    link: string;
+    title_description: string;
+    main_description: string;
+    tab: string;
+    parameters: EndpointParameter[];
+    method: AllowedEndpointTypes;
+    responses: EndpointResponse[];
+}
+
+export interface EndpointParameter{
+    id: string;
+    endpoint_link: string;
+    required: boolean;
+    type: AllowedParameterTypes;
+    name: string;
+    value_type: string
+    example: string;
+}
+
+export interface EndpointResponse{
+    code: string;
+    description: string;
+    conditions: string[];
+    example: string
+}

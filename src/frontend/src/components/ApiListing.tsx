@@ -19,6 +19,7 @@ const ApiListing: React.FC<ApiListingProps>  = ({
   isMyApis,
   onDelete,
 }) => {
+  console.log(api)
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [iconURL, setIconURL] = useState<string>("")
   useEffect(() => {
