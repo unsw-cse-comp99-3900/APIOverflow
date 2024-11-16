@@ -10,9 +10,11 @@ import {
   TagData,
   UserCreate,
   EndpointResponse,
+  ServiceApprove,
 } from "../types/backendTypes";
 import { Rating, Tag } from "../types/miscTypes";
 import {
+  adminUpdateDataFormatter,
   briefApiDataFormatter,
   detailedApiDataFormatter,
   permDataFormatter,
@@ -21,7 +23,7 @@ import {
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (tags?: Tag[], hidePending = false) => {
+export const getApis = async (tags?: Tag[], hidePending = true) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
   const response = await fetch(
@@ -369,3 +371,32 @@ export const apiGetReviews = async (sid: string, testing: boolean = true) => {
 };
 
 /*        Admin Services       */
+export const getPendingServices = async () => {
+  const response = await fetch(`${baseUrl}/admin/get/services`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    method: "GET",
+  });
+  const data = await response.json();
+  return adminUpdateDataFormatter(data);
+}
+
+export const approveService = async (sid: string, approved: boolean, reason: string, serviceGlobal: boolean, versionName: string|null) => {
+  const approvalInfo: ServiceApprove = {
+    sid,
+    approved,
+    reason,
+    service_global: serviceGlobal,
+    version_name: versionName,
+  }
+  console.log(approvalInfo);
+  await fetch(`${baseUrl}/admin/service/approve`, {
+    headers: {  
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(approvalInfo),
+    method: "POST",
+  });
+}

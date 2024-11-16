@@ -31,3 +31,37 @@ export const permDataFormatter = (data: any) => {
     isSuperAdmin: data.is_super,
   };
 };
+
+export const adminUpdateDataFormatter = (
+  data: any
+) => {
+  return {
+    newServices: data.new_services.map((service: any) => {
+      return {
+        id: service.id,
+        name: service.name,
+        description: service.description,
+        serviceGlobal: true,
+        versionName: service.version_fields.version_name
+      };
+    }),
+    newVersions: data.version_updates.map((version: any) => {
+      return {
+        id: version.id,
+        name: `${version.name}  |  ${version.version_name}`,
+        description: version.version_description,
+        serviceGlobal: false,
+        versionName: version.version_name,
+      };
+    }),
+    generalInfoUpdates: data.global_updates.map((service: any) => {
+      return {
+        id: service.id,
+        name: service.name,
+        description: service.description,
+        serviceGlobal: true,
+        versionName: null
+      };
+    }),
+  };
+};
