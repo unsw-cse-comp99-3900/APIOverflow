@@ -84,11 +84,6 @@ def test_invalid_user(simple_user):
                            headers={"Authorization": "Bearer"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : '',
                                 'tags' : [],
                                 'endpoints': []
@@ -104,11 +99,6 @@ def test_no_name(simple_user):
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
                             json={
                                 'name' : '',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : '',
                                 'tags' : [],
                                 'endpoints': []
@@ -123,11 +113,6 @@ def test_invalid_url(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : 'www.googlefake.xyzabsdh',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : 'hi',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -143,11 +128,6 @@ def test_invalid_dimensions(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : -10,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : 'hi',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -159,11 +139,6 @@ def test_invalid_dimensions(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 1000,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : 'hi',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -175,11 +150,6 @@ def test_invalid_dimensions(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : -10,
-                                'y_end' : 0,
                                 'description' : 'hi',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -191,11 +161,6 @@ def test_invalid_dimensions(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 1000,
-                                'y_end' : 0,
                                 'description' : 'hi',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -210,11 +175,6 @@ def test_no_description(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : '',
                                 'tags' : [],
                                 'endpoints': []
@@ -229,11 +189,6 @@ def test_no_tags(simple_user):
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : 'This is a test API',
                                 'tags' : [],
                                 'endpoints': []
@@ -248,11 +203,6 @@ def test_no_endpoint(simple_user):
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : 'This is a test API',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -266,11 +216,6 @@ def test_create_api(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -308,11 +253,6 @@ def test_multiple_tags(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API', 'Public', 'In Development'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -346,11 +286,6 @@ def test_custom_icon(simple_user):
     '''
     api_info = {
                 'name' : 'Fake Google',
-                'icon_url': 'http://cdn.mos.cms.futurecdn.net/iC7HBvohbJqExqvbKcV3pP.jpg',
-                'x_start' : 0,
-                'x_end' : 100,
-                'y_start' : 0,
-                'y_end' : 100,
                 'description' : 'This is a definitely... Google',
                 'tags' : ['API', 'Public', 'In Development'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -383,11 +318,6 @@ def test_update_api_invalid_sid(simple_user):
 
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -417,11 +347,6 @@ def test_update_api_documents(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -514,11 +439,6 @@ def test_delete_api(simple_user):
     '''
     api_info1 = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -561,11 +481,6 @@ def test_delete_apis(simple_user):
     '''
     api_info1 = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -573,11 +488,6 @@ def test_delete_apis(simple_user):
     
     api_info2 = {
                 'name' : 'Test API I',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -643,10 +553,6 @@ def test_get_apis(simple_user):
     api_info1 = {
                 'name' : 'Test API',
                 'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -655,10 +561,6 @@ def test_get_apis(simple_user):
     api_info2 = {
                 'name' : 'Test API I',
                 'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -696,10 +598,6 @@ def test_admin_get_pending_services(simple_user):
     api_info = {
                 'name' : 'Test API 1',
                 'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -746,11 +644,6 @@ def test_admin_get_pending_services(simple_user):
 def test_admin_approve(simple_user):
     api_info = {
                 'name' : 'Test API 1',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -829,11 +722,6 @@ def test_admin_approve(simple_user):
 def test_admin_disapprove(simple_user):
     api_info = {
                 'name' : 'Test API 1',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -909,11 +797,6 @@ def test_update_global_api_fields(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -1138,11 +1021,6 @@ def test_service_version(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -1265,11 +1143,6 @@ def test_update_version_api_fields(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -1568,11 +1441,6 @@ def test_global_version_combination_updates(simple_user):
 
     service1 = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -1582,11 +1450,6 @@ def test_global_version_combination_updates(simple_user):
 
     service2 = {
         'name' : 'Test API 2',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This ',
                 'tags' : ['Service'],
                 'endpoints': [simple_endpoint2.model_dump()],

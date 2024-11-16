@@ -10,6 +10,7 @@ from src.backend.database import *
 from src.backend.classes.models import ServiceReviewEditInfo
 from src.backend.classes.Review import *
 from src.backend.classes.ReviewReply import *
+from src.backend.server.email import send_email
 
 def review_get_wrapper(rid: str) -> dict[str, str]:
     '''
@@ -139,6 +140,20 @@ def review_add_reply_wrapper(rid: str, uid: str, comment: str) -> None:
     user.add_reply(reply.get_id())
     data_store.add_reply(reply)
     review.add_reply(reply.get_id())
+
+    review_owner_id = review.get_owner()
+    review_owner = data_store.get_user_by_id(review_owner_id)
+    service = server
+    reply_owner = service.get_owner()
+    action = "reply"
+    msg = comment
+    subname = review_owner.get_name()
+    rname = reply_owner.get_name()
+    sname = service.get_name()
+    uemail = review_owner.get_email()
+    content = {'action': action, 'msg': msg, 'subname': subname, 'rname': rname, 'sname': sname}
+    send_email(uemail, '', 'reivew_reply', content)
+
 
 def review_delete_reply_wrapper(rid: str, uid: str) -> None:
     '''

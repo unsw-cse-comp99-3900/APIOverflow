@@ -68,11 +68,6 @@ def simple_user():
 def test_simple_search(simple_user):
     api1 = {
         'name' : 'Google',
-        'icon_url' : '',
-        'x_start' : 0,
-        'x_end' : 0,
-        'y_start' : 0,
-        'y_end' : 0,
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
         'endpoints': [simple_endpoint.dict()]
@@ -82,11 +77,6 @@ def test_simple_search(simple_user):
                            json=api1)
     api2 = {
             'name' : 'Googooww',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -109,11 +99,6 @@ def test_simple_search(simple_user):
 def test_simple_search_2(simple_user):
     api1 = {
         'name' : 'Google',
-        'icon_url' : '',
-        'x_start' : 0,
-        'x_end' : 0,
-        'y_start' : 0,
-        'y_end' : 0,
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
         'endpoints': [simple_endpoint.dict()]
@@ -123,11 +108,6 @@ def test_simple_search_2(simple_user):
                            json=api1)
     api2 = {
             'name' : 'Googooww',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -152,11 +132,6 @@ def test_simple_search_2(simple_user):
 def test_simple_empty(simple_user):
     api1 = {
         'name' : 'Google',
-        'icon_url' : '',
-        'x_start' : 0,
-        'x_end' : 0,
-        'y_start' : 0,
-        'y_end' : 0,
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
         'endpoints': [simple_endpoint.dict()]
@@ -166,11 +141,6 @@ def test_simple_empty(simple_user):
                            json=api1)
     api2 = {
             'name' : 'Googooww',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -192,11 +162,6 @@ def test_simple_empty(simple_user):
 def test_simple_regex_search(simple_user):
     api1 = {
         'name' : 'Google',
-        'icon_url' : '',
-        'x_start' : 0,
-        'x_end' : 0,
-        'y_start' : 0,
-        'y_end' : 0,
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
         'endpoints': [simple_endpoint.dict()]
@@ -206,11 +171,6 @@ def test_simple_regex_search(simple_user):
                            json=api1)
     api2 = {
             'name' : 'Googooww',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -235,11 +195,6 @@ def test_simple_regex_search(simple_user):
 def test_simple_regex_sensitivity(simple_user):
     api1 = {
         'name' : 'Google',
-        'icon_url' : '',
-        'x_start' : 0,
-        'x_end' : 0,
-        'y_start' : 0,
-        'y_end' : 0,
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
         'endpoints': [simple_endpoint.dict()]
@@ -249,11 +204,6 @@ def test_simple_regex_sensitivity(simple_user):
                            json=api1)
     api2 = {
             'name' : 'Googooww',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]

@@ -58,50 +58,7 @@ def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
         Returns:    sid representing id of newly created service
     '''
     validate_api_fields(packet)
-
-    # Retrieve image from url
-    response = None
-    img_url = packet['icon_url']
-    x_start, x_end = packet['x_start'], packet['x_end']
-    y_start, y_end = packet['y_start'], packet['y_end']
-
-    if x_start < 0 or y_start < 0 or x_start > x_end or y_start > y_end:
-        raise HTTPException(status_code=400,
-                            detail="Invalid X/Y dimensions")
-
-    if img_url != '':
-        internal_url = f"{IMAGE_PATH}/image{data_store.num_imgs()}.jpg"
-        try:
-            image, response = urllib.request.urlretrieve(img_url, internal_url)
-        except HTTPError as err:
-            raise HTTPException(status_code=400,
-                                detail=f"HTTP exception {response} raised when retrieving image") from err
-        except URLError as err:
-            raise HTTPException(status_code=400,
-                                detail=f"URL exception {response} raised when retrieving image") from err
-        except Exception as err:
-            raise HTTPException(status_code=400,
-                                detail=f"An odd error {response} was raised when retrieving image") from err
-
-        # Open image
-        image_obj = Image.open(image)
-
-        # Handle Error where x_start or y_start
-        x_limit, y_limit = image_obj.size
-        if x_end > x_limit or y_end > y_limit or x_start < 0 or y_start < 0:
-            raise HTTPException(status_code=400,
-                                detail="Boundaries for cropping beyond size of image")
-        if x_start > x_end or y_start > y_end:
-            raise HTTPException(status_code=400,
-                                detail="X or Y start bigger than X/Y end")
-
-        # Crop photo
-        image_cropped = image_obj.crop((x_start, y_start, x_end, y_end))
-        image_cropped.save(internal_url)
-
-    else:
-        internal_url = ""
-    
+    internal_url = ""
     if len(packet['endpoints']) == 0:
         raise HTTPException(status_code=400,
                     detail="Must input at least 1 endpoint")

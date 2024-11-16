@@ -14,6 +14,7 @@ from src.backend.server.admin import *
 from src.backend.server.upload import *
 from src.backend.server.user import *
 from src.backend.server.review import *
+from src.backend.server.dummy import *
 from json import dumps
 import asyncio
 from contextlib import asynccontextmanager
@@ -102,6 +103,13 @@ async def clear():
     clear_blacklist()
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
+
+@app.post("/testing/dummy")
+async def add_dummy():
+    '''
+        Internal Testing function to add some data for testing
+    '''
+    import_dummy_data()
 
 @app.post("/upload/pdfs")
 async def upload_pdf(file: UploadFile = File(...)):
@@ -266,7 +274,7 @@ async def add_service_version(service: ServiceAddVersion, user: User = Depends(m
     add_new_service_version_wrapper(request)
 
 @app.post("/service/version/update")
-async def add_service_version(service: ServiceUpdateVersion, user: User = Depends(manager)):
+async def update_service_version(service: ServiceUpdateVersion, user: User = Depends(manager)):
     '''
         Method used to update fields related to specific version
     '''
@@ -274,7 +282,7 @@ async def add_service_version(service: ServiceUpdateVersion, user: User = Depend
     update_new_service_version_wrapper(request)
 
 @app.delete("/service/version/delete")
-async def add_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
+async def delete_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
     '''
         Method used to delete a specific version from a service
     '''

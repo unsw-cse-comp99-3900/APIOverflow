@@ -51,11 +51,6 @@ class FilterRequest(BaseModel):
 class ServiceAdd(BaseModel):
 
     name: str                           # Name of service
-    icon_url: str                       # URL of service icon uploaded
-    x_start: int                        # Starting x-coord of img crop
-    x_end: int                          # Ending x-coord of img crop
-    y_start: int                        # Starting y-coord of img crop
-    y_end: int                          # Ending y-coord of img crop
     description: str                    # Descrtipion of service
     tags: List[str]                     # List of tags assigned to the service
     endpoints: List[Endpoint]           # Endpoint of the service uploaded

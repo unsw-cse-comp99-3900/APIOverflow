@@ -115,6 +115,7 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
         msg = content['msg']
         if len(msg) > 80:
             msg = msg[:80] + "..."
+        msg = '"' + msg + '"'
         subject_name = content['subname']
         related_name = content['rname']
         service_name = content['sname']
