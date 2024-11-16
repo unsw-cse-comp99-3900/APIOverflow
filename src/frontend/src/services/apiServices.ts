@@ -258,7 +258,6 @@ export const apiAddIcon = async (sid: string, docId: string) => {
 };
 
 export const apiGetIcon = async (sid: string) => {
-  console.log(sid);
   const response = await fetch(`${baseUrl}/service/get/icon?sid=${sid}`, {
     headers: {
       "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
