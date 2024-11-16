@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from PIL import Image
 import urllib.request
 from urllib.error import HTTPError, URLError
-from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS
+from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS, PENDING_OPTIONS, REJECTED_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.classes.Service import Service, ServiceVersionInfo
@@ -185,13 +185,13 @@ def api_tag_filter(tags, providers, pay_models, show_live: bool, show_pending: b
     res: List[Service] = []
 
     for api in return_list:
-        if api.get_status() == ServiceStatus.LIVE and show_live:
+        if api.get_status() in LIVE_OPTIONS and show_live:
             print(f"API status: {api.get_status()}, show_live: {show_live}")
             res.append(api.to_summary_json())
-        elif api.get_status() in [ServiceStatus.PENDING, ServiceStatus.UPDATE_PENDING] and show_pending:
+        elif api.get_status() in PENDING_OPTIONS and show_pending:
             print(f"API status: {api.get_status()}, show_pending: {show_pending}")
             res.append(api.to_summary_json())
-        elif api.get_status() in [ServiceStatus.REJECTED, ServiceStatus.UPDATE_REJECTED] and show_rejected:
+        elif api.get_status() in REJECTED_OPTIONS and show_rejected:
             print(f"API status: {api.get_status()}, show_rejected: {show_rejected}")
             res.append(api.to_summary_json())
     return res
@@ -202,11 +202,11 @@ def api_name_search(name, show_live: bool, show_pending: bool, show_rejected: bo
     return_list: List[Service] = []
 
     for api in api_list:
-        if api.get_status() == ServiceStatus.LIVE and show_live:
+        if api.get_status() in LIVE_OPTIONS and show_live:
             return_list.append(api.to_summary_json())
-        elif api.get_status() in [ServiceStatus.PENDING, ServiceStatus.UPDATE_PENDING] and show_pending:
+        elif api.get_status() in PENDING_OPTIONS and show_pending:
             return_list.append(api.to_summary_json())
-        elif api.get_status() in [ServiceStatus.REJECTED, ServiceStatus.UPDATE_REJECTED] and show_rejected:
+        elif api.get_status() in REJECTED_OPTIONS and show_rejected:
             return_list.append(api.to_summary_json())
     return return_list
 
@@ -248,12 +248,6 @@ def get_doc_wrapper(doc_id: str) -> FileResponse:
         raise HTTPException(status_code=404, detail="No such document found")
     
     return FileResponse(doc.get_path())
-
-def list_pending_apis():
-    return [api.to_summary_json() for api in data_store.get_apis() if api.get_status() == ServiceStatus.PENDING]
-
-def list_nonpending_apis():
-    return [api.to_summary_json() for api in data_store.get_apis() if api.get_status == ServiceStatus.LIVE]
 
 def delete_service(sid: str):
     if sid == '':

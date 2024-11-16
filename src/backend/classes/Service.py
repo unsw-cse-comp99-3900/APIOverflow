@@ -14,9 +14,10 @@ class ServiceStatus(Enum):
     PENDING = 0
     REJECTED = -1
 
-STATUS_STRINGS = ["LIVE", "PENDING", "REJECTED", "UPDATE_PENDING", "UPDATE_REJECTED"]
-PENDING_OPTIONS = ["PENDING", "UPDATE_PENDING"]
-LIVE_OPTIONS = ["LIVE", "UPDATE_PENDING", "UPDATE_REJECTED"]
+
+PENDING_OPTIONS = [ServiceStatus.PENDING, ServiceStatus.UPDATE_PENDING]
+LIVE_OPTIONS = [ServiceStatus.LIVE, ServiceStatus.UPDATE_PENDING, ServiceStatus.UPDATE_REJECTED]
+REJECTED_OPTIONS = [ServiceStatus.REJECTED, ServiceStatus.UPDATE_REJECTED]
 PAY_MODEL_OPTIONS = ["Free", "Freemium", "Premium"]
 
 T = TypeVar("T")
@@ -68,7 +69,7 @@ class ServiceVersionInfo:
         elif self._status == ServiceStatus.UPDATE_PENDING:
             updated_fields = self._pending_update
 
-        if self._status.name in PENDING_OPTIONS:
+        if self._status in PENDING_OPTIONS:
             return {
                 "id": id,
                 "name": name,
@@ -633,7 +634,7 @@ class Service:
         elif self._status == ServiceStatus.PENDING:
             updated_fields = self
 
-        if self._status.name in PENDING_OPTIONS:
+        if self._status in PENDING_OPTIONS:
             return {
                 "id": self._id,
                 "name": updated_fields.get_name(),

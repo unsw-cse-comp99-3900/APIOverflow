@@ -194,7 +194,7 @@ async def filter(
     show_pending: bool = False,
     show_rejected: bool = False
 ):
-    return api_tag_filter(tags, providers, pay_models, show_pending, show_live, show_rejected)
+    return api_tag_filter(tags, providers, pay_models, show_live, show_pending, show_rejected)
 
 @app.get("/service/search")
 async def search(
