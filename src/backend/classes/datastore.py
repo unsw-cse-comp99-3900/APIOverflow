@@ -1,6 +1,6 @@
 from typing import *
+from copy import deepcopy
 from src.backend.classes.Document import Document
-from src.backend.classes.Service import Service
 from src.backend.classes.User import User
 from src.backend.classes.Tag import Tag, SYSTEM, CUSTOM
 
@@ -56,7 +56,7 @@ class Datastore:
         '''
             Constrcutor with default schema as initial store
         '''
-        self.__store = schema.copy()
+        self.__store = deepcopy(schema)
 
     ######################################
     #   Loading and Saving Methods Methods
@@ -66,25 +66,7 @@ class Datastore:
         pass
 
     def clear_datastore(self) -> None:
-        self.__store = {
-                    'users' : [],
-                    'user_count' : 0,
-                    'max_user_count': 0,
-                    'apis' : [],
-                    'api_count' : 0,
-                    'tags' : DEFAULT_TAGS.copy(),
-                    'tag_count' : len(DEFAULT_TAGS),
-                    'max_tag_count': len(DEFAULT_TAGS),
-                    'img_count' : 0,
-                    'docs_count': 1,
-                    'docs': [DEFAULT_ICON],
-                    'reviews' : [],
-                    'review_count': 0,
-                    'review_total': 0,
-                    'replys' : [],          # Yes I know it's 'replies' but it's for delete_items
-                    'reply_count': 0,
-                    'reply_total': 0
-                }
+        self.__store = deepcopy(schema)
 
     ##################################
     #   Datastore Insertion Methods
@@ -158,7 +140,7 @@ class Datastore:
         '''
         return self.__store['users']
     
-    def get_apis(self) -> List[Service]:
+    def get_apis(self) -> List[T]:
         '''
             Returns a list of all apis
         '''
@@ -191,7 +173,7 @@ class Datastore:
             Returns a list of 'num' tags {tag: str, amt: int} in desc order
         '''
         # Sort list of tags 
-        tags = sorted(self.__store['tags'], key=lambda x : len(x.get_servers()), reverse=True)
+        tags = sorted(self.__store['tags'], key=lambda x : (-len(x.get_servers()), x.get_tag().lower()))
         return {
             'tags': [tag.to_json() for tag in tags[:num]]
         }

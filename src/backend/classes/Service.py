@@ -3,6 +3,7 @@ from enum import Enum
 from src.backend.classes.Endpoint import Endpoint
 from src.backend.classes.Document import Document
 from src.backend.classes.User import User
+from src.backend.classes.datastore import data_store
 
 from fastapi import HTTPException
 
@@ -345,6 +346,22 @@ class Service:
         if self._status == ServiceStatus.UPDATE_PENDING:
             self._name = self._pending_update.get_name()
             self._description = self._pending_update.get_description()
+
+            # update analytics for tags (assumes new tags are already in datastore)
+            curr_tags = self._tags
+            new_tags = self._pending_update.get_tags()
+            for _tag in new_tags:
+                if _tag not in curr_tags:
+                    # update tag
+                    tag = data_store.get_tag_by_name(_tag)
+                    tag.add_server(self._id)
+                else:
+                    curr_tags.remove(_tag)
+
+            for _tag in curr_tags:
+                tag = data_store.get_tag_by_name(_tag)
+                tag.remove_server(self._id)
+
             self._tags = self._pending_update.get_tags()
             self._pay_model = self._pending_update.get_pay_model()
             self._pending_update = None

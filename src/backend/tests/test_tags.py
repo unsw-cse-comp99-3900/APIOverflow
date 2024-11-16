@@ -281,11 +281,172 @@ def test_get_top5(admin_user):
     assert response.status_code == SUCCESS
     assert response.json()['tags'][0]['tag'] == 'API'
     assert response.json()['tags'][0]['num'] == 4
-    assert response.json()['tags'][1]['tag'] == 'Microservice'
+    assert response.json()['tags'][1]['tag'] == 'custom1'
     assert response.json()['tags'][1]['num'] == 4
-    assert response.json()['tags'][2]['tag'] == 'custom1'
+    assert response.json()['tags'][2]['tag'] == 'Microservice'
     assert response.json()['tags'][2]['num'] == 4
     assert response.json()['tags'][3]['tag'] == 'custom2'
     assert response.json()['tags'][3]['num'] == 3
     assert response.json()['tags'][4]['tag'] == 'custom3'
     assert response.json()['tags'][4]['num'] == 2
+
+def test_ranked_tags_delete_shift(admin_user):
+    '''
+        Test whether deleting a service updates tag analytics
+    '''
+    custom = [
+        {'tag': 'custom1'},
+        {'tag': 'custom2'},
+        {'tag': 'custom3'},
+        {'tag': 'custom4'},
+        {'tag': 'custom5'},
+    ]
+    customs = ['custom1', 'custom2', 'custom3', 'custom4', 'custom5']
+    sid = []
+    for tag in custom:
+        response = client.post("/tag/add",
+                            headers={"Authorization": f"Bearer {admin_user['token']}"},
+                            json=tag)
+        assert response.status_code == SUCCESS
+    for i in range(4):
+        api_info = {
+                    'name' : f'Test API{i}',
+                    'icon_url' : '',
+                    'x_start' : 0,
+                    'x_end' : 0,
+                    'y_start' : 0,
+                    'y_end' : 0,
+                    'description' : 'This is a test API',
+                    'tags' : ['API'] + customs[:(i + 1)],
+                    'endpoints': [simple_endpoint.model_dump()],
+                    'version_name': "some_version_name"
+                    }
+        response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {admin_user['token']}"},
+                           json=api_info)
+        assert response.status_code == SUCCESS
+        sid.append(response.json()['id'])
+
+    reason = 'very pog service'
+    for i in range(4):
+        response = client.post("/admin/service/approve",
+                            headers={"Authorization": f"Bearer {admin_user['token']}"},
+                                json={
+                                    'sid': sid[i],
+                                    'reason': reason,
+                                    'approved': True,
+                                    'version_name': api_info["version_name"],
+                                    'service_global': True
+                                })
+        assert response.status_code == SUCCESS
+
+    response = client.delete("/service/delete",
+                             headers={"Authorization": f"Bearer {admin_user['token']}"},
+                             params={'sid': sid[0]})
+    assert response.status_code == SUCCESS
+
+    response = client.get("/tags/get/ranked",
+                          params={'num': 5})
+    assert response.status_code == SUCCESS
+    assert response.json()['tags'][0]['tag'] == 'API'
+    assert response.json()['tags'][0]['num'] == 3
+    assert response.json()['tags'][1]['tag'] == 'custom1'
+    assert response.json()['tags'][1]['num'] == 3
+    assert response.json()['tags'][2]['tag'] == 'custom2'
+    assert response.json()['tags'][2]['num'] == 3
+    assert response.json()['tags'][3]['tag'] == 'custom3'
+    assert response.json()['tags'][3]['num'] == 2
+    assert response.json()['tags'][4]['tag'] == 'custom4'
+    assert response.json()['tags'][4]['num'] == 1
+
+def test_ranked_tags_edit_shift(admin_user):
+    '''
+        Test whether updates properly update tag analytics
+    '''
+    custom = [
+        {'tag': 'custom1'},
+        {'tag': 'custom2'},
+        {'tag': 'custom3'},
+        {'tag': 'custom4'},
+        {'tag': 'custom5'},
+    ]
+    customs = ['custom1', 'custom2', 'custom3', 'custom4', 'custom5']
+    for tag in custom:
+        response = client.post("/tag/add",
+                            headers={"Authorization": f"Bearer {admin_user['token']}"},
+                            json=tag)
+        assert response.status_code == SUCCESS
+    
+    api_info = {
+                    'name' : 'Test API',
+                    'icon_url' : '',
+                    'x_start' : 0,
+                    'x_end' : 0,
+                    'y_start' : 0,
+                    'y_end' : 0,
+                    'description' : 'This is a test API',
+                    'tags' : ['API', 'Microservice'],
+                    'endpoints': [simple_endpoint.model_dump()],
+                    'version_name': "some_version_name"
+                    }
+    response = client.post("/service/add",
+                        headers={"Authorization": f"Bearer {admin_user['token']}"},
+                        json=api_info)
+    assert response.status_code == SUCCESS
+    sid = response.json()['id']
+
+    response = client.post("/admin/service/approve",
+                        headers={"Authorization": f"Bearer {admin_user['token']}"},
+                            json={
+                                'sid': sid,
+                                'reason': "LOL",
+                                'approved': True,
+                                'version_name': api_info["version_name"],
+                                'service_global': True
+                            })
+    assert response.status_code == SUCCESS
+
+    response = client.get("/tags/get/ranked",
+                          params={'num': 2})
+    assert response.status_code == SUCCESS
+    assert response.json()['tags'][0]['tag'] == 'API'
+    assert response.json()['tags'][0]['num'] == 1
+    assert response.json()['tags'][1]['tag'] == 'Microservice'
+    assert response.json()['tags'][1]['num'] == 1
+
+    package = {
+        'name': 'HAXORZED',
+        'description': 'This API has been HAXED',
+        'tags': customs,
+        'sid': sid,
+        'pay_model': 'Premium'
+    }
+    response = client.post("/service/update",
+                           headers={"Authorization": f"Bearer {admin_user['token']}"},
+                            json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.post("/admin/service/approve",
+                        headers={"Authorization": f"Bearer {admin_user['token']}"},
+                            json={
+                                'sid': sid,
+                                'reason': "LOL",
+                                'approved': True,
+                                'version_name': api_info["version_name"],
+                                'service_global': True
+                            })
+    assert response.status_code == SUCCESS
+
+    response = client.get("/tags/get/ranked",
+                          params={'num': 5})
+    assert response.status_code == SUCCESS
+    assert response.json()['tags'][0]['tag'] == 'custom1'
+    assert response.json()['tags'][0]['num'] == 1
+    assert response.json()['tags'][1]['tag'] == 'custom2'
+    assert response.json()['tags'][1]['num'] == 1
+    assert response.json()['tags'][2]['tag'] == 'custom3'
+    assert response.json()['tags'][2]['num'] == 1
+    assert response.json()['tags'][3]['tag'] == 'custom4'
+    assert response.json()['tags'][3]['num'] == 1
+    assert response.json()['tags'][4]['tag'] == 'custom5'
+    assert response.json()['tags'][4]['num'] == 1

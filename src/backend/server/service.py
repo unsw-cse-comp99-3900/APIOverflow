@@ -116,7 +116,7 @@ def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
                     packet['endpoints'],
                     packet['version_name'],
                     packet['version_description'],
-                    packet['pay_model']
+                    pay_model=packet['pay_model']
                     )
     
     data_store.add_api(new_api)
@@ -218,14 +218,15 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
     if pay_models:
         for api in secondary_list:
             for pay_model in pay_models:
-                if pay_model in api.get_pay_model() and api not in return_list:
+                if pay_model == api.get_pay_model() and api not in return_list:
+                    print(pay_model, api.get_pay_model())
                     return_list.append(api)
                     break
     else:
         return_list = [api for api in secondary_list]
 
     for api in return_list:
-        print(api.get_status().name)
+        print(api.get_name(), api.get_pay_model())
     
     return [api.to_summary_json() for api in return_list if
             api.get_status().name in LIVE_OPTIONS or 

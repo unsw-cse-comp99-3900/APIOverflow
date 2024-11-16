@@ -26,7 +26,7 @@ class API(Service):
                  ) -> None:
         super().__init__(
             sid, name, owner, icon_url, description, tags, endpoints, 'api',
-            version_name, version_description, pay_model)
+            version_name, version_description, pay_model=pay_model)
     
     def get_type(self):
         '''

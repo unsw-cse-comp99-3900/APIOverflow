@@ -1706,48 +1706,218 @@ def test_pay_model_display(simple_user):
     '''
         Test whether pay_model works
     '''
-    pass
-    # service1 = {
-    #             'name' : 'Test API',
-    #             'icon_url' : '',
-    #             'x_start' : 0,
-    #             'x_end' : 0,
-    #             'y_start' : 0,
-    #             'y_end' : 0,
-    #             'description' : 'This is a test API',
-    #             'tags' : ['API'],
-    #             'endpoints': [simple_endpoint.model_dump()],
-    #             'version_name': "some_version_name",
-    #             'pay_model': 'Premium'
-    #             }
+    service1 = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name",
+                'pay_model': 'Premium'
+                }
 
-    # response = client.post("/auth/login", json={
-    #     "username": "superadmin",
-    #     "password": "superadminpassword"
-    # })
-    # assert response.status_code == SUCCESS
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
 
-    # access_token = response.json()["access_token"]
+    access_token = response.json()["access_token"]
 
-    # response = client.post("/service/add",
-    #                        headers={"Authorization": f"Bearer {simple_user['token']}"},
-    #                        json=service1)
-    # assert response.status_code == SUCCESS
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=service1)
+    assert response.status_code == SUCCESS
 
-    # response_info = response.json()
-    # sid = response_info['id']
+    response_info = response.json()
+    sid = response_info['id']
 
-    # client.post("/admin/service/approve",
-    #                        headers={"Authorization": f"Bearer {access_token}"},
-    #                         json={
-    #                             'sid': sid,
-    #                             'reason': "",
-    #                             'approved': True,
-    #                             'version_name': service1["version_name"],
-    #                             'service_global': True
-    #                         })
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True,
+                                'version_name': service1["version_name"],
+                                'service_global': True
+                            })
+    
+    response = client.get("/service/get_service",
+                          params={'sid': sid})
+    assert response.json()['pay_model'] == "Premium"
 
 def test_pay_model_filter(simple_user):
-    pass
+    '''
+        Test whether pay_model filtering works
+    '''
+    service1 = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name",
+                'pay_model': 'Premium'
+                }
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=service1)
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    sid = response_info['id']
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True,
+                                'version_name': service1["version_name"],
+                                'service_global': True
+                            })
+
+    response = client.get("/service/filter",
+                          params={'pay_models': ['Premium']})
+    assert response.status_code == SUCCESS
+    assert response.json()[0]['pay_model'] == 'Premium'
+    assert response.json()[0]['name'] == service1['name']
+
+    response = client.get("/service/filter",
+                          params={"pay_models": ['Free']})
+    assert response.status_code == SUCCESS
+    assert response.json() == []
+
+    # Test multi-tag
+    service2 = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name",
+                'pay_model': 'Freemium'
+                }
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=service2)
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    sid = response_info['id']
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True,
+                                'version_name': service2["version_name"],
+                                'service_global': True
+                            })
+    response = client.get("/service/filter",
+                          params={'tags': ['API']})
+    assert response.status_code == SUCCESS
+    assert len(response.json()) == 2
+
+
 def test_pay_model_update(simple_user):
-    pass
+    '''
+        Test whether pay_model classification successfully changes when updating service
+    '''
+    service1 = {
+                'name' : 'Test API',
+                'icon_url' : '',
+                'x_start' : 0,
+                'x_end' : 0,
+                'y_start' : 0,
+                'y_end' : 0,
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name",
+                'pay_model': 'Premium'
+                }
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=service1)
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    sid = response_info['id']
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True,
+                                'version_name': service1["version_name"],
+                                'service_global': True
+                            })
+
+    package = {
+        'name': 'HAXORZED',
+        'description': 'This API has been HAXED',
+        'tags': ["API"],
+        'sid': sid,
+        'pay_model': 'Freemium'
+    }
+    response = client.post("/service/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.post("/admin/service/approve",
+                        headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "LOL",
+                                'approved': True,
+                                'version_name': service1["version_name"],
+                                'service_global': True
+                            })
+    assert response.status_code == SUCCESS
+    
+    response = client.get("/service/get_service",
+                          params={'sid': sid})
+    assert response.json()['pay_model'] == "Freemium"
+    response = client.get("/service/filter",
+                          params={"pay_models": ['Premium']})
+    assert response.status_code == SUCCESS
+    assert response.json() == []
+
+    response = client.get("/service/filter",
+                          params={'pay_models': ['Freemium']})
+    assert response.status_code == SUCCESS
+    assert response.json()[0]['pay_model'] == 'Freemium'
+    assert response.json()[0]['name'] == 'HAXORZED'
