@@ -190,20 +190,16 @@ async def filter(
     tags: Optional[List[str]] = Query(None), 
     providers: Optional[List[str]] = Query(None),
     pay_models: Optional[List[str]] = Query(None),
-    show_live: bool = True,    
-    show_pending: bool = False,
-    show_rejected: bool = False
+    hide_pending: bool = True
 ):
-    return api_tag_filter(tags, providers, pay_models, show_live, show_pending, show_rejected)
+    return api_tag_filter(tags, providers, pay_models, hide_pending)
 
 @app.get("/service/search")
 async def search(
     name: Optional[str] = Query(None),
-    show_live: bool = True,
-    show_pending: bool = False,
-    show_rejected: bool = False,
+    hide_pending: bool = True
 ):
-    return api_name_search(name, show_live, show_pending, show_rejected)
+    return api_name_search(name, hide_pending)
 
 @app.delete("/service/delete")
 async def delete_api(sid: str):

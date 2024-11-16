@@ -130,7 +130,7 @@ def delete_service_version_wrapper(sid: str, version_name: str):
     
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
-def api_tag_filter(tags, providers, pay_models, show_live: bool, show_pending: bool, show_rejected: bool) -> list:
+def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
 
     api_list = data_store.get_apis()
     filtered_apis = []
@@ -182,32 +182,22 @@ def api_tag_filter(tags, providers, pay_models, show_live: bool, show_pending: b
     else:
         return_list = [api for api in secondary_list]
     
-    res: List[Service] = []
-
-    for api in return_list:
-        if api.get_status() in LIVE_OPTIONS and show_live:
-            print(f"API status: {api.get_status()}, show_live: {show_live}")
-            res.append(api.to_summary_json())
-        elif api.get_status() in PENDING_OPTIONS and show_pending:
-            print(f"API status: {api.get_status()}, show_pending: {show_pending}")
-            res.append(api.to_summary_json())
-        elif api.get_status() in REJECTED_OPTIONS and show_rejected:
-            print(f"API status: {api.get_status()}, show_rejected: {show_rejected}")
-            res.append(api.to_summary_json())
-    return res
+    return [api.to_summary_json() for api in return_list if
+            api.get_status().name in LIVE_OPTIONS or 
+            (not hide_pending and api.get_status() == ServiceStatus.PENDING)
+            ]
 
 # returns a list of regex matching services 
-def api_name_search(name, show_live: bool, show_pending: bool, show_rejected: bool) -> list: 
+def api_name_search(name, hide_pending: bool) -> list: 
     api_list = data_store.get_apis()
     return_list: List[Service] = []
 
     for api in api_list:
-        if api.get_status() in LIVE_OPTIONS and show_live:
-            return_list.append(api.to_summary_json())
-        elif api.get_status() in PENDING_OPTIONS and show_pending:
-            return_list.append(api.to_summary_json())
-        elif api.get_status() in REJECTED_OPTIONS and show_rejected:
-            return_list.append(api.to_summary_json())
+        if re.search(name, api.get_name(), re.IGNORECASE) and (
+            api.get_status().name in LIVE_OPTIONS or
+            api.get_status() == ServiceStatus.PENDING and not hide_pending
+        ):
+            return_list.append(api)
     return return_list
 
 async def upload_docs_wrapper(sid: str, uid: str, doc_id: str, version: Optional[str]) -> None:

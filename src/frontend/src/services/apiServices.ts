@@ -21,11 +21,11 @@ import {
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (tags?: Tag[], showLive:boolean = true, showPending: boolean = true, showRejected: boolean = false) => {
+export const getApis = async (tags?: Tag[], hidePending = false) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
   const response = await fetch(
-    `${baseUrl}/service/filter?show_live=${showLive}&show_pending=${showPending}&show_rejected=${showRejected}${queryParams}`,
+    `${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`,
     {
       method: "GET",
     }
