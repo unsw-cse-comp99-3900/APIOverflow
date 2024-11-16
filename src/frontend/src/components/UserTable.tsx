@@ -25,7 +25,6 @@ const UserTable: React.FC<UserTableProps> = ({ users, onPromote, onDemote, onDel
   return (
     <div className="w-full">
       <div className="flex justify-between mb-4">
-        <h2 className="text-2xl font-bold text-blue-800">Users</h2>
         <div>
           <label className="mr-2 text-gray-700 font-semibold">Filter:</label>
           <select
@@ -33,7 +32,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onPromote, onDemote, onDel
             onChange={(e) => setFilter(e.target.value as "all" | "admin" | "general")}
             className="p-2 border rounded-md"
           >
-            <option value="all">All Users</option>
+            <option className="border rounded-md" value="all">All Users</option>
             <option value="admin">Admins</option>
             <option value="general">General Users</option>
           </select>

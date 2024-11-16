@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (token: string) => {
     localStorage.setItem("token", token); // Save token on login
     const perm = await userCheckPerm();
-
+    
     setIsLoggedIn(true);
     setIsAdmin(perm.isAdmin);
     setIsSuperAdmin(perm.isSuperAdmin);
@@ -39,6 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     localStorage.removeItem("token"); // Remove token on logout
     userLogout();
+
     // Reset perms
     setIsLoggedIn(false);
     setIsAdmin(false);

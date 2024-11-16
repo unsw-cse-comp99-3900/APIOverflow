@@ -1,5 +1,12 @@
 import React from "react";
-import { FaSignOutAlt, FaCode, FaRegPlusSquare } from "react-icons/fa";
+import {
+  FaSignOutAlt,
+  FaCode,
+  FaRegPlusSquare,
+  FaRegUser,
+  FaFolderOpen,
+  FaCommentDots,
+} from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../contexts/AuthContext";
@@ -12,13 +19,14 @@ const UserSideBar = () => {
 
   const navigate = useNavigate();
   const auth = useAuth();
-  const { logout, isAdmin } = auth!;
+  const { logout, isAdmin, isSuperAdmin } = auth!;
   console.log(`isAdmin: ${isAdmin}`);
+  console.log(`isSuperAdmin: ${isSuperAdmin}`);
 
   const onLogOutClick = async () => {
     const confirm = window.confirm("Are you sure you want to sign out?");
     if (!confirm) return;
-    logout()
+    logout();
     toast.success("Signed out successfully");
     navigate("/");
   };
@@ -42,6 +50,11 @@ const UserSideBar = () => {
       <div className="flex flex-col justify-between flex-1">
         <nav>
           {/* Functional Tabs */}
+          <NavLink to="/profile/my-profile" className={linkClass}>
+            <span className="ml-3 font-medium flex items-center">
+              <FaRegUser className="mr-2" /> My Profile
+            </span>
+          </NavLink>
           <NavLink to="/profile/my-apis" className={linkClass}>
             <span className="ml-3 font-medium flex items-center">
               <FaCode className="mr-2" /> My APIs
@@ -52,6 +65,36 @@ const UserSideBar = () => {
               <FaRegPlusSquare className="mr-2" /> New API
             </span>
           </NavLink>
+
+          {/* Admin Tabs */}
+
+          {isAdmin && (
+            <>
+              <div className="border border-gray-100 mb-5 mt-5"></div>
+              <NavLink to="/profile/admin/services" className={linkClass}>
+                <span className="ml-3 font-medium flex items-center">
+                  <FaFolderOpen className="mr-2" /> Service Management
+                </span>
+              </NavLink>
+
+              <NavLink to="/profile/admin/reviews" className={linkClass}>
+                <span className="ml-3 font-medium flex items-center">
+                  <FaCommentDots className="mr-2" /> Review Management
+                </span>
+              </NavLink>
+            </>
+          )}
+
+          {isSuperAdmin && (
+            <>
+              <div className="border border-gray-100 mb-5 mt-5"></div>
+              <NavLink to="/profile/admin/users" className={linkClass}>
+                <span className="ml-3 font-medium flex items-center">
+                  <FaRegUser className="mr-2" /> User Management
+                </span>
+              </NavLink>
+            </>
+          )}
 
           {/* Setting tabs */}
           <div className="border border-gray-100 mb-5 mt-5"></div>

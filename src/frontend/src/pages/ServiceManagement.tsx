@@ -37,9 +37,9 @@ const ServiceManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-4xl font-extrabold text-center mb-8 text-blue-800 underline underline-offset-8">
-        Service Management
+    <div className="p-12">
+      <h1 className="text-3xl font-bold mb-8 text-blue-800 underline-offset-8">
+        Services
       </h1>
       <ServiceTable
         services={services}

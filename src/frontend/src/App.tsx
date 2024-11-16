@@ -24,6 +24,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import ReviewManagement from "./pages/ReviewManagement";
 import ServiceManagement from "./pages/ServiceManagement";
 import UserManagement from "./pages/UserManagement";
+import MyProfilePage from "./pages/UserProfilePage";
 
 const ProtectedRoute = () => {
   const auth = useAuth();
@@ -52,12 +53,19 @@ const App = () => {
           <Route path="/apis" element={<TagsSidebarLayout />}>
             <Route path="/apis" element={<APIsPage />} />
           </Route>
-          
+
           <Route element={<ProtectedRoute />}>
-            <Route path="/admin/reviews" element={<ReviewManagement />} />
-            <Route path="/admin/services" element={<ServiceManagement />} />
-            <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/profile" element={<UserSidebarLayout />}>
+              <Route
+                path="/profile/admin/reviews"
+                element={<ReviewManagement />}
+              />
+              <Route
+                path="/profile/admin/services"
+                element={<ServiceManagement />}
+              />
+              <Route path="/profile/admin/users" element={<UserManagement />} />
+              <Route path="/profile/my-profile" element={<MyProfilePage />} />
               <Route path="/profile/my-apis" element={<MyApisPage />} />
               <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
               <Route path="/profile/add-api" element={<AddApiPage />} />

@@ -48,7 +48,7 @@ const ApiListing: React.FC<ApiListingProps>  = ({
 
 
   return (
-    <div className="bg-white rounded-xl shadow-md relative">
+    <div className="bg-white rounded-xl shadow-md relative transition-transform transform hover:scale-105">
       <div className="p-4">
         <div className="pb-16">
           <div className="flex items-start mb-2">

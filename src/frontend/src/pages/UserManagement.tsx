@@ -24,9 +24,9 @@ const UserManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-4xl font-extrabold text-center mb-8 text-blue-800 underline underline-offset-8">
-        User Management
+    <div className="p-12">
+      <h1 className="text-3xl font-bold mb-8 text-blue-800 underline-offset-8">
+        Users
       </h1>
       <UserTable users={users} onPromote={handlePromote} onDemote={handleDemote} onDelete={handleDelete} />
     </div>

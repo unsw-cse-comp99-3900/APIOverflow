@@ -31,7 +31,6 @@ export const getApis = async (tags?: Tag[], hidePending: boolean = false) => {
     }
   );
   const data = await response.json();
-  console.log(data);
   return data.map(briefApiDataFormatter);
 };
 
@@ -59,7 +58,6 @@ export const getApi = async (id: string) => {
   if (response.status === 404) {
     throw new Error("Service Not Found");
   }
-  console.log(data);
   return detailedApiDataFormatter(data);
 };
 
@@ -177,7 +175,7 @@ export const userLogin = async (credentials: LoginModel) => {
 };
 
 export const userLogout = async () => {
-  const response = await fetch(`${baseUrl}/auth/logout`, {
+  await fetch(`${baseUrl}/auth/logout`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
@@ -266,7 +264,7 @@ export const apiAddIcon = async (sid: string, docId: string) => {
     sid,
     doc_id: docId,
   };
-  const response = await fetch(`${baseUrl}/service/add_icon`, {
+  await fetch(`${baseUrl}/service/add_icon`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -310,7 +308,7 @@ export const uploadDocs = async (sid: string, docId: string) => {
     sid,
     doc_id: docId,
   };
-  const response = await fetch(`${baseUrl}/service/upload_docs`, {
+  await fetch(`${baseUrl}/service/upload_docs`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
