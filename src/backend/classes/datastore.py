@@ -1,8 +1,12 @@
 from typing import *
+from copy import deepcopy
 from src.backend.classes.Document import Document
+from src.backend.classes.User import User
+from src.backend.classes.Tag import Tag, SYSTEM, CUSTOM
+
 
 T = TypeVar("T")
-DEFAULT_TAGS = [
+defaults = [
     "API",
     "Microservice",
     "Productivity",
@@ -12,6 +16,8 @@ DEFAULT_TAGS = [
     "Published",
     "Recently Updated"
 ]
+
+DEFAULT_TAGS = [Tag(i, j, SYSTEM) for i, j in enumerate(defaults)]
 
 DEFAULT_ICON_PATH = "static/imgs/default_icon.png"
 DEFAULT_ICON = Document('0', DEFAULT_ICON_PATH, 'image/png')
@@ -24,12 +30,16 @@ schema = {
     'api_count' : 0,
     'tags' : DEFAULT_TAGS.copy(),
     'tag_count' : len(DEFAULT_TAGS),
+    'max_tag_count': len(DEFAULT_TAGS),
     'img_count' : 0,
     'docs_count': 1,
     'docs': [DEFAULT_ICON],
     'reviews' : [],
     'review_count': 0,
-    'review_total': 0
+    'review_total': 0,
+    'replys' : [],          # Yes I know it's 'replies' but it's for delete_items
+    'reply_count': 0,
+    'reply_total': 0
 }
 
 class Datastore:
@@ -46,7 +56,7 @@ class Datastore:
         '''
             Constrcutor with default schema as initial store
         '''
-        self.__store = schema
+        self.__store = deepcopy(schema)
 
     ######################################
     #   Loading and Saving Methods Methods
@@ -56,21 +66,7 @@ class Datastore:
         pass
 
     def clear_datastore(self) -> None:
-        self.__store = {
-                            'users' : [],
-                            'user_count' : 0,
-                            'max_user_count' : 0,
-                            'apis' : [],
-                            'api_count' : 0,
-                            'tags' : DEFAULT_TAGS.copy(),
-                            'tag_count' : len(DEFAULT_TAGS),
-                            'img_count' : 0,
-                            'docs_count': 1,
-                            'docs': [DEFAULT_ICON],
-                            'reviews' : [],
-                            'review_count': 0,
-                            'review_total': 0
-                        }
+        self.__store = deepcopy(schema)
 
     ##################################
     #   Datastore Insertion Methods
@@ -90,19 +86,21 @@ class Datastore:
         self.__store['apis'].append(api)
         self.__store['api_count'] += 1
 
-    def add_tag(self, tag: str) -> Union[None, bool]:
+    def add_tag(self, tag: T) -> Union[None, T]:
         '''
-            Adds a tag into the datastore
+            Adds a tag into the datastore | returns None if dupe, otherwise Tag obj
         '''    
 
         # Shield against duplicates
-        if tag in self.__store['tags']:
-            print(self.__store['tags'])
+        if tag in [tag.get_tag() for tag in self.__store['tags']]:
             return None
 
-        self.__store['tags'].append(tag)
+        # Create new tag
+        new_tag = Tag(self.__store['max_tag_count'], tag, CUSTOM)
+        self.__store['tags'].append(new_tag)
         self.__store['tag_count'] += 1
-        return True
+        self.__store['max_tag_count'] += 1
+        return new_tag
 
     def add_img_count(self) -> None:
         '''
@@ -125,10 +123,18 @@ class Datastore:
         self.__store['review_count'] += 1
         self.__store['review_total'] += 1
 
+    def add_reply(self, reply: T) -> None:
+        '''
+            Adds a reply to the datastore
+        '''
+        self.__store['replys'].append(reply)
+        self.__store['reply_count'] += 1
+        self.__store['reply_total'] += 1
+
     ################################
     #   Datastore Search Methods
     ################################
-    def get_users(self) -> List[T]:
+    def get_users(self) -> List[User]:
         '''
             Returns a list of all users
         '''
@@ -140,11 +146,37 @@ class Datastore:
         '''
         return self.__store['apis']
     
-    def get_tags(self) -> List[str]:
+    def get_tags(self) -> List[T]:
         '''
             Returns a list of all tags
         '''
         return self.__store['tags']
+
+    def get_max_tags(self) -> int:
+        '''
+            Returns total number of tags created
+        '''
+        return self.__store['max_tag_count']
+
+    def get_tag_by_name(self, tag: str) -> T | None:
+        '''
+            Returns a tag given a tag-name, else None
+        '''
+        for item in self.__store['tags']:
+            if item.get_tag() == tag:
+                return item
+            
+        return None
+
+    def get_tag_ranking(self, num: int) -> list[dict[str, str | int]]:
+        '''
+            Returns a list of 'num' tags {tag: str, amt: int} in desc order
+        '''
+        # Sort list of tags 
+        tags = sorted(self.__store['tags'], key=lambda x : (-len(x.get_servers()), x.get_tag().lower()))
+        return {
+            'tags': [tag.to_json() for tag in tags[:num]]
+        }
 
     def get_docs(self) -> List[T]:
         '''
@@ -177,7 +209,6 @@ class Datastore:
             Returns with user obj based on username, or None if cannot find user
         '''
         for item in self.__store['users']:
-            # print("Item's name: %s | Name wanted: %s", item.get_name(), name)
             if item.get_name() == name:
                 return item
             
@@ -217,12 +248,12 @@ class Datastore:
         '''
         user_apis = []
         for item in self.__store['apis']:
-            owners = item.get_owner()
-            if str(eid) in owners:
+            owner = item.get_owner()
+            if str(eid) in owner.get_id():
                 api_info = {
                     'id': item.get_id(),
                     'name': item.get_name(),
-                    'owner': item.get_owner(),
+                    'owner': owner.get_displayname(),
                     'description': item.get_description(),
                     'icon_url': item.get_icon_url(),
                     'tags': item.get_tags()
@@ -278,10 +309,32 @@ class Datastore:
         '''
         return self.__store['review_total']
 
+    def get_reply_by_id(self, rid: str) -> T | None:
+        '''
+            Retrieves a reply by id if it exists, else None
+        '''
+        for item in self.__store['replys']:
+            if item.get_id() == rid:
+                return item
+
+        return None
+
+    def get_replies(self) -> List[T]:
+        '''
+            Returns all replies made
+        '''
+        return self.__store['replys']
+    
+    def total_replies(self) -> int:
+        '''
+            Returns totla number of all replies
+        '''
+        return self.__store['reply_total']
+
     ################################
     #   Datastore Deletion Methods
     ################################
-    def delete_item(self, eid: int, i_type: Literal['user', 'api', 'review']) -> None:
+    def delete_item(self, eid: int, i_type: Literal['user', 'api', 'review', 'reply']) -> None:
         '''
             Deletes an item from the database (not tags)
         '''
@@ -295,13 +348,20 @@ class Datastore:
 
     def delete_tag(self, tag: str) -> Union[None, bool]:
         ''''
-            Deletes a tag from the database
+            Deletes a tag from the database & corresponding servers
         '''
         for _tag in self.__store['tags']:
-            if _tag == tag:
-                self.__store['tags'].remove(tag)
+            if _tag.get_tag() == tag:
+
+                # Disassociate tag from each server
+                for server in _tag.get_servers():
+                    server.remove_tag(tag)
+
+                # Remove tag from store
+                self.__store['tags'].remove(_tag)
                 self.__store['tag_count'] -= 1
                 return True
+            
         return None
 
 print('Loading Datastore...')

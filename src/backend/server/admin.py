@@ -7,8 +7,7 @@ from src.backend.classes.User import User
 from typing import Literal, TypeVar, List
 from src.backend.database import *
 from src.backend.classes.Manager import manager
-from src.backend.classes.Review import LIVE, PENDING, REJECTED
-from src.backend.classes.Service import STATUS_STRINGS, STATUS_OPTIONS, PENDING_OPTIONS
+from src.backend.classes.Service import PENDING_OPTIONS
 from src.backend.server.email import send_email
 
 T = TypeVar("T")
@@ -94,46 +93,45 @@ def admin_filter_users(standard: bool, admin: bool, super: bool):
                 return_list.append(user.to_json())
     return return_list
         
-def admin_get_reviews_wrapper(status: str) -> List[dict[str, str]]:
+def admin_get_reviews_wrapper() -> List[dict[str, str]]:
     '''
         Wrapper which returns all reviews which are pending 
     '''
     reviews = []
-    statuses = [LIVE, PENDING, REJECTED]
-    if status not in statuses and status != '':
-        raise HTTPException(status_code=400, detail='Unknown status given')
-    
-    if status != '':
-        statuses = [status]
-
     for review in data_store.get_reviews():
-        if review.get_status() in statuses:
-            reviews.append(review.to_json(brief=True))
+        reviews.append(review.to_json(brief=True))
     
     return reviews
 
-def admin_get_pending_services(status: str) -> List[dict[str, str]]:
+def admin_get_pending_services() -> List[dict[str, str]]:
     '''
         Wrapper which returns all reviews which are pending 
     '''
-    services = []
-    if status not in STATUS_OPTIONS and status != '':
-        raise HTTPException(status_code=400, detail='Unknown status given')
-    
-        
-    if status == "ALL":
-        statuses = STATUS_STRINGS
-    elif status == "ALL_PENDING":
-        # default
-        statuses = PENDING_OPTIONS
-    else:
-        statuses = [status]
+    new_services = []
+    global_updates = []
+    version_updates = []
 
-    for service in data_store.get_apis():
-        if service.get_status().name in statuses:
-            services.append(service.to_updated_json())
-    
-    return services
+    for service in data_store.get_apis():    
+
+        if service.get_status().name in PENDING_OPTIONS:
+            if service.get_newly_created():
+                new_service_json = service.to_updated_json()
+                new_service_json["version_fields"] = service.get_latest_version(
+                ).to_updated_json(service.get_id(), service.get_name())
+                new_services.append(new_service_json)
+                continue
+            else:
+                global_updates.append(service.to_updated_json())
+        
+        for version in service.get_all_versions():
+            if version.get_status().name in PENDING_OPTIONS:
+                version_updates.append(version.to_updated_json(service.get_id(), service.get_name()))
+
+    return {
+        "new_services": new_services,
+        "global_updates": global_updates,
+        "version_updates": version_updates
+    }
 
 def admin_check_if_admin(uid: str):
     is_valid_user(uid)

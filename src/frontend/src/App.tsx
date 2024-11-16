@@ -21,6 +21,9 @@ import UserSidebarLayout from "./layouts/UserSidebarLayout";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import NotFoundPage from "./pages/NotFoundPage";
+import ReviewManagement from "./pages/ReviewManagement";
+import ServiceManagement from "./pages/ServiceManagement";
+import UserManagement from "./pages/UserManagement";
 
 const ProtectedRoute = () => {
   const auth = useAuth();
@@ -51,6 +54,9 @@ const App = () => {
           </Route>
           
           <Route element={<ProtectedRoute />}>
+            <Route path="/admin/reviews" element={<ReviewManagement />} />
+            <Route path="/admin/services" element={<ServiceManagement />} />
+            <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/profile" element={<UserSidebarLayout />}>
               <Route path="/profile/my-apis" element={<MyApisPage />} />
               <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
@@ -61,7 +67,6 @@ const App = () => {
               />
             </Route>
           </Route>
-
           <Route path="/*" element={<NotFoundPage />} />
         </Route>
       </>

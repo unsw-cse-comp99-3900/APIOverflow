@@ -5,19 +5,17 @@ import { Link, useNavigate } from "react-router-dom";
 import Blob1 from "../assets/images/blobs/blob1.svg";
 import Blob2 from "../assets/images/blobs/blob2.svg";
 import { useAuth } from "../contexts/AuthContext";
-import { userLogin, userRegister } from "../services/apiServices";
-import { LoginModel, UserCreate } from "../types/backendTypes";
+import { userRegister } from "../services/apiServices";
+import { UserCreate } from "../types/backendTypes";
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState("");
+  const [displayname, setDisplayname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const auth = useAuth();
-
-  const { login } = auth!;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,14 +24,15 @@ const RegisterPage: React.FC = () => {
       setError("Please fill in both fields.");
       return;
     }
-    const newUser: UserCreate = {
-      email,
-      username,
-      password,
-    };
-    await userRegister(newUser);
+    await userRegister(email, username, password, displayname);
     setIsLoading(true);
-    navigate("/login", { state: { username: username, password: password, warning:"Please verify your email first" } });
+    navigate("/login", {
+      state: {
+        username: username,
+        password: password,
+        warning: "Please verify your email first",
+      },
+    });
   };
 
   return (
@@ -77,7 +76,24 @@ const RegisterPage: React.FC = () => {
                 required
               />
             </div>
-
+            <div className="mb-4">
+              <label
+                htmlFor="displayname"
+                className="block text-sm font-bold text-gray-700 mb-2"
+              >
+                Display Name:
+              </label>
+              <input
+                type="displayname"
+                id="displayname"
+                name="displayname"
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                placeholder="The name that you show to others"
+                value={displayname}
+                onChange={(e) => setDisplayname(e.target.value)}
+                required
+              />
+            </div>
             <div className="mb-4">
               <label
                 htmlFor="username"

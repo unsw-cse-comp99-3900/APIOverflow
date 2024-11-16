@@ -14,6 +14,7 @@ from src.backend.server.admin import *
 from src.backend.server.upload import *
 from src.backend.server.user import *
 from src.backend.server.review import *
+from src.backend.server.dummy import *
 from json import dumps
 import asyncio
 from contextlib import asynccontextmanager
@@ -103,6 +104,13 @@ async def clear():
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
+@app.post("/testing/dummy")
+async def add_dummy():
+    '''
+        Internal Testing function to add some data for testing
+    '''
+    import_dummy_data()
+
 @app.post("/upload/pdfs")
 async def upload_pdf(file: UploadFile = File(...)):
     '''
@@ -123,16 +131,15 @@ async def upload_image(file: UploadFile = File(...)):
 #   Service Paths
 #####################################
 @app.post("/service/add")
-async def add_service(service: ServicePost, user: User = Depends(manager)):
+async def add_service(service: ServiceAdd, user: User = Depends(manager)):
     '''
         Method used to add service to platform
     '''
     # Unpack request body
     request = service.model_dump()
-    uid = user['id']
-    id = add_service_wrapper(request, str(uid))
+    user = data_store.get_user_by_id(user['id'])
+    id = add_service_wrapper(request, user)
     return {'id' : id}
-
 
 @app.get("/service/get_service")
 async def get_service(sid: str):
@@ -142,16 +149,15 @@ async def get_service(sid: str):
     response = get_service_wrapper(sid)
     return response
 
-@app.put("/service/update")
-async def update_service(service: ServiceUpdate, user: User = Depends(manager)):
+@app.post("/service/update")
+async def update_service(service: ServiceGlobalUpdate, user: User = Depends(manager)):
     '''
         Method used to update service to platform
     '''
 
     request = service.model_dump()
-    uid = user['id']
    
-    update_service_wrapper(request, str(uid))
+    update_service_wrapper(request)
     return None
 
 @app.get("/service/apis")
@@ -166,7 +172,7 @@ async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
     request = info.model_dump()
     sid = request['sid']
     doc_id = request['doc_id']
-    await upload_docs_wrapper(sid, user['id'], doc_id)
+    await upload_docs_wrapper(sid, user['id'], doc_id, request["version_name"])
     return 200
 
 @app.get("/service/my_services")
@@ -183,9 +189,10 @@ async def get_user_apis(user: User = Depends(manager)):
 async def filter(
     tags: Optional[List[str]] = Query(None), 
     providers: Optional[List[str]] = Query(None),
+    pay_models: Optional[List[str]] = Query(None),
     hide_pending: bool = True
 ):
-    return api_tag_filter(tags, providers, hide_pending)
+    return api_tag_filter(tags, providers, pay_models, hide_pending)
 
 @app.get("/service/search")
 async def search(
@@ -203,6 +210,7 @@ async def delete_api(sid: str):
 
 @app.post("/service/add_icon")
 async def api_add_icon(info: ServiceIconInfo, user: User = Depends(manager)):
+
     '''
         Adds an icon to the service
     '''
@@ -238,12 +246,12 @@ async def api_get_rating(sid: str):
     return service_get_rating_wrapper(sid)
 
 @app.get("/service/get/reviews")
-async def api_get_reviews(sid: str, testing: bool = False):
+async def api_get_reviews(sid: str, filter: str = '', uid: str = ''):
     '''
         Endpoint to retrieve a service's reviews
     '''
     return {
-        'reviews' : service_get_reviews_wrapper(sid, testing)
+        'reviews' : service_get_reviews_wrapper(sid, filter, uid)
     } 
 
 @app.get("/get/doc")
@@ -254,15 +262,50 @@ async def get_doc(doc_id: str):
     return get_doc_wrapper(doc_id)
 
 #####################################
+#   Service Version Paths
+#####################################
+
+@app.post("/service/version/add")
+async def add_service_version(service: ServiceAddVersion, user: User = Depends(manager)):
+    '''
+        Method used to add new version to existing 
+    '''
+    request = service.model_dump()
+    add_new_service_version_wrapper(request)
+
+@app.post("/service/version/update")
+async def update_service_version(service: ServiceUpdateVersion, user: User = Depends(manager)):
+    '''
+        Method used to update fields related to specific version
+    '''
+    request = service.model_dump()
+    update_new_service_version_wrapper(request)
+
+@app.delete("/service/version/delete")
+async def delete_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
+    '''
+        Method used to delete a specific version from a service
+    '''
+    delete_service_version_wrapper(sid, version_name)
+
+@app.post("/service/tags/generate") 
+async def generate_tags_endpoint(sid: str, user: User = Depends(manager)): 
+    '''
+        Method used to generate tags using ollama
+    '''
+    tags = auto_generate_tags(sid) 
+    return {"tags": tags}
+                                                                                                                               
+#####################################
 #   Review Paths
 #####################################
 
 @app.get("/review/get")
-async def review_get(rid: str):
+async def review_get(rid: str, uid: str = ''):
     '''
         Endpoint which directly retrieves a review
     '''
-    return review_get_wrapper(rid)
+    return review_get_wrapper(rid, uid=uid)
 
 @app.delete("/review/delete")
 async def review_delete(rid: str, user: User = Depends(manager)):
@@ -278,19 +321,54 @@ async def review_edit(info: ServiceReviewEditInfo, user: User = Depends(manager)
     '''
     review_edit_wrapper(info, user['id'], user['is_admin'])
 
-@app.post("/review/approve")
-async def review_approve(info: ServiceReviewAdminAction, user: User = Depends(manager), role: str = Depends(admin_required())):
+@app.post("/review/upvote")
+async def review_upvote(info: ReviewPackage, user: User = Depends(manager)):
     '''
-        Endpoint which approves a review
+        Endpoint which upvotes a given review
     '''
-    review_approve_wrapper(info.rid, info.reason)
+    review_vote_wrapper(info.rid, user['id'], 'positive')
 
-@app.post("/review/reject")
-async def review_reject(info: ServiceReviewAdminAction, user: User = Depends(manager), role: str = Depends(admin_required())):
+@app.post("/review/downvote")
+async def review_downvote(info: ReviewPackage, user: User = Depends(manager)):
     '''
-        Endpoint which rejects a review
+        Endpoint which downvotes a given review
     '''
-    review_reject_wrapper(info.rid, info.reason)
+    review_vote_wrapper(info.rid, user['id'], 'negative')
+
+@app.post("/review/remove_vote")
+async def review_remove_vote(info: ReviewPackage, user: User = Depends(manager)):
+    '''
+        Endpoint which removes a vote from given review
+    '''
+    review_remove_vote_wrapper(info.rid, user['id'])
+
+@app.post("/review/reply")
+async def review_reply(info: ReviewPackage, user: User = Depends(manager)):
+    '''
+        Endpoint which adds a reply to a review
+    '''
+    review_add_reply_wrapper(info.rid, user['id'], info.content)
+
+@app.delete("/review/reply/delete")
+async def review_reply_delete(rid: str, user: User = Depends(manager)):
+    '''
+        Endpoint which deletes a review reply
+    '''
+    review_delete_reply_wrapper(rid, user['id'])
+
+@app.post("/review/reply/edit")
+async def review_reply_edit(info: ReviewPackage, user: User = Depends(manager)):
+    '''
+        Endpoint which edits a review reply
+    '''
+    review_edit_reply_wrapper(info.rid, user['id'], info.content)
+
+@app.get("/review/reply/get")
+async def review_reply_get(rid: str):
+    '''
+        Endpoint which retrieves a review reply given an id
+    '''
+    return review_get_reply_wrapper(rid)
 
 #####################################
 #   Auth Paths
@@ -402,6 +480,13 @@ async def get_tags():
     '''
     return get_tags_wrapper()
 
+@app.get("/tags/get/ranked")
+async def get_tags_ranked(num: int):
+    '''
+        Endpoint to get ranked number of tags
+    '''
+    return get_top_tags_wrapper(num)
+
 #####################################
 #   Admin Paths
 #####################################
@@ -435,29 +520,34 @@ async def user_delete(uid: str, user: User = Depends(manager), role: str = Depen
     return delete_user(uid, user["is_super"])
 
 @app.get("/admin/get/reviews")
-async def admin_get_reviews(option: str = '', user: User = Depends(manager), role: str = Depends(admin_required())):
+async def admin_get_reviews(user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which retrieves all pending reviews
     '''
     return {
-        'reviews': admin_get_reviews_wrapper(option)
+        'reviews': admin_get_reviews_wrapper()
     }
 
 @app.get("/admin/get/services")
-async def admin_get_services(option: str = "ALL_PENDING", user: User = Depends(manager), role: str = Depends(admin_required())):
+async def admin_get_services(user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which retrieves all pending services
     '''
-    return {
-        'services' : admin_get_pending_services(option)
-    }
+    return admin_get_pending_services()
 
 @app.post("/admin/service/approve")
 async def admin_service_approve(info: ServiceApprove, user: User = Depends(manager), role: str = Depends(admin_required())):
     '''
         Endpoint which approves or disapproves a service
     '''
-    approve_service_wrapper(info.sid, info.approved, info.reason)
+    
+    request = info.model_dump()
+    approve_service_wrapper(request["sid"],
+                            request["approved"],
+                            request["reason"],
+                            request["service_global"],
+                            request["version_name"]
+                            )
 
 @app.get("/admin/filter_users")
 async def admin_user_filter(standard: bool, admin: bool, super: bool, user: User = Depends(manager), role: str = Depends(admin_required())):
@@ -530,6 +620,13 @@ async def delete_user_self(user: User = Depends(manager)):
         Endpoint which allows the user to un-register themselves
     '''
     return user_self_delete(user['id'])
+
+@app.get("/user/get/replies")
+async def user_get_replies(user: User = Depends(manager)):
+    '''
+        Endpoint which gets summary versions of all replies made by user
+    '''
+    return user_get_replies_wrapper(user['id'])
 
 @app.post("/user/update/displayname")
 async def update_user_displayname(new_displayname: GeneralString, user: User = Depends(manager)):

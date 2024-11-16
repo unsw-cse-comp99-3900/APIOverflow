@@ -22,8 +22,11 @@ class User:
             is_super:   Is the user a super admin
             icon:       ID of image file serving as user's icon
             ---
-            following:  List of services/users user is following
             reviews:    List of reviews the user has posted
+            is_verified: Is user verified?
+            num_reviews: Number of reviews made
+            replies:    List of replies user has made
+            num_replies: Number of replies made
             token:      Current token of the user
     
     '''
@@ -49,30 +52,30 @@ class User:
         self._is_super = is_super
 
         # Default vars
-        self._following = []
-        self._num_following = 0
         self._icon = DEFAULT_ICON
         self._is_verified = False
         self._reviews = []
         self._num_reviews = 0
+        self._replies = []
+        self._num_replies = 0
         self._token = None
     
     ################################
     #   Add Methods
     ################################
-    def add_following(self, uid: str) -> None:
-        '''
-            Adds another user to list of users self is following
-        '''
-        self._following.append(uid)
-        self._num_following += 1
-
     def add_review(self, rid: str) -> None:
         '''
             Adds a review to the user's list
         '''
         self._reviews.append(rid)
         self._num_reviews += 1
+
+    def add_reply(self, rid: str) -> None:
+        '''
+            Adds a reply to user's list
+        '''
+        self._replies.append(rid)
+        self._num_replies += 1
 
     ################################
     #  Modify Methods
@@ -133,14 +136,7 @@ class User:
 
     ################################
     #  Delete Methods
-    ################################
-    def remove_following(self, uid: str) -> None:
-        '''
-            Removes a user from self's following list
-        '''
-        self._following.remove(uid)
-        self._num_following -= 1
-    
+    ################################  
     def remove_icon(self) -> None:
         '''
             Removes user's current icon
@@ -153,6 +149,13 @@ class User:
         '''
         self._reviews.remove(rid)
         self._num_reviews -= 1
+
+    def remove_reply(self, rid: str) -> None:
+        '''
+            Removes reply from user's list
+        '''
+        self._replies.remove(rid)
+        self._num_replies -= 1
 
     ################################
     #  Get Methods
@@ -186,18 +189,6 @@ class User:
             Return icon url of user
         '''
         return self._icon_url
-
-    def get_following(self) -> str:
-        '''
-            Return list of users self is following
-        '''
-        return self._following
-    
-    def get_num_following(self) -> str:
-        '''
-            Return num of users self is following
-        '''
-        return self._num_following
     
     def get_is_admin(self) -> bool:
         '''
@@ -229,6 +220,12 @@ class User:
         '''
         return self._reviews
     
+    def get_replies(self) -> List[str]:
+        '''
+            Return list of replies
+        '''
+        return self._replies
+
     def get_profile(self) -> dict[str, str]:
         '''
             Returns profile info of user
@@ -268,8 +265,8 @@ class User:
             'icon_url' : self._icon_url,
             'is_admin' : self._is_admin,
             'is_super' : self._is_super,
-            'following' : self._following,
             'is_verified': self._is_verified,
             'reviews': self._reviews,
+            'replies': self._replies,
             'icon' : self._icon
         }
