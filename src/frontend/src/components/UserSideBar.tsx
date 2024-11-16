@@ -2,8 +2,9 @@ import React from "react";
 import {
   FaSignOutAlt,
   FaCode,
-  FaRegPlusSquare,
-  FaRegUser,
+  FaPlusSquare,
+  FaUser,
+  FaUserFriends,
   FaFolderOpen,
   FaCommentDots,
 } from "react-icons/fa";
@@ -52,7 +53,7 @@ const UserSideBar = () => {
           {/* Functional Tabs */}
           <NavLink to="/profile/my-profile" className={linkClass}>
             <span className="ml-3 font-medium flex items-center">
-              <FaRegUser className="mr-2" /> My Profile
+              <FaUser className="mr-2" /> My Profile
             </span>
           </NavLink>
           <NavLink to="/profile/my-apis" className={linkClass}>
@@ -62,7 +63,7 @@ const UserSideBar = () => {
           </NavLink>
           <NavLink to="/profile/add-api" className={linkClass}>
             <span className="ml-3 font-medium flex items-center">
-              <FaRegPlusSquare className="mr-2" /> New API
+              <FaPlusSquare className="mr-2" /> New API
             </span>
           </NavLink>
 
@@ -90,7 +91,7 @@ const UserSideBar = () => {
               <div className="border border-gray-100 mb-5 mt-5"></div>
               <NavLink to="/profile/admin/users" className={linkClass}>
                 <span className="ml-3 font-medium flex items-center">
-                  <FaRegUser className="mr-2" /> User Management
+                  <FaUserFriends className="mr-2" /> User Management
                 </span>
               </NavLink>
             </>

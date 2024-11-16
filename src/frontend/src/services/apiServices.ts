@@ -21,16 +21,17 @@ import {
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (tags?: Tag[], hidePending: boolean = false) => {
+export const getApis = async (tags?: Tag[], showLive:boolean = true, showPending: boolean = true, showRejected: boolean = false) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
   const response = await fetch(
-    `${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`,
+    `${baseUrl}/service/filter?show_live=${showLive}&show_pending=${showPending}&show_rejected=${showRejected}${queryParams}`,
     {
       method: "GET",
     }
   );
   const data = await response.json();
+  console.log(data);
   return data.map(briefApiDataFormatter);
 };
 
@@ -55,6 +56,7 @@ export const getApi = async (id: string) => {
     method: "GET",
   });
   const data = await response.json();
+  console.log(data)
   if (response.status === 404) {
     throw new Error("Service Not Found");
   }

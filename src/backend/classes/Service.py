@@ -648,7 +648,7 @@ class Service:
         return {
             'id': self._id,
             'name': self._name,
-            'owner': self._owner.get_displayname(),
+            'owner': self._owner,
             'description': self._description,
             'icon_url': self._icon_url,
             'tags': self._tags,
