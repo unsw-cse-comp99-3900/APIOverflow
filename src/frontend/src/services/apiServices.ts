@@ -1,4 +1,3 @@
-import { json } from "stream/consumers";
 import {
   LoginModel,
   ServiceIconInfo,
@@ -14,7 +13,6 @@ import {
   briefApiDataFormatter,
   detailedApiDataFormatter,
 } from "../utils/dataFormatters";
-import { info } from "console";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -155,12 +153,15 @@ export const userLogin = async (credentials: LoginModel) => {
 export const userRegister = async (
   email: string,
   username: string,
-  password: string
+  password: string,
+  displayname: string
+
 ) => {
   const newUser: UserCreate = {
     email,
     username,
     password,
+    displayname,
   };
   await fetch(`${baseUrl}/auth/register`, {
     method: "POST",

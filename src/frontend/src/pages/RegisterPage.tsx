@@ -10,6 +10,7 @@ import { UserCreate } from "../types/backendTypes";
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState("");
+  const [displayname, setDisplayname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,7 +24,7 @@ const RegisterPage: React.FC = () => {
       setError("Please fill in both fields.");
       return;
     }
-    await userRegister(email, username, password);
+    await userRegister(email, username, password, displayname);
     setIsLoading(true);
     navigate("/login", {
       state: {
@@ -75,7 +76,24 @@ const RegisterPage: React.FC = () => {
                 required
               />
             </div>
-
+            <div className="mb-4">
+              <label
+                htmlFor="displayname"
+                className="block text-sm font-bold text-gray-700 mb-2"
+              >
+                Display Name:
+              </label>
+              <input
+                type="displayname"
+                id="displayname"
+                name="displayname"
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                placeholder="The name that you show to others"
+                value={displayname}
+                onChange={(e) => setDisplayname(e.target.value)}
+                required
+              />
+            </div>
             <div className="mb-4">
               <label
                 htmlFor="username"

@@ -28,6 +28,7 @@ export interface LoginModel {
 export interface UserCreate {
     username: string;
     password: string;
+    displayname: string;
     email: string;
 }
 
