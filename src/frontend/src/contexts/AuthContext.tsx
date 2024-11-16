@@ -6,6 +6,8 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token')); // Set initial state based on whether token exists
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   const login = (token:string) => {
     localStorage.setItem('token', token); // Save token on login

@@ -15,6 +15,7 @@ import { Rating, Tag } from "../types/miscTypes";
 import {
   briefApiDataFormatter,
   detailedApiDataFormatter,
+  identityDataFormatter,
 } from "../utils/dataFormatters";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -73,10 +74,9 @@ export const addApi = async (
   name: string,
   description: string,
   tags: string[],
-  endpointLink: string,
+  endpointLink: string
 ) => {
-
-  const ParameterPlaceholder : EndpointParameter = {
+  const ParameterPlaceholder: EndpointParameter = {
     id: "1",
     endpoint_link: endpointLink,
     required: false,
@@ -84,14 +84,14 @@ export const addApi = async (
     name: "Parameter Placeholder",
     value_type: "string",
     example: "Example Placeholder",
-  }
+  };
 
-  const ResponsePlaceholder : EndpointResponse = {
+  const ResponsePlaceholder: EndpointResponse = {
     code: "1",
     description: "Description Placeholder",
     conditions: ["Condition Placeholder"],
     example: "Example Placeholder",
-  }
+  };
 
   const endpoint: Endpoint = {
     link: endpointLink,
@@ -100,8 +100,8 @@ export const addApi = async (
     tab: "Tab Placeholder",
     parameters: [ParameterPlaceholder],
     method: "GET",
-    responses: [ResponsePlaceholder]
-  }
+    responses: [ResponsePlaceholder],
+  };
 
   const api: ServiceAdd = {
     name,
@@ -181,7 +181,6 @@ export const userRegister = async (
   username: string,
   password: string,
   displayname: string
-
 ) => {
   const newUser: UserCreate = {
     email,
@@ -347,4 +346,16 @@ export const apiGetReviews = async (sid: string, testing: boolean = true) => {
   );
   const data = await response.json();
   return data.reviews;
+};
+
+/*        Admin Services       */
+export const getIdentity = async (uid: string) => {
+  const response = await fetch(`${baseUrl}/auth/check_if_admin?uid=${uid}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    method: "GET",
+  });
+  const data = await response.json();
+  return identityDataFormatter(data);
 };
