@@ -632,7 +632,7 @@ async def user_check_perms(user: User = Depends(manager)):
     '''
         Endpoint to check whether a user's permissions
     '''
-    return admin_check_user_role(user['uid'])
+    return admin_check_if_admin(user['uid'])
 
 if __name__ == "__main__":
     import uvicorn
