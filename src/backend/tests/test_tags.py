@@ -8,6 +8,7 @@ from src.backend.classes.datastore import defaults
 from src.backend.classes.Endpoint import Endpoint
 from src.backend.classes.Parameter import Parameter 
 from src.backend.classes.Response import Response
+from src.backend.server.tags import n_tags_min, n_tags_max
 
 # test endpoint
 simple_parameter = Parameter(id="1", endpoint_link='https://api.example.com/users/12345', required=True, 
@@ -435,3 +436,39 @@ def test_ranked_tags_edit_shift(admin_user):
     assert response.json()['tags'][3]['num'] == 1
     assert response.json()['tags'][4]['tag'] == 'custom5'
     assert response.json()['tags'][4]['num'] == 1
+
+def test_ollama_tag_gen(simple_user):
+    '''
+        Test whether an API is correctly created
+    '''
+    api_info = {
+                'name' : 'Test API',
+                'description' : 'The Tag Generation API is a microservice designed to automatically generate relevant tags from a given text input. This service leverages the capabilities of the Ollama API to analyze the provided text and produce a set of tags that accurately represent the content.',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()]
+                }
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info)
+    assert response.status_code == SUCCESS
+    sid = response.json()['id']
+    response = client.get("/service/get_service",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+
+    response = client.post("/service/tags/generate",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"},
+                          params={
+                              'sid' : sid
+                          })
+    
+    assert response.status_code == SUCCESS
+    tags = response.json()['tags']
+    assert isinstance(tags, list)
+    assert len(tags) >= n_tags_min
+    assert len(tags) <= n_tags_max

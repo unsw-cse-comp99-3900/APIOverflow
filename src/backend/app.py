@@ -288,6 +288,14 @@ async def delete_service_version(sid: str, version_name: str,  user: User = Depe
     '''
     delete_service_version_wrapper(sid, version_name)
 
+@app.post("/service/tags/generate") 
+async def generate_tags_endpoint(sid: str, user: User = Depends(manager)): 
+    '''
+        Method used to generate tags using ollama
+    '''
+    tags = auto_generate_tags(sid) 
+    return {"tags": tags}
+                                                                                                                               
 #####################################
 #   Review Paths
 #####################################

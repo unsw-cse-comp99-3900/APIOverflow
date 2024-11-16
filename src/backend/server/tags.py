@@ -1,5 +1,37 @@
 from fastapi import HTTPException
 from src.backend.classes.datastore import data_store, defaults
+import requests 
+import json
+
+vm_ip = "34.116.117.133"
+url = f"http://{vm_ip}:11434/api/generate"
+
+n_tags_max = 10
+n_tags_min = 1
+def auto_generate_tags(sid: str):
+    service = data_store.get_api_by_id(sid)
+    description = service.get_description()
+    headers = {"Content-Type": "application/json"}
+    data = {
+        "model": "llama3:latest",
+        "prompt": f"Generate exactly betwen {n_tags_min} to {n_tags_max} concise tags for the following text (depending how descriptive the text is). Provide the tags only as a comma-separated list, with no additional text or explanation. Here's the text: {description}"
+    }
+
+    response = requests.post(url, headers=headers, data=json.dumps(data), stream=False)
+
+    if response.status_code == 200:
+        final_response = ""
+        for line in response.iter_lines():
+            if line:
+                json_line = json.loads(line.decode('utf-8'))
+                if 'response' in json_line:
+                    final_response += json_line['response']
+                if json_line.get('done'):
+                    break
+        tag_list = [tag.strip() for tag in final_response.split(',')]
+        return tag_list
+    else:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
 
 def add_tag_wrapper(tag: str):
     '''
