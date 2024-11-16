@@ -58,50 +58,7 @@ def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
         Returns:    sid representing id of newly created service
     '''
     validate_api_fields(packet)
-
-    # Retrieve image from url
-    response = None
-    img_url = packet['icon_url']
-    x_start, x_end = packet['x_start'], packet['x_end']
-    y_start, y_end = packet['y_start'], packet['y_end']
-
-    if x_start < 0 or y_start < 0 or x_start > x_end or y_start > y_end:
-        raise HTTPException(status_code=400,
-                            detail="Invalid X/Y dimensions")
-
-    if img_url != '':
-        internal_url = f"{IMAGE_PATH}/image{data_store.num_imgs()}.jpg"
-        try:
-            image, response = urllib.request.urlretrieve(img_url, internal_url)
-        except HTTPError as err:
-            raise HTTPException(status_code=400,
-                                detail=f"HTTP exception {response} raised when retrieving image") from err
-        except URLError as err:
-            raise HTTPException(status_code=400,
-                                detail=f"URL exception {response} raised when retrieving image") from err
-        except Exception as err:
-            raise HTTPException(status_code=400,
-                                detail=f"An odd error {response} was raised when retrieving image") from err
-
-        # Open image
-        image_obj = Image.open(image)
-
-        # Handle Error where x_start or y_start
-        x_limit, y_limit = image_obj.size
-        if x_end > x_limit or y_end > y_limit or x_start < 0 or y_start < 0:
-            raise HTTPException(status_code=400,
-                                detail="Boundaries for cropping beyond size of image")
-        if x_start > x_end or y_start > y_end:
-            raise HTTPException(status_code=400,
-                                detail="X or Y start bigger than X/Y end")
-
-        # Crop photo
-        image_cropped = image_obj.crop((x_start, y_start, x_end, y_end))
-        image_cropped.save(internal_url)
-
-    else:
-        internal_url = ""
-    
+    internal_url = ""
     if len(packet['endpoints']) == 0:
         raise HTTPException(status_code=400,
                     detail="Must input at least 1 endpoint")
@@ -115,8 +72,10 @@ def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
                     packet['tags'],
                     packet['endpoints'],
                     packet['version_name'],
-                    packet['version_description']
+                    packet['version_description'],
+                    pay_model=packet['pay_model']
                     )
+    
     data_store.add_api(new_api)
     db_add_service(new_api.to_json())
     return str(new_api.get_id())
@@ -135,7 +94,7 @@ def update_service_wrapper(packet: dict[T, K]) -> None:
 
     # service is ref to API Obj in data store which gets updated
     service.create_pending_update(
-        packet["name"], packet["description"], packet["tags"])
+        packet["name"], packet["description"], packet["tags"], packet['pay_model'])
     
     db_update_service(sid, service.to_json())
     return None
@@ -171,12 +130,12 @@ def delete_service_version_wrapper(sid: str, version_name: str):
     
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
-def api_tag_filter(tags, providers, hide_pending: bool) -> list:
+def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
 
     api_list = data_store.get_apis()
     filtered_apis = []
 
-    print(api_list)
+    # print(api_list)
     #query = input("Search")
 
     #if query != "":
@@ -198,22 +157,33 @@ def api_tag_filter(tags, providers, hide_pending: bool) -> list:
                 if tag in api.get_tags() and api not in filtered_apis:
                         filtered_apis.append(api)
 
-    return_list: List[Service] = []
+    secondary_list: List[Service] = []
     if providers:
         # if providers list is not empty
         for api in filtered_apis:
             for provider in providers:
                 # I refactored get_owner so that it now returns the User object
                 # I've fixed this to what it was before (which is bugged)
-                if provider in api.get_owner().get_id() and api not in return_list:
+                if provider in api.get_owner().get_id() and api not in secondary_list:
+                    secondary_list.append(api)
+                    break
+
+    else:
+        secondary_list = [api for api in filtered_apis]
+    
+    return_list: List[Service] = []
+    if pay_models:
+        for api in secondary_list:
+            for pay_model in pay_models:
+                if pay_model == api.get_pay_model() and api not in return_list:
+                    print(pay_model, api.get_pay_model())
                     return_list.append(api)
                     break
     else:
-        return_list = [api for api in filtered_apis]
-    
+        return_list = [api for api in secondary_list]
+
     for api in return_list:
-        print(api.get_status().name)
-    
+        print(api.get_name(), api.get_pay_model())
     
     return [api.to_summary_json() for api in return_list if
             api.get_status().name in LIVE_OPTIONS or 
@@ -285,6 +255,12 @@ def delete_service(sid: str):
     if service is None:
         raise HTTPException(status_code=404, detail='No service found with given sid')
     service_name = service.get_name()
+    
+    # Disassociate server from tag
+    for _tag in service.get_tags():
+        tag = data_store.get_tag_by_name(_tag)
+        tag.remove_server(sid)
+
     data_store.delete_item(sid, 'api')
     db_status = db_delete_service(service_name)
 
@@ -444,7 +420,7 @@ def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> Li
     if filter == 'worst':
         review.sort(key=lambda x: x.get_net_vote())
 
-    return [review.to_json(uid) for review in reviews]
+    return [review.to_json(uid=uid) for review in reviews]
 
 def approve_service_wrapper(sid: str, approved: bool, reason: str, service_global: bool, version: Optional[str]):
 
@@ -469,6 +445,13 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str, service_globa
             object.update_status(ServiceStatus.LIVE, reason)
             object.update_newly_created()
         action = "approved"
+        
+        # Handle tag inclusions - ASSUMES THAT ALL TAGS HAVE BEEN ADDED PREVIOUSLY
+        for _tag in service.get_tags():
+            print(_tag)
+            tag = data_store.get_tag_by_name(_tag)
+            tag.add_server(service.get_id())
+
     else:
         for object in approvalObjects:
             if object.get_status() == ServiceStatus.PENDING:

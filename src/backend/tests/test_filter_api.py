@@ -79,11 +79,6 @@ def test_simple_filter(simple_user):
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Googl3',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 100,
-                                'y_start' : 0,
-                                'y_end' : 100,
                                 'description' : 'This is a test API',
                                 'tags' : ['API', 'Public'],
                                 'endpoints': [simple_endpoint.dict()]
@@ -92,11 +87,6 @@ def test_simple_filter(simple_user):
 
     api2 = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint2.dict()]
@@ -121,11 +111,6 @@ def test_simple_filter(simple_user):
 def test_simple_filter_multiple(simple_user):
     api = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -139,22 +124,12 @@ def test_simple_filter_multiple(simple_user):
                                 headers={"Authorization": f"Bearer {simple_user['token']}"},
                             json={
                                     'name' : 'Googl3',
-                                    'icon_url' : '',
-                                    'x_start' : 0,
-                                    'x_end' : 0,
-                                    'y_start' : 0,
-                                    'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
                                     'endpoints': [simple_endpoint2.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
             'endpoints': [simple_endpoint.dict()]
@@ -186,11 +161,6 @@ def test_simple_filter_multiple(simple_user):
 def test_providers(simple_user):
     api = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -204,22 +174,12 @@ def test_providers(simple_user):
                                 headers={"Authorization": f"Bearer {simple_user['token']}"},
                             json={
                                     'name' : 'Googl3',
-                                    'icon_url' : '',
-                                    'x_start' : 0,
-                                    'x_end' : 0,
-                                    'y_start' : 0,
-                                    'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
                                     'endpoints': [simple_endpoint2.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
             'endpoints': [simple_endpoint.dict()]
@@ -251,11 +211,6 @@ def test_providers(simple_user):
 def test_providers_with_tags(simple_user):
     api = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -269,22 +224,12 @@ def test_providers_with_tags(simple_user):
                                 headers={"Authorization": f"Bearer {simple_user['token']}"},
                             json={
                                     'name' : 'Googl3',
-                                    'icon_url' : '',
-                                    'x_start' : 0,
-                                    'x_end' : 0,
-                                    'y_start' : 0,
-                                    'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
                                     'endpoints': [simple_endpoint2.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
             'endpoints': [simple_endpoint.dict()]
@@ -316,11 +261,6 @@ def test_providers_with_tags(simple_user):
 def test_invalid_providers(simple_user):
     api = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -334,22 +274,12 @@ def test_invalid_providers(simple_user):
                                 headers={"Authorization": f"Bearer {simple_user['token']}"},
                             json={
                                     'name' : 'Googl3',
-                                    'icon_url' : '',
-                                    'x_start' : 0,
-                                    'x_end' : 0,
-                                    'y_start' : 0,
-                                    'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
                                     'endpoints': [simple_endpoint2.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
             'endpoints': [simple_endpoint.dict()]
@@ -381,11 +311,6 @@ def test_invalid_providers(simple_user):
 def test_providers_with_tags2(simple_user):
     api = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()] 
@@ -399,22 +324,12 @@ def test_providers_with_tags2(simple_user):
                                 headers={"Authorization": f"Bearer {simple_user['token']}"},
                             json={
                                     'name' : 'Googl3',
-                                    'icon_url' : '',
-                                    'x_start' : 0,
-                                    'x_end' : 0,
-                                    'y_start' : 0,
-                                    'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
                                     'endpoints': [simple_endpoint2.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['NOT API'],
             'endpoints': [simple_endpoint.dict()]
@@ -466,11 +381,6 @@ def test_providers_with_tags_multiple(simple_user):
 
     api = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -495,11 +405,6 @@ def test_providers_with_tags_multiple(simple_user):
                             })
     api2 = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
             'endpoints': [simple_endpoint.dict()]
@@ -557,11 +462,6 @@ def test_providers_with_tags_multiple2(simple_user):
 
     api = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -575,22 +475,12 @@ def test_providers_with_tags_multiple2(simple_user):
                                 headers={"Authorization": f"Bearer {usable_data2['token']}"},
                             json={
                                     'name' : 'Googl3',
-                                    'icon_url' : '',
-                                    'x_start' : 0,
-                                    'x_end' : 0,
-                                    'y_start' : 0,
-                                    'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['NOT API', 'Public'],
                                     'endpoints': [simple_endpoint.dict()]
                             })
     api2 = {
             'name' : 'Googl2',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API'],
             'endpoints': [simple_endpoint.dict()]
@@ -648,11 +538,6 @@ def test_duplicate_apis(simple_user):
 
     api = {
             'name' : 'test1',
-            'icon_url' : '',
-            'x_start' : 0,
-            'x_end' : 0,
-            'y_start' : 0,
-            'y_end' : 0,
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
             'endpoints': [simple_endpoint.dict()]
@@ -666,11 +551,6 @@ def test_duplicate_apis(simple_user):
                                 headers={"Authorization": f"Bearer {simple_user['token']}"},
                             json={
                                     'name' : 'test2',
-                                    'icon_url' : '',
-                                    'x_start' : 0,
-                                    'x_end' : 0,
-                                    'y_start' : 0,
-                                    'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['Not API', 'Public'],
                                     'endpoints': [simple_endpoint.dict()]

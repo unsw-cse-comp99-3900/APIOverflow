@@ -21,11 +21,12 @@ class API(Service):
                  tags: List[str],
                  endpoints: List[Endpoint],
                  version_name: str,
-                 version_description: str
+                 version_description: str,
+                 pay_model: str
                  ) -> None:
         super().__init__(
             sid, name, owner, icon_url, description, tags, endpoints, 'api',
-            version_name, version_description)
+            version_name, version_description, pay_model=pay_model)
     
     def get_type(self):
         '''

@@ -14,6 +14,7 @@ from src.backend.server.admin import *
 from src.backend.server.upload import *
 from src.backend.server.user import *
 from src.backend.server.review import *
+from src.backend.server.dummy import *
 from json import dumps
 import asyncio
 from contextlib import asynccontextmanager
@@ -103,6 +104,13 @@ async def clear():
     assert ds.num_apis() == 0
     return {"message" : "Clear Successful"}
 
+@app.post("/testing/dummy")
+async def add_dummy():
+    '''
+        Internal Testing function to add some data for testing
+    '''
+    import_dummy_data()
+
 @app.post("/upload/pdfs")
 async def upload_pdf(file: UploadFile = File(...)):
     '''
@@ -181,9 +189,10 @@ async def get_user_apis(user: User = Depends(manager)):
 async def filter(
     tags: Optional[List[str]] = Query(None), 
     providers: Optional[List[str]] = Query(None),
+    pay_models: Optional[List[str]] = Query(None),
     hide_pending: bool = True
 ):
-    return api_tag_filter(tags, providers, hide_pending)
+    return api_tag_filter(tags, providers, pay_models, hide_pending)
 
 @app.get("/service/search")
 async def search(
@@ -265,7 +274,7 @@ async def add_service_version(service: ServiceAddVersion, user: User = Depends(m
     add_new_service_version_wrapper(request)
 
 @app.post("/service/version/update")
-async def add_service_version(service: ServiceUpdateVersion, user: User = Depends(manager)):
+async def update_service_version(service: ServiceUpdateVersion, user: User = Depends(manager)):
     '''
         Method used to update fields related to specific version
     '''
@@ -273,7 +282,7 @@ async def add_service_version(service: ServiceUpdateVersion, user: User = Depend
     update_new_service_version_wrapper(request)
 
 @app.delete("/service/version/delete")
-async def add_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
+async def delete_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
     '''
         Method used to delete a specific version from a service
     '''
@@ -284,11 +293,11 @@ async def add_service_version(sid: str, version_name: str,  user: User = Depends
 #####################################
 
 @app.get("/review/get")
-async def review_get(rid: str):
+async def review_get(rid: str, uid: str = ''):
     '''
         Endpoint which directly retrieves a review
     '''
-    return review_get_wrapper(rid)
+    return review_get_wrapper(rid, uid=uid)
 
 @app.delete("/review/delete")
 async def review_delete(rid: str, user: User = Depends(manager)):
@@ -462,6 +471,13 @@ async def get_tags():
         Endpoint to grab all tags
     '''
     return get_tags_wrapper()
+
+@app.get("/tags/get/ranked")
+async def get_tags_ranked(num: int):
+    '''
+        Endpoint to get ranked number of tags
+    '''
+    return get_top_tags_wrapper(num)
 
 #####################################
 #   Admin Paths
