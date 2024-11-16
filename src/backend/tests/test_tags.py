@@ -247,11 +247,6 @@ def test_get_top5(admin_user):
     for i in range(4):
         api_info = {
                     'name' : f'Test API{i}',
-                    'icon_url' : '',
-                    'x_start' : 0,
-                    'x_end' : 0,
-                    'y_start' : 0,
-                    'y_end' : 0,
                     'description' : 'This is a test API',
                     'tags' : ['API', 'Microservice'] + customs[:(i + 1)],
                     'endpoints': [simple_endpoint.model_dump()],
@@ -311,11 +306,6 @@ def test_ranked_tags_delete_shift(admin_user):
     for i in range(4):
         api_info = {
                     'name' : f'Test API{i}',
-                    'icon_url' : '',
-                    'x_start' : 0,
-                    'x_end' : 0,
-                    'y_start' : 0,
-                    'y_end' : 0,
                     'description' : 'This is a test API',
                     'tags' : ['API'] + customs[:(i + 1)],
                     'endpoints': [simple_endpoint.model_dump()],
@@ -379,11 +369,6 @@ def test_ranked_tags_edit_shift(admin_user):
     
     api_info = {
                     'name' : 'Test API',
-                    'icon_url' : '',
-                    'x_start' : 0,
-                    'x_end' : 0,
-                    'y_start' : 0,
-                    'y_end' : 0,
                     'description' : 'This is a test API',
                     'tags' : ['API', 'Microservice'],
                     'endpoints': [simple_endpoint.model_dump()],

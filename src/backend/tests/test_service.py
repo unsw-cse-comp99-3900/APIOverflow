@@ -1571,11 +1571,6 @@ def test_pay_model_display(simple_user):
     '''
     service1 = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -1619,11 +1614,6 @@ def test_pay_model_filter(simple_user):
     '''
     service1 = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -1671,11 +1661,6 @@ def test_pay_model_filter(simple_user):
     # Test multi-tag
     service2 = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -1710,11 +1695,6 @@ def test_pay_model_update(simple_user):
     '''
     service1 = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
