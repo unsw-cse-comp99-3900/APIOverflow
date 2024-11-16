@@ -635,6 +635,13 @@ async def update_user_displayname(new_displayname: GeneralString, user: User = D
     '''
     return user_update_displayname(user['id'], new_displayname.content)
 
+@app.get("/user/permission_check")
+async def user_check_perms(user: User = Depends(manager)):
+    '''
+        Endpoint to check whether a user's permissions
+    '''
+    return admin_check_user_role(user['uid'])
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host='0.0.0.0', port=5000)
