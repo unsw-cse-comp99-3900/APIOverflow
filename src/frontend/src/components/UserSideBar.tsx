@@ -12,7 +12,8 @@ const UserSideBar = () => {
 
   const navigate = useNavigate();
   const auth = useAuth();
-  const { logout } = auth!;
+  const { logout, isAdmin } = auth!;
+  console.log(`isAdmin: ${isAdmin}`);
 
   const onLogOutClick = async () => {
     const confirm = window.confirm("Are you sure you want to sign out?");

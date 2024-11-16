@@ -559,13 +559,6 @@ async def admin_user_filter(standard: bool, admin: bool, super: bool, user: User
     print(super)
     return admin_filter_users(standard, admin, super)
 
-@app.get("/admin/check_if_admin")
-async def admin_check_user_role(uid: str, user: User = Depends(manager), role: str = Depends(admin_required())):
-    '''
-        Endpoint for internal use, check if a user is admin
-    '''
-    return admin_check_if_admin(uid)
-
 #####################################
 #   User Paths
 #####################################
@@ -640,7 +633,7 @@ async def user_check_perms(user: User = Depends(manager)):
     '''
         Endpoint to check whether a user's permissions
     '''
-    return admin_check_user_role(user['uid'])
+    return admin_check_if_admin(user['id'])
 
 if __name__ == "__main__":
     import uvicorn

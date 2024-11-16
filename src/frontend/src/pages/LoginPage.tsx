@@ -83,7 +83,7 @@ const LoginPage: React.FC = () => {
                 value={username}
                 onChange={(e) => {
                   setWarning("");
-                  setUsername(e.target.value)}}
+                  setUsername(e.target.value.replace(/\s/g, ""))}}
                 required
               />
             </div>
@@ -104,7 +104,7 @@ const LoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => {
                   setWarning("");
-                  setPassword(e.target.value)}}
+                  setPassword(e.target.value.replace(/\s/g, ""))}}
                 required
               />
             </div>

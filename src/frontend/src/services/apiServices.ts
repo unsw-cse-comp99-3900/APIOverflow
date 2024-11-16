@@ -15,7 +15,7 @@ import { Rating, Tag } from "../types/miscTypes";
 import {
   briefApiDataFormatter,
   detailedApiDataFormatter,
-  identityDataFormatter,
+  permDataFormatter,
 } from "../utils/dataFormatters";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -176,6 +176,15 @@ export const userLogin = async (credentials: LoginModel) => {
   return data.access_token;
 };
 
+export const userLogout = async () => {
+  const response = await fetch(`${baseUrl}/auth/logout`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    method: "POST",
+  });
+};
+
 export const userRegister = async (
   email: string,
   username: string,
@@ -196,6 +205,17 @@ export const userRegister = async (
     body: JSON.stringify(newUser),
   });
   return;
+};
+
+export const userCheckPerm = async () => {
+  const response = await fetch(`${baseUrl}/user/permission_check`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    method: "GET",
+  });
+  const data = await response.json();
+  return permDataFormatter(data);
 };
 
 /*        Tag Services       */
@@ -349,13 +369,3 @@ export const apiGetReviews = async (sid: string, testing: boolean = true) => {
 };
 
 /*        Admin Services       */
-export const getIdentity = async (uid: string) => {
-  const response = await fetch(`${baseUrl}/auth/check_if_admin?uid=${uid}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    method: "GET",
-  });
-  const data = await response.json();
-  return identityDataFormatter(data);
-};

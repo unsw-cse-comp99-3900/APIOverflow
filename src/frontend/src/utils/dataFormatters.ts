@@ -25,7 +25,7 @@ export const detailedApiDataFormatter = (data: any) => {
   };
 };
 
-export const identityDataFormatter = (data: any) => {
+export const permDataFormatter = (data: any) => {
   return {
     isAdmin: data.is_admin,
     isSuperAdmin: data.is_super,
