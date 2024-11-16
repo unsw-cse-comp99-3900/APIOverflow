@@ -6,14 +6,15 @@ import json
 vm_ip = "34.116.117.133"
 url = f"http://{vm_ip}:11434/api/generate"
 
-n_tags = 5
+n_tags_max = 10
+n_tags_min = 1
 def auto_generate_tags(sid: str):
     service = data_store.get_api_by_id(sid)
     description = service.get_description()
     headers = {"Content-Type": "application/json"}
     data = {
         "model": "llama3:latest",
-        "prompt": f"Generate exactly {n_tags} concise tags for the following text. Provide the tags only as a comma-separated list, with no additional text or explanation. Here's the text: {description}"
+        "prompt": f"Generate exactly betwen {n_tags_min} to {n_tags_max} concise tags for the following text (depending how descriptive the text is). Provide the tags only as a comma-separated list, with no additional text or explanation. Here's the text: {description}"
     }
 
     response = requests.post(url, headers=headers, data=json.dumps(data), stream=False)

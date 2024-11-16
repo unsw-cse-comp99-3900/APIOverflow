@@ -8,7 +8,7 @@ from src.backend.classes.datastore import defaults
 from src.backend.classes.Endpoint import Endpoint
 from src.backend.classes.Parameter import Parameter 
 from src.backend.classes.Response import Response
-from src.backend.server.tags import n_tags
+from src.backend.server.tags import n_tags_min, n_tags_max
 
 # test endpoint
 simple_parameter = Parameter(id="1", endpoint_link='https://api.example.com/users/12345', required=True, 
@@ -470,4 +470,5 @@ def test_ollama_tag_gen(simple_user):
     assert response.status_code == SUCCESS
     tags = response.json()['tags']
     assert isinstance(tags, list)
-    assert len(tags) == n_tags
+    assert len(tags) >= n_tags_min
+    assert len(tags) <= n_tags_max
