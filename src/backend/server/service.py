@@ -181,9 +181,6 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
                     break
     else:
         return_list = [api for api in secondary_list]
-
-    for api in return_list:
-        print(api.get_name(), api.get_pay_model())
     
     return [api.to_summary_json() for api in return_list if
             api.get_status().name in LIVE_OPTIONS or 
