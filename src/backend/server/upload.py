@@ -1,11 +1,17 @@
 from typing import TypeVar
-from fastapi import APIRouter, HTTPException, File, UploadFile
+from fastapi import APIRouter, HTTPException, File, UploadFile, FastAPI
+import yaml
 from PIL import Image
 import urllib.request
 from urllib.error import HTTPError, URLError
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.classes.Document import Document
+from src.backend.classes.Service import Service
+from src.backend.classes.Endpoint import Endpoint
+from src.backend.classes.Response import Response 
+from src.backend.classes.Parameter import Parameter
+from src.backend.server.service import parse_yaml_to_service
 from src.backend.database import *
 import aiofiles
 import os
@@ -13,6 +19,7 @@ import os
 # Constants
 IMAGE_PATH = "static/imgs"
 DOC_PATH = "static/docs"
+YAML_PATH = "static/yaml"
 MB1 = 1024 * 1024
 IMAGE_TYPES = ["image/jpg", "image/jpeg", "image/png"]
 
@@ -66,3 +73,20 @@ async def upload_img_wrapper(file: UploadFile) -> int:
 
     data_store.add_docs(doc)
     return str(doc.get_id())
+
+async def import_yaml_wrapper(file: UploadFile) -> Service:
+    '''
+        Function which uploads YAML files - returns a Service object
+    '''
+    # Check type
+    if file.content_type != 'application/x-yaml':
+        raise HTTPException(status_code=400, detail="File uploaded is not YAML")
+    
+    try:
+        file_content = await file.read()
+        yaml_data = yaml.safe_load(file_content)
+    except:
+        raise HTTPException(status_code=400, detail=f"Invalid YAML format: {str(e)}")
+
+    service = parse_yaml_to_service(yaml_data)
+    return service

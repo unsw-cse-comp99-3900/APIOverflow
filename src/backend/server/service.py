@@ -8,6 +8,7 @@ from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.classes.Service import Service, ServiceVersionInfo
+from src.backend.classes.Endpoint import Endpoint
 from src.backend.classes.User import User
 from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
@@ -482,3 +483,49 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str, service_globa
     send_email(uemail, '', 'service_approval', content)
     
         
+async def parse_yaml_to_service(yaml_data: dict) -> Service:
+    '''
+        Function which uploads YAML files - returns a Service object
+    '''
+    FIELD_MAPPING = {
+        "name": ["name", "service_title", "title", "service_name", "api_name", "api"],
+        "owner": ["owner", "author", "developer", "writer"],
+        "description": ["description", "desc", "details"],
+        "tags": ["tags", "categories", "labels"],
+        "endpoints": ["links", "endpoint", "endpoints", "api_endpoints", "service_endpoints"],
+        "version_name": ["version_name", "version", "api_version", "service_version"],
+        "type": ["API", "service", "api", "Service"]
+    }
+    # maybe add AI to this later 
+    
+    def find_field(yaml_data: dict, possible_names: List[str]) -> Optional[str]:
+        """Find the first matching key in the YAML data"""
+        for name in possible_names:
+            if name in yaml_data:
+                return yaml_data[name]
+        return None 
+
+    service_name = find_field(yaml_data, FIELD_MAPPING["name"])
+    service_description = find_field(yaml_data, FIELD_MAPPING["description"]) or "No description given"
+    service_tags = find_field(yaml_data, FIELD_MAPPING["tags"]) or []
+    endpoints_data = find_field(yaml_data, FIELD_MAPPING["endpoints"]) or []
+    version_name = find_field(yaml_data, FIELD_MAPPING["version_name"]) or "Unknown version"
+    service_type = find_field(yaml_data, FIELD_MAPPING["type"]) or "API"
+
+    endpoints = [Endpoint(**endpoint) for endpoint in endpoints_data if isinstance(endpoint, dict)]
+
+    return_service = Service (
+        sid = "", # replace with actual id 
+        name = service_name,
+        owner = None,
+        icon_url = "", # replce with actual icon url
+        description = service_description,
+        tags = service_tags,
+        endpoints = endpoints,
+        stype = service_type,
+        version_name = version_name,
+        version_description = "" # add this if needed
+    )
+
+    return return_service
+

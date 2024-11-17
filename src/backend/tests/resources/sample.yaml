@@ -1,0 +1,64 @@
+service_title: "Sample API Service"
+author: "John Doe"
+description: "A sample API service to demonstrate YAML structure."
+tags:
+  - "sample"
+  - "api"
+  - "testing"
+api_endpoints:
+  - link: "/v1/resource"
+    title_description: "Get Resource Details"
+    main_description: "Retrieve detailed information about a specific resource."
+    tab: "Resource Management"
+    parameters:
+      - id: "param1"
+        endpoint_link: "/v1/resource"
+        required: true
+        type: "QUERY"
+        name: "resource_id"
+        value_type: "string"
+        example: "12345"
+      - id: "param2"
+        endpoint_link: "/v1/resource"
+        required: false
+        type: "HEADER"
+        name: "Authorization"
+        value_type: "string"
+        example: "Bearer <token>"
+    method: "GET"
+    responses:
+      - code: "200"
+        description: "Success"
+        conditions:
+          - "Resource exists"
+        example: '{"id": "12345", "name": "Sample Resource"}'
+      - code: "404"
+        description: "Not Found"
+        conditions:
+          - "Resource does not exist"
+        example: '{"error": "Resource not found"}'
+  - link: "/v1/resource"
+    title_description: "Create Resource"
+    main_description: "Create a new resource in the system."
+    tab: "Resource Management"
+    parameters:
+      - id: "param1"
+        endpoint_link: "/v1/resource"
+        required: true
+        type: "BODY"
+        name: "resource_data"
+        value_type: "object"
+        example: '{"name": "New Resource", "type": "example"}'
+    method: "POST"
+    responses:
+      - code: "201"
+        description: "Resource Created"
+        conditions:
+          - "Valid input data"
+        example: '{"id": "67890", "name": "New Resource"}'
+      - code: "400"
+        description: "Bad Request"
+        conditions:
+          - "Invalid input data"
+        example: '{"error": "Invalid resource data"}'
+api_version: "1.0.0"

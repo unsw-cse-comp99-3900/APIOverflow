@@ -14,6 +14,7 @@ from src.backend.server.admin import *
 from src.backend.server.upload import *
 from src.backend.server.user import *
 from src.backend.server.review import *
+from src.backend.upload import import_yaml_wrapper
 from json import dumps
 import asyncio
 from contextlib import asynccontextmanager
@@ -118,6 +119,14 @@ async def upload_image(file: UploadFile = File(...)):
     '''
     doc_id = await upload_img_wrapper(file)
     return {'doc_id': doc_id}
+
+@app.post("upload/yaml")
+async def upload_yaml(file: UploadFile = File(...)):
+    '''
+        Endpoint to upload a YAML file
+    '''
+    service = import_yaml_wrapper(file)
+    print(service)
 
 #####################################
 #   Service Paths
