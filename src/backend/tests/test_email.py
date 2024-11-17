@@ -106,7 +106,13 @@ def test_send_pass_email_non_auth():
     user.verify_user()
     
     response = client.post(f"/reset-password", json={'content': 'test@gmail.com'})
+    assert response.status_code == 200
     assert response.json() == {"message": "Password reset email sent."}
+
+def test_send_pass_email_non_auth_fail():
+    response = client.post(f"/reset-password", json={'content': 'test@gmail.com'})
+    assert response.status_code == 400
+    assert response.json() == {"detail": "User not found"}
 
 def test_verify_email():
 
