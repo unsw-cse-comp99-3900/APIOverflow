@@ -93,6 +93,27 @@ def test_send_pass_email_route():
     response = client.post(f"/auth/reset-password", headers={"Authorization": f"Bearer {access_token}"})
     assert response.json() == {"message": "Password reset email sent."}
 
+def test_send_pass_email_non_auth():
+    response = client.post("/auth/register", json={
+        "displayname" : "testuser",
+        "username": "testuser",
+        "password": "testpassword",
+        "email" : "test@gmail.com"
+    })
+    assert response.status_code == 200
+    uid = response.json()['uid']
+    user = data_store.get_user_by_id(uid)
+    user.verify_user()
+    
+    response = client.post(f"/reset-password", json={'content': 'test@gmail.com'})
+    assert response.status_code == 200
+    assert response.json() == {"message": "Password reset email sent."}
+
+def test_send_pass_email_non_auth_fail():
+    response = client.post(f"/reset-password", json={'content': 'test@gmail.com'})
+    assert response.status_code == 400
+    assert response.json() == {"detail": "User not found"}
+
 def test_verify_email():
 
     new_user = User("12",

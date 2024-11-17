@@ -85,3 +85,11 @@ export interface EndpointResponse{
     conditions: string[];
     example: string
 }
+
+export interface ServiceApprove{
+    sid: string;
+    approved: boolean;
+    reason: string;
+    service_global: boolean;
+    version_name: string | null;
+}

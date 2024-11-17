@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from PIL import Image
 import urllib.request
 from urllib.error import HTTPError, URLError
-from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS
+from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS, PENDING_OPTIONS, REJECTED_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.classes.Service import Service, ServiceVersionInfo
@@ -183,17 +183,18 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
         return_list = [api for api in secondary_list]
     
     return [api.to_summary_json() for api in return_list if
-            api.get_status().name in LIVE_OPTIONS or 
+            api.get_status() in LIVE_OPTIONS or 
             (not hide_pending and api.get_status() == ServiceStatus.PENDING)
             ]
 
 # returns a list of regex matching services 
 def api_name_search(name, hide_pending: bool) -> list: 
     api_list = data_store.get_apis()
-    return_list = []
+    return_list: List[Service] = []
+
     for api in api_list:
         if re.search(name, api.get_name(), re.IGNORECASE) and (
-            api.get_status().name in LIVE_OPTIONS or
+            api.get_status() in LIVE_OPTIONS or
             api.get_status() == ServiceStatus.PENDING and not hide_pending
         ):
             return_list.append(api)
@@ -237,12 +238,6 @@ def get_doc_wrapper(doc_id: str) -> FileResponse:
         raise HTTPException(status_code=404, detail="No such document found")
     
     return FileResponse(doc.get_path())
-
-def list_pending_apis():
-    return [api.to_summary_json() for api in data_store.get_apis() if api.get_status() == ServiceStatus.PENDING]
-
-def list_nonpending_apis():
-    return [api.to_summary_json() for api in data_store.get_apis() if api.get_status == ServiceStatus.LIVE]
 
 def delete_service(sid: str):
     if sid == '':

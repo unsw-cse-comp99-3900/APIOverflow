@@ -1,6 +1,7 @@
 // src/components/UserTable.tsx
 
 import React, { useState } from "react";
+import { UserBrief } from "../types/userTypes";
 
 interface User {
   id: string;
@@ -9,31 +10,30 @@ interface User {
 }
 
 interface UserTableProps {
-  users: User[];
+  users: UserBrief[];
   onPromote: (userId: string, userName: string) => void;
   onDemote: (userId: string, userName: string) => void;
   onDelete: (userId: string, userName: string) => void;
 }
 
 const UserTable: React.FC<UserTableProps> = ({ users, onPromote, onDemote, onDelete }) => {
-  const [filter, setFilter] = useState<"all" | "admin" | "general">("all");
+  const [filter, setFilter] = useState<"All" | "General" | "Admin" | "Super Admin">("All");
 
   const filteredUsers = users.filter((user) =>
-    filter === "all" ? true : user.role === filter
+    filter === "All" ? true : user.role === filter
   );
 
   return (
     <div className="w-full">
       <div className="flex justify-between mb-4">
-        <h2 className="text-2xl font-bold text-blue-800">Users</h2>
         <div>
           <label className="mr-2 text-gray-700 font-semibold">Filter:</label>
           <select
             value={filter}
-            onChange={(e) => setFilter(e.target.value as "all" | "admin" | "general")}
+            onChange={(e) => setFilter(e.target.value as "All" | "General" | "Admin" | "Super Admin")}
             className="p-2 border rounded-md"
           >
-            <option value="all">All Users</option>
+            <option className="border rounded-md" value="all">All Users</option>
             <option value="admin">Admins</option>
             <option value="general">General Users</option>
           </select>
@@ -51,9 +51,9 @@ const UserTable: React.FC<UserTableProps> = ({ users, onPromote, onDemote, onDel
           {filteredUsers.map((user) => (
             <tr key={user.id} className="border-b hover:bg-gray-100">
               <td className="p-3">{user.name}</td>
-              <td className="p-3">{user.role === "admin" ? "Admin" : "General User"}</td>
+              <td className="p-3">{user.role}</td>
               <td className="p-3 flex justify-end space-x-2">
-                {user.role === "general" ? (
+                {user.role === "General User" ? (
                   <button
                     className="bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-3 rounded transition-all"
                     onClick={() => onPromote(user.id, user.name)}

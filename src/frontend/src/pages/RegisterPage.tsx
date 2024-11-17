@@ -72,7 +72,7 @@ const RegisterPage: React.FC = () => {
                 className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.replace(/\s/g, ""))}
                 required
               />
             </div>
@@ -108,7 +108,9 @@ const RegisterPage: React.FC = () => {
                 className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
                 placeholder="Enter your username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+
+                // remove all spaces from the username
+                onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
                 required
               />
             </div>
@@ -127,7 +129,7 @@ const RegisterPage: React.FC = () => {
                 className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
                 placeholder="Enter your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
                 required
               />
             </div>

@@ -6,6 +6,7 @@ import Tag from "./Tag";
 import DeleteApiButton from "./DeleteApiButton";
 import EditApiButton from "./EditApiButton";
 import { apiGetIcon } from "../services/apiServices";
+import { useAuth } from "../contexts/AuthContext";
 
 interface ApiListingProps {
   api: BriefApi;
@@ -21,6 +22,10 @@ const ApiListing: React.FC<ApiListingProps>  = ({
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [iconURL, setIconURL] = useState<string>("")
+
+  const auth = useAuth();
+  const { isAdmin, isSuperAdmin } = auth!;
+
   useEffect(() => {
     const fetchIcon = async () => {
       try{
@@ -48,7 +53,7 @@ const ApiListing: React.FC<ApiListingProps>  = ({
 
 
   return (
-    <div className="bg-white rounded-xl shadow-md relative">
+    <div className="bg-white rounded-xl shadow-md relative transition-transform transform hover:scale-105">
       <div className="p-4">
         <div className="pb-16">
           <div className="flex items-start mb-2">
