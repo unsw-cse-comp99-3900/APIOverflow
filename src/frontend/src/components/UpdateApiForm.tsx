@@ -281,7 +281,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                   type="text"
                   onChange={(e) => setEndpoint(e.target.value)}
                   placeholder="https://api-overflow.com/non-playable-coders/example-endpoint"
-                  defaultValue={api?.endpoint}
+                  defaultValue={api?.versions[0].endpoints[0].link}
                   className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 text-md leading-6"
                 />
               </div>

@@ -17,7 +17,7 @@ export const detailedApiDataFormatter = (data: any) => {
     description: data.description,
     owner: data.owner,
     tags: data.tags,
-    docs: data.docs,
+    docs: data.versions[0].docs,
     endpoint: data.versions[0].endpoints[0].link,
     reviews: data.reviews,
     upvotes: data.upvotes,

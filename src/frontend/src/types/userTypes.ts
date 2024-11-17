@@ -10,3 +10,9 @@ export interface UserBrief {
   name: string;
   role: "General User" | "Admin" | "Super Admin";
 }
+
+export interface serviceOwner {
+  id: number;
+  name: string;
+  email: string;
+}
