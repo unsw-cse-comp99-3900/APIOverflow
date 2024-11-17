@@ -7,26 +7,15 @@ interface EndpointComponentProps {
   endpoint: Endpoint;
 }
 
-interface SectionProps {
-  title: string;
-  children: React.ReactNode;
-}
 const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
   const textToCopy = endpoint.link;
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const borderDark = {
     GET: "border-blue-500",
     POST: "border-emerald-500",
     PUT: "border-yellow-500",
     DELETE: "border-red-500",
-  };
-
-  const borderLight = {
-    GET: "border-blue-100",
-    POST: "border-emerald-100",
-    PUT: "border-yellow-100",
-    DELETE: "border-red-100",
   };
 
   const bgDark = {
@@ -53,7 +42,6 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
   const bgDarkColor = bgDark[endpoint.method];
   const bgLightColor = bgLight[endpoint.method];
   const borderDarkColor = borderDark[endpoint.method];
-  const borderLightColor = borderLight[endpoint.method];
   const textDarkColor = textDark[endpoint.method];
 
   const copyToClipboard = async () => {
@@ -171,24 +159,24 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
               // each individual response box
               <div key={index} className="my-4">
                 {/* General info */}
-                <div className={`bg-gray-50 border ${borderLightColor} rounded p-4`}>
+                <div className={`bg-gray-50 border-2 border-gray-300 rounded p-4`}>
                   <h3 className="font-semibold mb-2">{`Response Code: ${response.code}`}</h3>
                   <div className="mb-2">{response.description}</div>
 
                   {/* Example Value */}
-                  <div className={`border ${borderLightColor} my-4`}></div>
+                  <div className={`border-2 border-gray-300 my-4`}></div>
                   <h4 className="font-semibold">Example Value</h4>
                   <div className="bg-black text-white p-2 rounded mt-2">
                     <code>{response.example}</code>
                   </div>
 
                   {/* Conditions */}
-                  <div className={`border ${borderLightColor} my-4`}></div>
+                  <div className={`border-2 border-gray-300 my-4`}></div>
                   <h3 className="font-semibold my-2">Conditions</h3>
                   {response.conditions.map((condition, index) => (
                     <div
                       key={index}
-                      className={`bg-white border ${borderLightColor} p-2 rounded mt-2`}
+                      className={`bg-white border-2 border-gray-300 p-2 rounded mt-2`}
                     >
                       <code>{condition}</code>
                     </div>
