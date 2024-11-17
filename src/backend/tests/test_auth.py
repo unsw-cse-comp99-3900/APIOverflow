@@ -159,7 +159,7 @@ def test_reaccess_after_logout_and_login_more():
         "displayname": "guestuser",
         "username": "guestuser",
         "password": "guestpassword",
-        "email" : "doxxed@gmail.com"
+        "email" : "doxxed1@gmail.com"
     })
     response = client.post("/auth/login", json={
         "username": "guestuser",
@@ -172,7 +172,7 @@ def test_reaccess_after_logout_and_login_more():
         "displayname": "guestuser",
         "username": "guestuser1",
         "password": "guestpassword",
-        "email" : "doxxed@gmail.com"
+        "email" : "doxxed2@gmail.com"
     })
     response = client.post("/auth/login", json={
         "username": "guestuser1",
@@ -218,3 +218,20 @@ def test_reaccess_after_logout_and_login_more():
     response = client.get("/auth/admin", headers={"Authorization": f"Bearer {access_token0}"})
     assert response.status_code == 401
     assert response.json() == {"detail": "Current token is invalid"}
+
+def test_register_duplicate_email():
+    """Test registering a duplicate user."""
+    client.post("/auth/register", json={
+        "displayname": "testuser",
+        "username": "testuser1",
+        "password": "testpassword",
+        "email" : "doxxed@gmail.com"
+    })
+    response = client.post("/auth/register", json={
+        "displayname": "testuser",
+        "username": "testuser2",
+        "password": "newpassword",
+        "email" : "doxxed@gmail.com"
+    })
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Email already registered"}

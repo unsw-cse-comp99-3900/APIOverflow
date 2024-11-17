@@ -213,6 +213,16 @@ class Datastore:
                 return item
             
         return None
+    
+    def get_user_by_email(self, email: str) -> T | None:
+        '''
+            Returns with user obj based on email, or None if cannot find user
+        '''
+        for item in self.__store['users']:
+            if item.get_email() == email:
+                return item
+            
+        return None
 
     def get_doc_by_id(self, eid: str) -> T | None:
         '''

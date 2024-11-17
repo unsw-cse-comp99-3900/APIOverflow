@@ -73,7 +73,7 @@ def delete_user(uid: str, is_super: bool):
 
 def get_all_users():
     users = data_store.get_users()
-    users_json = [user.to_json() for user in users]
+    users_json = [user.to_json(include_password=False) for user in users]
     return {"users": users_json, "user_count": data_store.num_users()}
 
 def admin_filter_users(standard: bool, admin: bool, super: bool):

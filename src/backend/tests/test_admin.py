@@ -412,7 +412,7 @@ def test_admin_check_dashboard(simple_user):
     response = client.get("/admin/dashboard/users", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == SUCCESS
     assert response.json()["user_count"] == 4
-    assert response.json()["users"] == [user0.to_json(), user1.to_json(), user2.to_json(), user3.to_json()]
+    assert response.json()["users"] == [user0.to_json(False), user1.to_json(False), user2.to_json(False), user3.to_json(False)]
 
     response = client.delete("/admin/delete/user", headers={"Authorization": f"Bearer {access_token}"},
                             params={
@@ -423,7 +423,7 @@ def test_admin_check_dashboard(simple_user):
     response = client.get("/admin/dashboard/users", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == SUCCESS
     assert response.json()["user_count"] == 3
-    assert response.json()["users"] == [user0.to_json(), user2.to_json(), user3.to_json()]
+    assert response.json()["users"] == [user0.to_json(False), user2.to_json(False), user3.to_json(False)]
 
 def test_admin_filter_standard_users(simple_user):
     '''
