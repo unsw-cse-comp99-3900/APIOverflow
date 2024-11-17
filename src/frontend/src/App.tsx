@@ -77,7 +77,6 @@ const App = () => {
           <Route element={<UserProtectedRoute />}>
             <Route path="/profile" element={<UserSidebarLayout />}>
               <Route element={<AdminProtectedRoute />}>
-                <Route path="/profile/admin/reviews" element={<ReviewManagement />}/>
                 <Route path="/profile/admin/services" element={<ServiceManagement />} />
                 <Route element={<SuperAdminProtectedRoute />}>
                   <Route path="/profile/admin/users" element={<UserManagement />} />

@@ -183,7 +183,7 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
         return_list = [api for api in secondary_list]
     
     return [api.to_summary_json() for api in return_list if
-            api.get_status().name in LIVE_OPTIONS or 
+            api.get_status() in LIVE_OPTIONS or 
             (not hide_pending and api.get_status() == ServiceStatus.PENDING)
             ]
 
@@ -194,7 +194,7 @@ def api_name_search(name, hide_pending: bool) -> list:
 
     for api in api_list:
         if re.search(name, api.get_name(), re.IGNORECASE) and (
-            api.get_status().name in LIVE_OPTIONS or
+            api.get_status() in LIVE_OPTIONS or
             api.get_status() == ServiceStatus.PENDING and not hide_pending
         ):
             return_list.append(api)

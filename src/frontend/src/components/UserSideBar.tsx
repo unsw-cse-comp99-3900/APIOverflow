@@ -17,7 +17,6 @@ const UserSideBar = () => {
     isActive
       ? "flex items-center px-4 py-2 text-gray-900 bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3"
       : "flex items-center px-4 py-2 text-gray-900 bg-white rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3";
-
   const navigate = useNavigate();
   const auth = useAuth();
   const { logout, isAdmin, isSuperAdmin } = auth!;
@@ -75,24 +74,15 @@ const UserSideBar = () => {
                   <FaFolderOpen className="mr-2" /> Service Management
                 </span>
               </NavLink>
-
-              <NavLink to="/profile/admin/reviews" className={linkClass}>
-                <span className="ml-3 font-medium flex items-center">
-                  <FaCommentDots className="mr-2" /> Review Management
-                </span>
-              </NavLink>
             </>
           )}
 
           {isSuperAdmin && (
-            <>
-              <div className="border border-gray-100 mb-5 mt-5"></div>
               <NavLink to="/profile/admin/users" className={linkClass}>
                 <span className="ml-3 font-medium flex items-center">
                   <FaUserFriends className="mr-2" /> User Management
                 </span>
               </NavLink>
-            </>
           )}
 
           {/* Setting tabs */}
