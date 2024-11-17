@@ -408,9 +408,21 @@ async def verify_email(token: str):
 @app.post("/auth/reset-password")
 async def request_password_reset(user: User = Depends(manager)):
     '''
-        Sends a password request
+        Sends a password request to authenticated user
     '''
     uid = user['id']
+    password_reset_request(uid)
+    return {"message": "Password reset email sent."}
+
+@app.post("/reset-password")
+async def request_password_reset_non_auth(email: GeneralString):
+    '''
+        Sends a password request to non-authenticated user
+    '''
+    user = data_store.get_user_by_email(email.content)
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+    uid = user.get_id()
     password_reset_request(uid)
     return {"message": "Password reset email sent."}
 
