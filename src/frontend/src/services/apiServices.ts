@@ -16,7 +16,6 @@ import { Rating, Tag } from "../types/miscTypes";
 import {
   adminUpdateDataFormatter,
   briefApiDataFormatter,
-  detailedApiDataFormatter,
   permDataFormatter,
   usersDataFormatter,
 } from "../utils/dataFormatters";
@@ -62,7 +61,7 @@ export const getApi = async (id: string) => {
   if (response.status === 404) {
     throw new Error("Service Not Found");
   }
-  return detailedApiDataFormatter(data);
+  return data;
 };
 
 export const deleteApi = async (id: string) => {

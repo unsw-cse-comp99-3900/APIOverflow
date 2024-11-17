@@ -1,5 +1,6 @@
 import { Endpoint } from "./backendTypes";
 import { Review, ServiceType } from "./miscTypes";
+import { serviceOwner } from "./userTypes";
 
 export interface BriefApi {
   id: string;
@@ -9,13 +10,40 @@ export interface BriefApi {
   tags: string[];
 }
 
-export type DetailedApi = BriefApi & {
-  docs: string[];
-  endpoint: string;
-  reviews: Review[];
+export type ServiceStatus =
+  | "LIVE"
+  | "PENDING"
+  | "REJECTED"
+  | "UPDATE_PENDING"
+  | "UPDATE_REJECTED";
+
+export type DetailedApi = {
+  description: string;
+  downvotes: number;
   upvotes: number;
+  icon: string;
+  icon_url: string;
+  id: string;
+  name: string;
+  owner: serviceOwner;
+  pay_model: "Free" | "Paid";
+  reviews: Review[];
+  status:ServiceStatus;
+  tags: string[];
   type: ServiceType;
+  versions: Version[];
 };
+
+export type Version = {
+  docs: string[];
+  endpoints: Endpoint[];
+  newly_created: boolean;
+  status: ServiceStatus;
+  status_reason: string;
+  version_description:string;
+  version_name: string;
+};
+
 
 export interface ServiceAdminBrief {
   id: string;
