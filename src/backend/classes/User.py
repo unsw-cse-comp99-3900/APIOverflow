@@ -252,15 +252,14 @@ class User:
     ################################
     #  Storage Methods
     ################################
-    def to_json(self) -> dict[T, K]:
+    def to_json(self, include_password=True) -> dict[T, K]:
         '''
             Converts object into json
         '''
-        return {
+        data = {
             'id': self._id,
             'displayname' : self._displayname,
             'username' : self._name,
-            'password' : self._password,
             'email' : self._email,
             'icon_url' : self._icon_url,
             'is_admin' : self._is_admin,
@@ -270,3 +269,8 @@ class User:
             'replies': self._replies,
             'icon' : self._icon
         }
+
+        if include_password:
+            data['password'] = self._password
+    
+        return data
