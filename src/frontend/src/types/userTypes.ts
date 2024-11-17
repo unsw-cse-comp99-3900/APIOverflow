@@ -4,3 +4,9 @@ export interface User {
   email: string;
   displayName: string;
 }
+
+export interface UserBrief {
+  id: string;
+  name: string;
+  role: "General User" | "Admin" | "Super Admin";
+}

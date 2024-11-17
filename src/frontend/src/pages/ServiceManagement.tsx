@@ -58,13 +58,11 @@ const ServiceManagement: React.FC = () => {
 
   const handleApprove = (service: ServiceAdminBrief, reason: string) => {
     approveService(service.id, true, reason, service.serviceGlobal, service.versionName)
-    setUpdateData(null)
     console.log(`Service with ID: ${service.id} approved. Reason: ${reason}`);
   };
 
   const handleReject = (service: ServiceAdminBrief, reason: string) => {
     approveService(service.id, false, reason, service.serviceGlobal, service.versionName)
-    setUpdateData(null)
     console.log(`Service with ID: ${service.id} rejected. Reason: ${reason}`);
   };
 

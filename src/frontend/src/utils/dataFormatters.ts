@@ -65,3 +65,21 @@ export const adminUpdateDataFormatter = (
     }),
   };
 };
+
+export const usersDataFormatter = (data: any) => {
+  return data.map((user: any) => {
+    let role = "General User";
+    
+    if (user.is_super) {
+      role = "Super Admin";
+    } else if (user.is_admin) {
+      role = "Admin";
+    }
+
+    return {
+      id: user.id,
+      name: user.displayname,
+      role
+    };
+  });
+}

@@ -1,25 +1,35 @@
 // src/pages/UserManagement.tsx
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UserTable from "../components/UserTable";
+import { getUsers, userDelete, userDemote, userPromote } from "../services/apiServices";
+import { UserBrief } from "../types/userTypes";
 
 const UserManagement: React.FC = () => {
   // Dummy data for testing (you can replace this with fetched data)
-  const [users, setUsers] = useState([
-    { id: "1", name: "John Doe", role: "general" as "general" },
-    { id: "2", name: "Jane Smith", role: "admin" as "admin" },
-    { id: "3", name: "Mike Johnson", role: "general" as "general" },
-  ]);
+  const [users, setUsers] = useState<UserBrief[]>([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      // Fetch services from the API
+      const usersData = await getUsers();
+      setUsers(usersData);
+    };
+    fetchUsers();
+  }, [users]);
 
   const handlePromote = (userId: string, userName: string) => {
+    userPromote(userId);
     console.log(`User with ID: ${userId} (${userName}) promoted to admin.`);
   };
 
   const handleDemote = (userId: string, userName: string) => {
+    userDemote(userId);
     console.log(`User with ID: ${userId} (${userName}) demoted to general user.`);
   };
 
   const handleDelete = (userId: string, userName: string) => {
+    userDelete(userId);
     console.log(`User with ID: ${userId} (${userName}) deleted.`);
   };
 

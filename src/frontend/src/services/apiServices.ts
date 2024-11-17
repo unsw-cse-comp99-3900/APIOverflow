@@ -18,6 +18,7 @@ import {
   briefApiDataFormatter,
   detailedApiDataFormatter,
   permDataFormatter,
+  usersDataFormatter,
 } from "../utils/dataFormatters";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -33,7 +34,6 @@ export const getApis = async (tags?: Tag[], hidePending = true) => {
     }
   );
   const data = await response.json();
-  console.log(data);
   return data.map(briefApiDataFormatter);
 };
 
@@ -58,7 +58,7 @@ export const getApi = async (id: string) => {
     method: "GET",
   });
   const data = await response.json();
-  console.log(data)
+  console.log(data);
   if (response.status === 404) {
     throw new Error("Service Not Found");
   }
@@ -380,23 +380,79 @@ export const getPendingServices = async () => {
   });
   const data = await response.json();
   return adminUpdateDataFormatter(data);
-}
+};
 
-export const approveService = async (sid: string, approved: boolean, reason: string, serviceGlobal: boolean, versionName: string|null) => {
+export const approveService = async (
+  sid: string,
+  approved: boolean,
+  reason: string,
+  serviceGlobal: boolean,
+  versionName: string | null
+) => {
   const approvalInfo: ServiceApprove = {
     sid,
     approved,
     reason,
     service_global: serviceGlobal,
     version_name: versionName,
-  }
+  };
   console.log(approvalInfo);
   await fetch(`${baseUrl}/admin/service/approve`, {
-    headers: {  
+    headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(approvalInfo),
     method: "POST",
   });
-}
+};
+
+export const userPromote = async (uid: string) => {
+  console.log({
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({uid}),
+    method: "POST",
+  })
+  const reponse = await fetch(`${baseUrl}/admin/promote?uid=${uid}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  });
+};
+
+export const userDemote = async (uid: string) => {
+  const reponse = await fetch(`${baseUrl}/admin/demote?uid=${uid}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  });
+};
+
+export const userDelete = async (uid: string) => {
+  const reponse = await fetch(`${baseUrl}/admin/delete/user?uid=${uid}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "DELETE",
+  });
+};
+
+export const getUsers = async () => {
+  const reponse = await fetch(`${baseUrl}/admin/dashboard/users`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+  });
+  const data = await reponse.json();
+  return usersDataFormatter(data.users);
+};
