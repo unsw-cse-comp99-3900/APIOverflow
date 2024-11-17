@@ -77,37 +77,84 @@ export const addApi = async (
   tags: string[],
   endpointLink: string
 ) => {
-  const ParameterPlaceholder: EndpointParameter = {
+  const ParameterPlaceholder1: EndpointParameter = {
     id: "1",
     endpoint_link: endpointLink,
     required: false,
     type: "BODY",
-    name: "Parameter Placeholder",
+    name: "Parameter Placeholder1",
     value_type: "string",
-    example: "Example Placeholder",
+    example: "Example Placeholder1",
   };
 
-  const ResponsePlaceholder: EndpointResponse = {
-    code: "1",
-    description: "Description Placeholder",
-    conditions: ["Condition Placeholder"],
-    example: "Example Placeholder",
+  const ParameterPlaceholder2: EndpointParameter = {
+    id: "2",
+    endpoint_link: endpointLink,
+    required: true,
+    type: "HEADER",
+    name: "Parameter Placeholder2",
+    value_type: "string",
+    example: "Example Placeholder2",
   };
 
-  const endpoint: Endpoint = {
+  const ResponsePlaceholder1: EndpointResponse = {
+    code: "200",
+    description: "Description Placeholder1",
+    conditions: ["Condition Placeholder1", "Condition Placeholder2"],
+    example: "Example Placeholder1",
+  };
+
+  const ResponsePlaceholder2: EndpointResponse = {
+    code: "404",
+    description: "Description Placeholder2",
+    conditions: ["Condition Placeholder1", "Condition Placeholder2"],
+    example: "Example Placeholder2",
+  };
+
+  const endpoint1: Endpoint = {
     link: endpointLink,
-    title_description: "Title Description Placeholder",
-    main_description: "Main Description Placeholder",
-    tab: "Tab Placeholder",
-    parameters: [ParameterPlaceholder],
+    title_description: "Title Description Placeholder 1",
+    main_description: "Main Description Placeholder 1",
+    tab: "Tab Placeholder 1",
+    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
     method: "GET",
-    responses: [ResponsePlaceholder],
+    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
+  };
+
+  const endpoint2: Endpoint = {
+    link: endpointLink,
+    title_description: "Title1 Description Placeholder 2",
+    main_description: "Main Description Placeholder 2",
+    tab: "Tab Placeholder 2",
+    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
+    method: "POST",
+    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
+  };
+
+  const endpoint3: Endpoint = {
+    link: endpointLink,
+    title_description: "Title1 Description Placeholder 3",
+    main_description: "Main Description Placeholder 3",
+    tab: "Tab Placeholder 3",
+    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
+    method: "PUT",
+    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
+  };
+
+  const endpoint4: Endpoint = {
+    link: endpointLink,
+    title_description: "Title1 Description Placeholder 4",
+    main_description: "Main Description Placeholder 4",
+    tab: "Tab Placeholder 4",
+    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
+    method: "DELETE",
+    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
   };
 
   const api: ServiceAdd = {
     name,
     description,
-    endpoints: [endpoint],
+    endpoints: [endpoint1, endpoint2, endpoint3, endpoint4],
     tags,
   };
 

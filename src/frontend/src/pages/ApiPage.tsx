@@ -9,7 +9,7 @@ import ApiReviews from "../components/ApiReviews";
 import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import ApiDescription from "../components/ApiDescription";
 import BackButton from "../components/BackButton";
-import EndpointAndDocumentation from "../components/EndpointAndDocumentation";
+import VersionFields from "../components/VersionFields";
 
 const ApiPage: React.FC = () => {
   const [api, setApi] = useState<DetailedApi | null>(null);
@@ -83,7 +83,7 @@ const ApiPage: React.FC = () => {
             <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
               <div className="w-2/3">
                 <ApiDescription api={api} />
-                <EndpointAndDocumentation api={api} />
+                <VersionFields versions={api.versions} />
               </div>
               <ApiReviews sid={api.id} />
             </div>

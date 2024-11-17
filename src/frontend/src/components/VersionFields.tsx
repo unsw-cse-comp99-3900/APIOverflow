@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { DetailedApi } from "../types/apiTypes";
+import { DetailedApi, Version } from "../types/apiTypes";
 import { toast } from "react-toastify";
 import { FaRegCopy } from "react-icons/fa";
 import { getDoc } from "../services/apiServices";
+import EndpointComponent from "./EndpointComponent";
 
-interface EndpointAndDocumentationProps {
-  api: DetailedApi;
+interface VersionFieldsProps {
+  versions: Version[];
 }
 
-const EndpointAndDocumentation: React.FC<EndpointAndDocumentationProps> = ({
-  api,
-}) => {
+const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -18,8 +17,8 @@ const EndpointAndDocumentation: React.FC<EndpointAndDocumentationProps> = ({
   useEffect(() => {
     const fetchDocs = async () => {
       try {
-        if (api.versions[0].docs && api.versions[0].docs.length > 0) {
-          const docURL = await getDoc(api.versions[0].docs[0]);
+        if (versions[0].docs && versions[0].docs.length > 0) {
+          const docURL = await getDoc(versions[0].docs[0]);
           setPdfUrl(docURL);
         } else {
           setError("No documentation available.");
@@ -36,9 +35,9 @@ const EndpointAndDocumentation: React.FC<EndpointAndDocumentationProps> = ({
     };
 
     fetchDocs();
-  }, [api.versions]); // Only run when `api.docs` changes
+  }, [versions]); // Only run when `api.docs` changes
 
-  const textToCopy = api.versions[0].endpoints[0].link;
+  const textToCopy = versions[0].endpoints[0].link;
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(textToCopy);
@@ -53,19 +52,16 @@ const EndpointAndDocumentation: React.FC<EndpointAndDocumentationProps> = ({
     <>
       <div className=" bg-white rounded-2xl shadow-lg p-6 mt-6">
         <h2 className="text-xl font-bold mb-4">Patch Note</h2>
-        <p className="break-words text-justify">{api.description}</p>
+        <p className="break-words text-justify">
+          {versions[0].version_description}
+        </p>
         <div className="border border-gray-100 w-full my-5"></div>
 
-        <h2 className="text-xl font-bold mb-4">Endpoint</h2>
-        <div className="flex items-center rounded-xl px-5 my-5 min-h-12 bg-gray-100 border-2 border-gray-500">
-          <p className="break-words font-semibold">{api.versions[0].endpoints[0].link}</p>
-          <button
-            onClick={copyToClipboard}
-            className="ml-auto p-2 hover:bg-gray-400 rounded-xl min-h-5"
-          >
-            <FaRegCopy />
-          </button>
-        </div>
+        <h2 className="text-xl font-bold mb-4">Endpoints</h2>
+
+        {versions[0].endpoints.map((endpoint) => (
+          <EndpointComponent endpoint={endpoint} />
+        ))}
 
         <div className="border border-gray-100 w-full my-5"></div>
 
@@ -90,4 +86,4 @@ const EndpointAndDocumentation: React.FC<EndpointAndDocumentationProps> = ({
   );
 };
 
-export default EndpointAndDocumentation;
+export default VersionFields;
