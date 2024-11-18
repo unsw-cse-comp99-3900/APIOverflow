@@ -505,3 +505,11 @@ export const getUsers = async () => {
   const data = await reponse.json();
   return usersDataFormatter(data.users);
 };
+
+
+/*        Misc Services       */
+export const verifyEmail = async (token: string) => {
+  return fetch(`${baseUrl}/auth/verify_email?token=${token}`, {
+    method: "POST",
+  });
+}
