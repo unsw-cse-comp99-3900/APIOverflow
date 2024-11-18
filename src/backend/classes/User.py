@@ -1,16 +1,22 @@
 from typing import *
 
+
 T = TypeVar("T")
 K = TypeVar("K")
 
+
 DEFAULT_ICON = '0'
 
+
 class User:
+
 
     '''
         Class representing a User on the platform
 
+
         Stores the following:
+
 
             uid:        ID of user
             displayname:Username of user (non-unique)
@@ -28,18 +34,19 @@ class User:
             replies:    List of replies user has made
             num_replies: Number of replies made
             token:      Current token of the user
-    
+
     '''
 
+
     def __init__(self,
-                 uid: str,
-                 displayname: str,
-                 username: str,
-                 password: str,
-                 email: str,
-                 is_admin: bool,
-                 is_super: bool,
-                 icon_url: str = None) -> None:
+                uid: str,
+                displayname: str,
+                username: str,
+                password: str,
+                email: str,
+                is_admin: bool,
+                is_super: bool,
+                icon_url: str = None) -> None:
         
         # Initialised vars
         self._id = uid
@@ -51,6 +58,7 @@ class User:
         self._is_admin = is_admin
         self._is_super = is_super
 
+
         # Default vars
         self._icon = DEFAULT_ICON
         self._is_verified = False
@@ -59,7 +67,7 @@ class User:
         self._replies = []
         self._num_replies = 0
         self._token = None
-    
+
     ################################
     #   Add Methods
     ################################
@@ -70,12 +78,14 @@ class User:
         self._reviews.append(rid)
         self._num_reviews += 1
 
+
     def add_reply(self, rid: str) -> None:
         '''
             Adds a reply to user's list
         '''
         self._replies.append(rid)
         self._num_replies += 1
+
 
     ################################
     #  Modify Methods
@@ -86,23 +96,25 @@ class User:
         '''
         self._displayname = new
 
+
     def modify_username(self, new: str) -> None:
         '''
             Modifies user's username
         '''
         self._name = new
-    
+
     def modify_email(self, new: str) -> None:
         '''
             Modifies user's email
         '''
         self._email = new
-    
+
     def promote_to_admin(self) -> None:
         '''
             Promotes user to admin
         '''
         self._is_admin = True
+
 
     def demote_to_user(self) -> None:
         '''
@@ -110,11 +122,13 @@ class User:
         '''
         self._is_admin = False
 
+
     def modify_icon(self, doc_id: str) -> None:
         '''
             Modifies user's icon
         '''
         self._icon = doc_id
+
 
     def verify_user(self) -> None:
         '''
@@ -122,26 +136,29 @@ class User:
         '''
         self._is_verified = True
 
+
     def change_password(self, new:str) -> None:
         '''
             Changes the user password
         '''
         self._password = new
-    
+
     def update_token(self, new:str) -> None:
         '''
             Updates the user token
         '''
         self._token = new
 
+
     ################################
     #  Delete Methods
-    ################################  
+    ################################ 
     def remove_icon(self) -> None:
         '''
             Removes user's current icon
         '''
         self._icon = DEFAULT_ICON
+
 
     def remove_review(self, rid: str) -> None:
         '''
@@ -150,12 +167,14 @@ class User:
         self._reviews.remove(rid)
         self._num_reviews -= 1
 
+
     def remove_reply(self, rid: str) -> None:
         '''
             Removes reply from user's list
         '''
         self._replies.remove(rid)
         self._num_replies -= 1
+
 
     ################################
     #  Get Methods
@@ -165,66 +184,69 @@ class User:
             Returns uid of user
         '''
         return self._id
-    
+
     def get_name(self) -> str:
         '''
             Returns username of user
         '''
         return self._name
-    
+
     def get_email(self) -> str:
         '''
             Returns email of user
         '''
         return self._email
-    
+
     def get_password(self) -> str:
         '''
             Return user password
         '''
         return self._password
 
+
     def get_icon_url(self) -> str:
         '''
             Return icon url of user
         '''
         return self._icon_url
-    
+
     def get_is_admin(self) -> bool:
         '''
             Return the admin status of the user
         '''
         return self._is_admin
-    
+
     def get_is_super(self) -> bool:
         '''
             Return the super admin status of the user
         '''
         return self._is_super
-    
+
     def get_icon(self) -> str:
         '''
             Grabs user's icon (in doc_id form)
         '''
         return self._icon
 
+
     def get_is_verified(self) -> bool:
         '''
             Return the verify status of the user
         '''
         return self._is_verified
-    
+
     def get_reviews(self) -> List[str]:
         '''
             Return list of reviews
         '''
         return self._reviews
-    
+
     def get_replies(self) -> List[str]:
         '''
             Return list of replies
         '''
         return self._replies
+
 
     def get_profile(self) -> dict[str, str]:
         '''
@@ -237,17 +259,22 @@ class User:
             'icon': self._icon
         }
 
+
     def get_displayname(self) -> str:
         '''
             Return user's displayname
         '''
         return self._displayname
 
+
     def get_token(self) -> str:
         '''
             Return user's current token
         '''
         return self._token
+
+
+
 
     ################################
     #  Storage Methods
