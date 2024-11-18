@@ -1,14 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { FaCrown } from "react-icons/fa";
 import { DetailedApi } from "../types/apiTypes";
 import { apiGetIcon, getApi } from "../services/apiServices";
 import FetchStatus from "../components/FetchStatus";
-import Tag from "../components/Tag";
-import EditApiButton from "../components/EditApiButton";
-import DeleteApiButton from "../components/DeleteApiButton";
-import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import ApiReviews from "../components/ApiReviews";
 import ApiDescription from "../components/ApiDescription";
 import BackButton from "../components/BackButton";
