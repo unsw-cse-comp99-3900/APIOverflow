@@ -4,13 +4,14 @@ import { FaCrown } from "react-icons/fa";
 import Tag from "./Tag";
 import EditApiButton from "./EditApiButton";
 import DeleteApiButton from "./DeleteApiButton";
+import { PayModel } from "../types/miscTypes";
 
 interface ApiGeneralInfoProps {
   apiId: string;
   iconURL: string;
   apiName: string;
   ownerName: string;
-  payModel: string;
+  payModel: PayModel;
   tags: string[];
   isMyApi: boolean;
 }
@@ -24,6 +25,12 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
   tags,
   isMyApi,
 }) => {
+  const bgColor = {
+    Free: "bg-blue-500",
+    Freemium: "bg-purple-500",
+    Premium: "bg-amber-500",
+  };
+
   return (
     <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
       <div className="flex items-center">
@@ -38,10 +45,15 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
         <div className="ml-10 w-full">
           <div className="flex items-center">
             <h1 className="text-4xl font-bold mb-2">{apiName}</h1>
-            <div className="text-amber-500 border-2  text-2xl px-2 pb-1">
+            <div
+              className={`flex items-center ${bgColor[payModel]} rounded-md mx-3 px-2`}
+            >
               {(payModel === "Premium" || payModel === "Freemium") && (
-                <FaCrown />
+                <div className="flex items-center justify-center text-white rounded-md mr-2">
+                  <FaCrown />
+                </div>
               )}
+              <span className="text-white text-lg font-medium">{payModel}</span>
             </div>
           </div>
 

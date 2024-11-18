@@ -17,9 +17,9 @@ import {
   adminUpdateDataFormatter,
   briefApiDataFormatter,
   permDataFormatter,
+  userProfileDataFormatter,
   usersDataFormatter,
 } from "../utils/dataFormatters";
-import { BriefApi } from "../types/apiTypes";
 
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -35,6 +35,7 @@ export const getApis = async (tags?: Tag[], hidePending = true) => {
     }
   );
   const data = await response.json();
+  console.log(data)
   return data.map(briefApiDataFormatter);
 };
 
@@ -49,9 +50,10 @@ export const getMyApis = async () => {
   if (response.status === 401) {
     throw new Error("Unauthorized");
   }
-
+  
   const data = await response.json();
-  return data;
+  console.log(data)
+  return data.map(briefApiDataFormatter);
 };
 
 export const getApi = async (id: string) => {
@@ -160,7 +162,7 @@ export const addApi = async (
     tags,
     version_name: "1.0.0",
     version_description: "Initial Version",
-    pay_model: "Freemium",
+    pay_model: "Free",
   };
 
   const response = await fetch(`${baseUrl}/service/add`, {
@@ -508,6 +510,68 @@ export const getUsers = async () => {
   return usersDataFormatter(data.users);
 };
 
+/*        User Services       */
+export const getUser = async () => {
+  const response = await fetch(`${baseUrl}/user/get`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      method: "GET"
+    }
+  );
+  const data = await response.json();
+  return userProfileDataFormatter(data);
+}
+
+export const getUserIcon = async () => {
+  const response = await fetch(`${baseUrl}/user/get/icon`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+      method: "GET",
+    });
+  const blob = await response.blob(); // Get the Blob data
+  const url = URL.createObjectURL(blob); // Create a URL for the Blob
+  return url;
+}
+
+export const updateDisplayName = async (displayName: string) => {
+  const info = {
+    content: displayName
+  }
+  const response = await fetch(`${baseUrl}/user/update/displayname`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(info)
+    }
+  );
+  console.log(response.status);
+  console.log(response.json());
+}
+
+export const userAddIcon = async (docId: string) => {
+  const info = {
+    doc_id: docId,
+  };
+  await fetch(`${baseUrl}/user/add_icon`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(info),
+  });
+};
 
 /*        Misc Services       */
 export const verifyEmail = async (token: string | null) => {
@@ -534,8 +598,9 @@ export const searchApis = async (searchTerm: string, hidePending: boolean = true
     }
 
     const data = await response.json();
-    return Array.isArray(data) ? data : [];
+    return data.map(briefApiDataFormatter)
   } catch (error) {
     console.error('Search API error:', error);
     throw error;
   }
+};

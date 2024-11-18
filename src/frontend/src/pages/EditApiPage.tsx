@@ -1,5 +1,5 @@
 import React from "react";
-import EditApiForm from "../components/UpdateApiForm";
+import EditApiForm from "../components/EditApiForm";
 import { useParams } from "react-router-dom";
 
 const EditApiPage: React.FC = () => {

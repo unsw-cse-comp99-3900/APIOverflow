@@ -1,5 +1,5 @@
 import React from "react";
-import EditApiForm from "../components/UpdateApiForm";
+import EditApiForm from "../components/EditApiForm";
 
 const AddApiPage: React.FC = () => {
   return (

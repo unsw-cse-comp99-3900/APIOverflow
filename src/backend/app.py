@@ -190,9 +190,9 @@ async def update_service(service: ServiceGlobalUpdate, user: User = Depends(mana
    return None
 
 
-@app.get("/service/apis")
-async def view_apis():
-   return list_nonpending_apis()
+# @app.get("/service/apis")
+# async def view_apis():
+#    return list_nonpending_apis()
 
 
 @app.post("/service/upload_docs")
@@ -434,6 +434,7 @@ async def register(user: UserCreate):
    '''
        Register a user onto the platform
    '''
+   print("Received request")
    uid = register_wrapper(user.displayname, user.username, user.password, user.email)
    return {'uid' : uid}
 
@@ -668,9 +669,6 @@ async def user_add_icon(doc: DocumentID, user: User=Depends(manager)):
        Endpoint to add an icon to a user
    '''
    user_add_icon_wrapper(user['id'], doc.doc_id)
-
-
-
 
 @app.delete("/user/delete_icon")
 async def user_delete_icon(user: User=Depends(manager)):

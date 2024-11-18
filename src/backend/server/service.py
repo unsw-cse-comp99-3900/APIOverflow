@@ -202,14 +202,14 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
 # returns a list of regex matching services 
 def api_name_search(name, hide_pending: bool) -> list: 
     api_list = data_store.get_apis()
-    return_list: List[Service] = []
+    return_list: List[dict[str, str]] = []
 
     for api in api_list:
         if re.search(name, api.get_name(), re.IGNORECASE) and (
             api.get_status() in LIVE_OPTIONS or
             api.get_status() == ServiceStatus.PENDING and not hide_pending
         ):
-            return_list.append(api)
+            return_list.append(api.to_summary_json())
     return return_list
 
 async def upload_docs_wrapper(sid: str, uid: str, doc_id: str, version: Optional[str]) -> None:

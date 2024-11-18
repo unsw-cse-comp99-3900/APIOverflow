@@ -17,6 +17,8 @@ export type ServiceType = "api" | "micro"
 
 export type Status = "pending" | "approved" | "rejected"
 
+export type PayModel = "Free" | "Freemium" | "Premium"
+
 export type AllowedEndpointTypes = "GET" | "POST" | "PUT" | "DELETE"
 
 export type AllowedParameterTypes = "HEADER" | "BODY" | "PATH" | "QUERY"

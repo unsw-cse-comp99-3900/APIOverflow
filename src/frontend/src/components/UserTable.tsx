@@ -25,7 +25,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onPromote, onDemote, onDel
 
   return (
     <div className="w-full">
-      <div className="flex justify-between mb-4">
+      {/* <div className="flex justify-between mb-4">
         <div>
           <label className="mr-2 text-gray-700 font-semibold">Filter:</label>
           <select
@@ -38,7 +38,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onPromote, onDemote, onDel
             <option value="general">General Users</option>
           </select>
         </div>
-      </div>
+      </div> */}
       <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
         <thead>
           <tr className="bg-gray-200">

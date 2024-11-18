@@ -19,7 +19,7 @@ import { Tag } from "../types/miscTypes";
 import FileCard from "./FileCard";
 import { useAuth } from "../contexts/AuthContext";
 
-const EditApiForm = ({ apiId }: { apiId?: string }) => {
+const UpdateApiForm = ({ apiId }: { apiId?: string }) => {
   const navigate = useNavigate();
 
   // current api detail for editing
@@ -362,4 +362,4 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   );
 };
 
-export default EditApiForm;
+export default UpdateApiForm;
