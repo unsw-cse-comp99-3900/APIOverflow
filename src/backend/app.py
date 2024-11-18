@@ -190,9 +190,9 @@ async def update_service(service: ServiceGlobalUpdate, user: User = Depends(mana
    return None
 
 
-@app.get("/service/apis")
-async def view_apis():
-   return list_nonpending_apis()
+# @app.get("/service/apis")
+# async def view_apis():
+#    return list_nonpending_apis()
 
 
 @app.post("/service/upload_docs")
