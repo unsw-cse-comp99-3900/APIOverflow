@@ -158,6 +158,9 @@ export const addApi = async (
     description,
     endpoints: [endpoint1, endpoint2, endpoint3, endpoint4],
     tags,
+    version_name: "1.0.0",
+    version_description: "Initial Version",
+    pay_model: "Freemium",
   };
 
   const response = await fetch(`${baseUrl}/service/add`, {
@@ -505,6 +508,15 @@ export const getUsers = async () => {
   return usersDataFormatter(data.users);
 };
 
+
+/*        Misc Services       */
+export const verifyEmail = async (token: string | null) => {
+  const response = await fetch(`${baseUrl}/auth/verify-email/${token}`, {
+    method: "POST",
+  });
+  return await response
+}
+
 export const searchApis = async (searchTerm: string, hidePending: boolean = true) => {
   try {
     const response = await fetch(
@@ -527,4 +539,3 @@ export const searchApis = async (searchTerm: string, hidePending: boolean = true
     console.error('Search API error:', error);
     throw error;
   }
-};

@@ -5,6 +5,9 @@ export interface ServiceAdd {
     description: string;
     tags: string[];
     endpoints: Endpoint[];
+    version_name: string;
+    version_description: string;
+    pay_model: "Free" | "Premium" | "Freemium";
 }
 
 export interface ServiceUpdate{

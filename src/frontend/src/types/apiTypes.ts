@@ -26,7 +26,7 @@ export type DetailedApi = {
   id: string;
   name: string;
   owner: serviceOwner;
-  pay_model: "Free" | "Paid";
+  pay_model: "Free" | "Premium" | "Freemium";
   reviews: Review[];
   status:ServiceStatus;
   tags: string[];
