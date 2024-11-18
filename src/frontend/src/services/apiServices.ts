@@ -156,6 +156,9 @@ export const addApi = async (
     description,
     endpoints: [endpoint1, endpoint2, endpoint3, endpoint4],
     tags,
+    version_name: "1.0.0",
+    version_description: "Initial Version",
+    pay_model: "Freemium",
   };
 
   const response = await fetch(`${baseUrl}/service/add`, {

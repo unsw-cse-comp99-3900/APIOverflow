@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { DetailedApi, Version } from "../types/apiTypes";
 import { toast } from "react-toastify";
-import { FaRegCopy } from "react-icons/fa";
 import { getDoc } from "../services/apiServices";
 import EndpointComponent from "./EndpointComponent";
 

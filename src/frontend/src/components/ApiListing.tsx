@@ -23,9 +23,6 @@ const ApiListing: React.FC<ApiListingProps>  = ({
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [iconURL, setIconURL] = useState<string>("")
 
-  const auth = useAuth();
-  const { isAdmin, isSuperAdmin } = auth!;
-
   useEffect(() => {
     const fetchIcon = async () => {
       try{
