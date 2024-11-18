@@ -528,3 +528,37 @@ export const searchApis = async (searchTerm: string, hidePending: boolean = true
     throw error;
   }
 };
+
+export const requestPasswordReset = async (email: string) => {
+  const response = await fetch(`${baseUrl}/reset-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ content: email }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to send reset email');
+  }
+
+  return response.json();
+};
+
+export const resetPasswordWithToken = async (token: string, newPassword: string) => {
+  const response = await fetch(`${baseUrl}/auth/reset-password/${token}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ newpass: newPassword }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to reset password');
+  }
+
+  return response.json();
+};

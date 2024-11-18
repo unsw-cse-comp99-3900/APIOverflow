@@ -25,6 +25,9 @@ import ReviewManagement from "./pages/ReviewManagement";
 import ServiceManagement from "./pages/ServiceManagement";
 import UserManagement from "./pages/UserManagement";
 import MyProfilePage from "./pages/UserProfilePage";
+import PasswordResetRequest from './components/PasswordResetRequest';
+import PasswordReset from './components/PasswordReset';
+
 
 const UserProtectedRoute = () => {
   const auth = useAuth();
@@ -73,7 +76,8 @@ const App = () => {
           <Route path="/apis" element={<TagsSidebarLayout />}>
             <Route path="/apis" element={<APIsPage />} />
           </Route>
-
+          <Route path="/forgot-password" element={<PasswordResetRequest />} />
+          <Route path="/reset-password/:token" element={<PasswordReset />} />
           <Route element={<UserProtectedRoute />}>
             <Route path="/profile" element={<UserSidebarLayout />}>
               <Route element={<AdminProtectedRoute />}>
