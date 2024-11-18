@@ -266,7 +266,8 @@ class Datastore:
                     'owner': owner.get_displayname(),
                     'description': item.get_description(),
                     'icon_url': item.get_icon_url(),
-                    'tags': item.get_tags()
+                    'tags': item.get_tags(),
+                    'pay_model': item.get_pay_model()
                 }
                 user_apis.append(api_info)
         return user_apis
