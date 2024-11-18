@@ -511,11 +511,13 @@ export const getUsers = async () => {
 
 
 /*        Misc Services       */
-export const verifyEmail = async (token: string) => {
-  return fetch(`${baseUrl}/auth/verify_email?token=${token}`, {
+export const verifyEmail = async (token: string | null) => {
+  const response = await fetch(`${baseUrl}/auth/verify-email/${token}`, {
     method: "POST",
   });
+  return await response
 }
+
 export const searchApis = async (searchTerm: string, hidePending: boolean = true) => {
   try {
     const response = await fetch(
