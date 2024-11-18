@@ -510,7 +510,7 @@ def parse_yaml_to_api(yaml_data: dict, user: User) -> Service:
        "tags": ["tags", "categories", "labels"],
        "endpoints": ["links", "endpoint", "endpoints", "api_endpoints", "service_endpoints"],
        "version_name": ["version_name", "version", "api_version", "service_version"],
-       "type": ["API", "service", "api", "Service"]
+       "paid": ["payment", "paid", "pay", "monetise", "monetised", "model", "pay_model"]
    }
    # maybe add AI to this later
   
@@ -527,6 +527,7 @@ def parse_yaml_to_api(yaml_data: dict, user: User) -> Service:
    service_tags = find_field(yaml_data, FIELD_MAPPING["tags"]) or []
    endpoints_data = find_field(yaml_data, FIELD_MAPPING["endpoints"]) or []
    version_name = find_field(yaml_data, FIELD_MAPPING["version_name"]) or "Unknown version"
+   paid = find_field(yaml_data, FIELD_MAPPING["paid"]) or "Free"
 
 
    endpoints = []
@@ -556,7 +557,8 @@ def parse_yaml_to_api(yaml_data: dict, user: User) -> Service:
                      service_tags,
                      endpoints,
                      version_name,
-                     "" # add this if needed
+                     "", # add versino description if needed
+                     paid, # assume not paid
                    )
 
 

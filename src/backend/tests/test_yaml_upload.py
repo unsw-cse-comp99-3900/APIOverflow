@@ -112,7 +112,7 @@ def test_yaml(simple_user):
    assert response.status_code == SUCCESS
 
 
-def wrong_file(simple_user):
+def test_wrong_file(simple_user):
    '''
        Test YAML import
    '''

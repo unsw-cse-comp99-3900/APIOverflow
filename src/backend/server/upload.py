@@ -97,7 +97,7 @@ async def import_yaml_wrapper(file: UploadFile, user: User) -> Service:
        file_content = await file.read()
        yaml_data = yaml.safe_load(file_content)
    except:
-       raise HTTPException(status_code=400, detail=f"Invalid YAML format: {str(e)}")
+       raise HTTPException(status_code=400, detail=f"Invalid YAML format")
 
 
    api = parse_yaml_to_api(yaml_data, user)
