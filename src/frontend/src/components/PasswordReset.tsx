@@ -1,26 +1,34 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import Blob1 from "../assets/images/blobs/blob1.svg";
+import Blob2 from "../assets/images/blobs/blob2.svg";
 
-const PasswordReset: React.FC = () => {
+let baseUrl = process.env.REACT_APP_API_BASE_URL;
+
+const VerifiedPasswordReset: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { token } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!token) {
+      setError('Invalid reset link');
+      return;
+    }
+    
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
     setIsLoading(true);
-    setError('');
-
     try {
-      const response = await fetch(`/auth/reset-password/${token}`, {
+      const response = await fetch(`${baseUrl}/auth/reset-password/${token}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -29,7 +37,8 @@ const PasswordReset: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to reset password');
+        const data = await response.json();
+        throw new Error(data.detail || 'Failed to reset password');
       }
 
       navigate('/login', { 
@@ -38,18 +47,29 @@ const PasswordReset: React.FC = () => {
         } 
       });
     } catch (err) {
-      setError('Failed to reset password. Please try again.');
+      setError((err as Error).message || 'Failed to reset password');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="relative w-screen h-screen pt-24">
-      <div className="h-full pt-24 bg-gradient-to-b from-blue-900 to-[#63b3de] flex justify-center items-center">
+    <div className="h-screen flex items-center justify-center">
+      <div className="h-full w-full bg-gradient-to-b from-blue-900 to-[#63b3de] flex justify-center items-center">
+        <img
+          src={Blob1}
+          alt="Blob 1"
+          className="absolute top-24 right-0 w-[400px] h-auto"
+        />
+        <img
+          src={Blob2}
+          alt="Blob 2"
+          className="absolute bottom-0 left-0 w-[400px] h-auto"
+        />
+
         <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8 z-10">
           <h1 className="text-2xl font-bold text-center text-blue-900 mb-6">Set New Password</h1>
-
+          
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
           <form onSubmit={handleSubmit}>
@@ -63,7 +83,7 @@ const PasswordReset: React.FC = () => {
                 className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
                 placeholder="Enter new password"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={(e) => setNewPassword(e.target.value.replace(/\s/g, ""))}
                 required
               />
             </div>
@@ -78,7 +98,7 @@ const PasswordReset: React.FC = () => {
                 className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
                 placeholder="Confirm new password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => setConfirmPassword(e.target.value.replace(/\s/g, ""))}
                 required
               />
             </div>
@@ -103,4 +123,4 @@ const PasswordReset: React.FC = () => {
   );
 };
 
-export default PasswordReset;
+export default VerifiedPasswordReset;

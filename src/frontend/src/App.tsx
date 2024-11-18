@@ -80,6 +80,7 @@ const App = () => {
           </Route>
           <Route path="/forgot-password" element={<PasswordResetRequest />} />
           <Route path="/reset-password/:token" element={<PasswordReset />} />
+          <Route path="/verified-password-reset" element={<PasswordReset />} />
           <Route element={<UserProtectedRoute />}>
             <Route path="/profile" element={<UserSidebarLayout />}>
               <Route element={<AdminProtectedRoute />}>
