@@ -73,7 +73,7 @@ def delete_user(uid: str, is_super: bool):
 
 def get_all_users():
     users = data_store.get_users()
-    users_json = [user.to_json() for user in users]
+    users_json = [user.to_json(include_password=False) for user in users]
     return {"users": users_json, "user_count": data_store.num_users()}
 
 def admin_filter_users(standard: bool, admin: bool, super: bool):
@@ -113,7 +113,7 @@ def admin_get_pending_services() -> List[dict[str, str]]:
 
     for service in data_store.get_apis():    
 
-        if service.get_status().name in PENDING_OPTIONS:
+        if service.get_status() in PENDING_OPTIONS:
             if service.get_newly_created():
                 new_service_json = service.to_updated_json()
                 new_service_json["version_fields"] = service.get_latest_version(
@@ -124,7 +124,7 @@ def admin_get_pending_services() -> List[dict[str, str]]:
                 global_updates.append(service.to_updated_json())
         
         for version in service.get_all_versions():
-            if version.get_status().name in PENDING_OPTIONS:
+            if version.get_status() in PENDING_OPTIONS:
                 version_updates.append(version.to_updated_json(service.get_id(), service.get_name()))
 
     return {

@@ -51,16 +51,12 @@ class FilterRequest(BaseModel):
 class ServiceAdd(BaseModel):
 
     name: str                           # Name of service
-    icon_url: str                       # URL of service icon uploaded
-    x_start: int                        # Starting x-coord of img crop
-    x_end: int                          # Ending x-coord of img crop
-    y_start: int                        # Starting y-coord of img crop
-    y_end: int                          # Ending y-coord of img crop
     description: str                    # Descrtipion of service
     tags: List[str]                     # List of tags assigned to the service
     endpoints: List[Endpoint]           # Endpoint of the service uploaded
     version_name: str = "version 1"     # name of service version
     version_description: str = "No version description provided" # description
+    pay_model: str = 'Free'             # Pay model of the service
 
     class Config:
         arbitrary_types_allowed = True
@@ -85,6 +81,7 @@ class ServiceGlobalUpdate(BaseModel):
     description: str                # Descrtipion of service
     tags: List[str]                 # List of tags assigned to the service
     sid: str
+    pay_model: str = 'Free'         # Pay model of service
     class Config:
         arbitrary_types_allowed = True
 
@@ -139,3 +136,6 @@ class ReviewPackage(BaseModel):
     content: str = ''
 class GeneralString(BaseModel):
     content: str
+
+class GeneralInt(BaseModel):
+    num: int

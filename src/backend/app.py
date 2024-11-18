@@ -15,6 +15,7 @@ from src.backend.server.upload import *
 from src.backend.server.user import *
 from src.backend.server.review import *
 from src.backend.server.upload import import_yaml_wrapper
+from src.backend.server.dummy import *
 from json import dumps
 import asyncio
 from contextlib import asynccontextmanager
@@ -117,6 +118,13 @@ async def clear():
    return {"message" : "Clear Successful"}
 
 
+@app.post("/testing/dummy")
+async def add_dummy():
+    '''
+        Internal Testing function to add some data for testing
+    '''
+    import_dummy_data()
+
 @app.post("/upload/pdfs")
 async def upload_pdf(file: UploadFile = File(...)):
    '''
@@ -212,17 +220,17 @@ async def get_user_apis(user: User = Depends(manager)):
 
 @app.get("/service/filter")
 async def filter(
-   tags: Optional[List[str]] = Query(None),
-   providers: Optional[List[str]] = Query(None),
-   hide_pending: bool = True
+    tags: Optional[List[str]] = Query(None), 
+    providers: Optional[List[str]] = Query(None),
+    pay_models: Optional[List[str]] = Query(None),
+    hide_pending: bool = True
 ):
-   return api_tag_filter(tags, providers, hide_pending)
-
+    return api_tag_filter(tags, providers, pay_models, hide_pending)
 
 @app.get("/service/search")
 async def search(
-   name: Optional[str] = Query(None),
-   hide_pending: bool = True,
+    name: Optional[str] = Query(None),
+    hide_pending: bool = True
 ):
    return api_name_search(name, hide_pending)
 
@@ -312,34 +320,39 @@ async def add_service_version(service: ServiceAddVersion, user: User = Depends(m
 
 
 @app.post("/service/version/update")
-async def add_service_version(service: ServiceUpdateVersion, user: User = Depends(manager)):
-   '''
-       Method used to update fields related to specific version
-   '''
-   request = service.model_dump()
-   update_new_service_version_wrapper(request)
-
+async def update_service_version(service: ServiceUpdateVersion, user: User = Depends(manager)):
+    '''
+        Method used to update fields related to specific version
+    '''
+    request = service.model_dump()
+    update_new_service_version_wrapper(request)
 
 @app.delete("/service/version/delete")
-async def add_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
-   '''
-       Method used to delete a specific version from a service
-   '''
-   delete_service_version_wrapper(sid, version_name)
+async def delete_service_version(sid: str, version_name: str,  user: User = Depends(manager)):
+    '''
+        Method used to delete a specific version from a service
+    '''
+    delete_service_version_wrapper(sid, version_name)
 
-
+@app.post("/service/tags/generate") 
+async def generate_tags_endpoint(sid: str, user: User = Depends(manager)): 
+    '''
+        Method used to generate tags using ollama
+    '''
+    tags = auto_generate_tags(sid) 
+    return {"tags": tags}
+                                                                                                                               
 #####################################
 #   Review Paths
 #####################################
 
 
 @app.get("/review/get")
-async def review_get(rid: str):
-   '''
-       Endpoint which directly retrieves a review
-   '''
-   return review_get_wrapper(rid)
-
+async def review_get(rid: str, uid: str = ''):
+    '''
+        Endpoint which directly retrieves a review
+    '''
+    return review_get_wrapper(rid, uid=uid)
 
 @app.delete("/review/delete")
 async def review_delete(rid: str, user: User = Depends(manager)):
@@ -454,13 +467,24 @@ async def verify_email(token: str):
 
 @app.post("/auth/reset-password")
 async def request_password_reset(user: User = Depends(manager)):
-   '''
-       Sends a password request
-   '''
-   uid = user['id']
-   password_reset_request(uid)
-   return {"message": "Password reset email sent."}
+    '''
+        Sends a password request to authenticated user
+    '''
+    uid = user['id']
+    password_reset_request(uid)
+    return {"message": "Password reset email sent."}
 
+@app.post("/reset-password")
+async def request_password_reset_non_auth(email: GeneralString):
+    '''
+        Sends a password request to non-authenticated user
+    '''
+    user = data_store.get_user_by_email(email.content)
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+    uid = user.get_id()
+    password_reset_request(uid)
+    return {"message": "Password reset email sent."}
 
 @app.post("/auth/reset-password/{token}")
 async def reset_password_form(token: str, password: Password):
@@ -538,6 +562,13 @@ async def get_tags():
    '''
    return get_tags_wrapper()
 
+
+@app.get("/tags/get/ranked")
+async def get_tags_ranked(num: int):
+    '''
+        Endpoint to get ranked number of tags
+    '''
+    return get_top_tags_wrapper(num)
 
 #####################################
 #   Admin Paths
@@ -706,6 +737,13 @@ async def update_user_displayname(new_displayname: GeneralString, user: User = D
    '''
    return user_update_displayname(user['id'], new_displayname.content)
 
+
+@app.get("/user/permission_check")
+async def user_check_perms(user: User = Depends(manager)):
+    '''
+        Endpoint to check whether a user's permissions
+    '''
+    return admin_check_if_admin(user['id'])
 
 if __name__ == "__main__":
    import uvicorn

@@ -13,7 +13,6 @@ import {
 } from "../services/apiServices";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { ServicePost, ServiceUpdate } from "../types/backendTypes";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import TagsOverlay from "./TagsOverlay";
 import { Tag } from "../types/miscTypes";
@@ -107,68 +106,36 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       // Add newly created tags to the database
       for (const newTag of newTags) {
         if (selectedTags.includes(newTag)) {
-          await addTag({
-            tag: newTag,
-          });
+          await addTag(newTag);
         }
       }
 
       // Edit existing API
       if (apiId) {
-        const updatedApi: ServiceUpdate = {
-          sid: apiId,
-          name,
-          description,
-          endpoint,
-          tags: selectedTags,
-        };
-        await updateApi(updatedApi);
+        await updateApi(name, description, selectedTags, endpoint, apiId);
         if (selectedImageData) {
           const doc_id = await uploadImage(selectedImageData);
-          apiAddIcon({
-            sid: apiId,
-            doc_id,
-          });
+          apiAddIcon(apiId, doc_id);
         }
         if (selectedFile) {
           console.log(selectedFile);
           const doc_id = await uploadPDF(selectedFile);
           console.log(doc_id);
-          await uploadDocs({
-            sid: apiId,
-            doc_id,
-          });
+          await uploadDocs(apiId, doc_id);
         }
         navigate(`/profile/my-apis/${apiId}`);
 
         // Add new API
       } else {
-        const newApi: ServicePost = {
-          name,
-          description,
-          endpoint,
-          x_start: 0,
-          x_end: 100,
-          y_start: 0,
-          y_end: 100,
-          icon_url: "",
-          tags: selectedTags,
-        };
-        const newId = await addApi(newApi);
+        const newId = await addApi(name, description, selectedTags, endpoint);
         if (selectedImageData) {
           const doc_id = await uploadImage(selectedImageData);
-          apiAddIcon({
-            sid: newId,
-            doc_id,
-          });
+          apiAddIcon(newId, doc_id);
         }
 
         if (selectedFile) {
           const doc_id = await uploadPDF(selectedFile);
-          await uploadDocs({
-            sid: newId,
-            doc_id,
-          });
+          await uploadDocs(newId, doc_id);
         }
         navigate(`/profile/my-apis/${newId}`);
       }
@@ -314,7 +281,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
                   type="text"
                   onChange={(e) => setEndpoint(e.target.value)}
                   placeholder="https://api-overflow.com/non-playable-coders/example-endpoint"
-                  defaultValue={api?.endpoint}
+                  defaultValue={api?.versions[0].endpoints[0].link}
                   className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 text-md leading-6"
                 />
               </div>

@@ -44,9 +44,9 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
     """Send an email with HTML and plain text content."""
     sender_email = "api.overflow6@gmail.com"
     
-    root_link = f"http://{app_host}:{app_port}/auth"
+    root_link = f"http://{app_host}:{app_port}"
     if email_type == 'verification':
-        verification_link = f"{root_link}/verify-email/{token}"
+        verification_link = f"{root_link}/verify-email?token={token}"
         subject = "Please Verify Your Email Address"
         msg_html = f"""
         Hi,<br/>
@@ -60,7 +60,7 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
                     f"{verification_link}\nIf you did not create an account, please ignore this email.\nBest regards,\nAPI Overflow Team"
 
     elif email_type == 'password_reset':
-        reset_link = f"{root_link}/reset-password/{token}"
+        reset_link = f"{root_link}/verified-password-reset?token={token}"
         subject = "Password Reset Request"
         msg_html = f"""
         Hi,<br/>
@@ -115,6 +115,7 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
         msg = content['msg']
         if len(msg) > 80:
             msg = msg[:80] + "..."
+        msg = '"' + msg + '"'
         subject_name = content['subname']
         related_name = content['rname']
         service_name = content['sname']

@@ -84,11 +84,6 @@ def test_invalid_user(simple_user):
                            headers={"Authorization": "Bearer"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : '',
                                 'tags' : [],
                                 'endpoints': []
@@ -104,11 +99,6 @@ def test_no_name(simple_user):
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
                             json={
                                 'name' : '',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : '',
                                 'tags' : [],
                                 'endpoints': []
@@ -123,11 +113,6 @@ def test_invalid_url(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : 'www.googlefake.xyzabsdh',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : 'hi',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -143,11 +128,6 @@ def test_invalid_dimensions(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : -10,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : 'hi',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -159,11 +139,6 @@ def test_invalid_dimensions(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 1000,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : 'hi',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -175,11 +150,6 @@ def test_invalid_dimensions(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : -10,
-                                'y_end' : 0,
                                 'description' : 'hi',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -191,11 +161,6 @@ def test_invalid_dimensions(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 1000,
-                                'y_end' : 0,
                                 'description' : 'hi',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -210,11 +175,6 @@ def test_no_description(simple_user):
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : '',
                                 'tags' : [],
                                 'endpoints': []
@@ -229,11 +189,6 @@ def test_no_tags(simple_user):
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : 'This is a test API',
                                 'tags' : [],
                                 'endpoints': []
@@ -248,11 +203,6 @@ def test_no_endpoint(simple_user):
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json={
                                 'name' : 'Test API',
-                                'icon_url' : '',
-                                'x_start' : 0,
-                                'x_end' : 0,
-                                'y_start' : 0,
-                                'y_end' : 0,
                                 'description' : 'This is a test API',
                                 'tags' : ['API'],
                                 'endpoints': []
@@ -266,11 +216,6 @@ def test_create_api(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -308,11 +253,6 @@ def test_multiple_tags(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API', 'Public', 'In Development'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -346,11 +286,6 @@ def test_custom_icon(simple_user):
     '''
     api_info = {
                 'name' : 'Fake Google',
-                'icon_url': 'http://cdn.mos.cms.futurecdn.net/iC7HBvohbJqExqvbKcV3pP.jpg',
-                'x_start' : 0,
-                'x_end' : 100,
-                'y_start' : 0,
-                'y_end' : 100,
                 'description' : 'This is a definitely... Google',
                 'tags' : ['API', 'Public', 'In Development'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -383,11 +318,6 @@ def test_update_api_invalid_sid(simple_user):
 
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -417,11 +347,6 @@ def test_update_api_documents(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -514,11 +439,6 @@ def test_delete_api(simple_user):
     '''
     api_info1 = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -561,11 +481,6 @@ def test_delete_apis(simple_user):
     '''
     api_info1 = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -573,11 +488,6 @@ def test_delete_apis(simple_user):
     
     api_info2 = {
                 'name' : 'Test API I',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -643,10 +553,6 @@ def test_get_apis(simple_user):
     api_info1 = {
                 'name' : 'Test API',
                 'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -655,10 +561,6 @@ def test_get_apis(simple_user):
     api_info2 = {
                 'name' : 'Test API I',
                 'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
@@ -696,10 +598,6 @@ def test_admin_get_pending_services(simple_user):
     api_info = {
                 'name' : 'Test API 1',
                 'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -746,11 +644,6 @@ def test_admin_get_pending_services(simple_user):
 def test_admin_approve(simple_user):
     api_info = {
                 'name' : 'Test API 1',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -829,11 +722,6 @@ def test_admin_approve(simple_user):
 def test_admin_disapprove(simple_user):
     api_info = {
                 'name' : 'Test API 1',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API 1',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -909,11 +797,6 @@ def test_update_global_api_fields(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -950,6 +833,14 @@ def test_update_global_api_fields(simple_user):
         'description' : 'new description',
         'tags' : ['new', 'tag'],
     }
+
+    response = client.post("/tag/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json={'tag': 'new'})
+    
+    response = client.post("/tag/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json={'tag': 'tag'})
 
     response = client.post("/service/update",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -1130,11 +1021,6 @@ def test_service_version(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -1257,11 +1143,6 @@ def test_update_version_api_fields(simple_user):
     '''
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -1560,11 +1441,6 @@ def test_global_version_combination_updates(simple_user):
 
     service1 = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()],
@@ -1574,11 +1450,6 @@ def test_global_version_combination_updates(simple_user):
 
     service2 = {
         'name' : 'Test API 2',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This ',
                 'tags' : ['Service'],
                 'endpoints': [simple_endpoint2.model_dump()],
@@ -1693,3 +1564,203 @@ def test_global_version_combination_updates(simple_user):
     assert len(response_info["new_services"]) == 1
     assert len(response_info["global_updates"]) == 1
     assert len(response_info["version_updates"]) == 2
+
+def test_pay_model_display(simple_user):
+    '''
+        Test whether pay_model works
+    '''
+    service1 = {
+                'name' : 'Test API',
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name",
+                'pay_model': 'Premium'
+                }
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=service1)
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    sid = response_info['id']
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True,
+                                'version_name': service1["version_name"],
+                                'service_global': True
+                            })
+    
+    response = client.get("/service/get_service",
+                          params={'sid': sid})
+    assert response.json()['pay_model'] == "Premium"
+
+def test_pay_model_filter(simple_user):
+    '''
+        Test whether pay_model filtering works
+    '''
+    service1 = {
+                'name' : 'Test API',
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name",
+                'pay_model': 'Premium'
+                }
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=service1)
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    sid = response_info['id']
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True,
+                                'version_name': service1["version_name"],
+                                'service_global': True
+                            })
+
+    response = client.get("/service/filter",
+                          params={'pay_models': ['Premium']})
+    assert response.status_code == SUCCESS
+    assert response.json()[0]['pay_model'] == 'Premium'
+    assert response.json()[0]['name'] == service1['name']
+
+    response = client.get("/service/filter",
+                          params={"pay_models": ['Free']})
+    assert response.status_code == SUCCESS
+    assert response.json() == []
+
+    # Test multi-tag
+    service2 = {
+                'name' : 'Test API',
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name",
+                'pay_model': 'Freemium'
+                }
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=service2)
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    sid = response_info['id']
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True,
+                                'version_name': service2["version_name"],
+                                'service_global': True
+                            })
+    response = client.get("/service/filter",
+                          params={'tags': ['API']})
+    assert response.status_code == SUCCESS
+    assert len(response.json()) == 2
+
+
+def test_pay_model_update(simple_user):
+    '''
+        Test whether pay_model classification successfully changes when updating service
+    '''
+    service1 = {
+                'name' : 'Test API',
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()],
+                'version_name': "some_version_name",
+                'pay_model': 'Premium'
+                }
+
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+
+    access_token = response.json()["access_token"]
+
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=service1)
+    assert response.status_code == SUCCESS
+
+    response_info = response.json()
+    sid = response_info['id']
+
+    client.post("/admin/service/approve",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "",
+                                'approved': True,
+                                'version_name': service1["version_name"],
+                                'service_global': True
+                            })
+
+    package = {
+        'name': 'HAXORZED',
+        'description': 'This API has been HAXED',
+        'tags': ["API"],
+        'sid': sid,
+        'pay_model': 'Freemium'
+    }
+    response = client.post("/service/update",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.post("/admin/service/approve",
+                        headers={"Authorization": f"Bearer {access_token}"},
+                            json={
+                                'sid': sid,
+                                'reason': "LOL",
+                                'approved': True,
+                                'version_name': service1["version_name"],
+                                'service_global': True
+                            })
+    assert response.status_code == SUCCESS
+    
+    response = client.get("/service/get_service",
+                          params={'sid': sid})
+    assert response.json()['pay_model'] == "Freemium"
+    response = client.get("/service/filter",
+                          params={"pay_models": ['Premium']})
+    assert response.status_code == SUCCESS
+    assert response.json() == []
+
+    response = client.get("/service/filter",
+                          params={'pay_models': ['Freemium']})
+    assert response.status_code == SUCCESS
+    assert response.json()[0]['pay_model'] == 'Freemium'
+    assert response.json()[0]['name'] == 'HAXORZED'

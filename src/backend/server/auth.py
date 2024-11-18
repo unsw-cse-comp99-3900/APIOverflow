@@ -75,6 +75,8 @@ def register_wrapper(displayname: str, name: str, password: str, email: str, ver
         create_super_admin()
     if data_store.get_user_by_name(name):
         raise HTTPException(status_code=400, detail="Username already taken")
+    if data_store.get_user_by_email(email):
+        raise HTTPException(status_code=400, detail="Email already registered")
     new_user = User(str(data_store.max_num_users()),
                     displayname, 
                     name,

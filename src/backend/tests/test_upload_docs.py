@@ -82,11 +82,6 @@ def two_users():
     # Create an API
     api_info = {
                 'name' : 'Test API',
-                'icon_url' : '',
-                'x_start' : 0,
-                'x_end' : 0,
-                'y_start' : 0,
-                'y_end' : 0,
                 'description' : 'This is a test API',
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.dict()]

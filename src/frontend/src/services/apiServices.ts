@@ -1,31 +1,38 @@
-import { json } from "stream/consumers";
 import {
+  Endpoint,
   LoginModel,
+  EndpointParameter,
   ServiceIconInfo,
-  ServicePost,
+  ServiceAdd,
   ServiceReviewInfo,
   ServiceUpdate,
   ServiceUpload,
   TagData,
   UserCreate,
+  EndpointResponse,
+  ServiceApprove,
 } from "../types/backendTypes";
-import { Tag } from "../types/miscTypes";
+import { Rating, Tag } from "../types/miscTypes";
 import {
+  adminUpdateDataFormatter,
   briefApiDataFormatter,
-  detailedApiDataFormatter,
+  permDataFormatter,
+  usersDataFormatter,
 } from "../utils/dataFormatters";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (tags?: Tag[], hidePending : boolean = false) => {
+export const getApis = async (tags?: Tag[], hidePending = true) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
-  const response = await fetch(`${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`, {
-    method: "GET",
-  });
+  const response = await fetch(
+    `${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`,
+    {
+      method: "GET",
+    }
+  );
   const data = await response.json();
-  console.log(data)
   return data.map(briefApiDataFormatter);
 };
 
@@ -50,11 +57,11 @@ export const getApi = async (id: string) => {
     method: "GET",
   });
   const data = await response.json();
+  console.log(data);
   if (response.status === 404) {
     throw new Error("Service Not Found");
   }
-  console.log(data)
-  return detailedApiDataFormatter(data);
+  return data;
 };
 
 export const deleteApi = async (id: string) => {
@@ -64,14 +71,100 @@ export const deleteApi = async (id: string) => {
   return;
 };
 
-export const addApi = async (service: ServicePost) => {
+export const addApi = async (
+  name: string,
+  description: string,
+  tags: string[],
+  endpointLink: string
+) => {
+  const ParameterPlaceholder1: EndpointParameter = {
+    id: "1",
+    endpoint_link: endpointLink,
+    required: false,
+    type: "BODY",
+    name: "Parameter Placeholder1",
+    value_type: "string",
+    example: "Example Placeholder1",
+  };
+
+  const ParameterPlaceholder2: EndpointParameter = {
+    id: "2",
+    endpoint_link: endpointLink,
+    required: true,
+    type: "HEADER",
+    name: "Parameter Placeholder2",
+    value_type: "string",
+    example: "Example Placeholder2",
+  };
+
+  const ResponsePlaceholder1: EndpointResponse = {
+    code: "200",
+    description: "Description Placeholder1",
+    conditions: ["Condition Placeholder1", "Condition Placeholder2"],
+    example: "Example Placeholder1",
+  };
+
+  const ResponsePlaceholder2: EndpointResponse = {
+    code: "404",
+    description: "Description Placeholder2",
+    conditions: ["Condition Placeholder1", "Condition Placeholder2"],
+    example: "Example Placeholder2",
+  };
+
+  const endpoint1: Endpoint = {
+    link: endpointLink,
+    title_description: "Title Description Placeholder 1",
+    main_description: "Main Description Placeholder 1",
+    tab: "Tab Placeholder 1",
+    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
+    method: "GET",
+    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
+  };
+
+  const endpoint2: Endpoint = {
+    link: endpointLink,
+    title_description: "Title1 Description Placeholder 2",
+    main_description: "Main Description Placeholder 2",
+    tab: "Tab Placeholder 2",
+    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
+    method: "POST",
+    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
+  };
+
+  const endpoint3: Endpoint = {
+    link: endpointLink,
+    title_description: "Title1 Description Placeholder 3",
+    main_description: "Main Description Placeholder 3",
+    tab: "Tab Placeholder 3",
+    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
+    method: "PUT",
+    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
+  };
+
+  const endpoint4: Endpoint = {
+    link: endpointLink,
+    title_description: "Title1 Description Placeholder 4",
+    main_description: "Main Description Placeholder 4",
+    tab: "Tab Placeholder 4",
+    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
+    method: "DELETE",
+    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
+  };
+
+  const api: ServiceAdd = {
+    name,
+    description,
+    endpoints: [endpoint1, endpoint2, endpoint3, endpoint4],
+    tags,
+  };
+
   const response = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(service),
+    body: JSON.stringify(api),
   });
 
   if (response.status === 401) {
@@ -82,7 +175,20 @@ export const addApi = async (service: ServicePost) => {
   return data.id;
 };
 
-export const updateApi = async (api: ServiceUpdate) => {
+export const updateApi = async (
+  name: string,
+  description: string,
+  tags: string[],
+  endpoint: string,
+  sid: string
+) => {
+  const api: ServiceUpdate = {
+    sid,
+    name,
+    description,
+    endpoint,
+    tags: tags,
+  };
   const response = await fetch(`${baseUrl}/service/update`, {
     method: "PUT",
     headers: {
@@ -118,15 +224,46 @@ export const userLogin = async (credentials: LoginModel) => {
   return data.access_token;
 };
 
-export const userRegister = async (user: UserCreate) => {
+export const userLogout = async () => {
+  await fetch(`${baseUrl}/auth/logout`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    method: "POST",
+  });
+};
+
+export const userRegister = async (
+  email: string,
+  username: string,
+  password: string,
+  displayname: string
+) => {
+  const newUser: UserCreate = {
+    email,
+    username,
+    password,
+    displayname,
+  };
   await fetch(`${baseUrl}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(user),
+    body: JSON.stringify(newUser),
   });
   return;
+};
+
+export const userCheckPerm = async () => {
+  const response = await fetch(`${baseUrl}/user/permission_check`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    method: "GET",
+  });
+  const data = await response.json();
+  return permDataFormatter(data);
 };
 
 /*        Tag Services       */
@@ -138,7 +275,10 @@ export const getTags = async () => {
   return data.tags;
 };
 
-export const addTag = async (tag: TagData) => {
+export const addTag = async (tagName: string) => {
+  const tag: TagData = {
+    tag: tagName,
+  };
   const response = await fetch(`${baseUrl}/tag/add`, {
     method: "POST",
     headers: {
@@ -165,13 +305,16 @@ export const uploadImage = async (file: File) => {
     body: formData,
   });
   const data = await response.json();
-  console.log(data)
   return data.doc_id;
 };
 
 // Link icon with service
-export const apiAddIcon = async (info: ServiceIconInfo) => {
-  const response = await fetch(`${baseUrl}/service/add_icon`, {
+export const apiAddIcon = async (sid: string, docId: string) => {
+  const info: ServiceIconInfo = {
+    sid,
+    doc_id: docId,
+  };
+  await fetch(`${baseUrl}/service/add_icon`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -182,7 +325,6 @@ export const apiAddIcon = async (info: ServiceIconInfo) => {
 };
 
 export const apiGetIcon = async (sid: string) => {
-  console.log(sid)
   const response = await fetch(`${baseUrl}/service/get/icon?sid=${sid}`, {
     headers: {
       "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
@@ -193,17 +335,7 @@ export const apiGetIcon = async (sid: string) => {
   });
   const blob = await response.blob(); // Get the Blob data
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
-  if(blob.size === 62114){
-    console.log(`icon for sid ${sid}: lmao`)
-  }else if (blob.size === 29457){
-    console.log(`icon for sid ${sid}: flooshed`)
-  }else if (blob.size === 8255){
-    console.log(`icon for sid ${sid}: default`)
-  }else{
-    console.log("icon: WTF IS HAPPENING")
-  }
-  console.log(blob.size)
-  return url
+  return url;
 };
 
 /*        Document Services       */
@@ -218,19 +350,23 @@ export const uploadPDF = async (file: File) => {
   });
   const data = await response.json();
   return data.doc_id;
-}
+};
 
 // Link service with documentation
-export const uploadDocs = async (info: ServiceUpload) => {
-  const response = await fetch(`${baseUrl}/service/upload_docs`, {
+export const uploadDocs = async (sid: string, docId: string) => {
+  const info: ServiceUpload = {
+    sid,
+    doc_id: docId,
+  };
+  await fetch(`${baseUrl}/service/upload_docs`, {
     method: "POST",
-    headers: {  
+    headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(info),
   });
-}
+};
 
 export const getDoc = async (doc_id: string) => {
   const response = await fetch(`${baseUrl}/get/doc?doc_id=${doc_id}`, {
@@ -238,30 +374,131 @@ export const getDoc = async (doc_id: string) => {
   });
   const blob = await response.blob(); // Get the Blob data
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
-  return url
-}
+  return url;
+};
 
 /*        Review Services       */
-export const apiAddReview = async (info: ServiceReviewInfo) => {
+export const apiAddReview = async (
+  sid: string,
+  rating: Rating,
+  title: string,
+  comment: string
+) => {
+  const info: ServiceReviewInfo = {
+    sid,
+    rating,
+    title,
+    comment,
+  };
   const response = await fetch(`${baseUrl}/service/review/add`, {
     method: "POST",
-    headers: {  
+    headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
-    
+
     body: JSON.stringify(info),
   });
   const data = await response.json();
   if (response.status === 403) {
     throw new Error(data.detail);
   }
-}
+};
 
-export const apiGetReviews = async (sid: string, testing:boolean=true) => {
-  const response = await fetch(`${baseUrl}/service/get/reviews?sid=${sid}&testing=${testing}`, {
+export const apiGetReviews = async (sid: string, testing: boolean = true) => {
+  const response = await fetch(
+    `${baseUrl}/service/get/reviews?sid=${sid}&testing=${testing}`,
+    {
+      method: "GET",
+    }
+  );
+  const data = await response.json();
+  return data.reviews;
+};
+
+/*        Admin Services       */
+export const getPendingServices = async () => {
+  const response = await fetch(`${baseUrl}/admin/get/services`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
     method: "GET",
   });
   const data = await response.json();
-  return data.reviews;
-}
+  return adminUpdateDataFormatter(data);
+};
+
+export const approveService = async (
+  sid: string,
+  approved: boolean,
+  reason: string,
+  serviceGlobal: boolean,
+  versionName: string | null
+) => {
+  const approvalInfo: ServiceApprove = {
+    sid,
+    approved,
+    reason,
+    service_global: serviceGlobal,
+    version_name: versionName,
+  };
+  console.log(approvalInfo);
+  await fetch(`${baseUrl}/admin/service/approve`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(approvalInfo),
+    method: "POST",
+  });
+};
+
+export const userPromote = async (uid: string) => {
+  console.log({
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({uid}),
+    method: "POST",
+  })
+  const reponse = await fetch(`${baseUrl}/admin/promote?uid=${uid}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  });
+};
+
+export const userDemote = async (uid: string) => {
+  const reponse = await fetch(`${baseUrl}/admin/demote?uid=${uid}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  });
+};
+
+export const userDelete = async (uid: string) => {
+  const reponse = await fetch(`${baseUrl}/admin/delete/user?uid=${uid}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "DELETE",
+  });
+};
+
+export const getUsers = async () => {
+  const reponse = await fetch(`${baseUrl}/admin/dashboard/users`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+  });
+  const data = await reponse.json();
+  return usersDataFormatter(data.users);
+};

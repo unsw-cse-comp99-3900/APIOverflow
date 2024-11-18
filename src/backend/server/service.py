@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from PIL import Image
 import urllib.request
 from urllib.error import HTTPError, URLError
-from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS
+from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS, PENDING_OPTIONS, REJECTED_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.classes.Service import Service, ServiceVersionInfo
@@ -35,132 +35,76 @@ K = TypeVar('K')
 
 
 def validate_api_fields(packet: dict[T, K]) -> None:
-   if packet['name'] == '':
-       raise HTTPException(status_code=400, detail='No service name provided')
-  
-   if packet['description'] == '':
-       raise HTTPException(status_code=400, detail='No service desc provided')
-  
-   if len(packet['tags']) == 0:
-       raise HTTPException(status_code=400, detail='No service tags provided')
-  
-
+    if packet['name'] == '':
+        raise HTTPException(status_code=400, detail='No service name provided')
+    
+    if packet['description'] == '':
+        raise HTTPException(status_code=400, detail='No service desc provided')
+    
+    if len(packet['tags']) == 0:
+        raise HTTPException(status_code=400, detail='No service tags provided')
+    
 
 def get_validate_service_id(sid: str) -> API:
-   if sid == '':
-       raise HTTPException(status_code=400, detail='No service id provided')
+    if sid == '':
+        raise HTTPException(status_code=400, detail='No service id provided')
 
-
-   service = data_store.get_api_by_id(sid)
-   if service is None:
-       raise HTTPException(status_code=404, detail='No service found with given sid')
-  
-   return service
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail='No service found with given sid')
+    
+    return service
 
 
 # Endpoint Wrappers
 def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
-   '''
-       Adds a Service (default to API) to the platform
+    '''
+        Adds a Service (default to API) to the platform
 
+        Raises:     HTTP Error 400 if missing info/bad request
+        Returns:    sid representing id of newly created service
+    '''
+    validate_api_fields(packet)
+    internal_url = ""
+    if len(packet['endpoints']) == 0:
+        raise HTTPException(status_code=400,
+                    detail="Must input at least 1 endpoint")
 
-       Raises:     HTTP Error 400 if missing info/bad request
-       Returns:    sid representing id of newly created service
-   '''
-   validate_api_fields(packet)
-
-
-   # Retrieve image from url
-   response = None
-   img_url = packet['icon_url']
-   x_start, x_end = packet['x_start'], packet['x_end']
-   y_start, y_end = packet['y_start'], packet['y_end']
-
-
-   if x_start < 0 or y_start < 0 or x_start > x_end or y_start > y_end:
-       raise HTTPException(status_code=400,
-                           detail="Invalid X/Y dimensions")
-
-
-   if img_url != '':
-       internal_url = f"{IMAGE_PATH}/image{data_store.num_imgs()}.jpg"
-       try:
-           image, response = urllib.request.urlretrieve(img_url, internal_url)
-       except HTTPError as err:
-           raise HTTPException(status_code=400,
-                               detail=f"HTTP exception {response} raised when retrieving image") from err
-       except URLError as err:
-           raise HTTPException(status_code=400,
-                               detail=f"URL exception {response} raised when retrieving image") from err
-       except Exception as err:
-           raise HTTPException(status_code=400,
-                               detail=f"An odd error {response} was raised when retrieving image") from err
-
-
-       # Open image
-       image_obj = Image.open(image)
-
-
-       # Handle Error where x_start or y_start
-       x_limit, y_limit = image_obj.size
-       if x_end > x_limit or y_end > y_limit or x_start < 0 or y_start < 0:
-           raise HTTPException(status_code=400,
-                               detail="Boundaries for cropping beyond size of image")
-       if x_start > x_end or y_start > y_end:
-           raise HTTPException(status_code=400,
-                               detail="X or Y start bigger than X/Y end")
-
-
-       # Crop photo
-       image_cropped = image_obj.crop((x_start, y_start, x_end, y_end))
-       image_cropped.save(internal_url)
-
-
-   else:
-       internal_url = ""
-  
-   if len(packet['endpoints']) == 0:
-       raise HTTPException(status_code=400,
-                   detail="Must input at least 1 endpoint")
-
-
-   # Create new API
-   new_api = API(str(data_store.num_apis()),
-                   packet['name'],
-                   user,
-                   internal_url,
-                   packet['description'],
-                   packet['tags'],
-                   packet['endpoints'],
-                   packet['version_name'],
-                   packet['version_description']
-                   )
-   data_store.add_api(new_api)
-   db_add_service(new_api.to_json())
-   return str(new_api.get_id())
-
+    # Create new API
+    new_api = API(str(data_store.num_apis()),
+                    packet['name'],
+                    user,
+                    internal_url,
+                    packet['description'],
+                    packet['tags'],
+                    packet['endpoints'],
+                    packet['version_name'],
+                    packet['version_description'],
+                    pay_model=packet['pay_model']
+                    )
+    
+    data_store.add_api(new_api)
+    db_add_service(new_api.to_json())
+    return str(new_api.get_id())
 
 def update_service_wrapper(packet: dict[T, K]) -> None:
-   '''
-       Updates a service by sid
+    '''
+        Updates a service by sid
 
+        Raises:     HTTP Error 400 if missing info/bad request
+                    HTTP Error 404 if no such sid found
+        Returns:    None
+    '''
+    sid = packet["sid"]
+    service = get_validate_service_id(sid)
+    validate_api_fields(packet)
 
-       Raises:     HTTP Error 400 if missing info/bad request
-                   HTTP Error 404 if no such sid found
-       Returns:    None
-   '''
-   sid = packet["sid"]
-   service = get_validate_service_id(sid)
-   validate_api_fields(packet)
-
-
-   # service is ref to API Obj in data store which gets updated
-   service.create_pending_update(
-       packet["name"], packet["description"], packet["tags"])
-  
-   db_update_service(sid, service.to_json())
-   return None
-
+    # service is ref to API Obj in data store which gets updated
+    service.create_pending_update(
+        packet["name"], packet["description"], packet["tags"], packet['pay_model'])
+    
+    db_update_service(sid, service.to_json())
+    return None
 
 def get_service_wrapper(sid: str) -> dict[T : K]:
    '''
@@ -198,72 +142,75 @@ def delete_service_version_wrapper(sid: str, version_name: str):
   
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
-def api_tag_filter(tags, providers, hide_pending: bool) -> list:
+def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
 
+    api_list = data_store.get_apis()
+    filtered_apis = []
 
-   api_list = data_store.get_apis()
-   filtered_apis = []
+    # print(api_list)
+    #query = input("Search")
 
+    #if query != "":
+        # if not empty, then Ollama match
+    #    data = {
+    #        "model": "llama3.2",
+    #        "prompt": query
+    #    }    
+    #    response = requests.post(url, json=data)
+        
+    if not tags:
+        # if they don't specify any tags, assume all APIs
+        for api in api_list:
+            filtered_apis.append(api)
+    else:
+        # otherwise get all the APIs with the tag/s
+        for api in api_list:
+            for tag in tags:
+                if tag in api.get_tags() and api not in filtered_apis:
+                        filtered_apis.append(api)
 
-   print(api_list)
-   #query = input("Search")
+    secondary_list: List[Service] = []
+    if providers:
+        # if providers list is not empty
+        for api in filtered_apis:
+            for provider in providers:
+                # I refactored get_owner so that it now returns the User object
+                # I've fixed this to what it was before (which is bugged)
+                if provider in api.get_owner().get_id() and api not in secondary_list:
+                    secondary_list.append(api)
+                    break
 
+    else:
+        secondary_list = [api for api in filtered_apis]
+    
+    return_list: List[Service] = []
+    if pay_models:
+        for api in secondary_list:
+            for pay_model in pay_models:
+                if pay_model == api.get_pay_model() and api not in return_list:
+                    print(pay_model, api.get_pay_model())
+                    return_list.append(api)
+                    break
+    else:
+        return_list = [api for api in secondary_list]
+    
+    return [api.to_summary_json() for api in return_list if
+            api.get_status() in LIVE_OPTIONS or 
+            (not hide_pending and api.get_status() == ServiceStatus.PENDING)
+            ]
 
-   #if query != "":
-       # if not empty, then Ollama match
-   #    data = {
-   #        "model": "llama3.2",
-   #        "prompt": query
-   #    }   
-   #    response = requests.post(url, json=data)
-      
-   if not tags:
-       # if they don't specify any tags, assume all APIs
-       for api in api_list:
-           filtered_apis.append(api)
-   else:
-       # otherwise get all the APIs with the tag/s
-       for api in api_list:
-           for tag in tags:
-               if tag in api.get_tags() and api not in filtered_apis:
-                       filtered_apis.append(api)
+# returns a list of regex matching services 
+def api_name_search(name, hide_pending: bool) -> list: 
+    api_list = data_store.get_apis()
+    return_list: List[Service] = []
 
-
-   return_list: List[Service] = []
-   if providers:
-       # if providers list is not empty
-       for api in filtered_apis:
-           for provider in providers:
-               # I refactored get_owner so that it now returns the User object
-               # I've fixed this to what it was before (which is bugged)
-               if provider in api.get_owner().get_id() and api not in return_list:
-                   return_list.append(api)
-                   break
-   else:
-       return_list = [api for api in filtered_apis]
-  
-   for api in return_list:
-       print(api.get_status().name)
-  
-  
-   return [api.to_summary_json() for api in return_list if
-           api.get_status().name in LIVE_OPTIONS or
-           (not hide_pending and api.get_status() == ServiceStatus.PENDING)
-           ]
-
-
-# returns a list of regex matching services
-def api_name_search(name, hide_pending: bool) -> list:
-   api_list = data_store.get_apis()
-   return_list = []
-   for api in api_list:
-       if re.search(name, api.get_name(), re.IGNORECASE) and (
-           api.get_status().name in LIVE_OPTIONS or
-           api.get_status() == ServiceStatus.PENDING and not hide_pending
-       ):
-           return_list.append(api)
-   return return_list
-
+    for api in api_list:
+        if re.search(name, api.get_name(), re.IGNORECASE) and (
+            api.get_status() in LIVE_OPTIONS or
+            api.get_status() == ServiceStatus.PENDING and not hide_pending
+        ):
+            return_list.append(api)
+    return return_list
 
 async def upload_docs_wrapper(sid: str, uid: str, doc_id: str, version: Optional[str]) -> None:
    '''
@@ -310,28 +257,24 @@ def get_doc_wrapper(doc_id: str) -> FileResponse:
    return FileResponse(doc.get_path())
 
 
-def list_pending_apis():
-   return [api.to_summary_json() for api in data_store.get_apis() if api.get_status() == ServiceStatus.PENDING]
-
-
-def list_nonpending_apis():
-   return [api.to_summary_json() for api in data_store.get_apis() if api.get_status == ServiceStatus.LIVE]
-
-
 def delete_service(sid: str):
-   if sid == '':
-       raise HTTPException(status_code=400, detail='No service id provided')
+    if sid == '':
+        raise HTTPException(status_code=400, detail='No service id provided')
 
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail='No service found with given sid')
+    service_name = service.get_name()
+    
+    # Disassociate server from tag
+    for _tag in service.get_tags():
+        tag = data_store.get_tag_by_name(_tag)
+        tag.remove_server(sid)
 
-   service = data_store.get_api_by_id(sid)
-   if service is None:
-       raise HTTPException(status_code=404, detail='No service found with given sid')
-   service_name = service.get_name()
-   data_store.delete_item(sid, 'api')
-   db_status = db_delete_service(service_name)
+    data_store.delete_item(sid, 'api')
+    db_status = db_delete_service(service_name)
 
-
-   return {"name": service_name, "deleted": db_status}
+    return {"name": service_name, "deleted": db_status}
 
 
 def service_add_icon_wrapper(uid: str, sid: str, doc_id: str) -> None:
@@ -512,44 +455,48 @@ def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> Li
    return [review.to_json(uid) for review in reviews]
 
 
+
 def approve_service_wrapper(sid: str, approved: bool, reason: str, service_global: bool, version: Optional[str]):
 
+    service : API = data_store.get_api_by_id(sid)
+    sname = service.get_name()
+    owner = service.get_owner()
+    uname = owner.get_name()
+    uemail = owner.get_email()
 
-   service : API = data_store.get_api_by_id(sid)
-   sname = service.get_name()
-   owner = service.get_owner()
-   uname = owner.get_name()
-   uemail = owner.get_email()
+    action = "rejected"
+    if service is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    approvalObjects : List[Service | ServiceVersionInfo] = [service]
+    if version is not None:
+        # local update, so we get ServiceVersionInfo object and update that version
+        approvalObjects.append(service.get_version_info(version))
 
+    if approved:
+        for object in approvalObjects:
+            object.complete_update()
+            object.update_status(ServiceStatus.LIVE, reason)
+            object.update_newly_created()
+        action = "approved"
+        
+        # Handle tag inclusions - ASSUMES THAT ALL TAGS HAVE BEEN ADDED PREVIOUSLY
+        for _tag in service.get_tags():
+            print(_tag)
+            tag = data_store.get_tag_by_name(_tag)
+            tag.add_server(service.get_id())
 
-   action = "rejected"
-   if service is None:
-       raise HTTPException(status_code=404, detail="Service not found")
-  
-   approvalObjects : List[Service | ServiceVersionInfo] = [service]
-   if version is not None:
-       # local update, so we get ServiceVersionInfo object and update that version
-       approvalObjects.append(service.get_version_info(version))
+    else:
+        for object in approvalObjects:
+            if object.get_status() == ServiceStatus.PENDING:
+                object.update_status(ServiceStatus.REJECTED, reason)
+            elif object.get_status() == ServiceStatus.UPDATE_PENDING:
+                object.update_status(ServiceStatus.UPDATE_REJECTED, reason)
+    
+    db_update_service(sid, service.to_json())
 
-
-   if approved:
-       for object in approvalObjects:
-           object.complete_update()
-           object.update_status(ServiceStatus.LIVE, reason)
-           object.update_newly_created()
-       action = "approved"
-   else:
-       for object in approvalObjects:
-           if object.get_status() == ServiceStatus.PENDING:
-               object.update_status(ServiceStatus.REJECTED, reason)
-           elif object.get_status() == ServiceStatus.UPDATE_PENDING:
-               object.update_status(ServiceStatus.UPDATE_REJECTED, reason)
-  
-   db_update_service(sid, service.to_json())
-
-
-   content = {'action': action, 'sname': sname, 'uname': uname}
-   send_email(uemail, '', 'service_approval', content)
+    content = {'action': action, 'sname': sname, 'uname': uname}
+    send_email(uemail, '', 'service_approval', content)
   
       
 def parse_yaml_to_api(yaml_data: dict, user: User) -> Service:
@@ -616,8 +563,3 @@ def parse_yaml_to_api(yaml_data: dict, user: User) -> Service:
    data_store.add_api(return_api)
    db_add_service(return_api.to_json())
    return return_api
-
-
-
-
-
