@@ -28,10 +28,10 @@ const VerificationPage: React.FC = () => {
             const res = await verifyEmail(token)
             setIsLoading(false);
             if (!res.ok) { // Something happened here.
-                setMsg(`Something went wrong in the verification process (Error ${res.status}). Please try again later!`);
+                setMsg(`Something went wrong in the verification process. Please try again later!`);
 
             } else {
-                setMsg("Your email has been verified. Welcome to APIOverflow!")
+                setMsg("Your email has been verified and you may now login. Welcome to APIOverflow!")
             }
             
           } catch (error) {
