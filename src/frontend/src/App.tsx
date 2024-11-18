@@ -24,6 +24,9 @@ import NotFoundPage from "./pages/NotFoundPage";
 import ReviewManagement from "./pages/ReviewManagement";
 import ServiceManagement from "./pages/ServiceManagement";
 import UserManagement from "./pages/UserManagement";
+// import ResetPasswordRequestPage from "./pages/ResetPasswordRequestPage";
+// import ResetPasswordPage from "./pages/ResetPasswordPage";
+
 
 const ProtectedRoute = () => {
   const auth = useAuth();
@@ -52,7 +55,8 @@ const App = () => {
           <Route path="/apis" element={<TagsSidebarLayout />}>
             <Route path="/apis" element={<APIsPage />} />
           </Route>
-          
+          {/* <Route path="/reset-password" element={<ResetPasswordRequestPage />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} /> */}
           <Route element={<ProtectedRoute />}>
             <Route path="/admin/reviews" element={<ReviewManagement />} />
             <Route path="/admin/services" element={<ServiceManagement />} />

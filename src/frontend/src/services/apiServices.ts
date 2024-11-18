@@ -348,3 +348,54 @@ export const apiGetReviews = async (sid: string, testing: boolean = true) => {
   const data = await response.json();
   return data.reviews;
 };
+
+export const searchApis = async (name: string, hidePending: boolean = true) => {
+  const response = await fetch(
+    `${baseUrl}/service/search?name=${encodeURIComponent(name)}&hide_pending=${hidePending}`,
+    {
+      method: "GET",
+    }
+  );
+
+  if (!response.ok) {
+    const errorDetails = await response.text();
+    console.error("Error in searchApis:", errorDetails);
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+
+  const data = await response.json();
+  console.log("Search Results:", data);
+  return data;
+};
+
+
+export const resetPasswordEmail = async (email: string) => {
+  const response = await fetch(`${baseUrl}/auth/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to send reset email.");
+  }
+
+  return data;
+};
+
+
+
+export const resetPassword = async (token: string, newPassword: string) => {
+  const response = await fetch(`${baseUrl}/auth/reset-password/${token}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ newpass: newPassword }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to reset password");
+  }
+};
