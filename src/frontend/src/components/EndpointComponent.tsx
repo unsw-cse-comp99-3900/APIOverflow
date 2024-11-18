@@ -25,6 +25,13 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
     DELETE: "bg-red-500",
   };
 
+  const hoverBgDark = {
+    GET: "hover:bg-blue-500",
+    POST: "hover:bg-emerald-500",
+    PUT: "hover:bg-yellow-500",
+    DELETE: "hover:bg-red-500",
+  };
+
   const bgLight = {
     GET: "bg-blue-100",
     POST: "bg-green-100",
@@ -43,6 +50,7 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
   const bgLightColor = bgLight[endpoint.method];
   const borderDarkColor = borderDark[endpoint.method];
   const textDarkColor = textDark[endpoint.method];
+  const hoverBgDarkColor = hoverBgDark[endpoint.method];
 
   const copyToClipboard = async () => {
     try {
@@ -76,7 +84,7 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
           <div>
             <h2 className="font-bold text-lg ml-3">{endpoint.link}</h2>
 
-            <text className="ml-3">{endpoint.title_description}</text>
+            <div className="ml-3">{endpoint.title_description}</div>
           </div>
         </div>
 
@@ -88,13 +96,13 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
               e.stopPropagation(); // Stops the click event from propagating
               copyToClipboard();
             }}
-            className={`w-10 h-10 flex items-center justify-center rounded-full ${textDarkColor} hover:${bgDarkColor} hover:text-white`}
+            className={`w-10 h-10 flex items-center justify-center rounded-full ${textDarkColor}  ${hoverBgDarkColor}  hover:text-white`}
           >
             <FaCopy />
           </button>
           {/* Expand/Collapse Button */}
           <button
-            className={`w-10 h-10 flex items-center justify-center rounded-full ${textDarkColor} hover:${bgDarkColor} hover:text-white`}
+            className={`w-10 h-10 flex items-center justify-center rounded-full ${textDarkColor} ${hoverBgDarkColor}  hover:text-white`}
             aria-label={isOpen ? "Collapse section" : "Expand section"}
           >
             {isOpen ? <FaAngleUp /> : <FaAngleDown />}

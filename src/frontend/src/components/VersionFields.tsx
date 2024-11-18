@@ -35,18 +35,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     };
 
     fetchDocs();
-  }, [versions]); // Only run when `api.docs` changes
-
-  const textToCopy = versions[0].endpoints[0].link;
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(textToCopy);
-      toast.success("Copied to clipboard!");
-    } catch (err) {
-      console.log("Failed to copy!");
-      toast.error("Failed to copy to clipboard");
-    }
-  };
+  }, [versions]);
 
   return (
     <>
@@ -59,8 +48,8 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
 
         <h2 className="text-xl font-bold mb-4">Endpoints</h2>
 
-        {versions[0].endpoints.map((endpoint) => (
-          <EndpointComponent endpoint={endpoint} />
+        {versions[0].endpoints.map((endpoint, index) => (
+          <EndpointComponent key={index} endpoint={endpoint} />
         ))}
 
         <div className="border border-gray-100 w-full my-5"></div>
