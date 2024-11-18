@@ -541,6 +541,38 @@ export const getUserIcon = async () => {
   return url;
 }
 
+export const updateDisplayName = async (displayName: string) => {
+  const info = {
+    content: displayName
+  }
+  const response = await fetch(`${baseUrl}/user/update/displayname`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(info)
+    }
+  );
+  console.log(response.status);
+  console.log(response.json());
+}
+
+export const userAddIcon = async (docId: string) => {
+  const info = {
+    doc_id: docId,
+  };
+  await fetch(`${baseUrl}/user/add_icon`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(info),
+  });
+};
+
 /*        Misc Services       */
 export const verifyEmail = async (token: string | null) => {
   const response = await fetch(`${baseUrl}/auth/verify-email/${token}`, {

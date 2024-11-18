@@ -84,22 +84,20 @@ export const usersDataFormatter = (data: any) => {
 }
 
 export const userProfileDataFormatter = (data: any) => {
-  return data.map((user: any) => {
-    
+     
     let role = "General User";
-    if (user.is_super) {
+    if (data.is_super) {
       role = "Super Admin";
-    } else if (user.is_admin) {
+    } else if (data.is_admin) {
       role = "Admin";
     }
-    
     return {
-      id: user.id,
+      id: data.id,
       role,
-      name: user.displayname,
-      username: user.usernam,
-      email: user.email,
-      icon: user.icon,
+      displayName: data.displayname,
+      username: data.username,
+      email: data.email,
+      icon: data.icon,
     }
-  });
+
 }

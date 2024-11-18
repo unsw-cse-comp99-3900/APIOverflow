@@ -37,8 +37,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token"); // Remove token on logout
     userLogout();
+    localStorage.removeItem("token"); // Remove token on logout
 
     // Reset perms
     setIsLoggedIn(false);

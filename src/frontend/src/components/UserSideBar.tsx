@@ -30,31 +30,36 @@ const UserSideBar = () => {
     navigate("/");
   };
 
-  let defaultIconURL = "https://img.freepik.com/premium-vector/anonymous-user-circle-icon-vector-illustration-flat-style-with-long-shadow_520826-1931.jpg?semt=ais_hybrid"
   const [displayName, setDisplayName] = useState("Guest");
   const [email, setEmail] = useState("guest@apioverflow.com");
+  const [iconURL, setIconURL] = useState("https://img.freepik.com/premium-vector/anonymous-user-circle-icon-vector-illustration-flat-style-with-long-shadow_520826-1931.jpg?semt=ais_hybrid");
 
   useEffect(() => {
-      getUserInfo()
-  return
-  },[]);
-  
-  const getUserInfo = async (...args: never[]) =>  {
+    let ignore = false;
+    const getUserInfo = async (...args: never[]) =>  {
       try {
           const res = await getUser();
-          setDisplayName(`${res.name}`)
-          setEmail(`${res.email}`)
-          defaultIconURL = await getUserIcon();
+          setDisplayName(`${res.displayName}`);
+          setEmail(`${res.email}`);
+          console.log("Starting req");
+          setIconURL(await getUserIcon());
+          console.log("Finished req");
         } catch (error) {
+          console.log(`!Something went wrong: ${error}`);
         }
-  }
+    }
+    if (!ignore) getUserInfo();
+  return () => { ignore = true;}
+  },[]);
+  
+  
 
   return (
     <aside className="fixed left-0 w-80 h-full px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700 flex flex-col justify-between">
       <div className="flex flex-col items-center mt-6 -mx-2">
         <img
           className="object-cover w-40 h-40 mx-2 rounded-full border-2 border-gray-300"
-          src={defaultIconURL}
+          src={iconURL}
           alt="User Avatar"
         />
         <h4 className="mx-2 mt-2 font-medium text-gray-800 dark:text-gray-200">

@@ -302,7 +302,7 @@ class User:
     
         return data
     
-    def _to_summary_json(self) -> dict[T, K]:
+    def to_summary_json(self) -> dict[T, K]:
         '''
             Converts object to a summary json for frontend
         '''
