@@ -31,7 +31,7 @@ const VerificationPage: React.FC = () => {
                 setMsg(`Something went wrong in the verification process. Please try again later!`);
 
             } else {
-                setMsg("Your email has been verified and you may now login. Welcome to APIOverflow!")
+                setMsg("Your email has been verified and you may now login.\n Welcome to APIOverflow!")
             }
             
           } catch (error) {
