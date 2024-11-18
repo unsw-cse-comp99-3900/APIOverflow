@@ -19,7 +19,6 @@ import {
   permDataFormatter,
   usersDataFormatter,
 } from "../utils/dataFormatters";
-import { BriefApi } from "../types/apiTypes";
 
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -35,6 +34,7 @@ export const getApis = async (tags?: Tag[], hidePending = true) => {
     }
   );
   const data = await response.json();
+  console.log(data)
   return data.map(briefApiDataFormatter);
 };
 
@@ -49,9 +49,10 @@ export const getMyApis = async () => {
   if (response.status === 401) {
     throw new Error("Unauthorized");
   }
-
+  
   const data = await response.json();
-  return data;
+  console.log(data)
+  return data.map(briefApiDataFormatter);
 };
 
 export const getApi = async (id: string) => {
@@ -160,7 +161,7 @@ export const addApi = async (
     tags,
     version_name: "1.0.0",
     version_description: "Initial Version",
-    pay_model: "Freemium",
+    pay_model: "Free",
   };
 
   const response = await fetch(`${baseUrl}/service/add`, {
@@ -532,7 +533,7 @@ export const searchApis = async (searchTerm: string, hidePending: boolean = true
     }
 
     const data = await response.json();
-    return Array.isArray(data) ? data : [];
+    return data.map(briefApiDataFormatter)
   } catch (error) {
     console.error('Search API error:', error);
     throw error;

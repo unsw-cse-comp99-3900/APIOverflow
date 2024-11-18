@@ -5,8 +5,7 @@ export const briefApiDataFormatter = (data: any) => {
     description: data.description,
     owner: data.owner,
     tags: data.tags,
-    documents: data.documents,
-    endpoint: "yes",
+    payModel: data.pay_model,
   };
 };
 
