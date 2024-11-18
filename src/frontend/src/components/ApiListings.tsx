@@ -55,25 +55,7 @@ const ApiListings: React.FC<ApiListingsProps> = ({
 
     try {
       const data = await searchApis(searchTerm);
-      const validResults = data.map((item: any) => ({
-        name: item.name || item._name,
-        id: item.id || item._id,
-        owner: item.owner || item._owner || {},
-        description: item.description || '',
-        serviceGlobal: false,
-        versions: [],
-        reviews: [],
-        tags: item.tags || [],
-        type: item.type || 'api',
-        upvotes: item.upvotes || 0,
-        downvotes: item.downvotes || 0,
-        newly_created: false,
-        icon: '',
-        icon_url: item.icon_url || '',
-        pay_model: 'free',
-        users: []
-      }));
-      setApis(validResults);
+      setApis(data);
     } catch (err) {
       console.error('Search error:', err);
       setError('Failed to fetch search results');

@@ -1,5 +1,5 @@
 import { Endpoint } from "./backendTypes";
-import { Review, ServiceType } from "./miscTypes";
+import { PayModel, Review, ServiceType } from "./miscTypes";
 import { serviceOwner } from "./userTypes";
 
 export interface BriefApi {
@@ -8,6 +8,7 @@ export interface BriefApi {
   description: string;
   owner: string;
   tags: string[];
+  payModel: PayModel;
 }
 
 export type ServiceStatus =
@@ -26,7 +27,7 @@ export type DetailedApi = {
   id: string;
   name: string;
   owner: serviceOwner;
-  pay_model: "Free" | "Paid";
+  pay_model: PayModel;
   reviews: Review[];
   status:ServiceStatus;
   tags: string[];

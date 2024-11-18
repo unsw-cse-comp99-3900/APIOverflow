@@ -50,9 +50,13 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
         subject = "Please Verify Your Email Address"
         msg_html = f"""
         Hi,<br/>
+        <br/>
         Thank you for registering! Please click the link below to verify your email address:<br/>
+        <br/>
         <a href="{verification_link}">Verify Email</a><br/>
+        <br/>
         If you did not create an account, please ignore this email.<br/>
+        <br/>
         Best regards,<br/>
         API Overflow Team
         """

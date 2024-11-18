@@ -128,7 +128,7 @@ def test_verify_email():
     verification_token = generate_verification_token("12") 
     assert user.get_is_verified() == False
 
-    response = client.get(f"/auth/verify-email/{verification_token}")
+    response = client.post(f"/auth/verify-email/{verification_token}")
 
     user = data_store.get_user_by_id("12")
     assert user.get_is_verified() == True

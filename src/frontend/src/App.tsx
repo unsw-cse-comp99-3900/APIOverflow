@@ -28,6 +28,7 @@ import MyProfilePage from "./pages/UserProfilePage";
 import PasswordResetRequest from './components/PasswordResetRequest';
 import PasswordReset from './components/PasswordReset';
 
+import VerificationPage from "./pages/VerificationPage";
 
 const UserProtectedRoute = () => {
   const auth = useAuth();
@@ -67,6 +68,7 @@ const App = () => {
           <Route index element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-email" element={<VerificationPage />}/>
         </Route>
 
         <Route path="/" element={<ContentLayout />}>

@@ -6,7 +6,7 @@ import Tag from "./Tag";
 import DeleteApiButton from "./DeleteApiButton";
 import EditApiButton from "./EditApiButton";
 import { apiGetIcon } from "../services/apiServices";
-import { useAuth } from "../contexts/AuthContext";
+import { FaCrown } from "react-icons/fa";
 
 interface ApiListingProps {
   api: BriefApi;
@@ -14,27 +14,26 @@ interface ApiListingProps {
   onDelete: (id: string) => void;
 }
 
-
-const ApiListing: React.FC<ApiListingProps>  = ({
-  api,
-  isMyApis,
-  onDelete,
-}) => {
+const ApiListing: React.FC<ApiListingProps> = ({ api, isMyApis, onDelete }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [iconURL, setIconURL] = useState<string>("")
+  const [iconURL, setIconURL] = useState<string>("");
 
-  const auth = useAuth();
-  const { isAdmin, isSuperAdmin } = auth!;
+  console.log(api);
+  const bgColor = {
+    Free: "bg-blue-500",
+    Freemium: "bg-purple-500",
+    Premium: "bg-amber-500",
+  };
 
   useEffect(() => {
     const fetchIcon = async () => {
-      try{
-        const iconURL = await apiGetIcon(api.id)
-        setIconURL(iconURL)
-      } catch(error){
-        console.log(error)
+      try {
+        const iconURL = await apiGetIcon(api.id);
+        setIconURL(iconURL);
+      } catch (error) {
+        console.log(error);
       }
-    }
+    };
     fetchIcon();
 
     // Cleanup the object URL to avoid memory leaks
@@ -43,14 +42,12 @@ const ApiListing: React.FC<ApiListingProps>  = ({
         URL.revokeObjectURL(iconURL);
       }
     };
-
-  }, [])
+  }, []);
   let description = api.description;
 
   if (!showFullDescription && description.length > 90) {
     description = description.substring(0, 90) + "...";
   }
-
 
   return (
     <div className="bg-white rounded-xl shadow-md relative transition-transform transform hover:scale-105">
@@ -64,7 +61,25 @@ const ApiListing: React.FC<ApiListingProps>  = ({
             />
 
             <div>
-              <h3 className="text-xl font-bold my-2">{api.name}</h3>
+              <div className="flex items-center">
+                <h3 className="text-xl font-bold my-2">{api.name}</h3>
+                <div
+                  className={`flex items-center ${
+                    bgColor[api.payModel]
+                  } rounded-md mx-3 px-2`}
+                >
+                  {(api.payModel === "Premium" ||
+                    api.payModel === "Freemium") && (
+                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                      <FaCrown />
+                    </div>
+                  )}
+
+                  <span className="text-white text-md font-medium">
+                    {api.payModel}
+                  </span>
+                </div>
+              </div>
               <div className="text-gray-600">{`By: ${api.owner}`}</div>
               <div className="flex flex-wrap mt-4 mb-3">
                 {api.tags.map((tag) => (
@@ -92,7 +107,7 @@ const ApiListing: React.FC<ApiListingProps>  = ({
 
         {isMyApis && (
           <div className="absolute top-8 right-8 flex space-x-2">
-            <EditApiButton apiId={api.id}/>
+            <EditApiButton apiId={api.id} />
             <DeleteApiButton apiId={api.id} onDelete={onDelete} />
           </div>
         )}

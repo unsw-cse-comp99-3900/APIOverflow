@@ -16,3 +16,12 @@ export interface serviceOwner {
   name: string;
   email: string;
 }
+
+export interface UserProfile {
+  id: string;
+  username: string;
+  email: string;
+  displayName: string;
+  icon: string;
+  role: string;
+}
