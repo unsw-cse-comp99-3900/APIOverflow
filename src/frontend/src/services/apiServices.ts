@@ -17,6 +17,7 @@ import {
   adminUpdateDataFormatter,
   briefApiDataFormatter,
   permDataFormatter,
+  userProfileDataFormatter,
   usersDataFormatter,
 } from "../utils/dataFormatters";
 
@@ -509,6 +510,36 @@ export const getUsers = async () => {
   return usersDataFormatter(data.users);
 };
 
+/*        User Services       */
+export const getUser = async () => {
+  const response = await fetch(`${baseUrl}/user/get`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      method: "GET"
+    }
+  );
+  const data = await response.json();
+  return userProfileDataFormatter(data);
+}
+
+export const getUserIcon = async () => {
+  const response = await fetch(`${baseUrl}/user/get/icon`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+      method: "GET",
+    });
+  const blob = await response.blob(); // Get the Blob data
+  const url = URL.createObjectURL(blob); // Create a URL for the Blob
+  return url;
+}
 
 /*        Misc Services       */
 export const verifyEmail = async (token: string | null) => {

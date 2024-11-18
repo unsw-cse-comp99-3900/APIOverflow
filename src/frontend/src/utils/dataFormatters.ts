@@ -82,3 +82,24 @@ export const usersDataFormatter = (data: any) => {
     };
   });
 }
+
+export const userProfileDataFormatter = (data: any) => {
+  return data.map((user: any) => {
+    
+    let role = "General User";
+    if (user.is_super) {
+      role = "Super Admin";
+    } else if (user.is_admin) {
+      role = "Admin";
+    }
+    
+    return {
+      id: user.id,
+      role,
+      name: user.displayname,
+      username: user.usernam,
+      email: user.email,
+      icon: user.icon,
+    }
+  });
+}
