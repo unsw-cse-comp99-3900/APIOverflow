@@ -25,6 +25,7 @@ import ReviewManagement from "./pages/ReviewManagement";
 import ServiceManagement from "./pages/ServiceManagement";
 import UserManagement from "./pages/UserManagement";
 import MyProfilePage from "./pages/UserProfilePage";
+import VerificationPage from "./pages/VerificationPage";
 
 const UserProtectedRoute = () => {
   const auth = useAuth();
@@ -64,6 +65,7 @@ const App = () => {
           <Route index element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-email" element={<VerificationPage />}/>
         </Route>
 
         <Route path="/" element={<ContentLayout />}>

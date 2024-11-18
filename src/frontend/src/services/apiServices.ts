@@ -508,8 +508,9 @@ export const getUsers = async () => {
 
 
 /*        Misc Services       */
-export const verifyEmail = async (token: string) => {
-  return fetch(`${baseUrl}/auth/verify_email?token=${token}`, {
+export const verifyEmail = async (token: string | null) => {
+  const response = await fetch(`${baseUrl}/auth/verify-email/${token}`, {
     method: "POST",
   });
+  return await response
 }

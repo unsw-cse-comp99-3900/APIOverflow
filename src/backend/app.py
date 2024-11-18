@@ -391,7 +391,7 @@ async def login(credentials: LoginModel):
     access_token = login_wrapper(username, password)
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/auth/verify-email/{token}")
+@app.post("/auth/verify-email/{token}")
 async def verify_email(token: str):
     '''
         Verify a user
