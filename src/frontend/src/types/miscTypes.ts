@@ -20,3 +20,12 @@ export type Status = "pending" | "approved" | "rejected"
 export type AllowedEndpointTypes = "GET" | "POST" | "PUT" | "DELETE"
 
 export type AllowedParameterTypes = "HEADER" | "BODY" | "PATH" | "QUERY"
+
+export interface SearchResult {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  tags: string[];
+  type: string;
+}
