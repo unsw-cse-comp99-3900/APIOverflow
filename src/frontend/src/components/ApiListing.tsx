@@ -18,7 +18,6 @@ const ApiListing: React.FC<ApiListingProps> = ({ api, isMyApis, onDelete }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [iconURL, setIconURL] = useState<string>("");
 
-  console.log(api);
   const bgColor = {
     Free: "bg-blue-500",
     Freemium: "bg-purple-500",

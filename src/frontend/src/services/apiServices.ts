@@ -51,7 +51,6 @@ export const getMyApis = async () => {
   }
   
   const data = await response.json();
-  console.log(data)
   return data.map(briefApiDataFormatter);
 };
 
@@ -60,7 +59,6 @@ export const getApi = async (id: string) => {
     method: "GET",
   });
   const data = await response.json();
-  console.log(data);
   if (response.status === 404) {
     throw new Error("Service Not Found");
   }
@@ -450,7 +448,6 @@ export const approveService = async (
     service_global: serviceGlobal,
     version_name: versionName,
   };
-  console.log(approvalInfo);
   await fetch(`${baseUrl}/admin/service/approve`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -459,6 +456,7 @@ export const approveService = async (
     body: JSON.stringify(approvalInfo),
     method: "POST",
   });
+  console.log("approval complete")
 };
 
 export const userPromote = async (uid: string) => {
