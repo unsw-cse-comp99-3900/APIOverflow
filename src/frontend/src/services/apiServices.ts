@@ -251,6 +251,7 @@ export const userRegister = async (
     password,
     displayname,
   };
+  console.log("hi3")
   await fetch(`${baseUrl}/auth/register`, {
     method: "POST",
     headers: {
@@ -258,6 +259,7 @@ export const userRegister = async (
     },
     body: JSON.stringify(newUser),
   });
+  
   return;
 };
 
