@@ -20,13 +20,13 @@ import {
   usersDataFormatter,
 } from "../utils/dataFormatters";
 
-
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
 export const getApis = async (tags?: Tag[], hidePending = true) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
+  console.log("starting getAPIs")
   const response = await fetch(
     `${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`,
     {
@@ -34,7 +34,9 @@ export const getApis = async (tags?: Tag[], hidePending = true) => {
     }
   );
   const data = await response.json();
-  console.log(data)
+  console.log("finishing getAPIs")
+  console.log(data);
+
   return data.map(briefApiDataFormatter);
 };
 
@@ -49,7 +51,7 @@ export const getMyApis = async () => {
   if (response.status === 401) {
     throw new Error("Unauthorized");
   }
-  
+
   const data = await response.json();
   return data.map(briefApiDataFormatter);
 };
@@ -162,6 +164,8 @@ export const addApi = async (
     pay_model: "Free",
   };
 
+  console.log("starting addAPI")
+  console.log(api)
   const response = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
@@ -175,6 +179,7 @@ export const addApi = async (
     throw new Error("Unauthorized");
   }
 
+  console.log("finishing addAPI")
   const data = await response.json();
   return data.id;
 };
@@ -249,7 +254,7 @@ export const userRegister = async (
     password,
     displayname,
   };
-  console.log("hi3")
+  console.log("hi3");
   await fetch(`${baseUrl}/auth/register`, {
     method: "POST",
     headers: {
@@ -257,7 +262,7 @@ export const userRegister = async (
     },
     body: JSON.stringify(newUser),
   });
-  
+
   return;
 };
 
@@ -448,6 +453,8 @@ export const approveService = async (
     service_global: serviceGlobal,
     version_name: versionName,
   };
+
+  console.log("starting approval");
   await fetch(`${baseUrl}/admin/service/approve`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -456,7 +463,7 @@ export const approveService = async (
     body: JSON.stringify(approvalInfo),
     method: "POST",
   });
-  console.log("approval complete")
+  console.log("approval complete");
 };
 
 export const userPromote = async (uid: string) => {
@@ -465,9 +472,9 @@ export const userPromote = async (uid: string) => {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({uid}),
+    body: JSON.stringify({ uid }),
     method: "POST",
-  })
+  });
   const reponse = await fetch(`${baseUrl}/admin/promote?uid=${uid}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -509,35 +516,37 @@ export const getUsers = async () => {
   return usersDataFormatter(data.users);
 };
 
-
 /*        Misc Services       */
 export const verifyEmail = async (token: string | null) => {
   const response = await fetch(`${baseUrl}/auth/verify-email/${token}`, {
     method: "POST",
   });
-  return await response
-}
+  return await response;
+};
 
-export const searchApis = async (searchTerm: string, hidePending: boolean = true) => {
+export const searchApis = async (
+  searchTerm: string,
+  hidePending: boolean = true
+) => {
   try {
     const response = await fetch(
       `${baseUrl}/service/search?name=${encodeURIComponent(searchTerm)}`,
       {
         method: "GET",
         headers: {
-          'Accept': 'application/json',
-        }
+          Accept: "application/json",
+        },
       }
     );
 
     if (!response.ok) {
-      throw new Error('Search failed');
+      throw new Error("Search failed");
     }
 
     const data = await response.json();
-    return data.map(briefApiDataFormatter)
+    return data.map(briefApiDataFormatter);
   } catch (error) {
-    console.error('Search API error:', error);
+    console.error("Search API error:", error);
     throw error;
   }
 };
