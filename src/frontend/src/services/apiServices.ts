@@ -19,6 +19,8 @@ import {
   permDataFormatter,
   usersDataFormatter,
 } from "../utils/dataFormatters";
+import { BriefApi } from "../types/apiTypes";
+
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -514,3 +516,26 @@ export const verifyEmail = async (token: string | null) => {
   });
   return await response
 }
+
+export const searchApis = async (searchTerm: string, hidePending: boolean = true) => {
+  try {
+    const response = await fetch(
+      `${baseUrl}/service/search?name=${encodeURIComponent(searchTerm)}`,
+      {
+        method: "GET",
+        headers: {
+          'Accept': 'application/json',
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Search failed');
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('Search API error:', error);
+    throw error;
+  }

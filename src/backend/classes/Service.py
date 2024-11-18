@@ -5,14 +5,17 @@ from src.backend.classes.Document import Document
 from src.backend.classes.User import User
 from src.backend.classes.datastore import data_store
 
+
 from fastapi import HTTPException
 
+
 class ServiceStatus(Enum):
-    UPDATE_REJECTED = 3
-    UPDATE_PENDING = 2
-    LIVE = 1
-    PENDING = 0
-    REJECTED = -1
+   UPDATE_REJECTED = 3
+   UPDATE_PENDING = 2
+   LIVE = 1
+   PENDING = 0
+   REJECTED = -1
+
 
 
 PENDING_OPTIONS = [ServiceStatus.PENDING, ServiceStatus.UPDATE_PENDING]
@@ -20,9 +23,11 @@ LIVE_OPTIONS = [ServiceStatus.LIVE, ServiceStatus.UPDATE_PENDING, ServiceStatus.
 REJECTED_OPTIONS = [ServiceStatus.REJECTED, ServiceStatus.UPDATE_REJECTED]
 PAY_MODEL_OPTIONS = ["Free", "Freemium", "Premium"]
 
+
 T = TypeVar("T")
 K = TypeVar("K")
 DEFAULT_ICON = '0'
+
 
 class ServiceVersionInfo:
     '''
@@ -111,9 +116,6 @@ class ServiceVersionInfo:
             self._version_description = self._pending_update._version_description
 
             self._pending_update = None
-        
-
-
 
 class ServicePendingVersionUpdate:
     '''
@@ -135,6 +137,7 @@ class ServicePendingVersionUpdate:
     
     def get_version_description(self) -> str:
         return self._version_description
+
 
 class ServicePendingGlobalUpdate:
     '''
