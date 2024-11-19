@@ -274,13 +274,22 @@ export const userCheckPerm = async () => {
 };
 
 /*        Tag Services       */
-export const getTags = async () => {
-  const response = await fetch(`${baseUrl}/tags/get`, {
+export const getTags = async (option: boolean = false) => {
+  const response = await fetch(`${baseUrl}/tags/get?system=${option}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data.tags;
+};
+
+export const getCustomTags = async (option: boolean = false) => {
+  const response = await fetch(`${baseUrl}/tags/get/ranked?num=${10}&custom=${option}`,{
     method: "GET",
   });
   const data = await response.json();
   return data.tags;
-};
+}
 
 export const addTag = async (tagName: string) => {
   const tag: TagData = {
