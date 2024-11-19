@@ -156,7 +156,6 @@ class Review(Comment):
                 voted = 'up'
             elif uid in self._downvote:
                 voted = 'down'
-
         return {
                 'rid': self._id,
                 'reviewer': self._owner,
@@ -167,7 +166,7 @@ class Review(Comment):
                 'downvotes': len(self._downvote),
                 'timestamp': self.get_timestamp(),
                 'edited': self.is_edited(),
-                'e_timestamp': self.get_content(),
+                'e_timestamp': self.get_e_timestamp(),
                 'reply' : reply,
                 'voted' : voted
             }

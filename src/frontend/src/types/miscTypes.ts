@@ -1,5 +1,4 @@
 export type Review = {
-  id: string;
   rid: string;
   reviewer: string; // uid
   reviewerName: string;
@@ -7,19 +6,21 @@ export type Review = {
   title: string;
   comment: string;
   type: Rating;
-  status: Status;
+  upvotes: string;
+  downvotes: string;
+  timestamp: string;
+  e_timestamp: string;
+  edited: boolean;
+  voted: string;
 }
 
 export type ReviewDetail = {
-  id: string;
   rid: string;
   reviewer: string; // uid
   reviewerName: string;
   service: string; // sid
-  title: string;
   comment: string;
   type: Rating;
-  status: Status;
   upvotes: string;
   downvotes: string;
 }

@@ -421,9 +421,26 @@ export const apiAddReview = async (
   }
 };
 
-export const apiGetReviews = async (sid: string, testing: boolean = true) => {
+export const apiGetReviews = async (sid: string, filter: string = '') => {
+  
+  let u_toggle;
+  if (localStorage.getItem("token")) { 
+    const res = await fetch(`${baseUrl}/user/get/id`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    const data = await res.json();
+    u_toggle = data.uid;
+  } else {
+    u_toggle = "";
+  }
+  console.log(u_toggle);
   const response = await fetch(
-    `${baseUrl}/service/get/reviews?sid=${sid}&testing=${testing}`,
+    `${baseUrl}/service/get/reviews?sid=${sid}&filter=${filter}&uid=${u_toggle}`,
     {
       method: "GET",
     }
@@ -631,6 +648,59 @@ export const userDeleteReview = async (rid: string) => {
     },
   }
   );
+}
+
+export const userUpvoteReview = async(rid: string) => {
+  const response = await fetch(`${baseUrl}/review/upvote`,{
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      rid: rid,
+      content: ""
+    })
+  });
+  if (!response.ok) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export const userDownvoteReview = async(rid: string) => {
+  const response = await fetch(`${baseUrl}/review/downvote`,{
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      rid: rid,
+      content: ""
+    })
+  });
+
+  if (!response.ok) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export const userRemoveVote = async(rid: string) => {
+  await fetch(`${baseUrl}/review/remove_vote`,{
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      rid: rid,
+      content: ""
+    })
+  })
 }
 
 /*        Misc Services       */
