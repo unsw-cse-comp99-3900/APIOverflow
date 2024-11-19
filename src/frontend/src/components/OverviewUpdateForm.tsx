@@ -192,16 +192,25 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
             >
               Description
             </label>
-            <div className="mb-10">
-              <textarea
-                id="description"
-                name="description"
-                placeholder="A library of Apis and Microservices"
-                required
-                onChange={(e) => setDescription(e.target.value)}
-                value={description}
-                className="block w-full rounded-md border-0 py-2 pl-3 min-h-10 text-black text-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
-              />
+            <div className="mb-10"> 
+              <div className="items-center py-2">
+                <div className="font-semibold pl-2 py-1">Description</div>
+                <textarea
+                  id="description"
+                  name="description"
+                  required
+                  onChange={(e) => setDescription(e.target.value)}
+                  onInput={(e) => {
+                    const textarea = e.target as HTMLTextAreaElement;
+                    textarea.style.height = "auto";
+                    textarea.style.height = textarea.scrollHeight + "px"; // Set height to content
+                  }}
+                  placeholder="Description for this endpoint"
+                  value={description}
+                  style={{ overflow: "hidden" }}
+                  className=" w-full border rounded-md p-2 shadow-sm focus:ring-2 focus:ring-indigo-600"
+                />
+              </div>
             </div>
           </div>
 

@@ -37,7 +37,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const [currEndpoint, setCurrEndpoint] = useState<Endpoint>({
     link: "",
     method: "GET",
-    title_description: "Placeholder",
+    title_description: "title_description place holder",
     main_description: "",
     tab: "",
     parameters: [],
@@ -70,10 +70,19 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       }
     };
     fetchApi();
-  }, [apiId]);
+  }, [apiId, currEndpoint]);
+  
 
   // Submit the API update to the backend
   const submitApi = async () => {
+    if (name === "") {
+      toast.error("Name cannot be empty" );
+      return;
+    } else if (description === "") {
+      toast.error("Description cannot be empty");
+      return;
+    }
+
     try {
       // Add newly created tags to the database
       for (const newTag of newTags) {
@@ -149,7 +158,11 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         {currPage === "Endpoint" && (
           <EndpointUpdateForm
             currEndpoint={currEndpoint}
+            endpoints = {endpoints}
+            currEndpointIdx = {currEndpointIdx}
             setCurrEndpoint={setCurrEndpoint}
+            setEndpoints = {setEndpoints}
+            setCurrEndpointIdx={setCurrEndpointIdx}
           />
         )}
       </div>

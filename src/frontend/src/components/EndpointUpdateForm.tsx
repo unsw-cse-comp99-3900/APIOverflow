@@ -1,19 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Endpoint,
   EndpointParameter,
   EndpointResponse,
 } from "../types/backendTypes";
 import { AllowedEndpointTypes } from "../types/miscTypes";
+import { FaPlus } from "react-icons/fa";
+import NewParameter from "./NewParameter";
+import ParameterCard from "./ParameterCard";
+import NewResponse from "./NewResponse";
+import ResponseCard from "./ResponseCard";
 
 interface EndpointUpdateFormProps {
   currEndpoint: Endpoint;
+  endpoints: Endpoint[];
+  currEndpointIdx: number;
   setCurrEndpoint: React.Dispatch<React.SetStateAction<Endpoint>>;
+  setEndpoints: React.Dispatch<React.SetStateAction<Endpoint[]>>;
+  setCurrEndpointIdx: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
   currEndpoint,
+  endpoints,
+  currEndpointIdx,
   setCurrEndpoint,
+  setEndpoints,
+  setCurrEndpointIdx,
 }) => {
   const [link, setLink] = useState<string>(currEndpoint.link);
   const [mainDescription, setMainDescription] = useState<string>(
@@ -30,6 +43,63 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
     currEndpoint.responses
   );
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setLink(currEndpoint.link);
+    setMainDescription(currEndpoint.main_description);
+    setTab(currEndpoint.tab);
+    setParameters(currEndpoint.parameters);
+    setMethod(currEndpoint.method);
+    setResponses(currEndpoint.responses);
+  }, [currEndpoint]);
+
+  const submitEndpoint = () => {
+    console.log(currEndpointIdx);
+
+    if (currEndpointIdx === -1) {
+      // Add a new endpoint
+      setEndpoints([
+        ...endpoints,
+        {
+          title_description: "title_description place holder",
+          link,
+          main_description: mainDescription,
+          tab,
+          parameters,
+          method,
+          responses,
+        },
+      ]);
+    } else {
+      // Update an existing endpoint
+      const updatedEndpoints = endpoints.map((endpoint, index) =>
+        index === currEndpointIdx
+          ? {
+              ...endpoint,
+              title_description: "title_description place holder",
+              link,
+              main_description: mainDescription,
+              tab,
+              parameters,
+              method,
+              responses,
+            }
+          : endpoint
+      );
+
+      setEndpoints(updatedEndpoints); // Update the state with the modified endpoints array
+    }
+    setCurrEndpoint({
+      link: "",
+      method: "GET",
+      title_description: "title_description place holder",
+      main_description: "",
+      tab: "",
+      parameters: [],
+      responses: [],
+    });
+    setCurrEndpointIdx(-1);
+  };
 
   const methods: AllowedEndpointTypes[] = ["GET", "POST", "PUT", "DELETE"];
   const borderDark = {
@@ -53,25 +123,11 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
     DELETE: "bg-red-500",
   };
 
-  const hoverBgDark = {
-    GET: "hover:bg-blue-500",
-    POST: "hover:bg-emerald-500",
-    PUT: "hover:bg-yellow-500",
-    DELETE: "hover:bg-red-500",
-  };
-
   const bgLight = {
     GET: "bg-blue-100",
     POST: "bg-green-100",
     PUT: "bg-yellow-100",
     DELETE: "bg-red-100",
-  };
-
-  const textDark = {
-    GET: "text-blue-800",
-    POST: "text-green-800",
-    PUT: "text-yellow-800",
-    DELETE: "text-red-800",
   };
 
   return (
@@ -89,7 +145,7 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
 
           {/*  */}
           <div
-            className={`border-2 ${borderDark[method]} rounded-lg shadow-md my-4`}
+            className={`border-2 ${borderDark[method]} rounded-lg shadow-md`}
           >
             <div
               className={`cursor-pointer ${bgLight[method]} rounded-md px-4 py-2 flex justify-between items-center`}
@@ -97,7 +153,7 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
               <div className="flex items-center">
                 {/* Method Badge */}
                 <div>
-                  <div className = "flex">
+                  <div className="flex">
                     <div
                       className={`rounded-md my-2 w-20 h-10 flex items-center justify-center text-white ${bgDark[method]} hover:border-2 ${hoverBorderDark[method]} hover:transition-transform hover:scale-105`}
                       onClick={() => {
@@ -117,7 +173,7 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
                           type="text"
                           onChange={(e) => setLink(e.target.value)}
                           placeholder="/example/endpoint"
-                          defaultValue={link}
+                          value={link}
                           className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 focus:font-semibold text-md leading-6"
                         />
                       </div>
@@ -147,14 +203,11 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
 
           {/*  */}
           <div className="col-span-full">
-            <label
-              htmlFor="apiTab"
-              className="block text-2xl font-semibold py-6 leading-6 text-blue-800"
-            >
+            <div className="text-2xl font-semibold pt-10 pb-2 leading-6 text-blue-800">
               Category
-            </label>
+            </div>
             <div className="mt-2">
-              <div className="flex mb-10 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 max-w-md">
+              <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 max-w-md">
                 <input
                   id="apiTag"
                   name="apiTag"
@@ -162,51 +215,70 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
                   type="text"
                   onChange={(e) => setTab(e.target.value)}
                   placeholder="Send Information"
-                  defaultValue={tab}
+                  value={tab}
                   className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 focus:font-semibold text-md leading-6"
                 />
               </div>
             </div>
           </div>
 
-
           <div className="col-span-full">
-            <label
-              htmlFor="mainDescription"
-              className="block text-2xl mt-10 font-semibold py-6 leading-6 text-blue-800"
-            >
+            <div className=" text-2xl font-semibold leading-6 pt-10 pb-2  text-blue-800">
               Description
-            </label>
-            <div className="mb-10">
+            </div>
+
+            <div className="items-center py-2">
               <textarea
                 id="mainDescription"
                 name="mainDescription"
-                placeholder="This Endpoint sends information to the server"
                 required
                 onChange={(e) => setMainDescription(e.target.value)}
+                onInput={(e) => {
+                  const textarea = e.target as HTMLTextAreaElement;
+                  textarea.style.height = "auto";
+                  textarea.style.height = textarea.scrollHeight + "px"; // Set height to content
+                }}
+                placeholder="Description for this endpoint"
                 value={mainDescription}
-                className="block w-full rounded-md border-0 py-2 pl-3 min-h-10 text-black text-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
+                style={{ overflow: "hidden" }}
+                className=" w-full border rounded-md p-2 shadow-sm focus:ring-2 focus:ring-indigo-600"
               />
             </div>
           </div>
 
-          <div className="col-span-full">
-            <label
-              htmlFor="description"
-              className="block text-2xl mt-10 font-semibold py-6 leading-6 text-blue-800"
-            >
-              Parameters
-            </label>
-            <div className="mb-10">
-
-            </div>
+          <div className=" text-2xl font-semibold py-4 leading-6 text-blue-800">
+            Parameters
           </div>
 
+          <NewParameter parameters={parameters} setParameters={setParameters} />
 
+          {parameters.map((parameter) => (
+            <ParameterCard key={parameter.id} parameter={parameter} />
+          ))}
+
+          <div className="col-span-full block text-2xl pt-10 pb-2 font-semibold py-6 leading-6 text-blue-800">
+            Responses
+          </div>
+          <NewResponse responses={responses} setResponses={setResponses} />
+
+          {responses.map((response) => (
+            <ResponseCard
+              key={response.code}
+              responseCode={response.code}
+              responseConditions={response.conditions}
+              responseDescription={response.description}
+              responseExample={response.example}
+            />
+          ))}
           <div className="mt-6 flex items-center justify-end gap-x-6">
+            <button className="rounded-md bg-red-500 px-3 py-2 text-lg font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+              Delete
+            </button>
             <button
-              type="submit"
-              className="rounded-md bg-blue-800 px-3 py-2 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+              className="rounded-md bg-blue-500 px-3 py-2 text-lg font-semibold text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+              onClick={() => {
+                submitEndpoint();
+              }}
             >
               Save
             </button>

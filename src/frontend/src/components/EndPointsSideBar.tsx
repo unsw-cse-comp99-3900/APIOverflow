@@ -38,9 +38,9 @@ const EndpointsSidebar: React.FC<EndpointsSidebarProps> = ({
   };
 
   const newEndpoint: Endpoint = {
-    link: "/endpoint/testing",
+    link: "",
     method: "GET",
-    title_description: "",
+    title_description: "title_description place holder",
     main_description: "",
     tab: "",
     parameters: [],
@@ -82,8 +82,8 @@ const EndpointsSidebar: React.FC<EndpointsSidebarProps> = ({
         className="flex border drop-shadow-md border-gray-300 items-center justify-center px-4 py-4 my-8 text-gray-900 bg-white rounded-lg hover:bg-gray-100 mt-3 hover:cursor-pointer"
         onClick={() => {
           setCurrPage("Endpoint");
-          setEndpoints((prevEndpoints) => [...prevEndpoints, currEndpoint]);
-          setCurrEndpointIdx(endpoints.length);
+          setCurrEndpoint(newEndpoint);
+          setCurrEndpointIdx(-1);
         }}
       >
         <span className="flex text-lg font-medium items-center">
