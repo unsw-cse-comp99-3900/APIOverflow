@@ -23,12 +23,15 @@ def is_valid_user(uid: str):
         raise HTTPException(status_code=404, detail='No user found with given uid')
 
 
-def promote_user(uid: str):
+def promote_user(uid: str, is_super: bool):
     is_valid_user(uid)
     user = data_store.get_user_by_id(uid)
     if user.get_is_admin():
         raise HTTPException(status_code=400, detail=f"User {user.get_name()} is already an admin.")
-    user.promote_to_admin()
+    if is_super:
+        user.promote_to_admin()
+    else:
+        raise HTTPException(status_code=403, detail="Only Superadmin can promote users.")
     db_update_user(uid, user.to_json())
     username = user.get_name()
     return {"name": username, "status": user.get_is_admin()}
