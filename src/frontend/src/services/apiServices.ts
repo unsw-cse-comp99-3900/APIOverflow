@@ -280,9 +280,10 @@ export const uploadPDF = async (file: File) => {
 };
 
 // Link service with documentation
-export const uploadDocs = async (sid: string, docId: string) => {
+export const uploadDocs = async (sid: string, docId: string, versionName: string) => {
   const info: ServiceUpload = {
     sid,
+    version_name: versionName,
     doc_id: docId,
   };
   await fetch(`${baseUrl}/service/upload_docs`, {

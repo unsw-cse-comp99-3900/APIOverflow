@@ -79,26 +79,35 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
     fetchApi();
   }, [apiId, currEndpoint]);
 
-  const submitApiOverlay = () => {
-    try{
+  const submitApiOverlay = async () => {
+    try {
       if (apiId === undefined) {
         // create new api
-        addApi({
+        const newId = await addApi({
           name,
           description,
           tags: selectedTags,
-          pay_model:payModel,
+          pay_model: payModel,
           endpoints,
           version_name: versionName,
           version_description: versionDescription,
-        })
-        
+        });
+
+        if (selectedImageData) {
+          const doc_id = await uploadImage(selectedImageData);
+          apiAddIcon(newId, doc_id);
+        }
+        if (selectedFile) {
+          const doc_id = await uploadPDF(selectedFile);
+          await uploadDocs(newId, doc_id, versionName);
+        }
+        navigate(`/profile/my-apis/${newId}`);
       } else {
         // update existing api
       }
       toast.success("Success!");
       setIsVersionInfoOverlayOpen(false);
-    }catch (error) {
+    } catch (error) {
       if (error instanceof Error && error.message === "Unauthorized") {
         logout();
         navigate("/login");
@@ -121,11 +130,17 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       return;
     }
 
-    if (versionUpdated) {
+    if (apiId === undefined) {
       // create new api
       setIsVersionInfoOverlayOpen(true);
     } else {
-      // update general info
+      // update
+
+      if (versionUpdated) {
+        // version specific update
+        setIsVersionInfoOverlayOpen(true);
+      }
+      // general info update
     }
 
     // try {

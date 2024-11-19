@@ -41,6 +41,7 @@ export interface ServiceIconInfo {
 
 export interface ServiceUpload {
     sid: string;
+    version_name: string;
     doc_id: string;
 }
 
