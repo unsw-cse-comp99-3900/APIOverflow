@@ -374,6 +374,41 @@ def test_admin_demote_admin(simple_user):
     assert response.status_code == NOT_AUTH
     assert response.json() == {"detail": "Admins cannot demote other Admins."}
 
+def test_normal_admin_promote_user(simple_user):
+    '''
+        Test normal admin promoting a user
+    '''
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    response = client.post("/admin/promote", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'uid' : simple_user['uid']
+                            })
+    assert response.status_code == SUCCESS
+    assert response.json() == {"name": "Tester 1", "status": True}
+
+    user_creds2 = {
+        "displayname" : "Tester 2",
+        "username" : "Tester 2",
+        "password" : "password22",
+        "email": "doxx22ed@gmail.com"
+    }
+    response = client.post("/auth/register", json=user_creds2)
+    assert response.status_code == SUCCESS
+    uid2 = response.json()['uid']
+
+    response = client.post("/admin/promote", headers={"Authorization": f"Bearer {simple_user['token']}"},
+                            params={
+                              'uid' : uid2
+                            })
+    assert response.status_code == NOT_AUTH
+    assert response.json() == {"detail": "Only Superadmin can promote users."}
+
 def test_admin_check_dashboard(simple_user):
     '''
         Test promoting a user
