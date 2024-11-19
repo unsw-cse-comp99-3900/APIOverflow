@@ -10,6 +10,7 @@ import NewParameter from "./NewParameter";
 import ParameterCard from "./ParameterCard";
 import NewResponse from "./NewResponse";
 import ResponseCard from "./ResponseCard";
+import { toast } from "react-toastify";
 
 interface EndpointUpdateFormProps {
   currEndpoint: Endpoint;
@@ -53,8 +54,45 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
     setResponses(currEndpoint.responses);
   }, [currEndpoint]);
 
+  const deleteEndpoint = () => {
+    if (currEndpointIdx !== -1) {
+      toast.success("Endpoint Deleted");
+      setEndpoints(endpoints.filter((_, index) => index !== currEndpointIdx));
+      setCurrEndpointIdx(-1);
+      setCurrEndpoint({
+        link: "",
+        method: "GET",
+        title_description: "title_description place holder",
+        main_description: "",
+        tab: "",
+        parameters: [],
+        responses: [],
+      });
+    } else {
+      toast.error("No endpoint selected");
+    }
+  };
+
   const submitEndpoint = () => {
-    console.log(currEndpointIdx);
+    if (link === "") {
+      toast.error("Link cannot be empty");
+      return;
+    } else if (mainDescription === "") {
+      toast.error("Description cannot be empty");
+      return;
+    } else if (tab === "") {
+      toast.error("Tab cannot be empty");
+      return;
+    } else if (parameters.length === 0) {
+      toast.error("Parameters cannot be empty");
+      return;
+    } else if (responses.length === 0) {
+      toast.error("Responses cannot be empty");
+      return;
+    } else if (currEndpointIdx === -1) {
+      toast.error("Please add an endpoint");
+      return;
+    }
 
     if (currEndpointIdx === -1) {
       // Add a new endpoint
@@ -271,7 +309,12 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
             />
           ))}
           <div className="mt-6 flex items-center justify-end gap-x-6">
-            <button className="rounded-md bg-red-500 px-3 py-2 text-lg font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+            <button
+              className="rounded-md bg-red-500 px-3 py-2 text-lg font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+              onClick={() => {
+                deleteEndpoint();
+              }}
+            >
               Delete
             </button>
             <button

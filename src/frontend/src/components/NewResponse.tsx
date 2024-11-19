@@ -30,16 +30,16 @@ const NewResponse: React.FC<NewResponseProps> = ({
 
   const addNewResponse = () => {
     if (code === "") {
-      toast.error("Code cannot be empty");
+      toast.error("Response ode cannot be empty");
       return;
     } else if (description === "") {
-      toast.error("Description cannot be empty");
+      toast.error("Response description cannot be empty");
       return;
     } else if (example === "") {
-      toast.error("Example cannot be empty");
+      toast.error("Response example cannot be empty");
       return;
     } else if (conditions.length === 0) {
-      toast.error("Conditions cannot be empty");
+      toast.error("Response conditions cannot be empty");
       return;
     }
 
@@ -112,7 +112,7 @@ const NewResponse: React.FC<NewResponseProps> = ({
               textarea.style.height = "auto";
               textarea.style.height = textarea.scrollHeight + "px"; // Set height to content
             }}
-            placeholder="Example description for this response code"
+            placeholder="Description for this response code"
             value={description}
             style={{ overflow: "hidden" }}
             className=" w-full border rounded-md p-2 shadow-sm focus:ring-2 focus:ring-indigo-600"
@@ -159,7 +159,7 @@ const NewResponse: React.FC<NewResponseProps> = ({
               textarea.style.height = "auto";
               textarea.style.height = textarea.scrollHeight + "px"; // Set height to content
             }}
-            placeholder="Example response body for this response code"
+            placeholder="Condition that this response code applies to"
             value={currCondition}
             style={{ overflow: "hidden" }}
             className=" w-full border rounded-md p-2 shadow-sm focus:ring-2 focus:ring-indigo-600"

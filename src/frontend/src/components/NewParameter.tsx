@@ -21,13 +21,13 @@ const NewParameter: React.FC<NewPrameterProps> = ({
 
   const addNewParameter = () => {
     if (name === "") {
-      toast.error("Name cannot be empty");
+      toast.error("Parameter name cannot be empty");
       return;
     } else if (type === "") {
-      toast.error("Type cannot be empty");
+      toast.error("Parameter type cannot be empty");
       return;
     } else if (example === "") {
-      toast.error("Example cannot be empty");
+      toast.error("Parameter example cannot be empty");
       return;
     }
     setParameters([
