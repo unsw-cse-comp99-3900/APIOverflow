@@ -15,9 +15,9 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8">
-      {services.map((service) => (
+      {services.map((service, index) => (
         <div
-          key={service.id}
+          key={index}
           className="relative shadow-md rounded-lg p-4 bg-white border transition-transform transform hover:scale-105 border-gray-200"
         >
           <h2 className="text-2xl font-bold text-blue-800 mb-3">

@@ -3,7 +3,7 @@ import { DetailedApi, Version } from "../types/apiTypes";
 import { toast } from "react-toastify";
 import { getDoc } from "../services/apiServices";
 import EndpointComponent from "./EndpointComponent";
-import { notNewVersions } from "../utils/versions";
+import { getCurrVersions } from "../utils/versions";
 
 interface VersionFieldsProps {
   versions: Version[];
@@ -13,16 +13,44 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const currVersions = notNewVersions(versions);
+  const [currVersions, setCurrVersions] = useState<Version[]>(
+    versions.filter((version) => !version.newly_created)
+  );
+  const [currVersion, setCurrVersion] = useState<Version | null>(null);
+  const [currVersionName, setCurrVersionName] = useState<string>("");
+
+  useEffect(() => {
+    if (currVersions.length > 0) {
+      const defaultVersion =
+        currVersions.find((ver) => ver.version_name === currVersionName) ||
+        currVersions[0]; // Fallback to the first version
+      setCurrVersion(defaultVersion);
+      setCurrVersionName(defaultVersion.version_name); // Ensure `currVersionName` matches
+    }
+  }, [currVersions, currVersionName]);
+
+  useEffect(() => {
+    for (const currVer of currVersions) {
+      if (currVer.version_name === currVersionName) {
+        setCurrVersion(currVer);
+        break;
+      }
+    }
+  }, [currVersionName, currVersions]);
 
   useEffect(() => {
     const fetchDocs = async () => {
       try {
-        if (currVersions[0].docs && versions[0].docs.length > 0) {
-          const docURL = await getDoc(versions[0].docs[0]);
+        console.log(currVersion);
+        if (!currVersion) {
+          setError(
+            "No live version available for this service yet, come back later!"
+          );
+        } else if (currVersion.docs && currVersion.docs.length > 0) {
+          const docURL = await getDoc(currVersions[0].docs[0]);
           setPdfUrl(docURL);
         } else {
-          setError("No documentation available.");
+          setError("No document for this service available");
         }
       } catch (error) {
         console.log("Error fetching data", error);
@@ -36,22 +64,50 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     };
 
     fetchDocs();
-  }, [versions]);
+  }, [currVersion, currVersions]);
 
   return (
     <>
       <div className=" bg-white rounded-2xl shadow-lg p-6 mt-6">
-        <h2 className="text-xl font-bold mb-4">Patch Note</h2>
+        <div className="flex justify-between mb-2">
+          <div className="flex items-center text-xl font-bold">
+            <h2 className="text-xl font-bold">Patch Note</h2>
+          </div>
+          {currVersion !== null && (
+            <div className="flex items-center text-xl font-bold">
+              <h2 className="text-xl font-bold mr-2">Version</h2>
+              <div className="flex items-center">
+                <select
+                  value={currVersionName}
+                  onChange={(e) => setCurrVersionName(e.target.value)}
+                  className="p-2 border w-40 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-600"
+                >
+                  {currVersions.map((version, index) => (
+                    <option key={index} value={version.version_name}>
+                      {version.version_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+        </div>
+
         <p className="break-words text-justify">
-          {versions[0].version_description}
+          {currVersion
+            ? currVersion.version_description
+            : "No live version available for this service yet, come back later!"}
         </p>
+
         <div className="border border-gray-100 w-full my-5"></div>
 
         <h2 className="text-xl font-bold mb-4">Endpoints</h2>
 
-        {versions[0].endpoints.map((endpoint, index) => (
-          <EndpointComponent key={index} endpoint={endpoint} />
-        ))}
+        {currVersion
+          ? currVersion.endpoints.map((endpoint, index) => (
+              <EndpointComponent key={index} endpoint={endpoint} />
+            ))
+          : "No live version available for this service yet, come back later!"}
 
         <div className="border border-gray-100 w-full my-5"></div>
 

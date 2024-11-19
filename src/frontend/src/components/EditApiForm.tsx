@@ -103,6 +103,12 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         navigate(`/profile/my-apis/${newId}`);
       } else {
         // update existing api
+        for (const preVer of api!.versions) {
+          if (preVer.version_name === versionName) {
+            toast.error("Version name already exists");
+            return;
+          }
+        }
         await addNewVersion(apiId, versionName, versionDescription, endpoints);
         if (selectedImageData) {
           const doc_id = await uploadImage(selectedImageData);
