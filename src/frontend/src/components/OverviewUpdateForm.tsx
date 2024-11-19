@@ -1,8 +1,8 @@
 import { PhotoIcon, DocumentIcon } from "@heroicons/react/24/solid";
 import React, { useState } from "react";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaCrown, FaPlus, FaTrash } from "react-icons/fa";
 import TagsOverlay from "./TagsOverlay";
-import { Tag } from "../types/miscTypes";
+import { PayModel, Tag } from "../types/miscTypes";
 import FileCard from "./FileCard";
 
 interface OverviewUpdateFormProps {
@@ -13,6 +13,7 @@ interface OverviewUpdateFormProps {
   selectedImage: string;
   selectedImageData: File | null;
   selectedFile: File | null;
+  payModel: PayModel;
   setName: React.Dispatch<React.SetStateAction<string>>;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   setSelectedTags: React.Dispatch<React.SetStateAction<Tag[]>>;
@@ -20,6 +21,7 @@ interface OverviewUpdateFormProps {
   setSelectedImage: React.Dispatch<React.SetStateAction<string>>;
   setSelectedImageData: React.Dispatch<React.SetStateAction<File | null>>;
   setSelectedFile: React.Dispatch<React.SetStateAction<File | null>>;
+  setPayModel: React.Dispatch<React.SetStateAction<PayModel>>;
 }
 
 const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
@@ -27,6 +29,7 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
   description,
   selectedTags,
   newTags,
+  payModel,
   selectedImage,
   selectedImageData,
   selectedFile,
@@ -34,6 +37,7 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
   setDescription,
   setSelectedTags,
   setNewTags,
+  setPayModel,
   setSelectedImage,
   setSelectedImageData,
   setSelectedFile,
@@ -82,6 +86,11 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
     <div className="container-xl lg:container mx-auto p-10">
       <div>
         <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
+          <h1 className="text-lg font-semibold text-gray-600 mb-10">
+            *Note: Editing the Documentation or Endpoints will create a new
+            version of the service.
+          </h1>
+
           <div className="col-span-full flex flex-col items-center py-6 mx-2">
             <button
               type="button"
@@ -114,12 +123,12 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
           <div className="col-span-full">
             <label
               htmlFor="apiName"
-              className="block text-2xl font-semibold py-6 leading-6 text-blue-800"
+              className="block text-2xl font-semibold pt-10 pb-4 leading-6 text-blue-800"
             >
               Name
             </label>
-            <div className="mt-2">
-              <div className="flex mb-10 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 max-w-md">
+
+              <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 max-w-md">
                 <input
                   id="apiName"
                   name="apiName"
@@ -131,13 +140,95 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
                   className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 focus:font-semibold text-md leading-6"
                 />
               </div>
+          </div>
+
+          <div className="col-span-full">
+            <label
+              htmlFor="payModel"
+              className="block text-2xl font-semibold pt-10 pb-6 leading-6 text-blue-800"
+            >
+              Pay Model
+            </label>
+            <div className="space-y-4">
+              {/* Premium Option */}
+              <div className="flex items-center">
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="radio"
+                    name="payModel"
+                    value="Premium"
+                    checked={payModel === "Premium"}
+                    onChange={() => setPayModel("Premium")}
+                    className="h-5 w-5 text-amber-500 focus:ring-amber-500"
+                  />
+                  <div
+                    className={`py-1 flex items-center justify-center bg-amber-500 rounded-md px-4 w-36`}
+                  >
+                    <FaCrown className="text-white mr-2" />
+                    <span className="text-white text-lg font-medium">
+                      Premium
+                    </span>
+                  </div>
+                </label>
+                <div className="font-semibold text-gray-700 ml-4">
+                  Premium services are available to users with a subscription
+                </div>
+              </div>
+
+              {/* Freemium Option */}
+              <div className="flex items-center">
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="radio"
+                    name="payModel"
+                    value="Freemium"
+                    checked={payModel === "Freemium"}
+                    onChange={() => setPayModel("Freemium")}
+                    className="h-5 w-5 text-purple-500 focus:ring-purple-500"
+                  />
+                  <div
+                    className={`py-1 flex items-center justify-center bg-purple-500 rounded-md px-4 w-36`}
+                  >
+                    <FaCrown className="text-white mr-2" />
+                    <span className="text-white text-lg font-medium">
+                      Freemium
+                    </span>
+                  </div>
+                </label>
+                <div className="font-semibold text-gray-700 ml-4">
+                  Freemium services are available to all users with some
+                  limitations
+                </div>
+              </div>
+
+              {/* Free Option */}
+              <div className="flex items-center">
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="radio"
+                    name="payModel"
+                    value="Free"
+                    checked={payModel === "Free"}
+                    onChange={() => setPayModel("Free")}
+                    className="h-5 w-5 text-blue-500 focus:ring-blue-500"
+                  />
+                  <div
+                    className={`py-1 flex items-center justify-center bg-blue-500 rounded-md px-4 w-36`}
+                  >
+                    <span className="text-white text-lg font-medium">Free</span>
+                  </div>
+                </label>
+                <div className="font-semibold text-gray-700 ml-4">
+                  Free services are available to all users
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="col-span-full">
             <label
               htmlFor="apiName"
-              className="block text-2xl font-semibold py-6 leading-6 text-blue-800"
+              className="block text-2xl font-semibold pt-10 pb-4 leading-6 text-blue-800"
             >
               Tags
             </label>
@@ -188,38 +279,36 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
           <div className="col-span-full">
             <label
               htmlFor="description"
-              className="block text-2xl mt-10 font-semibold py-6 leading-6 text-blue-800"
+              className="block text-2xl font-semibold pt-10 pb-2 leading-6 text-blue-800"
             >
               Description
             </label>
-            <div className="mb-10"> 
-              <div className="items-center py-2">
-                <div className="font-semibold pl-2 py-1">Description</div>
-                <textarea
-                  id="description"
-                  name="description"
-                  required
-                  onChange={(e) => setDescription(e.target.value)}
-                  onInput={(e) => {
-                    const textarea = e.target as HTMLTextAreaElement;
-                    textarea.style.height = "auto";
-                    textarea.style.height = textarea.scrollHeight + "px"; // Set height to content
-                  }}
-                  placeholder="Description for this endpoint"
-                  value={description}
-                  style={{ overflow: "hidden" }}
-                  className=" w-full border rounded-md p-2 shadow-sm focus:ring-2 focus:ring-indigo-600"
-                />
-              </div>
+
+            <div className="items-center py-2">
+              <textarea
+                id="description"
+                name="description"
+                required
+                onChange={(e) => setDescription(e.target.value)}
+                onInput={(e) => {
+                  const textarea = e.target as HTMLTextAreaElement;
+                  textarea.style.height = "auto";
+                  textarea.style.height = textarea.scrollHeight + "px"; // Set height to content
+                }}
+                placeholder="Description for this endpoint"
+                value={description}
+                style={{ overflow: "hidden" }}
+                className=" w-full border rounded-md p-2 shadow-sm focus:ring-2 focus:ring-indigo-600"
+              />
             </div>
           </div>
 
           <div className="col-span-full">
             <label
               htmlFor="Documentation"
-              className="block text-2xl font-semibold py-6 leading-6 text-blue-800"
+              className="block text-2xl font-semibold pt-10 pb-2 leading-6 text-blue-800"
             >
-              Documentations
+              Documentation
             </label>
             <div className="mt-2 flex justify-center rounded-lg border border-dashed border-blue-800/25 px-6 py-10">
               <div className="text-center">

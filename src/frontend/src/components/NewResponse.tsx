@@ -141,7 +141,7 @@ const NewResponse: React.FC<NewResponseProps> = ({
         <div className="items-center py-2">
           <div className="font-semibold pl-2 py-1">Conditions</div>
           <div
-            className="flex border drop-shadow-lg border-gray-300 items-center justify-center px-4 py-2 mb-4 bg-gray-100 text-black rounded-lg hover:bg-gray-200 hover:cursor-pointer"
+            className="flex border drop-shadow-lg border-gray-300 items-center justify-center px-4 py-4 mb-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:cursor-pointer"
             onClick={() => addNewCondition()}
           >
             <span className="flex text-lg font-medium items-center">

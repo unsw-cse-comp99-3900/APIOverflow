@@ -14,26 +14,30 @@ import {
   uploadPDF,
 } from "../services/apiServices";
 import { toast } from "react-toastify";
-import { Tag } from "../types/miscTypes";
+import { PayModel, Tag } from "../types/miscTypes";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { DetailedApi } from "../types/apiTypes";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
   // General Info
-  const [api, setApi] = useState<any>({});
+  const [api, setApi] = useState<DetailedApi | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<Tag[]>(["API"]);
   const [newTags, setNewTags] = useState<Tag[]>([]);
+  const [payModel, setPayModel] = useState<PayModel>("Free");
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedImageData, setSelectedImageData] = useState<File | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
 
   // Verion Info
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [versionUpdated, setVersionUpdated] = useState<boolean>(false);
+  const [enterVersionDetail, setEnterVersionDetail] = useState<boolean>(false);
   const [currPage, setCurrPage] = useState<"Overview" | "Endpoint">("Overview");
   const [currEndpointIdx, setCurrEndpointIdx] = useState<number>(-1);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [currEndpoint, setCurrEndpoint] = useState<Endpoint>({
     link: "",
     method: "GET",
@@ -51,7 +55,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
   useEffect(() => {
     setVersionUpdated(true);
-  }, [endpoints]);
+  }, [endpoints, selectedFile]);
 
   useEffect(() => {
     const fetchApi = async () => {
@@ -71,12 +75,11 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
     };
     fetchApi();
   }, [apiId, currEndpoint]);
-  
 
   // Submit the API update to the backend
   const submitApi = async () => {
     if (name === "") {
-      toast.error("Name cannot be empty" );
+      toast.error("Name cannot be empty");
       return;
     } else if (description === "") {
       toast.error("Description cannot be empty");
@@ -93,7 +96,13 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
       // Edit existing API
       if (apiId) {
-        await updateApi(name, description, selectedTags, "/testing/endpoint", apiId);
+        await updateApi(
+          name,
+          description,
+          selectedTags,
+          "/testing/endpoint",
+          apiId
+        );
         if (selectedImageData) {
           const doc_id = await uploadImage(selectedImageData);
           apiAddIcon(apiId, doc_id);
@@ -108,7 +117,12 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
         // Add new API
       } else {
-        const newId = await addApi(name, description, selectedTags, "/testing/endpoint");
+        const newId = await addApi(
+          name,
+          description,
+          selectedTags,
+          "/testing/endpoint"
+        );
         if (selectedImageData) {
           const doc_id = await uploadImage(selectedImageData);
           apiAddIcon(newId, doc_id);
@@ -143,10 +157,12 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
             description={description}
             selectedTags={selectedTags}
             newTags={newTags}
+            payModel={payModel}
             selectedImage={selectedImage}
             selectedImageData={selectedImageData}
             selectedFile={selectedFile}
             setName={setName}
+            setPayModel={setPayModel}
             setDescription={setDescription}
             setSelectedTags={setSelectedTags}
             setNewTags={setNewTags}
@@ -158,10 +174,10 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         {currPage === "Endpoint" && (
           <EndpointUpdateForm
             currEndpoint={currEndpoint}
-            endpoints = {endpoints}
-            currEndpointIdx = {currEndpointIdx}
+            endpoints={endpoints}
+            currEndpointIdx={currEndpointIdx}
             setCurrEndpoint={setCurrEndpoint}
-            setEndpoints = {setEndpoints}
+            setEndpoints={setEndpoints}
             setCurrEndpointIdx={setCurrEndpointIdx}
           />
         )}
