@@ -597,7 +597,7 @@ async def promote(uid: str, user: User = Depends(manager), role: str = Depends(a
    '''
        Endpoint to promote given their id
    '''
-   return promote_user(uid)
+   return promote_user(uid, user["is_super"])
 
 
 @app.post("/admin/demote")
