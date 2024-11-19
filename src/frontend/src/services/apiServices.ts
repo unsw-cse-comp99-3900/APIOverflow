@@ -1,3 +1,4 @@
+import { DetailedApi } from "../types/apiTypes";
 import {
   Endpoint,
   LoginModel,
@@ -24,10 +25,14 @@ import {
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (tags?: Tag[], hidePending = true, sortRating = true) => {
+export const getApis = async (
+  tags?: Tag[],
+  hidePending = true,
+  sortRating = true
+) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
-  console.log("starting getAPIs")
+  console.log("starting getAPIs");
   const response = await fetch(
     `${baseUrl}/service/filter?hide_pending=${hidePending}&sort_rating=${sortRating}${queryParams}`,
     {
@@ -35,7 +40,7 @@ export const getApis = async (tags?: Tag[], hidePending = true, sortRating = tru
     }
   );
   const data = await response.json();
-  console.log("finishing getAPIs")
+  console.log("finishing getAPIs");
   console.log(data);
 
   return data.map(briefApiDataFormatter);
@@ -75,98 +80,8 @@ export const deleteApi = async (id: string) => {
   return;
 };
 
-export const addApi = async (
-  name: string,
-  description: string,
-  tags: string[],
-  endpointLink: string
-) => {
-  const ParameterPlaceholder1: EndpointParameter = {
-    id: "1",
-    endpoint_link: endpointLink,
-    required: false,
-    type: "BODY",
-    name: "Parameter Placeholder1",
-    value_type: "string",
-    example: "Example Placeholder1",
-  };
-
-  const ParameterPlaceholder2: EndpointParameter = {
-    id: "2",
-    endpoint_link: endpointLink,
-    required: true,
-    type: "HEADER",
-    name: "Parameter Placeholder2",
-    value_type: "string",
-    example: "Example Placeholder2",
-  };
-
-  const ResponsePlaceholder1: EndpointResponse = {
-    code: "200",
-    description: "Description Placeholder1",
-    conditions: ["Condition Placeholder1", "Condition Placeholder2"],
-    example: "Example Placeholder1",
-  };
-
-  const ResponsePlaceholder2: EndpointResponse = {
-    code: "404",
-    description: "Description Placeholder2",
-    conditions: ["Condition Placeholder1", "Condition Placeholder2"],
-    example: "Example Placeholder2",
-  };
-
-  const endpoint1: Endpoint = {
-    link: endpointLink,
-    title_description: "Title Description Placeholder 1",
-    main_description: "Main Description Placeholder 1",
-    tab: "Tab Placeholder 1",
-    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
-    method: "GET",
-    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
-  };
-
-  const endpoint2: Endpoint = {
-    link: endpointLink,
-    title_description: "Title1 Description Placeholder 2",
-    main_description: "Main Description Placeholder 2",
-    tab: "Tab Placeholder 2",
-    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
-    method: "POST",
-    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
-  };
-
-  const endpoint3: Endpoint = {
-    link: endpointLink,
-    title_description: "Title1 Description Placeholder 3",
-    main_description: "Main Description Placeholder 3",
-    tab: "Tab Placeholder 3",
-    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
-    method: "PUT",
-    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
-  };
-
-  const endpoint4: Endpoint = {
-    link: endpointLink,
-    title_description: "Title1 Description Placeholder 4",
-    main_description: "Main Description Placeholder 4",
-    tab: "Tab Placeholder 4",
-    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
-    method: "DELETE",
-    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
-  };
-
-  const api: ServiceAdd = {
-    name,
-    description,
-    endpoints: [endpoint1, endpoint2, endpoint3, endpoint4],
-    tags,
-    version_name: "1.0.0",
-    version_description: "Initial Version",
-    pay_model: "Free",
-  };
-
-  console.log("starting addAPI")
-  console.log(api)
+export const addApi = async (api: ServiceAdd) => {
+  console.log(api);
   const response = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
@@ -180,7 +95,7 @@ export const addApi = async (
     throw new Error("Unauthorized");
   }
 
-  console.log("finishing addAPI")
+  console.log("finishing addAPI");
   const data = await response.json();
   return data.id;
 };
@@ -429,15 +344,12 @@ export const apiGetReviews = async (sid: string, testing: boolean = true) => {
 };
 
 export const apiGetRating = async (sid: string) => {
-  const response = await fetch(
-    `${baseUrl}/service/get/rating?sid=${sid}`,
-    {
-      method: "GET",
-    }
-  )
-  const data = await response.json()
-  return data.rating
-}
+  const response = await fetch(`${baseUrl}/service/get/rating?sid=${sid}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  return data.rating;
+};
 
 /*        Admin Services       */
 export const getPendingServices = async () => {
@@ -530,55 +442,50 @@ export const getUsers = async () => {
 
 /*        User Services       */
 export const getUser = async () => {
-  const response = await fetch(`${baseUrl}/user/get`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-      method: "GET"
-    }
-  );
+  const response = await fetch(`${baseUrl}/user/get`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+  });
   if (response.status === 401) {
     throw new Error("Unauthorized");
   }
   const data = await response.json();
   return userProfileDataFormatter(data);
-}
+};
 
 export const getUserIcon = async () => {
-  const response = await fetch(`${baseUrl}/user/get/icon`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-      method: "GET",
-    });
+  const response = await fetch(`${baseUrl}/user/get/icon`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+      Pragma: "no-cache",
+      Expires: "0",
+    },
+    method: "GET",
+  });
   const blob = await response.blob(); // Get the Blob data
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
   return url;
-}
+};
 
 export const updateDisplayName = async (displayName: string) => {
   const info = {
-    content: displayName
-  }
-  const response = await fetch(`${baseUrl}/user/update/displayname`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(info)
-    }
-  );
+    content: displayName,
+  };
+  const response = await fetch(`${baseUrl}/user/update/displayname`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(info),
+  });
   console.log(response.status);
   console.log(response.json());
-}
+};
 
 export const userAddIcon = async (docId: string) => {
   const info = {

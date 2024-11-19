@@ -89,9 +89,6 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
     } else if (responses.length === 0) {
       toast.error("Responses cannot be empty");
       return;
-    } else if (currEndpointIdx === -1) {
-      toast.error("Please add an endpoint");
-      return;
     }
 
     if (currEndpointIdx === -1) {
