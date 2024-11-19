@@ -43,9 +43,7 @@ const UserSideBar = () => {
           const res = await getUser();
           setDisplayName(`${res.displayName}`);
           setEmail(`${res.email}`);
-          console.log("Starting req");
           setIconURL(await getUserIcon());
-          console.log("Finished req");
         } catch (error) {
           console.log(`!Something went wrong: ${error}`);
         }
