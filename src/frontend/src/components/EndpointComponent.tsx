@@ -83,8 +83,6 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
           {/* Endpoint Link */}
           <div>
             <h2 className="font-bold text-lg ml-3">{endpoint.link}</h2>
-
-            <div className="ml-3">{endpoint.title_description}</div>
           </div>
         </div>
 

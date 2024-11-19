@@ -35,9 +35,9 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const [currPage, setCurrPage] = useState<"Overview" | "Endpoint">("Overview");
   const [currEndpointIdx, setCurrEndpointIdx] = useState<number>(-1);
   const [currEndpoint, setCurrEndpoint] = useState<Endpoint>({
-    link: "testing",
+    link: "",
     method: "GET",
-    title_description: "",
+    title_description: "Placeholder",
     main_description: "",
     tab: "",
     parameters: [],
@@ -149,7 +149,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         {currPage === "Endpoint" && (
           <EndpointUpdateForm
             currEndpoint={currEndpoint}
-            setcurrEndpoint={setCurrEndpoint}
+            setCurrEndpoint={setCurrEndpoint}
           />
         )}
       </div>
