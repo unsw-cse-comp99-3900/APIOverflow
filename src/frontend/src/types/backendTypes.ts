@@ -1,4 +1,4 @@
-import { AllowedEndpointTypes, AllowedParameterTypes, Rating } from "./miscTypes";
+import { AllowedEndpointTypes, AllowedParameterTypes, PayModel, Rating } from "./miscTypes";
 
 export interface ServiceAdd {
     name: string;
@@ -7,14 +7,14 @@ export interface ServiceAdd {
     endpoints: Endpoint[];
     version_name: string;
     version_description: string;
-    pay_model: "Free" | "Premium" | "Freemium";
+    pay_model: PayModel;
 }
 
-export interface ServiceUpdate{
+export interface ServiceGlobalUpdate{
     name: string;
     description: string;
     tags: string[];
-    endpoint:string
+    pay_model:PayModel
     sid: string;
 }
 
@@ -96,4 +96,11 @@ export interface ServiceApprove{
     reason: string;
     service_global: boolean;
     version_name: string | null;
+}
+
+export interface ServiceAddVersion{
+    sid: string;
+    version_name: string;
+    version_description: string;
+    endpoints: Endpoint[];
 }

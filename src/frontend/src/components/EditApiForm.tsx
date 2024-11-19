@@ -5,10 +5,11 @@ import OverviewUpdateForm from "./OverviewUpdateForm";
 import EndpointUpdateForm from "./EndpointUpdateForm";
 import {
   addApi,
+  addNewVersion,
   addTag,
   apiAddIcon,
   getApi,
-  updateApi,
+  updateServiceGlobal,
   uploadDocs,
   uploadImage,
   uploadPDF,
@@ -21,6 +22,7 @@ import { DetailedApi } from "../types/apiTypes";
 import VersionInfoOverlay from "./VersionInfoOverlay";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
+  
   // General Info
   const [api, setApi] = useState<DetailedApi | null>(null);
   const [name, setName] = useState<string>("");
@@ -34,6 +36,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   // Verion Info
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [versionUpdated, setVersionUpdated] = useState<boolean>(false);
+  const [generalInfoUpdated, setGeneralInfoUpdated] = useState<boolean>(false);
   const [versionName, setVersionName] = useState<string>("");
   const [versionDescription, setVersionDescription] = useState<string>("");
   const [isVersionInfoOverlayOpen, setIsVersionInfoOverlayOpen] =
@@ -61,23 +64,30 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   }, [endpoints, selectedFile]);
 
   useEffect(() => {
+    setGeneralInfoUpdated(true);
+  }, [name, description, selectedTags, payModel, selectedImageData]);
+
+  useEffect(() => {
     const fetchApi = async () => {
-      if (apiId === undefined) {
-        return;
+      if (apiId !== undefined) {
+        try {
+          const data = await getApi(apiId);
+          setApi(data);
+          setName(data.name);
+          setDescription(data.description);
+          setSelectedTags(data.tags);
+          setPayModel(data.pay_model);
+          setEndpoints(data.versions[0].endpoints);
+          setVersionUpdated(false);
+          setGeneralInfoUpdated(false);
+        } catch (error) {
+          toast.error("Error loading API data");
+        }
       }
-      try {
-        const data = await getApi(apiId);
-        setApi(data);
-        setName(data.name);
-        setDescription(data.description);
-        setSelectedTags(data.tags);
-      } catch (error) {
-        console.log("Error fetching data", error);
-        toast.error("Error loading API data");
-      }
+
     };
     fetchApi();
-  }, [apiId, currEndpoint]);
+  }, []);
 
   const submitApiOverlay = async () => {
     try {
@@ -104,6 +114,16 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         navigate(`/profile/my-apis/${newId}`);
       } else {
         // update existing api
+        await addNewVersion(apiId, versionName, versionDescription, endpoints);
+        if (selectedImageData) {
+          const doc_id = await uploadImage(selectedImageData);
+          apiAddIcon(apiId, doc_id);
+        }
+        if (selectedFile) {
+          const doc_id = await uploadPDF(selectedFile);
+          await uploadDocs(apiId, doc_id, versionName);
+        }
+        navigate(`/profile/my-apis/${apiId}`);
       }
       toast.success("Success!");
       setIsVersionInfoOverlayOpen(false);
@@ -117,7 +137,6 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
   // Submit the API update to the backend
   const submitApi = async () => {
-    console.log(versionUpdated);
 
     if (name === "") {
       toast.error("Name cannot be empty");
@@ -130,6 +149,12 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       return;
     }
 
+    for (const newTag of newTags) {
+      if (selectedTags.includes(newTag)) {
+        await addTag(newTag);
+      }
+    }
+
     if (apiId === undefined) {
       // create new api
       setIsVersionInfoOverlayOpen(true);
@@ -140,64 +165,8 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         // version specific update
         setIsVersionInfoOverlayOpen(true);
       }
-      // general info update
+      updateServiceGlobal(name, description, selectedTags, payModel, apiId);
     }
-
-    // try {
-    //   // Add newly created tags to the database
-    //   for (const newTag of newTags) {
-    //     if (selectedTags.includes(newTag)) {
-    //       await addTag(newTag);
-    //     }
-    //   }
-
-    //   // Edit existing API
-    //   if (apiId) {
-    //     await updateApi(
-    //       name,
-    //       description,
-    //       selectedTags,
-    //       "/testing/endpoint",
-    //       apiId
-    //     );
-    //     if (selectedImageData) {
-    //       const doc_id = await uploadImage(selectedImageData);
-    //       apiAddIcon(apiId, doc_id);
-    //     }
-    //     if (selectedFile) {
-    //       const doc_id = await uploadPDF(selectedFile);
-    //       await uploadDocs(apiId, doc_id);
-    //     }
-    //     navigate(`/profile/my-apis/${apiId}`);
-
-    //     // Add new API
-    //   } else {
-    //     const newId = await addApi(
-    //       name,
-    //       description,
-    //       selectedTags,
-    //       "/testing/endpoint"
-    //     );
-    //     if (selectedImageData) {
-    //       const doc_id = await uploadImage(selectedImageData);
-    //       apiAddIcon(newId, doc_id);
-    //     }
-
-    //     if (selectedFile) {
-    //       const doc_id = await uploadPDF(selectedFile);
-    //       await uploadDocs(newId, doc_id);
-    //     }
-    //     navigate(`/profile/my-apis/${newId}`);
-    //   }
-
-    //   toast.success("Success!");
-    // } catch (error) {
-    //   if (error instanceof Error && error.message === "Unauthorized") {
-    //     logout();
-    //     navigate("/login");
-    //   }
-    //   toast.error("Error updating API");
-    // }
   };
 
   return (

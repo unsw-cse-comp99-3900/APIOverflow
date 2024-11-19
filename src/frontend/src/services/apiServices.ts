@@ -6,14 +6,14 @@ import {
   ServiceIconInfo,
   ServiceAdd,
   ServiceReviewInfo,
-  ServiceUpdate,
+  ServiceGlobalUpdate,
   ServiceUpload,
   TagData,
   UserCreate,
   EndpointResponse,
   ServiceApprove,
 } from "../types/backendTypes";
-import { Rating, Tag } from "../types/miscTypes";
+import { PayModel, Rating, Tag } from "../types/miscTypes";
 import {
   adminUpdateDataFormatter,
   briefApiDataFormatter,
@@ -32,7 +32,6 @@ export const getApis = async (
 ) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
-  console.log("starting getAPIs");
   const response = await fetch(
     `${baseUrl}/service/filter?hide_pending=${hidePending}&sort_rating=${sortRating}${queryParams}`,
     {
@@ -40,9 +39,6 @@ export const getApis = async (
     }
   );
   const data = await response.json();
-  console.log("finishing getAPIs");
-  console.log(data);
-
   return data.map(briefApiDataFormatter);
 };
 
@@ -81,7 +77,6 @@ export const deleteApi = async (id: string) => {
 };
 
 export const addApi = async (api: ServiceAdd) => {
-  console.log(api);
   const response = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
@@ -95,27 +90,26 @@ export const addApi = async (api: ServiceAdd) => {
     throw new Error("Unauthorized");
   }
 
-  console.log("finishing addAPI");
   const data = await response.json();
   return data.id;
 };
 
-export const updateApi = async (
+export const updateServiceGlobal = async (
   name: string,
   description: string,
   tags: string[],
-  endpoint: string,
+  pay_model: PayModel,
   sid: string
 ) => {
-  const api: ServiceUpdate = {
+  const api: ServiceGlobalUpdate = {
     sid,
     name,
     description,
-    endpoint,
-    tags: tags,
+    pay_model,
+    tags,
   };
   const response = await fetch(`${baseUrl}/service/update`, {
-    method: "PUT",
+    method: "POST",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
@@ -128,6 +122,33 @@ export const updateApi = async (
   }
   return;
 };
+
+export const addNewVersion = async (
+  sid:string,
+  versionName:string,
+  versionDescription:string,
+  endpoints:Endpoint[],
+) => {
+  const newVersion = {
+    sid,
+    version_name: versionName,
+    version_description: versionDescription,
+    endpoints,
+  };
+  const response = await fetch(`${baseUrl}/service/version/add`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newVersion),
+  });
+
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
+  return;
+}
 
 /*        Auth Services       */
 export const userLogin = async (credentials: LoginModel) => {
@@ -170,7 +191,6 @@ export const userRegister = async (
     password,
     displayname,
   };
-  console.log("hi3");
   await fetch(`${baseUrl}/auth/register`, {
     method: "POST",
     headers: {
@@ -379,7 +399,6 @@ export const approveService = async (
     version_name: versionName,
   };
 
-  console.log("starting approval");
   await fetch(`${baseUrl}/admin/service/approve`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -388,18 +407,9 @@ export const approveService = async (
     body: JSON.stringify(approvalInfo),
     method: "POST",
   });
-  console.log("approval complete");
 };
 
 export const userPromote = async (uid: string) => {
-  console.log({
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ uid }),
-    method: "POST",
-  });
   const reponse = await fetch(`${baseUrl}/admin/promote?uid=${uid}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -484,8 +494,6 @@ export const updateDisplayName = async (displayName: string) => {
     },
     body: JSON.stringify(info),
   });
-  console.log(response.status);
-  console.log(response.json());
 };
 
 export const userAddIcon = async (docId: string) => {

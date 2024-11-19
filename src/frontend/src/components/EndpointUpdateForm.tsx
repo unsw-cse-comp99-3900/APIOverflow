@@ -122,7 +122,7 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
           : endpoint
       );
 
-      setEndpoints(updatedEndpoints); // Update the state with the modified endpoints array
+      setEndpoints(updatedEndpoints);
     }
     setCurrEndpoint({
       link: "",
