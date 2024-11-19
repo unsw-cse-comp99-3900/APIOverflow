@@ -14,6 +14,7 @@ from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
 from src.backend.classes.Review import Review
 import re
+import requests
 from src.backend.server.email import send_email
 
 
@@ -147,17 +148,12 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool, sort_rating:
     api_list = data_store.get_apis()
     filtered_apis = []
 
-    # print(api_list)
-    #query = input("Search")
+    prompt = "hello can you see this?"
 
-    #if query != "":
-        # if not empty, then Ollama match
-    #    data = {
-    #        "model": "llama3.2",
-    #        "prompt": query
-    #    }    
-    #    response = requests.post(url, json=data)
-        
+    response = query_ollama(prompt)
+    if response:
+        print(response)
+
     if not tags:
         # if they don't specify any tags, assume all APIs
         for api in api_list:
@@ -575,3 +571,34 @@ def parse_yaml_to_api(yaml_data: dict, user: User) -> Service:
    data_store.add_api(return_api)
    db_add_service(return_api.to_json())
    return return_api
+
+def query_ollama(prompt, model="llama3.2", api_url="http://localhost:11434"):
+    """
+    Send a prompt to Ollama API and get the response
+
+    Args:
+        prompt (str): The prompt to send to the model
+        model (str): The model to use (default: "llama2")
+        api_url (str): The base URL for Ollama API (default: "http://localhost:11434")
+
+    Returns:
+        str: The model's response
+    """
+    endpoint = f"{api_url}/api/generate"
+
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False  # Set to True if you want to stream the response
+    }
+
+    try:
+        response = requests.post(endpoint, json=payload)
+        response.raise_for_status()  # Raise an exception for bad status codes
+
+        result = response.json()
+        return result['response']
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+        return None
