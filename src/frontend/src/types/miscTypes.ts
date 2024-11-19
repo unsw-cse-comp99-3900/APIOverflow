@@ -2,6 +2,7 @@ export type Review = {
   id: string;
   rid: string;
   reviewer: string; // uid
+  reviewerName: string;
   service: string; // sid
   title: string;
   comment: string;

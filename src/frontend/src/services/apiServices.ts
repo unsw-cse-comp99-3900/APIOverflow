@@ -25,11 +25,11 @@ import {
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (tags?: Tag[], hidePending = true) => {
+export const getApis = async (tags?: Tag[], hidePending = true, sortRating = true) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
   const response = await fetch(
-    `${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`,
+    `${baseUrl}/service/filter?hide_pending=${hidePending}&sort_rating=${sortRating}${queryParams}`,
     {
       method: "GET",
     }
@@ -422,6 +422,17 @@ export const apiGetReviews = async (sid: string, testing: boolean = true) => {
   const data = await response.json();
   return data.reviews;
 };
+
+export const apiGetRating = async (sid: string) => {
+  const response = await fetch(
+    `${baseUrl}/service/get/rating?sid=${sid}`,
+    {
+      method: "GET",
+    }
+  )
+  const data = await response.json()
+  return data.rating
+}
 
 /*        Admin Services       */
 export const getPendingServices = async () => {

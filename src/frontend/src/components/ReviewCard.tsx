@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Review } from "../types/miscTypes";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 
@@ -11,14 +11,14 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
   const borderColor300 = review.type === "positive" ? "border-blue-300" : "border-red-300";
   const textColor800 = review.type === "positive" ? "text-blue-800" : "text-red-800";
   const textColor500 = review.type === "positive" ? "text-blue-500" : "text-red-500";
-
+  console.log(review);
   return (
     <div
       className={`p-3 bg-white border-2 ${borderColor300} rounded-lg`}
     >
       <div className={`flex items-center justify-between`}>
         <h2 className={`text-lg font-bold items-center justify-center ${textColor800}`}>
-          ReviewerNamePlaceholder
+          {review.reviewerName}
         </h2>
         <div
           className={`pr-3 flex items-center text-lg justify-center ${textColor500} rounded-xl`}

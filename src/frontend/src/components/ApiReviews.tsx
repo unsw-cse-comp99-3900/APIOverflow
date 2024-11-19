@@ -45,7 +45,7 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
       return;
     }
     try {
-      await apiAddReview(sid, reviewRating, reviewComment, "reviewTitle");
+      await apiAddReview(sid, reviewRating, "reviewTitle", reviewComment);
     } catch (error) {
       if (error instanceof Error) {
         setWarning(error.message);

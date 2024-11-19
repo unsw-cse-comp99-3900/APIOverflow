@@ -656,5 +656,6 @@ class Service:
             'description': self._description,
             'icon_url': self._icon_url,
             'tags': self._tags,
-            'pay_model': self._pay_model
+            'pay_model': self._pay_model,
+            'ratings': self.get_ratings()
         }
