@@ -67,6 +67,7 @@ const MyApiPage: React.FC = () => {
               payModel={api.pay_model}
               tags={api.tags}
               isMyApi={true}
+              rating={String(Number(api.upvotes) - Number(api.downvotes))}
             />
 
             <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">

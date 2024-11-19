@@ -604,6 +604,7 @@ class Service:
             'owner' : {
                 'id' : self._owner.get_id(),
                 'name' : self._owner.get_name(),
+                'displayName': self._owner.get_displayname(),
                 'email' : self._owner.get_email()
             },
             'icon_url' : self._icon_url,

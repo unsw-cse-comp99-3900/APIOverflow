@@ -448,7 +448,6 @@ def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> Li
 
         reviews.append(review)
 
-
     # Sorting the review list
     if filter == 'best':
         review.sort(reverse=True, key=lambda x : x.get_net_vote())
