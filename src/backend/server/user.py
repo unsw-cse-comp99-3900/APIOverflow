@@ -76,7 +76,9 @@ def user_get_reviews_wrapper(uid: str) -> List[dict[str, str]]:
     reviews = []
     for rid in user.get_reviews():
         review = data_store.get_review_by_id(rid)
-        reviews.append(review.to_json(brief=True))
+        json = review.to_json(brief=True)
+        json['reviewerName'] = user.get_displayname()
+        reviews.append(json)
     return reviews
 
 def user_get_profile_wrapper(uid: str) -> dict[str, str]:

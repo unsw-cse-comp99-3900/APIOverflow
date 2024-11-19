@@ -308,6 +308,17 @@ class Service:
     #   Update Methods
     ################################
 
+    def update_rating(self, rating: str) -> None:
+        '''
+            Updates a rating to the opposite given 
+        '''
+        if rating == 'negative':
+            self._upvotes -= 1
+            self._downvotes += 1
+        else:
+            self._downvotes -= 1
+            self._upvotes += 1
+        
     def update_name(self, name: str) -> None:
         '''
             Update service name

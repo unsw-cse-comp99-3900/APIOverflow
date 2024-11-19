@@ -67,7 +67,7 @@ const VerificationPage: React.FC = () => {
                     <span className="visually-hidden">Verifying...</span>
                 </div>
                 ) : (
-                <div className = "flex items-center">
+                <div>
                   <div className = "flex items-center">
                     <h1 className="text-3xl font-bold text-center text-blue-900">{bigMsg}</h1>  
                   </div>
