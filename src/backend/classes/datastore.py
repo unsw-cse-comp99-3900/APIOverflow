@@ -184,10 +184,16 @@ class Datastore:
         # Screen for unapproved services
         output = []
         for tag in tags:
-            for service in tag.get_servers():
-                if service.get_status() == LIVE:
+            for _service in tag.get_servers():
+                service = self.get_api_by_id(_service)
+                if service.get_status().value == LIVE:
                     output.append(tag)
         
+        if len(output) < num:
+            return {
+                'tags': [tag.to_json() for tag in output]
+            }
+
         return {
             'tags': [tag.to_json() for tag in output[:num]]
         }
