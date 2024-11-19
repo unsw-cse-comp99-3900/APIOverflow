@@ -2,6 +2,7 @@ export type Review = {
   id: string;
   rid: string;
   reviewer: string; // uid
+  reviewerName: string;
   service: string; // sid
   title: string;
   comment: string;
@@ -12,6 +13,13 @@ export type Review = {
 export type Rating = "positive" | "negative"
 
 export type Tag = string
+
+export type CustomTag = {
+  tid: string;
+  tag: string;
+  type: number;
+  num: number;
+}
 
 export type ServiceType = "api" | "micro"
 

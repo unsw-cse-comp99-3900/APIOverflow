@@ -4,6 +4,7 @@ from src.backend.classes.Document import Document
 from src.backend.classes.User import User
 from src.backend.classes.Tag import Tag, SYSTEM, CUSTOM
 
+LIVE = 1
 
 T = TypeVar("T")
 defaults = [
@@ -168,14 +169,27 @@ class Datastore:
             
         return None
 
-    def get_tag_ranking(self, num: int) -> list[dict[str, str | int]]:
+    def get_tag_ranking(self, num: int, custom: bool) -> list[dict[str, str | int]]:
         '''
             Returns a list of 'num' tags {tag: str, amt: int} in desc order
         '''
         # Sort list of tags 
-        tags = sorted(self.__store['tags'], key=lambda x : (-len(x.get_servers()), x.get_tag().lower()))
+        tags = []
+        if custom:
+            tags = [tag for tag in self.__store['tags'] if tag.get_type() == CUSTOM]
+            tags.sort(key=lambda x : (-len(x.get_servers()), x.get_tag().lower()))
+        else:
+            tags = sorted(self.__store['tags'], key=lambda x : (-len(x.get_servers()), x.get_tag().lower()))
+        
+        # Screen for unapproved services
+        output = []
+        for tag in tags:
+            for service in tag.get_servers():
+                if service.get_status() == LIVE:
+                    output.append(tag)
+        
         return {
-            'tags': [tag.to_json() for tag in tags[:num]]
+            'tags': [tag.to_json() for tag in output[:num]]
         }
 
     def get_docs(self) -> List[T]:

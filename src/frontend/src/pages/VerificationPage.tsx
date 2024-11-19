@@ -10,7 +10,8 @@ import { verifyEmail } from "../services/apiServices";
 
 const VerificationPage: React.FC = () => {
   const location = useLocation();
-  const [statusMsg, setMsg] = useState("Verifying...");
+  const [bigMsg, setBigMsg] = useState("");
+  const [smallMsg, setSmallMsg] = useState("Verifying...");
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   let [searchParams, setSearchParams] = useSearchParams();
@@ -28,10 +29,11 @@ const VerificationPage: React.FC = () => {
             const res = await verifyEmail(token)
             setIsLoading(false);
             if (!res.ok) { // Something happened here.
-                setMsg(`Something went wrong in the verification process. Please try again later!`);
+                setSmallMsg(`Something went wrong in the verification process. Please try again later!`);
 
             } else {
-                setMsg(`Email Verified. You may now log in.\n Welcome to APIOverflow!`)
+              setBigMsg("Welcome to APIOverflow!");
+              setSmallMsg(`Email verified. You may now log in.`)
             }
             
           } catch (error) {
@@ -66,7 +68,12 @@ const VerificationPage: React.FC = () => {
                 </div>
                 ) : (
                 <div className = "flex items-center">
-                    <h1 className="text-2xl font-bold text-center text-blue-900">{statusMsg}</h1>          
+                  <div className = "flex items-center">
+                    <h1 className="text-3xl font-bold text-center text-blue-900">{bigMsg}</h1>  
+                  </div>
+                  <div className = "flex items-center">
+                    <h1 className="text-2xl font-bold text-center text-blue-900">{smallMsg}</h1>    
+                  </div> 
                 </div>  
                 )}
         </div>

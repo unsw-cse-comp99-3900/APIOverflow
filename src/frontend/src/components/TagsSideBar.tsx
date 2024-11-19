@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Tag } from "../types/miscTypes";
+import { Tag, CustomTag } from "../types/miscTypes";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
-import { getTags } from "../services/apiServices";
+import { getCustomTags, getTags } from "../services/apiServices";
 import { useSelectedTags } from "../contexts/SelectedTagsContext";
 
 const TagsSideBar: React.FC = () => {
   const [tags, setTags] = useState<Tag[]>([]);
   const { selectedTags, toggleTag, clearTags } = useSelectedTags();
+  const [cTags, setCTags] = useState<CustomTag[]>([]);
 
   useEffect(() => {
     const fetchApis = async () => {
       try {
-        const data = await getTags();
+        const data = await getTags(true);
         setTags(data);
+
+        const cData = await getCustomTags(true);
+        setCTags(cData);
       } catch (error) {
         console.log("Error fetching data", error);
       }
@@ -30,7 +34,7 @@ const TagsSideBar: React.FC = () => {
   return (
     <aside className="fixed left-0 w-80 h-full px-4 py-8 overflow-y-auto bg-white border-r dark:bg-gray-900 dark:border-gray-700">
       <div className="flex justify-between items-center px-4">
-        <h4 className="font-bold text-gray-800 dark:text-gray-200 ml-3">
+        <h4 className="font-bold text-2xl text-gray-800 dark:text-gray-200 ml-1">
           Filter by Tags
         </h4>
         <button
@@ -41,6 +45,11 @@ const TagsSideBar: React.FC = () => {
         </button>
       </div>
       <div className="border border-gray-100 mb-5 mt-5"></div>
+      <div>
+        <h4 className="font-bold text-1xl text-gray-800 dark:text-gray-200 ml-1">
+            System Tags
+        </h4>
+      </div>
       <div className="grid grid-cols-1 gap-1">
         {tags.map((tag) => (
           <span
@@ -55,6 +64,27 @@ const TagsSideBar: React.FC = () => {
           </span>
         ))}
       </div>
+      <div className="mb-5 mt-5"></div>
+      <div>
+        <h4 className="font-bold text-1xl text-gray-800 dark:text-gray-200 ml-1">
+            Trending Tags
+        </h4>
+      </div>
+      <div className="grid grid-cols-1 gap-1">
+        {cTags.map((tagInfo) => (
+          <span
+            key={tagInfo.tag}
+            className="flex items-center px-4 py-2 text-gray-900 bg-white rounded-lg dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 group mt-3 hover:cursor-pointer"
+            onClick={() => toggleTag(tagInfo.tag)}
+          >
+            <span className="ml-3 font-medium flex items-center">
+              {tagIcon({ tag: tagInfo.tag })}
+              {tagInfo.tag} ({tagInfo.num})
+            </span>
+          </span>
+        ))}
+      </div>
+      <div className="mb-5 mt-5"></div>
     </aside>
   );
 };
