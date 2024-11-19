@@ -223,9 +223,10 @@ async def filter(
     tags: Optional[List[str]] = Query(None), 
     providers: Optional[List[str]] = Query(None),
     pay_models: Optional[List[str]] = Query(None),
-    hide_pending: bool = True
+    hide_pending: bool = True,
+    sort_rating: bool = False,
 ):
-    return api_tag_filter(tags, providers, pay_models, hide_pending)
+    return api_tag_filter(tags, providers, pay_models, hide_pending, sort_rating)
 
 @app.get("/service/search")
 async def search(
@@ -434,6 +435,7 @@ async def register(user: UserCreate):
    '''
        Register a user onto the platform
    '''
+   print("Received request")
    uid = register_wrapper(user.displayname, user.username, user.password, user.email)
    return {'uid' : uid}
 
@@ -668,9 +670,6 @@ async def user_add_icon(doc: DocumentID, user: User=Depends(manager)):
        Endpoint to add an icon to a user
    '''
    user_add_icon_wrapper(user['id'], doc.doc_id)
-
-
-
 
 @app.delete("/user/delete_icon")
 async def user_delete_icon(user: User=Depends(manager)):

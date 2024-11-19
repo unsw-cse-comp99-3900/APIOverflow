@@ -4,7 +4,7 @@ import UpdateApiForm from "../components/UpdateApiForm";
 
 const AddApiPage: React.FC = () => {
   return (
-      <EditApiForm />
+      <UpdateApiForm />
   );
 };
 

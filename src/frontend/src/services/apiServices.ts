@@ -17,18 +17,19 @@ import {
   adminUpdateDataFormatter,
   briefApiDataFormatter,
   permDataFormatter,
+  userProfileDataFormatter,
   usersDataFormatter,
 } from "../utils/dataFormatters";
 
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (tags?: Tag[], hidePending = true) => {
+export const getApis = async (tags?: Tag[], hidePending = true, sortRating = true) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
   console.log("starting getAPIs")
   const response = await fetch(
-    `${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`,
+    `${baseUrl}/service/filter?hide_pending=${hidePending}&sort_rating=${sortRating}${queryParams}`,
     {
       method: "GET",
     }
@@ -427,6 +428,17 @@ export const apiGetReviews = async (sid: string, testing: boolean = true) => {
   return data.reviews;
 };
 
+export const apiGetRating = async (sid: string) => {
+  const response = await fetch(
+    `${baseUrl}/service/get/rating?sid=${sid}`,
+    {
+      method: "GET",
+    }
+  )
+  const data = await response.json()
+  return data.rating
+}
+
 /*        Admin Services       */
 export const getPendingServices = async () => {
   const response = await fetch(`${baseUrl}/admin/get/services`, {
@@ -514,6 +526,69 @@ export const getUsers = async () => {
   });
   const data = await reponse.json();
   return usersDataFormatter(data.users);
+};
+
+/*        User Services       */
+export const getUser = async () => {
+  const response = await fetch(`${baseUrl}/user/get`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      method: "GET"
+    }
+  );
+  const data = await response.json();
+  return userProfileDataFormatter(data);
+}
+
+export const getUserIcon = async () => {
+  const response = await fetch(`${baseUrl}/user/get/icon`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+      method: "GET",
+    });
+  const blob = await response.blob(); // Get the Blob data
+  const url = URL.createObjectURL(blob); // Create a URL for the Blob
+  return url;
+}
+
+export const updateDisplayName = async (displayName: string) => {
+  const info = {
+    content: displayName
+  }
+  const response = await fetch(`${baseUrl}/user/update/displayname`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(info)
+    }
+  );
+  console.log(response.status);
+  console.log(response.json());
+}
+
+export const userAddIcon = async (docId: string) => {
+  const info = {
+    doc_id: docId,
+  };
+  await fetch(`${baseUrl}/user/add_icon`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(info),
+  });
 };
 
 /*        Misc Services       */

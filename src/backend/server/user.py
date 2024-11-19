@@ -49,10 +49,7 @@ def user_get_wrapper(uid: str):
     if user is None:
         raise HTTPException(status_code=404, detail="No such user found")
 
-    icon_id = user.get_icon()
-    return {
-        'icon' : user.get_icon(),
-    }
+    return user.to_summary_json()
 
 def user_get_icon_wrapper(uid: str) -> FileResponse:
     '''

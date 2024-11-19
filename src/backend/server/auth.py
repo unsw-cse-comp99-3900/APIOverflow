@@ -29,7 +29,7 @@ GENERAL = 'general'
 def load_email_setting():
     load_dotenv(Path(__file__).parent.parent / '.env')
     return os.getenv("EMAIL") == "True"
-email = load_email_setting()
+_email = load_email_setting()
 
 def generate_verification_token(uid: str) -> str:
     expiration_time = datetime.now(timezone.utc) + timedelta(minutes=30)
@@ -46,7 +46,7 @@ def verify_token(token: str):
         raise HTTPException(status_code=400, detail="Invalid verification token")
     
 # Login route
-def login_wrapper(username: str, password: str, verify: bool = email) -> T:
+def login_wrapper(username: str, password: str, verify: bool = _email) -> T:
     '''
         Wrapper used to handle logging in
     '''
@@ -67,10 +67,11 @@ def login_wrapper(username: str, password: str, verify: bool = email) -> T:
         del blacklisted_tokens[access_token]
     return access_token
 
-def register_wrapper(displayname: str, name: str, password: str, email: str, verify: bool = email) -> str:
+def register_wrapper(displayname: str, name: str, password: str, email: str, verify: bool = _email) -> str:
     '''
         Handles registering a new user    
     '''
+    print("registering user....")
     if data_store.num_users() == 0:
         create_super_admin()
     if data_store.get_user_by_name(name):
@@ -90,6 +91,7 @@ def register_wrapper(displayname: str, name: str, password: str, email: str, ver
     if verify:
         verification_token = generate_verification_token(new_user.get_id())
         send_email(email, verification_token)
+        print("email has been sent!")
 
     return new_user.get_id()
 
@@ -116,7 +118,7 @@ def change_password(uid: str, newpass: str) -> None:
     user.change_password(manager.hash_password(newpass))
     db_update_user(uid, user.to_json())
 
-def password_reset_request(uid: str, verify: bool = email) -> None:
+def password_reset_request(uid: str, verify: bool = _email) -> None:
     '''
         Handles password reset request  
     '''

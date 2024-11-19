@@ -301,3 +301,19 @@ class User:
             data['password'] = self._password
     
         return data
+    
+    def to_summary_json(self) -> dict[T, K]:
+        '''
+            Converts object to a summary json for frontend
+        '''
+        return {
+            'id': self._id,
+            'displayname' : self._displayname,
+            'username' : self._name,
+            'email' : self._email,
+            'is_admin' : self._is_admin,
+            'is_super' : self._is_super,
+            'reviews': self._reviews,
+            'replies': self._replies,
+            'icon' : self._icon
+        }
