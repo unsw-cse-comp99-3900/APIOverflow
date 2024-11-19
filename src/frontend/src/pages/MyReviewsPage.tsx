@@ -4,49 +4,73 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { UserProfile } from "../types/userTypes";
-import { ReviewDetail } from "../types/miscTypes";
+import { Rating, ReviewDetail } from "../types/miscTypes";
 import ReviewCard from "../components/ReviewCard";
 import ReviewModal from "../components/ReviewModal";
 import ReviewDetailModal from "../components/ReviewDetailModal";
 import { Review } from "../types/miscTypes";
 import ReviewCardHeader from "../components/ReviewCardHeader";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { apiGetReviews, userDeleteReview, userEditReview, userGetReviews } from "../services/apiServices";
+import ReviewDetailCard from "../components/ReviewDetailCard";
 
 // Dummy data for testing
-const reviews: ReviewDetail[] = [
-    {
-      id: "1",
-      rid: "R001",
-      reviewer: "Jane Doe",
-      reviewerName: "hihi",
-      service: "Service001",
-      title: "Great Service",
-      comment: "I had an amazing experience with this service!",
-      type: "positive",
-      status: "approved",
-      upvotes: "5",
-      downvotes: "20",
-    },
-    {
-      id: "2",
-      rid: "R002",
-      reviewer: "John Smith",
-      reviewerName: "hihi",
-      service: "Service002",
-      title: "Not Satisfied",
-      comment: "The service quality was below my expectations.",
-      type: "negative",
-      status: "pending",
-      upvotes: "20",
-      downvotes: "5",
-    },
-  ];
+// const reviews: ReviewDetail[] = [
+//     {
+//       id: "1",
+//       rid: "R001",
+//       reviewer: "Jane Doe",
+//       reviewerName: "hihi",
+//       service: "Service001",
+//       title: "Great Service",
+//       comment: "I had an amazing experience with this service!",
+//       type: "positive",
+//       status: "approved",
+//       upvotes: "5",
+//       downvotes: "20",
+//     },
+//     {
+//       id: "2",
+//       rid: "R002",
+//       reviewer: "John Smith",
+//       reviewerName: "hihi",
+//       service: "Service002",
+//       title: "Not Satisfied",
+//       comment: "The service quality was below my expectations.",
+//       type: "negative",
+//       status: "pending",
+//       upvotes: "20",
+//       downvotes: "5",
+//     },
+//   ];
 
 const MyReviewsPage = () => {
   const navigate = useNavigate();
   const [selectedReview, setSelectedReview] = useState<ReviewDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [numRating, setNumRating] = useState<number>(0);
+  const [reviews, setReviews] = useState<ReviewDetail[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [reload, setReload] = useState(true);
+
+  useEffect (() => {
+
+    const fetchReviews = async () => {
+      
+      if (!reload) {return};
+      
+      try {
+        const data = await userGetReviews();
+        setReviews(data);
+  
+      } catch(error) {
+        console.log(error);
+      }
+      setLoading(false);
+      setReload(false);
+    }
+    fetchReviews();
+  }, []);
 
   const handleOpenModal = (review: ReviewDetail) => {
     setSelectedReview(review);
@@ -58,14 +82,15 @@ const MyReviewsPage = () => {
     setIsModalOpen(false);
   };
 
-  const handleEdit = (reviewId: string) => {
-    console.log(`Approved review with ID: ${reviewId}`);
+  const handleEdit = async (reviewId: string, content: string, rating: Rating | null) => {
+    await userEditReview(reviewId, rating, content); 
     handleCloseModal();
+    setReload(true);
   };
 
-  const handleDelete = (reviewId: string, reason: string) => {
-    console.log(`Rejected review with ID: ${reviewId}, Reason: ${reason}`);
-    handleCloseModal();
+  const handleDelete = async (reviewId: string) => {
+    await userDeleteReview(reviewId);
+    setReload(true);
   };
 
   return (
@@ -75,10 +100,10 @@ const MyReviewsPage = () => {
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {reviews.map((review) => ( 
-            <div key={review.id} className="shadow-lg rounded-xl p-4 transition-transform transform hover:scale-105">
-                <ReviewCardHeader reviewID={review.id} service={review.service} />
+            <div key={review.rid} className="shadow-lg rounded-xl p-4 transition-transform transform hover:scale-105">
+                <ReviewCardHeader reviewID={review.rid} service={review.service} />
                 <div className="border border-gray-100 mx-4 mb-5"></div>
-                <ReviewCard review={review} />
+                <ReviewDetailCard review={review} />
                 <div className="grid grid-cols-3 gap-50">
                     <div>
                       <button
@@ -109,7 +134,7 @@ const MyReviewsPage = () => {
                     <div>
                       <button
                         className="absolute right-4 mt-4 bg-red-500 text-white font-semibold py-2 px-6 rounded-full hover:from-red-600 hover:to-red-800 transition-all shadow-lg"
-                        onClick={() => handleOpenModal(review)}
+                        onClick={() => handleDelete(review.rid)}
                         >
                         Delete Review
                       </button>
@@ -124,7 +149,7 @@ const MyReviewsPage = () => {
           isOpen={isModalOpen}
           onRequestClose={handleCloseModal}
           review={selectedReview}
-          onSave={handleDelete}
+          onSave={handleEdit}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import { Rating, Review, ReviewDetail } from "../types/miscTypes";
+import { Rating, ReviewDetail } from "../types/miscTypes";
 
 interface ReviewDetailModalProps {
   isOpen: boolean;
@@ -39,9 +39,10 @@ const ReviewDetailModal: React.FC<ReviewDetailModalProps> = ({
           <label htmlFor="content" className="block mb-2 font-semibold">Review Content:</label>
           <textarea
             id="content"
-            value={review.comment}
+            value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder={review.comment}
+            defaultValue={review.comment}
             className="w-full p-2 border rounded"
             rows={3}
           />

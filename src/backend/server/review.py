@@ -77,6 +77,11 @@ def review_edit_wrapper(info: ServiceReviewEditInfo, uid: str, is_admin: bool) -
     if rating not in ['positive', 'negative']:
          raise HTTPException(status_code=400, detail="Invalid rating given")
 
+    # Check if rating has changed
+    if rating != review.get_rating():
+        service = data_store.get_api_by_id(review.get_service())
+        service.update_rating(rating)
+
     # Edit review
     review.update_review(rating, comment)
 

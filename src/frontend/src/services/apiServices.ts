@@ -593,6 +593,46 @@ export const userAddIcon = async (docId: string) => {
   });
 };
 
+export const userGetReviews = async () => {
+  const response = await fetch(`${baseUrl}/user/get/reviews`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  const data = await response.json()
+  return data.reviews
+}
+
+export const userEditReview = async (id: string, rting: Rating | null, comment: string) => {
+  const info = {
+    rid: id,
+    rating: String(rting),
+    comment: comment,
+  };
+  
+  const response = await fetch(`${baseUrl}/review/edit`,  {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(info),
+    }
+  );
+  console.log(response.json());
+}
+
+export const userDeleteReview = async (rid: string) => {
+  await fetch(`${baseUrl}/review/delete?rid=${rid}`,  {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+  );
+}
+
 /*        Misc Services       */
 export const verifyEmail = async (token: string | null) => {
   const response = await fetch(`${baseUrl}/auth/verify-email/${token}`, {

@@ -139,10 +139,14 @@ class Review(Comment):
         if brief:
             return {
                 'rid': self._id,
+                'reviewer': self.get_owner(),
                 'service': self._service,
+                'comment': self.get_content(),
                 'type': self._rating,
                 'timestamp': self.get_timestamp(),
-                'e_timestamp': self.get_e_timestamp()
+                'e_timestamp': self.get_e_timestamp(),
+                'upvotes': self.get_upvote(),
+                'downvotes': self.get_downvote()
             }
         
         reply = None if self._reply is None else self._reply
