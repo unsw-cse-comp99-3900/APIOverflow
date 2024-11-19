@@ -293,13 +293,6 @@ class Service:
         
         new_endpoint = Endpoint(tab, parameters, method)
         self.get_version_info(version)._endpoints.append(new_endpoint)
-
-    # def add_owner(self, owner: str) -> None:
-    #     '''
-    #         Adds owner to service
-    #     '''
-    #     self._owner.append(owner)
-    #     self._owner_count += 1
     
     ################################
     #   Update Methods
@@ -421,13 +414,6 @@ class Service:
             Removes specified endpoint 
         '''
         self.get_version_info(version)._endpoints.remove(endpoint)
-
-    # def remove_owner(self, uid: str) -> None:
-    #     '''
-    #         Remove owner from ownership list
-    #     '''
-    #     self._owner.remove(uid)
-    #     self._owner_count -= 1
 
     ################################
     #   Get Methods

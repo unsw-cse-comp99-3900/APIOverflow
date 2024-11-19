@@ -66,7 +66,7 @@ class Response(BaseModel):
         '''
             Updates desc
         '''
-        self._description: desc 
+        self._description = desc 
 
     def update_conditions(self, conditions: list[str]) -> None:
         '''

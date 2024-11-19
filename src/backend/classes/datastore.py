@@ -1,8 +1,10 @@
 from typing import *
 from copy import deepcopy
+from pickle import dumps, loads
 from src.backend.classes.Document import Document
 from src.backend.classes.User import User
 from src.backend.classes.Tag import Tag, SYSTEM, CUSTOM
+from src.backend.database import *
 
 
 T = TypeVar("T")
@@ -61,9 +63,28 @@ class Datastore:
     ######################################
     #   Loading and Saving Methods Methods
     ######################################
-    def load_datastore(self) -> None:
-        # TODO - load data from mongoDB
-        pass
+    @classmethod
+    def save_data_store(cls):
+        
+        data = dumps(cls)
+        if db_get_data() is None:
+            db_add_data(data)
+        else:
+            db_update_data(data)
+
+        
+    @staticmethod
+    def load_datastore():
+
+        data = db_get_data()
+        if data is None:
+            return Datastore()
+    
+        try:
+            obj = loads(data)
+            return obj
+        except:
+            return Datastore()
 
     def clear_datastore(self) -> None:
         self.__store = deepcopy(schema)
@@ -377,5 +398,4 @@ class Datastore:
 print('Loading Datastore...')
 
 global data_store
-data_store = Datastore()
-#data_store.load_database()
+data_store = Datastore.load_datastore()

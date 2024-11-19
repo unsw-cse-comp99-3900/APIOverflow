@@ -8,7 +8,6 @@ K = TypeVar("K")
 
 # load_dotenv()
 # Initialize MongoDB client
-# client = MongoClient("mongodb://mongodb:27017/", connect=False)
 
 mongo_env = os.getenv('MONGO_ENV', 'local')
 
@@ -35,6 +34,9 @@ def db_add_service(item: dict[T, K]) -> None:
     '''
     db.services.insert_one(item)
 
+def db_add_data(item: dict[T, K]) -> None:
+    db.data_store.insert_one(item)
+
 
 ###################################
 #       Get Methods
@@ -50,6 +52,9 @@ def db_get_service(sid: str) -> dict[T, K] | None:
         Grabs service from MongoDB
     '''
     return db.services.find_one({'id': sid})
+
+def db_get_data() -> dict[T, K] | None:
+    return db.data_store.find_one({})
 
 ###################################
 #       Update (put) Methods
@@ -67,10 +72,8 @@ def db_update_service(sid: str, updated_service_object: dict[T, K]) -> None:
     '''
     db.services.replace_one({'id': sid}, updated_service_object)
 
-# def db_add_document(sid: str, new_doc: int) -> None:
-#     old_documents = db_get_service(sid)["docs"]
-#     old_documents.append(new_doc)
-#     db.services.update_one({'id': sid}, {"$set": {'docs': old_documents}}, upsert=False)
+def db_update_data(new_data: dict[T, K]):
+    db.data_store.replace_one({}, new_data)
 
 ###################################
 #       Delete Methods
@@ -95,3 +98,6 @@ def db_delete_user(username: str) -> None:
     """
     db.users.delete_one({'username': username})
     return True
+
+def db_clear_data():
+    db.data_store.delete_one({})

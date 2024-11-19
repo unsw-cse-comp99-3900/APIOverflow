@@ -1,14 +1,16 @@
 services:
   mongodb:
     image: mongo:latest
-    # tty: true
     ports:
       - "27017:27017"
     volumes:
-      - mongo:/data/db
-
+      # mounts a testing volume if DB_PATH is provided
+      # mounts data volume by default
+      - ${DB_PATH:-mongo}:/data/db
+      
   # docker compose run backend to run only backend 
   backend:
+    tty: true
     build: ./src/backend
     volumes: 
       # 'mounts' a volume so that modifying code locally automatically modifies
@@ -44,4 +46,5 @@ services:
       - CHOKIDAR_USEPOLLING=true
 
 volumes:
+  mongo_test:
   mongo:

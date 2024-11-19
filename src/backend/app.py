@@ -16,6 +16,8 @@ from src.backend.server.user import *
 from src.backend.server.review import *
 from src.backend.server.dummy import *
 from json import dumps
+import sys
+import signal
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
@@ -99,6 +101,7 @@ async def clear():
     ds.clear_datastore()
     clear_all_users()
     clear_all_services()
+    db_clear_data()
     create_super_admin()
     clear_blacklist()
     assert ds.num_apis() == 0
@@ -654,8 +657,15 @@ async def user_check_perms(user: User = Depends(manager)):
     '''
     return admin_check_if_admin(user['id'])
 
+def handler():
+    print("Saving to Datastore", flush=True)
+    data_store.save_data_store()
+    sys.exit(0)
+
+
 if __name__ == "__main__":
+    signal.signal(signal.SIGTERM, handler)
+    signal.signal(signal.SIGINT, handler)
     import uvicorn
     uvicorn.run(app, host='0.0.0.0', port=5000)
-    # Run using uvicorn app:app --reload
-
+        

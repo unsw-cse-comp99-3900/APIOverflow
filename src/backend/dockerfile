@@ -17,21 +17,17 @@ COPY . .
 EXPOSE 5000
 # CMD specifies the command used to start the application. We can only have one CMD statement in our Dockerfile
 
-ARG TEST="false"
-ENV TEST ${TEST}
-
-# copied from ray idk if this is better/different
-# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+ARG DB_PATH="mongo"
+ENV DB_PATH ${DB_PATH}
 
 # to run normally: docker compose build; docker compose up
-# to run pytest: docker compose build --build-arg TEST=t; docker compose up
+# to run pytest: docker compose build --build-arg DB_PATH=mongo_test; docker compose up
 # unless switching from normal to pytest or vice versa, no need to run docker compose build again
 # rebuilding is only required when modifying dockerfiles or switching between running
 # normally and running pytest
-# todo: figure out how to silence specific service output?
 
 # for increased testing speed, can change below command to 
 # pytest tests/file_name.py -vv
-CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv; fi
+CMD echo ${DB_PATH}; if [ "$DB_PATH" = "mongo" ] ; then python app.py; else pytest -vv; fi
 
 # pytest -vv tests/test.py::testfunc
