@@ -23,12 +23,15 @@ def is_valid_user(uid: str):
         raise HTTPException(status_code=404, detail='No user found with given uid')
 
 
-def promote_user(uid: str):
+def promote_user(uid: str, is_super: bool):
     is_valid_user(uid)
     user = data_store.get_user_by_id(uid)
     if user.get_is_admin():
         raise HTTPException(status_code=400, detail=f"User {user.get_name()} is already an admin.")
-    user.promote_to_admin()
+    if is_super:
+        user.promote_to_admin()
+    else:
+        raise HTTPException(status_code=403, detail="Only Superadmin can promote users.")
     db_update_user(uid, user.to_json())
     username = user.get_name()
     return {"name": username, "status": user.get_is_admin()}
@@ -113,7 +116,7 @@ def admin_get_pending_services() -> List[dict[str, str]]:
 
     for service in data_store.get_apis():    
 
-        if service.get_status() in PENDING_OPTIONS:
+        if service.get_status().name in PENDING_OPTIONS:
             if service.get_newly_created():
                 new_service_json = service.to_updated_json()
                 new_service_json["version_fields"] = service.get_latest_version(
@@ -124,7 +127,7 @@ def admin_get_pending_services() -> List[dict[str, str]]:
                 global_updates.append(service.to_updated_json())
         
         for version in service.get_all_versions():
-            if version.get_status() in PENDING_OPTIONS:
+            if version.get_status().name in PENDING_OPTIONS:
                 version_updates.append(version.to_updated_json(service.get_id(), service.get_name()))
 
     return {
