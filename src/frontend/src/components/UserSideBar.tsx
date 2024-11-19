@@ -7,6 +7,8 @@ import {
   FaUserFriends,
   FaFolderOpen,
   FaCommentDots,
+  FaCommentAlt,
+  FaComments,
 } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -86,7 +88,16 @@ const UserSideBar = () => {
               <FaPlusSquare className="mr-2" /> New API
             </span>
           </NavLink>
-
+          <NavLink to="/profile/my-reviews" className={linkClass}>
+            <span className="ml-3 font-medium flex items-center">
+              <FaCommentAlt className="mr-2" /> My Reviews
+            </span>
+          </NavLink>
+          <NavLink to="/profile/my-replies" className={linkClass}>
+            <span className="ml-3 font-medium flex items-center">
+              <FaComments className="mr-2" /> My Replies
+            </span>
+          </NavLink>
           {/* Admin Tabs */}
 
           {isAdmin && (

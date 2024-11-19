@@ -457,7 +457,7 @@ def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> Li
 
     output = []
     for review in reviews:
-        r = review.to_json(uid)
+        r = review.to_json(uid=uid)
         user = data_store.get_user_by_id(review.get_owner())
         r['reviewerName'] = user.get_displayname()
         output.append(r)

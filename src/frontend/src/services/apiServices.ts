@@ -214,13 +214,22 @@ export const userCheckPerm = async () => {
 };
 
 /*        Tag Services       */
-export const getTags = async () => {
-  const response = await fetch(`${baseUrl}/tags/get`, {
+export const getTags = async (option: boolean = false) => {
+  const response = await fetch(`${baseUrl}/tags/get?system=${option}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data.tags;
+};
+
+export const getCustomTags = async (option: boolean = false) => {
+  const response = await fetch(`${baseUrl}/tags/get/ranked?num=${10}&custom=${option}`,{
     method: "GET",
   });
   const data = await response.json();
   return data.tags;
-};
+}
 
 export const addTag = async (tagName: string) => {
   const tag: TagData = {
@@ -353,9 +362,26 @@ export const apiAddReview = async (
   }
 };
 
-export const apiGetReviews = async (sid: string, testing: boolean = true) => {
+export const apiGetReviews = async (sid: string, filter: string = '') => {
+  
+  let u_toggle;
+  if (localStorage.getItem("token")) { 
+    const res = await fetch(`${baseUrl}/user/get/id`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    const data = await res.json();
+    u_toggle = data.uid;
+  } else {
+    u_toggle = "";
+  }
+  console.log(u_toggle);
   const response = await fetch(
-    `${baseUrl}/service/get/reviews?sid=${sid}&testing=${testing}`,
+    `${baseUrl}/service/get/reviews?sid=${sid}&filter=${filter}&uid=${u_toggle}`,
     {
       method: "GET",
     }
@@ -509,6 +535,99 @@ export const userAddIcon = async (docId: string) => {
     body: JSON.stringify(info),
   });
 };
+
+export const userGetReviews = async () => {
+  const response = await fetch(`${baseUrl}/user/get/reviews`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  const data = await response.json()
+  return data.reviews
+}
+
+export const userEditReview = async (id: string, rting: Rating | null, comment: string) => {
+  const info = {
+    rid: id,
+    rating: String(rting),
+    comment: comment,
+  };
+  
+  const response = await fetch(`${baseUrl}/review/edit`,  {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(info),
+    }
+  );
+  console.log(response.json());
+}
+
+export const userDeleteReview = async (rid: string) => {
+  await fetch(`${baseUrl}/review/delete?rid=${rid}`,  {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+  );
+}
+
+export const userUpvoteReview = async(rid: string) => {
+  const response = await fetch(`${baseUrl}/review/upvote`,{
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      rid: rid,
+      content: ""
+    })
+  });
+  if (!response.ok) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export const userDownvoteReview = async(rid: string) => {
+  const response = await fetch(`${baseUrl}/review/downvote`,{
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      rid: rid,
+      content: ""
+    })
+  });
+
+  if (!response.ok) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export const userRemoveVote = async(rid: string) => {
+  await fetch(`${baseUrl}/review/remove_vote`,{
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      rid: rid,
+      content: ""
+    })
+  })
+}
 
 /*        Misc Services       */
 export const verifyEmail = async (token: string | null) => {
