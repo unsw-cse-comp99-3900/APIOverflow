@@ -638,3 +638,24 @@ export const resetPasswordWithToken = async (token: string, newPassword: string)
 
   return response.json();
 };
+
+export const submitReviewReply = async (reviewId: string, content: string) => {
+  const response = await fetch(`${baseUrl}/review/reply`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      rid: reviewId,         // review ID
+      content: content     // reply content
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to submit reply');
+  }
+
+  return response.json();
+};
