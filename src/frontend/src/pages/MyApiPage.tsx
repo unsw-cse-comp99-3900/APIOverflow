@@ -28,7 +28,6 @@ const MyApiPage: React.FC = () => {
         const data = await getApi(id);
         const iconURL = await apiGetIcon(id);
         setApi(data);
-        console.log(data);
         setIconURL(iconURL);
       } catch (error) {
         console.log("Error fetching data", error);

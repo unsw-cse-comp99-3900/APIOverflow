@@ -19,6 +19,7 @@ interface EndpointUpdateFormProps {
   setCurrEndpoint: React.Dispatch<React.SetStateAction<Endpoint>>;
   setEndpoints: React.Dispatch<React.SetStateAction<Endpoint[]>>;
   setCurrEndpointIdx: React.Dispatch<React.SetStateAction<number>>;
+  setVersionUpdated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
@@ -28,6 +29,7 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
   setCurrEndpoint,
   setEndpoints,
   setCurrEndpointIdx,
+  setVersionUpdated,
 }) => {
   const [link, setLink] = useState<string>(currEndpoint.link);
   const [mainDescription, setMainDescription] = useState<string>(
@@ -58,6 +60,7 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
     if (currEndpointIdx !== -1) {
       toast.success("Endpoint Deleted");
       setEndpoints(endpoints.filter((_, index) => index !== currEndpointIdx));
+      setVersionUpdated(true);
       setCurrEndpointIdx(-1);
       setCurrEndpoint({
         link: "",
@@ -121,9 +124,11 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
             }
           : endpoint
       );
-
+      
       setEndpoints(updatedEndpoints);
     }
+    console.log("Endpoint Updated");
+    setVersionUpdated(true);
     setCurrEndpoint({
       link: "",
       method: "GET",

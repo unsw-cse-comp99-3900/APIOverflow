@@ -22,6 +22,8 @@ interface OverviewUpdateFormProps {
   setSelectedImageData: React.Dispatch<React.SetStateAction<File | null>>;
   setSelectedFile: React.Dispatch<React.SetStateAction<File | null>>;
   setPayModel: React.Dispatch<React.SetStateAction<PayModel>>;
+  setVersionUpdated: React.Dispatch<React.SetStateAction<boolean>>;
+  setGeneralInfoUpdated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
@@ -33,6 +35,8 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
   selectedImage,
   selectedImageData,
   selectedFile,
+  setVersionUpdated,
+  setGeneralInfoUpdated,
   setName,
   setDescription,
   setSelectedTags,
@@ -78,6 +82,7 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      setVersionUpdated(true);
       setSelectedFile(e.target.files[0]);
     }
   };
@@ -128,18 +133,21 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
               Name
             </label>
 
-              <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 max-w-md">
-                <input
-                  id="apiName"
-                  name="apiName"
-                  required
-                  type="text"
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="API Overflow"
-                  defaultValue={name}
-                  className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 focus:font-semibold text-md leading-6"
-                />
-              </div>
+            <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 max-w-md">
+              <input
+                id="apiName"
+                name="apiName"
+                required
+                type="text"
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setGeneralInfoUpdated(true);
+                }}
+                placeholder="API Overflow"
+                defaultValue={name}
+                className="block flex-1 border-0 bg-transparent py-2 pl-3 text-gray-800 placeholder:text-gray-400 focus:ring-0 focus:font-semibold text-md leading-6"
+              />
+            </div>
           </div>
 
           <div className="col-span-full">
@@ -158,7 +166,10 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
                     name="payModel"
                     value="Premium"
                     checked={payModel === "Premium"}
-                    onChange={() => setPayModel("Premium")}
+                    onChange={() => {
+                      setPayModel("Premium");
+                      setGeneralInfoUpdated(true);
+                    }}
                     className="h-5 w-5 text-amber-500 focus:ring-amber-500"
                   />
                   <div
@@ -183,7 +194,10 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
                     name="payModel"
                     value="Freemium"
                     checked={payModel === "Freemium"}
-                    onChange={() => setPayModel("Freemium")}
+                    onChange={() => {
+                      setPayModel("Freemium");
+                      setGeneralInfoUpdated(true);
+                    }}
                     className="h-5 w-5 text-purple-500 focus:ring-purple-500"
                   />
                   <div
@@ -209,7 +223,10 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
                     name="payModel"
                     value="Free"
                     checked={payModel === "Free"}
-                    onChange={() => setPayModel("Free")}
+                    onChange={() => {
+                      setPayModel("Free");
+                      setGeneralInfoUpdated(true);
+                    }}
                     className="h-5 w-5 text-blue-500 focus:ring-blue-500"
                   />
                   <div
@@ -256,6 +273,7 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
                 onClick={() => {
                   setWarning("");
                   openOverlay();
+                  setGeneralInfoUpdated(true);
                 }}
                 className="border-blue-800 border-2 bg-white hover:bg-blue-800 hover:text-white text-blue-800 w-7 h-7 flex items-center justify-center rounded-md mx-1 my-1"
               >
@@ -289,7 +307,10 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
                 id="description"
                 name="description"
                 required
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  setGeneralInfoUpdated(true);
+                }}
                 onInput={(e) => {
                   const textarea = e.target as HTMLTextAreaElement;
                   textarea.style.height = "auto";

@@ -3,6 +3,7 @@ import { DetailedApi, Version } from "../types/apiTypes";
 import { toast } from "react-toastify";
 import { getDoc } from "../services/apiServices";
 import EndpointComponent from "./EndpointComponent";
+import { notNewVersions } from "../utils/versions";
 
 interface VersionFieldsProps {
   versions: Version[];
@@ -12,11 +13,12 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const currVersions = notNewVersions(versions);
 
   useEffect(() => {
     const fetchDocs = async () => {
       try {
-        if (versions[0].docs && versions[0].docs.length > 0) {
+        if (currVersions[0].docs && versions[0].docs.length > 0) {
           const docURL = await getDoc(versions[0].docs[0]);
           setPdfUrl(docURL);
         } else {

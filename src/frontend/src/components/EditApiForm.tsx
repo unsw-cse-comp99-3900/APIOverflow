@@ -22,7 +22,7 @@ import { DetailedApi } from "../types/apiTypes";
 import VersionInfoOverlay from "./VersionInfoOverlay";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
-  
+
   // General Info
   const [api, setApi] = useState<DetailedApi | null>(null);
   const [name, setName] = useState<string>("");
@@ -60,14 +60,6 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
   const { logout } = auth!;
 
   useEffect(() => {
-    setVersionUpdated(true);
-  }, [endpoints, selectedFile]);
-
-  useEffect(() => {
-    setGeneralInfoUpdated(true);
-  }, [name, description, selectedTags, payModel, selectedImageData]);
-
-  useEffect(() => {
     const fetchApi = async () => {
       if (apiId !== undefined) {
         try {
@@ -78,13 +70,10 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
           setSelectedTags(data.tags);
           setPayModel(data.pay_model);
           setEndpoints(data.versions[0].endpoints);
-          setVersionUpdated(false);
-          setGeneralInfoUpdated(false);
         } catch (error) {
           toast.error("Error loading API data");
         }
       }
-
     };
     fetchApi();
   }, []);
@@ -137,7 +126,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
   // Submit the API update to the backend
   const submitApi = async () => {
-
+    console.log(versionUpdated);
     if (name === "") {
       toast.error("Name cannot be empty");
       return;
@@ -160,12 +149,25 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       setIsVersionInfoOverlayOpen(true);
     } else {
       // update
-
+      if (generalInfoUpdated && versionUpdated) {
+        updateServiceGlobal(name, description, selectedTags, payModel, apiId);
+        setIsVersionInfoOverlayOpen(true);
+      }
       if (versionUpdated) {
         // version specific update
         setIsVersionInfoOverlayOpen(true);
+        
       }
-      updateServiceGlobal(name, description, selectedTags, payModel, apiId);
+      if (generalInfoUpdated) {
+        // general info update
+        updateServiceGlobal(name, description, selectedTags, payModel, apiId);
+        toast.success("Success!");
+        navigate(`/profile/my-apis/${apiId}`);
+      }
+
+      if (!versionUpdated && !generalInfoUpdated){
+        toast.error("No changes to update");
+      }
     }
   };
 
@@ -191,6 +193,8 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
             setSelectedImage={setSelectedImage}
             setSelectedImageData={setSelectedImageData}
             setSelectedFile={setSelectedFile}
+            setVersionUpdated={setVersionUpdated}
+            setGeneralInfoUpdated={setGeneralInfoUpdated}
           />
         )}
         {currPage === "Endpoint" && (
@@ -201,6 +205,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
             setCurrEndpoint={setCurrEndpoint}
             setEndpoints={setEndpoints}
             setCurrEndpointIdx={setCurrEndpointIdx}
+            setVersionUpdated={setVersionUpdated}
           />
         )}
       </div>
