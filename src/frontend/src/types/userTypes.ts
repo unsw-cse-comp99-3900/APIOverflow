@@ -14,6 +14,7 @@ export interface UserBrief {
 export interface serviceOwner {
   id: number;
   name: string;
+  displayName: string;
   email: string;
 }
 

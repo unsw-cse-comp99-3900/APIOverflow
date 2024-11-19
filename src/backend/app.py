@@ -223,9 +223,10 @@ async def filter(
     tags: Optional[List[str]] = Query(None), 
     providers: Optional[List[str]] = Query(None),
     pay_models: Optional[List[str]] = Query(None),
-    hide_pending: bool = True
+    hide_pending: bool = True,
+    sort_rating: bool = False,
 ):
-    return api_tag_filter(tags, providers, pay_models, hide_pending)
+    return api_tag_filter(tags, providers, pay_models, hide_pending, sort_rating)
 
 @app.get("/service/search")
 async def search(

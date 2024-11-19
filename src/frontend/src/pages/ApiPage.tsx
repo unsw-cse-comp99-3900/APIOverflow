@@ -65,10 +65,11 @@ const ApiPage: React.FC = () => {
               apiId={api.id}
               apiName={api.name}
               iconURL={api.icon_url}
-              ownerName={api.owner.name}
+              ownerName={api.owner.displayName}
               payModel={api.pay_model}
               tags={api.tags}
               isMyApi={false}
+              rating={String(Number(api.upvotes) - Number(api.downvotes))}
             />
             <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
               <div className="w-2/3">
