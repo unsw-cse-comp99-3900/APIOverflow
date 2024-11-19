@@ -10,11 +10,11 @@ from fastapi import HTTPException
 
 
 class ServiceStatus(Enum):
-   UPDATE_REJECTED = 3
-   UPDATE_PENDING = 2
-   LIVE = 1
-   PENDING = 0
-   REJECTED = -1
+    UPDATE_REJECTED = 3
+    UPDATE_PENDING = 2
+    LIVE = 1
+    PENDING = 0
+    REJECTED = -1
 
 
 

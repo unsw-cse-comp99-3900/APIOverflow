@@ -14,6 +14,13 @@ export type Rating = "positive" | "negative"
 
 export type Tag = string
 
+export type CustomTag = {
+  tid: string;
+  tag: string;
+  type: number;
+  num: number;
+}
+
 export type ServiceType = "api" | "micro"
 
 export type Status = "pending" | "approved" | "rejected"
