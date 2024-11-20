@@ -155,6 +155,10 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       setIsVersionInfoOverlayOpen(true);
     } else {
       // update
+      if (selectedImageData) {
+        const doc_id = await uploadImage(selectedImageData);
+        apiAddIcon(apiId, doc_id);
+      }
       if (generalInfoUpdated && versionUpdated) {
         updateServiceGlobal(name, description, selectedTags, payModel, apiId);
         setIsVersionInfoOverlayOpen(true);
