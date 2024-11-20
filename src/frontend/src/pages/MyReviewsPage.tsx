@@ -70,7 +70,7 @@ const MyReviewsPage = () => {
       setReload(false);
     }
     fetchReviews();
-  }, []);
+  }, [reload]);
 
   const handleOpenModal = (review: ReviewDetail) => {
     setSelectedReview(review);
@@ -80,6 +80,7 @@ const MyReviewsPage = () => {
   const handleCloseModal = () => {
     setSelectedReview(null);
     setIsModalOpen(false);
+    setReload(true);
   };
 
   const handleEdit = async (reviewId: string, content: string, rating: Rating | null) => {

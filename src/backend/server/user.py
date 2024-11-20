@@ -161,9 +161,11 @@ def user_get_replies_wrapper(uid: str) -> List[dict[str, str]]:
     
     replies = user.get_replies()
     output = []
-    for reply in replies:
-        output.append(data_store.get_reply_by_id(reply).to_json())
+    for _reply in replies:
+        reply = data_store.get_reply_by_id(_reply).to_json()
+        reply['reviewerName'] = user.get_displayname()
+        output.append(reply)
     return {
         'replies' : output
-    }
 
+    }
