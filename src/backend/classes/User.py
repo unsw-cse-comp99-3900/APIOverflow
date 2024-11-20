@@ -34,6 +34,7 @@ class User:
             replies:    List of replies user has made
             num_replies: Number of replies made
             token:      Current token of the user
+            service:    Service id created by the user
 
     '''
 
@@ -67,6 +68,10 @@ class User:
         self._replies = []
         self._num_replies = 0
         self._token = None
+        self._services = []
+        self._num_services = 0
+        self._upvotes = []
+        self._downvotes = []
 
     ################################
     #   Add Methods
@@ -86,6 +91,21 @@ class User:
         self._replies.append(rid)
         self._num_replies += 1
 
+    def add_service(self, sid: str) -> None:
+        '''
+            Adds a service to user's list
+        '''
+        self._services.append(sid)
+        self._num_services += 1
+
+    def add_vote(self, rid: str, vote: str) -> None:
+        '''
+            Adds a vote to user's list
+        '''
+        if vote == 'positive':
+            self._upvotes.append(rid)
+        else:
+            self._downvotes.append(rid)
 
     ################################
     #  Modify Methods
@@ -246,7 +266,24 @@ class User:
             Return list of replies
         '''
         return self._replies
-
+    
+    def get_services(self) -> List[str]:
+        '''
+            Return list of services
+        '''
+        return self._services
+    
+    def get_upvotes(self) -> List[str]:
+        '''
+            Return list of upvotes
+        '''
+        return self._upvotes
+    
+    def get_downvotes(self) -> List[str]:
+        '''
+            Return list of downvotes
+        '''
+        return self._downvotes
 
     def get_profile(self) -> dict[str, str]:
         '''

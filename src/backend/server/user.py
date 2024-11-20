@@ -9,6 +9,9 @@ from src.backend.classes.API import API
 from src.backend.database import *
 import re
 from src.backend.server.email import send_email
+from src.backend.server.service import delete_service
+from src.backend.server.review import review_delete_wrapper, review_remove_vote_wrapper
+from src.backend.classes.Manager import blacklist_user_token
 
 def user_add_icon_wrapper(uid: str, doc_id: str) -> None:
     '''
@@ -101,6 +104,7 @@ def user_self_delete(uid: str):
     if user is None:
         raise HTTPException(status_code=404, detail="No such user found")
     username = user.get_name()
+    user_delete_association(uid)
     data_store.delete_item(uid, 'user')
     db_status = db_delete_user(username)
     action = "self"
@@ -110,6 +114,28 @@ def user_self_delete(uid: str):
     send_email(uemail, '', 'account_deleted', content)
 
     return {"name": username, "deleted": db_status}
+
+def user_delete_association(uid: str):
+    user = data_store.get_user_by_id(uid)
+    upvoted_review_ids = user.get_upvotes()
+    downvoted_review_ids = user.get_downvotes()
+    print(upvoted_review_ids)
+    print(downvoted_review_ids)
+    for rid in upvoted_review_ids:
+        review_remove_vote_wrapper(rid, uid)
+
+    for rid in downvoted_review_ids:
+        review_remove_vote_wrapper(rid, uid)
+    
+    review_ids = user.get_reviews()
+    for rid in review_ids:
+        review_delete_wrapper(rid, '0', True) 
+
+    service_ids = user.get_services()
+    for sid in service_ids:
+        delete_service(sid)
+
+    blacklist_user_token(uid)
 
 def user_update_displayname(uid: str, new: str) -> None:
     '''
@@ -140,3 +166,4 @@ def user_get_replies_wrapper(uid: str) -> List[dict[str, str]]:
     return {
         'replies' : output
     }
+

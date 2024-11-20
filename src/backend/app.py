@@ -7,7 +7,7 @@ from src.backend.classes.models import *
 from src.backend.server.service import *
 from src.backend.classes.datastore import data_store as ds
 from src.backend.server.auth import *
-from src.backend.classes.Manager import manager as _manager, blacklisted_tokens, TOKEN_DURATION, clear_blacklist
+from src.backend.classes.Manager import manager as _manager, blacklist_user_token, clear_blacklist
 from src.backend.database import db
 from src.backend.server.tags import *
 from src.backend.server.admin import *
@@ -513,10 +513,8 @@ async def logout(user: User = Depends(manager)):
    '''
        Blacklist a user's current token and logs them out
    '''
-   user = data_store.get_user_by_id(user['id'])
-   token = user.get_token()
-   expiration_time = datetime.now(timezone.utc) + TOKEN_DURATION
-   blacklisted_tokens[token] = expiration_time
+   uid = user['id']
+   blacklist_user_token(uid)
    return {"message": "Successfully logged out"}
 
 

@@ -90,6 +90,8 @@ def review_vote_wrapper(rid: str, uid: str, vote: str) -> None:
         Wrapper which processes adding a vote to a review
     '''
     review = data_store.get_review_by_id(rid)
+    user = data_store.get_user_by_id(uid)
+    user.add_vote(rid, vote)
     if review is None:
         raise HTTPException(status_code=404, detail="Review not found")
     
