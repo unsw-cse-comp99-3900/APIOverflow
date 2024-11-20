@@ -142,7 +142,7 @@ def delete_service_version_wrapper(sid: str, version_name: str):
   
 # filter through database to find APIs that are fitted to the selected tags
 # returns a list of the filtered apis
-def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
+def api_tag_filter(tags, providers, pay_models, hide_pending: bool, sort_rating: bool) -> list:
 
     api_list = data_store.get_apis()
     filtered_apis = []
@@ -194,10 +194,15 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool) -> list:
     else:
         return_list = [api for api in secondary_list]
     
-    return [api.to_summary_json() for api in return_list if
+    output =  [api.to_summary_json() for api in return_list if
             api.get_status() in LIVE_OPTIONS or 
             (not hide_pending and api.get_status() == ServiceStatus.PENDING)
             ]
+    
+    if sort_rating:
+        output.sort(reverse=True, key=lambda x: x['ratings']['rating'])
+
+    return output
 
 # returns a list of regex matching services 
 def api_name_search(name, hide_pending: bool) -> list: 
@@ -423,36 +428,41 @@ def service_get_rating_wrapper(sid: str) -> dict[str, Union[int, float]]:
 
 
 def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> List[dict[str, str]]:
-   '''
-       Wrapper which grabs all reviews associated with the particular service
-   '''
-   # Grab server
-   service = data_store.get_api_by_id(sid)
-   if service is None:
-       raise HTTPException(status_code=404, detail="Service not found")
+    '''
+        Wrapper which grabs all reviews associated with the particular service
+    '''
+    # Grab server
+    service = data_store.get_api_by_id(sid)
+    if service is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+
+    # Grab reviews
+    reviews = []
+    for rid in service.get_reviews():
+        review = data_store.get_review_by_id(rid)
+        
+        # This should not trigger, but is there just in case
+        if review is None:
+            continue
+
+
+        reviews.append(review)
+
+    # Sorting the review list
+    if filter == 'best':
+        review.sort(reverse=True, key=lambda x : x.get_net_vote())
   
-   # Grab reviews
-   reviews = []
-   for rid in service.get_reviews():
-       review = data_store.get_review_by_id(rid)
-      
-       # This should not trigger, but is there just in case
-       if review is None:
-           continue
-
-
-       reviews.append(review)
-
-
-   # Sorting the review list
-   if filter == 'best':
-       review.sort(reverse=True, key=lambda x : x.get_net_vote())
-  
-   if filter == 'worst':
+    if filter == 'worst':
        review.sort(key=lambda x: x.get_net_vote())
 
+    output = []
+    for review in reviews:
+        r = review.to_json(uid=uid)
+        user = data_store.get_user_by_id(review.get_owner())
+        r['reviewerName'] = user.get_displayname()
+        output.append(r)
 
-   return [review.to_json(uid) for review in reviews]
+    return output
 
 
 

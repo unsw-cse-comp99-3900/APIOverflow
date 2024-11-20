@@ -1,3 +1,4 @@
+import { DetailedApi } from "../types/apiTypes";
 import {
   Endpoint,
   LoginModel,
@@ -5,14 +6,14 @@ import {
   ServiceIconInfo,
   ServiceAdd,
   ServiceReviewInfo,
-  ServiceUpdate,
+  ServiceGlobalUpdate,
   ServiceUpload,
   TagData,
   UserCreate,
   EndpointResponse,
   ServiceApprove,
 } from "../types/backendTypes";
-import { Rating, Tag } from "../types/miscTypes";
+import { PayModel, Rating, Tag } from "../types/miscTypes";
 import {
   adminUpdateDataFormatter,
   briefApiDataFormatter,
@@ -21,21 +22,23 @@ import {
   usersDataFormatter,
 } from "../utils/dataFormatters";
 
-
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (tags?: Tag[], hidePending = true) => {
+export const getApis = async (
+  tags?: Tag[],
+  hidePending = true,
+  sortRating = true
+) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
   const response = await fetch(
-    `${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`,
+    `${baseUrl}/service/filter?hide_pending=${hidePending}&sort_rating=${sortRating}${queryParams}`,
     {
       method: "GET",
     }
   );
   const data = await response.json();
-  console.log(data)
   return data.map(briefApiDataFormatter);
 };
 
@@ -50,9 +53,8 @@ export const getMyApis = async () => {
   if (response.status === 401) {
     throw new Error("Unauthorized");
   }
-  
+
   const data = await response.json();
-  console.log(data)
   return data.map(briefApiDataFormatter);
 };
 
@@ -61,7 +63,6 @@ export const getApi = async (id: string) => {
     method: "GET",
   });
   const data = await response.json();
-  console.log(data);
   if (response.status === 404) {
     throw new Error("Service Not Found");
   }
@@ -75,96 +76,7 @@ export const deleteApi = async (id: string) => {
   return;
 };
 
-export const addApi = async (
-  name: string,
-  description: string,
-  tags: string[],
-  endpointLink: string
-) => {
-  const ParameterPlaceholder1: EndpointParameter = {
-    id: "1",
-    endpoint_link: endpointLink,
-    required: false,
-    type: "BODY",
-    name: "Parameter Placeholder1",
-    value_type: "string",
-    example: "Example Placeholder1",
-  };
-
-  const ParameterPlaceholder2: EndpointParameter = {
-    id: "2",
-    endpoint_link: endpointLink,
-    required: true,
-    type: "HEADER",
-    name: "Parameter Placeholder2",
-    value_type: "string",
-    example: "Example Placeholder2",
-  };
-
-  const ResponsePlaceholder1: EndpointResponse = {
-    code: "200",
-    description: "Description Placeholder1",
-    conditions: ["Condition Placeholder1", "Condition Placeholder2"],
-    example: "Example Placeholder1",
-  };
-
-  const ResponsePlaceholder2: EndpointResponse = {
-    code: "404",
-    description: "Description Placeholder2",
-    conditions: ["Condition Placeholder1", "Condition Placeholder2"],
-    example: "Example Placeholder2",
-  };
-
-  const endpoint1: Endpoint = {
-    link: endpointLink,
-    title_description: "Title Description Placeholder 1",
-    main_description: "Main Description Placeholder 1",
-    tab: "Tab Placeholder 1",
-    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
-    method: "GET",
-    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
-  };
-
-  const endpoint2: Endpoint = {
-    link: endpointLink,
-    title_description: "Title1 Description Placeholder 2",
-    main_description: "Main Description Placeholder 2",
-    tab: "Tab Placeholder 2",
-    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
-    method: "POST",
-    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
-  };
-
-  const endpoint3: Endpoint = {
-    link: endpointLink,
-    title_description: "Title1 Description Placeholder 3",
-    main_description: "Main Description Placeholder 3",
-    tab: "Tab Placeholder 3",
-    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
-    method: "PUT",
-    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
-  };
-
-  const endpoint4: Endpoint = {
-    link: endpointLink,
-    title_description: "Title1 Description Placeholder 4",
-    main_description: "Main Description Placeholder 4",
-    tab: "Tab Placeholder 4",
-    parameters: [ParameterPlaceholder1, ParameterPlaceholder2],
-    method: "DELETE",
-    responses: [ResponsePlaceholder1, ResponsePlaceholder2],
-  };
-
-  const api: ServiceAdd = {
-    name,
-    description,
-    endpoints: [endpoint1, endpoint2, endpoint3, endpoint4],
-    tags,
-    version_name: "1.0.0",
-    version_description: "Initial Version",
-    pay_model: "Free",
-  };
-
+export const addApi = async (api: ServiceAdd) => {
   const response = await fetch(`${baseUrl}/service/add`, {
     method: "POST",
     headers: {
@@ -182,22 +94,22 @@ export const addApi = async (
   return data.id;
 };
 
-export const updateApi = async (
+export const updateServiceGlobal = async (
   name: string,
   description: string,
   tags: string[],
-  endpoint: string,
+  pay_model: PayModel,
   sid: string
 ) => {
-  const api: ServiceUpdate = {
+  const api: ServiceGlobalUpdate = {
     sid,
     name,
     description,
-    endpoint,
-    tags: tags,
+    pay_model,
+    tags,
   };
   const response = await fetch(`${baseUrl}/service/update`, {
-    method: "PUT",
+    method: "POST",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
@@ -210,6 +122,33 @@ export const updateApi = async (
   }
   return;
 };
+
+export const addNewVersion = async (
+  sid:string,
+  versionName:string,
+  versionDescription:string,
+  endpoints:Endpoint[],
+) => {
+  const newVersion = {
+    sid,
+    version_name: versionName,
+    version_description: versionDescription,
+    endpoints,
+  };
+  const response = await fetch(`${baseUrl}/service/version/add`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newVersion),
+  });
+
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
+  return;
+}
 
 /*        Auth Services       */
 export const userLogin = async (credentials: LoginModel) => {
@@ -259,6 +198,7 @@ export const userRegister = async (
     },
     body: JSON.stringify(newUser),
   });
+
   return;
 };
 
@@ -274,13 +214,22 @@ export const userCheckPerm = async () => {
 };
 
 /*        Tag Services       */
-export const getTags = async () => {
-  const response = await fetch(`${baseUrl}/tags/get`, {
+export const getTags = async (option: boolean = false) => {
+  const response = await fetch(`${baseUrl}/tags/get?system=${option}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  console.log(data);
+  return data.tags;
+};
+
+export const getCustomTags = async (option: boolean = false) => {
+  const response = await fetch(`${baseUrl}/tags/get/ranked?num=${10}&custom=${option}`,{
     method: "GET",
   });
   const data = await response.json();
   return data.tags;
-};
+}
 
 export const addTag = async (tagName: string) => {
   const tag: TagData = {
@@ -360,9 +309,10 @@ export const uploadPDF = async (file: File) => {
 };
 
 // Link service with documentation
-export const uploadDocs = async (sid: string, docId: string) => {
+export const uploadDocs = async (sid: string, docId: string, versionName: string) => {
   const info: ServiceUpload = {
     sid,
+    version_name: versionName,
     doc_id: docId,
   };
   await fetch(`${baseUrl}/service/upload_docs`, {
@@ -412,15 +362,40 @@ export const apiAddReview = async (
   }
 };
 
-export const apiGetReviews = async (sid: string, testing: boolean = true) => {
+export const apiGetReviews = async (sid: string, filter: string = '') => {
+  
+  let u_toggle;
+  if (localStorage.getItem("token")) { 
+    const res = await fetch(`${baseUrl}/user/get/id`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    const data = await res.json();
+    u_toggle = data.uid;
+  } else {
+    u_toggle = "";
+  }
+  console.log(u_toggle);
   const response = await fetch(
-    `${baseUrl}/service/get/reviews?sid=${sid}&testing=${testing}`,
+    `${baseUrl}/service/get/reviews?sid=${sid}&filter=${filter}&uid=${u_toggle}`,
     {
       method: "GET",
     }
   );
   const data = await response.json();
   return data.reviews;
+};
+
+export const apiGetRating = async (sid: string) => {
+  const response = await fetch(`${baseUrl}/service/get/rating?sid=${sid}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  return data.rating;
 };
 
 /*        Admin Services       */
@@ -449,7 +424,7 @@ export const approveService = async (
     service_global: serviceGlobal,
     version_name: versionName,
   };
-  console.log(approvalInfo);
+
   await fetch(`${baseUrl}/admin/service/approve`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -461,14 +436,6 @@ export const approveService = async (
 };
 
 export const userPromote = async (uid: string) => {
-  console.log({
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({uid}),
-    method: "POST",
-  })
   const reponse = await fetch(`${baseUrl}/admin/promote?uid=${uid}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -512,52 +479,48 @@ export const getUsers = async () => {
 
 /*        User Services       */
 export const getUser = async () => {
-  const response = await fetch(`${baseUrl}/user/get`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-      method: "GET"
-    }
-  );
+  const response = await fetch(`${baseUrl}/user/get`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+  });
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
   const data = await response.json();
   return userProfileDataFormatter(data);
-}
+};
 
 export const getUserIcon = async () => {
-  const response = await fetch(`${baseUrl}/user/get/icon`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-      method: "GET",
-    });
+  const response = await fetch(`${baseUrl}/user/get/icon`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+      Pragma: "no-cache",
+      Expires: "0",
+    },
+    method: "GET",
+  });
   const blob = await response.blob(); // Get the Blob data
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
   return url;
-}
+};
 
 export const updateDisplayName = async (displayName: string) => {
   const info = {
-    content: displayName
-  }
-  const response = await fetch(`${baseUrl}/user/update/displayname`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(info)
-    }
-  );
-  console.log(response.status);
-  console.log(response.json());
-}
+    content: displayName,
+  };
+  const response = await fetch(`${baseUrl}/user/update/displayname`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(info),
+  });
+};
 
 export const userAddIcon = async (docId: string) => {
   const info = {
@@ -573,34 +536,130 @@ export const userAddIcon = async (docId: string) => {
   });
 };
 
+export const userGetReviews = async () => {
+  const response = await fetch(`${baseUrl}/user/get/reviews`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  const data = await response.json()
+  return data.reviews
+}
+
+export const userEditReview = async (id: string, rting: Rating | null, comment: string) => {
+  const info = {
+    rid: id,
+    rating: String(rting),
+    comment: comment,
+  };
+  
+  const response = await fetch(`${baseUrl}/review/edit`,  {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(info),
+    }
+  );
+  console.log(response.json());
+}
+
+export const userDeleteReview = async (rid: string) => {
+  await fetch(`${baseUrl}/review/delete?rid=${rid}`,  {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  }
+  );
+}
+
+export const userUpvoteReview = async(rid: string) => {
+  const response = await fetch(`${baseUrl}/review/upvote`,{
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      rid: rid,
+      content: ""
+    })
+  });
+  if (!response.ok) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export const userDownvoteReview = async(rid: string) => {
+  const response = await fetch(`${baseUrl}/review/downvote`,{
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      rid: rid,
+      content: ""
+    })
+  });
+
+  if (!response.ok) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export const userRemoveVote = async(rid: string) => {
+  await fetch(`${baseUrl}/review/remove_vote`,{
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      rid: rid,
+      content: ""
+    })
+  })
+}
+
 /*        Misc Services       */
 export const verifyEmail = async (token: string | null) => {
   const response = await fetch(`${baseUrl}/auth/verify-email/${token}`, {
     method: "POST",
   });
-  return await response
-}
+  return await response;
+};
 
-export const searchApis = async (searchTerm: string, hidePending: boolean = true) => {
+export const searchApis = async (
+  searchTerm: string,
+  hidePending: boolean = true
+) => {
   try {
     const response = await fetch(
       `${baseUrl}/service/search?name=${encodeURIComponent(searchTerm)}`,
       {
         method: "GET",
         headers: {
-          'Accept': 'application/json',
-        }
+          Accept: "application/json",
+        },
       }
     );
 
     if (!response.ok) {
-      throw new Error('Search failed');
+      throw new Error("Search failed");
     }
 
     const data = await response.json();
-    return data.map(briefApiDataFormatter)
+    return data.map(briefApiDataFormatter);
   } catch (error) {
-    console.error('Search API error:', error);
+    console.error("Search API error:", error);
     throw error;
   }
 };

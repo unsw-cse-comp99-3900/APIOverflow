@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaAngleDown, FaAngleUp, FaCopy } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { Endpoint } from "../types/backendTypes";
+import ResponseCard from "./ResponseCard";
 
 interface EndpointComponentProps {
   endpoint: Endpoint;
@@ -66,10 +67,12 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
   };
 
   return (
-    <div className={`border-2 ${borderDarkColor} rounded-lg shadow-md my-4`}>
+    <div className={`border-2 ${borderDarkColor} rounded-lg shadow-md my-4 `}>
       <div
         onClick={toggleSection}
-        className={`cursor-pointer ${bgLightColor} rounded-md px-4 py-2 flex justify-between items-center`}
+        className={`cursor-pointer ${bgLightColor} ${
+          isOpen ? "rounded-t-md" : "rounded-md"
+        } px-4 py-2 flex justify-between items-center`}
       >
         <div className="flex items-center">
           {/* Method Badge */}
@@ -83,8 +86,6 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
           {/* Endpoint Link */}
           <div>
             <h2 className="font-bold text-lg ml-3">{endpoint.link}</h2>
-
-            <div className="ml-3">{endpoint.title_description}</div>
           </div>
         </div>
 
@@ -121,7 +122,7 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
           </div>
           <div className={`border ${borderDarkColor} `}></div>
           <div
-            className={`cursor-pointer ${bgLightColor}   px-4 py-2 flex justify-between items-center`}
+            className={`cursor-pointer ${bgLightColor}  px-4 py-2 flex justify-between items-center`}
           >
             <h2 className="font-bold text-lg">Parameters</h2>
           </div>
@@ -129,11 +130,10 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
           <div className="">
             {/* Grid Header Row */}
             <div
-              className={`grid px-4 grid-cols-4 gap-4 bg-gray-100 font-semibold py-2 rounded-t`}
+              className={`grid px-4 grid-cols-3 gap-4 bg-gray-100 font-semibold py-2 rounded-t`}
             >
               <div>Name</div>
               <div>Component</div>
-              <div>Endpoint Link</div>
               <div>Example</div>
             </div>
 
@@ -141,7 +141,7 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
             {endpoint.parameters.map((param, index) => (
               <div
                 key={index}
-                className="grid grid-cols-4 gap-4 border-b py-2 px-4 text-gray-700"
+                className="grid grid-cols-3 gap-4 border-b py-2 px-4 text-gray-700"
               >
                 <div>
                   <div className="flex font-semibold">
@@ -151,7 +151,6 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
                   {`(${param.value_type})`}
                 </div>
                 <div>{param.type}</div>
-                <div>{param.endpoint_link}</div>
                 <div>{param.example}</div>
               </div>
             ))}
@@ -160,37 +159,18 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
           <div
             className={`cursor-pointer ${bgLightColor}  px-4 py-2 flex justify-between items-center`}
           >
-            <h2 className="font-bold text-lg">Response</h2>
+            <h2 className="font-bold text-lg">Responses</h2>
           </div>
           <div className="px-4 pb-4">
             {endpoint.responses.map((response, index) => (
               // each individual response box
-              <div key={index} className="my-4">
-                {/* General info */}
-                <div className={`bg-gray-50 border-2 border-gray-300 rounded p-4`}>
-                  <h3 className="font-semibold mb-2">{`Response Code: ${response.code}`}</h3>
-                  <div className="mb-2">{response.description}</div>
-
-                  {/* Example Value */}
-                  <div className={`border-2 border-gray-300 my-4`}></div>
-                  <h4 className="font-semibold">Example Value</h4>
-                  <div className="bg-black text-white p-2 rounded mt-2">
-                    <code>{response.example}</code>
-                  </div>
-
-                  {/* Conditions */}
-                  <div className={`border-2 border-gray-300 my-4`}></div>
-                  <h3 className="font-semibold my-2">Conditions</h3>
-                  {response.conditions.map((condition, index) => (
-                    <div
-                      key={index}
-                      className={`bg-white border-2 border-gray-300 p-2 rounded mt-2`}
-                    >
-                      <code>{condition}</code>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <ResponseCard
+                key={index}
+                responseCode={response.code}
+                responseConditions={response.conditions}
+                responseDescription={response.description}
+                responseExample={response.example}
+              />
             ))}
           </div>
         </>

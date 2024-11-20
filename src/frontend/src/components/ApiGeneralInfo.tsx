@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
-import { FaCrown } from "react-icons/fa";
+import { FaCrown, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import Tag from "./Tag";
 import EditApiButton from "./EditApiButton";
 import DeleteApiButton from "./DeleteApiButton";
@@ -14,6 +14,7 @@ interface ApiGeneralInfoProps {
   payModel: PayModel;
   tags: string[];
   isMyApi: boolean;
+  rating: string;
 }
 
 const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
@@ -24,12 +25,25 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
   payModel,
   tags,
   isMyApi,
+  rating,
 }) => {
   const bgColor = {
     Free: "bg-blue-500",
     Freemium: "bg-purple-500",
     Premium: "bg-amber-500",
   };
+
+  let ratingCol = "bg-gray-500";
+  let numRating = 0;
+  let displayRating = rating;
+
+  numRating = Number(rating);
+  if (numRating > 0) {
+    ratingCol = "bg-green-500";
+  } else if (numRating < 0) {
+    ratingCol = "bg-red-500";
+    displayRating = String(numRating * -1);
+  }  
 
   return (
     <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
@@ -54,6 +68,29 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
                 </div>
               )}
               <span className="text-white text-lg font-medium">{payModel}</span>
+            </div>
+            <div className="absolute top-24 right-8 flex space-x-2">
+              <div>
+                  <div
+                    className={`flex items-center ${
+                      ratingCol
+                    } rounded-md mx-5 px-3`}
+                  >
+                  {(numRating < 0 ) && (
+                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                      <FaThumbsDown />
+                    </div>
+                  )}
+                  {(numRating >= 0 ) && (
+                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                      <FaThumbsUp />
+                    </div>
+                  )}
+                    <span className="text-white text-md font-medium">
+                      {displayRating}
+                    </span>
+                  </div>
+              </div>
             </div>
           </div>
 

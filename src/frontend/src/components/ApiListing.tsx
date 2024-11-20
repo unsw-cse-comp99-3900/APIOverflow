@@ -5,8 +5,9 @@ import defaultApiIcon from "../assets/images/defaultApiIcon.jpg";
 import Tag from "./Tag";
 import DeleteApiButton from "./DeleteApiButton";
 import EditApiButton from "./EditApiButton";
-import { apiGetIcon } from "../services/apiServices";
-import { FaCrown } from "react-icons/fa";
+import { apiGetIcon, apiGetRating } from "../services/apiServices";
+import { FaCrown, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
+import { rating } from "@material-tailwind/react";
 
 interface ApiListingProps {
   api: BriefApi;
@@ -17,8 +18,11 @@ interface ApiListingProps {
 const ApiListing: React.FC<ApiListingProps> = ({ api, isMyApis, onDelete }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [iconURL, setIconURL] = useState<string>("");
+  const [ratingCol, setRatingCol] = useState<string>("bg-gray-500");
+  const [rating, setRating] = useState<string>("0");
+  const [numRating, setNumRating] = useState<number>(0);
 
-  console.log(api);
+
   const bgColor = {
     Free: "bg-blue-500",
     Freemium: "bg-purple-500",
@@ -34,8 +38,25 @@ const ApiListing: React.FC<ApiListingProps> = ({ api, isMyApis, onDelete }) => {
         console.log(error);
       }
     };
-    fetchIcon();
 
+    const getRating = async () => {
+      try {
+        const rating = await apiGetRating(api.id)
+        const numRating = Number(rating);
+        setNumRating(numRating);
+        if (numRating > 0) {
+          setRatingCol("bg-green-500");
+          setRating(rating);
+        } else if (numRating < 0) {
+          setRatingCol("bg-red-500");
+          setRating(String(numRating * -1));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchIcon();
+    getRating();
     // Cleanup the object URL to avoid memory leaks
     return () => {
       if (iconURL) {
@@ -105,10 +126,61 @@ const ApiListing: React.FC<ApiListingProps> = ({ api, isMyApis, onDelete }) => {
           )}
         </div>
 
-        {isMyApis && (
+        {!isMyApis && (
           <div className="absolute top-8 right-8 flex space-x-2">
-            <EditApiButton apiId={api.id} />
-            <DeleteApiButton apiId={api.id} onDelete={onDelete} />
+            <div>
+                <div
+                  className={`flex items-center ${
+                    ratingCol
+                  } rounded-md mx-5 px-3`}
+                >
+                  {(numRating < 0 ) && (
+                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                      <FaThumbsDown />
+                    </div>
+                  )}
+                  {(numRating >= 0 ) && (
+                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                      <FaThumbsUp />
+                    </div>
+                  )}
+                  <span className="text-white text-md font-medium">
+                    {rating}
+                  </span>
+                </div>
+            </div>
+          </div>
+        )}
+
+        {isMyApis && (
+          <div>
+            <div className="absolute top-8 right-8 flex space-x-2">
+              <EditApiButton apiId={api.id} />
+              <DeleteApiButton apiId={api.id} onDelete={onDelete} />
+            </div>
+            <div className="absolute top-24 right-8 flex space-x-2">
+              <div>
+                  <div
+                    className={`flex items-center ${
+                      ratingCol
+                    } rounded-md mx-5 px-3`}
+                  >
+                  {(numRating < 0 ) && (
+                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                      <FaThumbsDown />
+                    </div>
+                  )}
+                  {(numRating >= 0 ) && (
+                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                      <FaThumbsUp />
+                    </div>
+                  )}
+                    <span className="text-white text-md font-medium">
+                      {rating}
+                    </span>
+                  </div>
+              </div>
+            </div>
           </div>
         )}
 

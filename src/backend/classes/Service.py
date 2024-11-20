@@ -10,11 +10,11 @@ from fastapi import HTTPException
 
 
 class ServiceStatus(Enum):
-   UPDATE_REJECTED = 3
-   UPDATE_PENDING = 2
-   LIVE = 1
-   PENDING = 0
-   REJECTED = -1
+    UPDATE_REJECTED = 3
+    UPDATE_PENDING = 2
+    LIVE = 1
+    PENDING = 0
+    REJECTED = -1
 
 
 
@@ -308,6 +308,17 @@ class Service:
     #   Update Methods
     ################################
 
+    def update_rating(self, rating: str) -> None:
+        '''
+            Updates a rating to the opposite given 
+        '''
+        if rating == 'negative':
+            self._upvotes -= 1
+            self._downvotes += 1
+        else:
+            self._downvotes -= 1
+            self._upvotes += 1
+        
     def update_name(self, name: str) -> None:
         '''
             Update service name
@@ -604,6 +615,7 @@ class Service:
             'owner' : {
                 'id' : self._owner.get_id(),
                 'name' : self._owner.get_name(),
+                'displayName': self._owner.get_displayname(),
                 'email' : self._owner.get_email()
             },
             'icon_url' : self._icon_url,
@@ -656,5 +668,6 @@ class Service:
             'description': self._description,
             'icon_url': self._icon_url,
             'tags': self._tags,
-            'pay_model': self._pay_model
+            'pay_model': self._pay_model,
+            'ratings': self.get_ratings()
         }

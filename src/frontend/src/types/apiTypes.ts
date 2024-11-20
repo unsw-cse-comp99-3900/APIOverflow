@@ -23,7 +23,6 @@ export type DetailedApi = {
   downvotes: number;
   upvotes: number;
   icon: string;
-  icon_url: string;
   id: string;
   name: string;
   owner: serviceOwner;

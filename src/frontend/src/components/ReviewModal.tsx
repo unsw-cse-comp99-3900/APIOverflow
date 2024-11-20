@@ -23,7 +23,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
 
   const handleReject = () => {
     if (reason.trim()) {
-      onReject(review.id, reason); // Pass review ID and rejection reason
+      onReject(review.rid, reason); // Pass review ID and rejection reason
       onRequestClose();
     } else {
       alert("Please provide a reason for rejection.");
@@ -69,7 +69,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
         {/* Action Buttons */}
         <div className="flex justify-end space-x-4 mt-6">
           <button
-            onClick={() => onApprove(review.id)} // Pass review ID for approval
+            onClick={() => onApprove(review.rid)} // Pass review ID for approval
             className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
           >
             Approve
