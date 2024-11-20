@@ -67,6 +67,7 @@ const ApiPage: React.FC = () => {
               iconURL={iconURL}
               ownerName={api.owner.name}
               payModel={api.pay_model}
+              status = {api.status}
               tags={api.tags}
               isMyApi={false}
               rating={String(Number(api.upvotes) - Number(api.downvotes))}
@@ -74,7 +75,7 @@ const ApiPage: React.FC = () => {
             <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
               <div className="w-2/3">
                 <ApiDescription api={api} />
-                <VersionFields versions={api.versions} />
+                <VersionFields versions={api.versions.filter((version) => !version.newly_created)} />
               </div>
               <ApiReviews sid={api.id} />
             </div>

@@ -5,6 +5,7 @@ import Tag from "./Tag";
 import EditApiButton from "./EditApiButton";
 import DeleteApiButton from "./DeleteApiButton";
 import { PayModel } from "../types/miscTypes";
+import { ServiceStatus } from "../types/apiTypes";
 
 interface ApiGeneralInfoProps {
   apiId: string;
@@ -12,6 +13,7 @@ interface ApiGeneralInfoProps {
   apiName: string;
   ownerName: string;
   payModel: PayModel;
+  status: ServiceStatus;
   tags: string[];
   isMyApi: boolean;
   rating: string;
@@ -22,6 +24,7 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
   iconURL,
   apiName,
   ownerName,
+  status,
   payModel,
   tags,
   isMyApi,
@@ -31,6 +34,14 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
     Free: "bg-blue-500",
     Freemium: "bg-purple-500",
     Premium: "bg-amber-500",
+  };
+
+  const textColor = {
+    LIVE: "text-green-600",
+    PENDING: "text-amber-600",
+    UPDATE_PENDING: "text-amber-600",
+    REJECTED: "text-red-600",
+    UPDATE_REJECTED: "text-red-600",
   };
 
   let ratingCol = "bg-gray-500";
@@ -43,7 +54,7 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
   } else if (numRating < 0) {
     ratingCol = "bg-red-500";
     displayRating = String(numRating * -1);
-  }  
+  }
 
   return (
     <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
@@ -71,31 +82,38 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
             </div>
             <div className="absolute top-24 right-8 flex space-x-2">
               <div>
-                  <div
-                    className={`flex items-center ${
-                      ratingCol
-                    } rounded-md mx-5 px-3`}
-                  >
-                  {(numRating < 0 ) && (
+                <div
+                  className={`flex items-center ${ratingCol} rounded-md mx-5 px-3`}
+                >
+                  {numRating < 0 && (
                     <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
                       <FaThumbsDown />
                     </div>
                   )}
-                  {(numRating >= 0 ) && (
+                  {numRating >= 0 && (
                     <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
                       <FaThumbsUp />
                     </div>
                   )}
-                    <span className="text-white text-md font-medium">
-                      {displayRating}
-                    </span>
-                  </div>
+                  <span className="text-white text-md font-medium">
+                    {displayRating}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="text-gray-600 mb-5">{`By: ${ownerName}`}</div>
-          <div className="border border-gray-100 w-full mb-5"></div>
+          {/* <div className="flex justify-between my-2">
+            <div className="text-gray-600">{`By: ${ownerName}`}</div>
+            <div className={`font-semibold ${textColor[status]}`}>
+              status: {status}
+            </div>
+          </div> */}
+          <div className="text-gray-600">{`By: ${ownerName}`}</div>
+          <div className={`font-semibold my-2 ${textColor[status]}`}>
+            status: {status}
+          </div>
+          <div className="border border-gray-100 w-full"></div>
           <div className="flex flex-wrap max-w-3xl mt-4 mb-5">
             {tags.map((tag, index) => (
               <Tag key={index} tag={tag} className="mr-3 mb-2" />

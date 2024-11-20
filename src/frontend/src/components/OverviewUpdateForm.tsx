@@ -75,6 +75,7 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
       reader.onload = () => {
         setSelectedImage(reader.result as string);
       };
+      setGeneralInfoUpdated(true);
       setSelectedImageData(iconImage);
       reader.readAsDataURL(iconImage);
     }
