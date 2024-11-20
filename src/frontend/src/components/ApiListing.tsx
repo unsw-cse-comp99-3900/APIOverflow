@@ -23,7 +23,6 @@ const ApiListing: React.FC<ApiListingProps> = ({ api, isMyApis, onDelete }) => {
   const [numRating, setNumRating] = useState<number>(0);
 
 
-  console.log(api);
   const bgColor = {
     Free: "bg-blue-500",
     Freemium: "bg-purple-500",
