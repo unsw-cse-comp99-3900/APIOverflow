@@ -13,30 +13,27 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [currVersions, setCurrVersions] = useState<Version[]>(
-    versions.filter((version) => !version.newly_created)
-  );
-  const [currVersion, setCurrVersion] = useState<Version | null>(null);
+  const [currVersion, setCurrVersion] = useState<Version | null>(versions[0]);
   const [currVersionName, setCurrVersionName] = useState<string>("");
 
   useEffect(() => {
-    if (currVersions.length > 0) {
+    if (versions.length > 0) {
       const defaultVersion =
-        currVersions.find((ver) => ver.version_name === currVersionName) ||
-        currVersions[0]; // Fallback to the first version
+        versions.find((ver) => ver.version_name === currVersionName) ||
+        versions[0]; // Fallback to the first version
       setCurrVersion(defaultVersion);
       setCurrVersionName(defaultVersion.version_name); // Ensure `currVersionName` matches
     }
-  }, [currVersions, currVersionName]);
+  }, [versions, currVersionName]);
 
   useEffect(() => {
-    for (const currVer of currVersions) {
+    for (const currVer of versions) {
       if (currVer.version_name === currVersionName) {
         setCurrVersion(currVer);
         break;
       }
     }
-  }, [currVersionName, currVersions]);
+  }, [currVersionName, versions]);
 
   useEffect(() => {
     const fetchDocs = async () => {
@@ -47,7 +44,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
             "No live version available for this service yet, come back later!"
           );
         } else if (currVersion.docs && currVersion.docs.length > 0) {
-          const docURL = await getDoc(currVersions[0].docs[0]);
+          const docURL = await getDoc(currVersion.docs[0]);
           setPdfUrl(docURL);
         } else {
           setError("No document for this service available");
@@ -64,31 +61,40 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     };
 
     fetchDocs();
-  }, [currVersion, currVersions]);
+  }, [currVersion, currVersionName]);
+
+  const textColor = {
+    "LIVE": "text-green-600",
+    "PENDING": "text-amber-600",
+    "UPDATE_PENDING": "text-amber-600",
+    "REJECTED": "text-red-600",
+    "UPDATE_REJECTED": "text-red-600",
+  }
 
   return (
     <>
       <div className=" bg-white rounded-2xl shadow-lg p-6 mt-6">
         <div className="flex justify-between mb-2">
-          <div className="flex items-center text-xl font-bold">
-            <h2 className="text-xl font-bold">Patch Note</h2>
+          <div className="flex justify-between items-center">
+            <div className="flex text-xl font-bold">
+              <h2 className="text-xl font-bold">Version Patch Note</h2>
+            </div>
           </div>
+
           {currVersion !== null && (
-            <div className="flex items-center text-xl font-bold">
-              <h2 className="text-xl font-bold mr-2">Version</h2>
-              <div className="flex items-center">
-                <select
-                  value={currVersionName}
-                  onChange={(e) => setCurrVersionName(e.target.value)}
-                  className="p-2 border w-40 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-600"
-                >
-                  {currVersions.map((version, index) => (
-                    <option key={index} value={version.version_name}>
-                      {version.version_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="flex items-center">
+              <div className={`mr-2 font-semibold ${textColor[currVersion.status]}`}>status: {currVersion.status}</div>
+              <select
+                value={currVersionName}
+                onChange={(e) => setCurrVersionName(e.target.value)}
+                className="p-2 border w-40 rounded-md focus:ring-2 focus:ring-indigo-600"
+              >
+                {versions.map((version, index) => (
+                  <option key={index} value={version.version_name}>
+                    {version.version_name}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
         </div>
@@ -98,9 +104,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
             ? currVersion.version_description
             : "No live version available for this service yet, come back later!"}
         </p>
-
         <div className="border border-gray-100 w-full my-5"></div>
-
         <h2 className="text-xl font-bold mb-4">Endpoints</h2>
 
         {currVersion
