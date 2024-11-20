@@ -131,6 +131,11 @@ const LoginPage: React.FC = () => {
                 Sign Up
               </Link>
             </div>
+            <div className="flex justify-center pt-3">
+              <Link to="/forgot-password" className="pl-2 text-blue-700 underline font-semibold">
+                Forgot Password?
+              </Link>
+            </div>
           </form>
           
         </div>
