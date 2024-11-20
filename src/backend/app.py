@@ -433,6 +433,12 @@ async def review_reply_get(rid: str):
    '''
    return review_get_reply_wrapper(rid)
 
+@app.get("/review/get/replies")
+async def review_replies_get(rid: str):
+   '''
+    Endpoint which retrivees all comments underneath a review
+   '''
+   return review_get_comments_wrapper(rid)
 
 #####################################
 #   Auth Paths

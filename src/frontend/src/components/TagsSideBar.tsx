@@ -12,18 +12,17 @@ const TagsSideBar: React.FC = () => {
   useEffect(() => {
     const fetchApis = async () => {
       try {
-        const data = await getTags(true);
+        const data = await getTags();
         setTags(data);
 
-        const cData = await getCustomTags(true);
+        const cData = await getCustomTags();
         setCTags(cData);
       } catch (error) {
-        console.log("Error fetching data", error);
+        console.error("Error fetching data:", error);
       }
     };
     fetchApis();
   }, []);
-
   const tagIcon = ({ tag }: { tag: string }) =>
     selectedTags.includes(tag) ? (
       <FaCheckSquare className="mr-2" />

@@ -25,15 +25,11 @@ import {
 let baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 /*        API Services        */
-export const getApis = async (
-  tags?: Tag[],
-  hidePending = true,
-  sortRating = true
-) => {
+export const getApis = async (tags?: Tag[], hidePending = true, sortRating = true) => {
   const queryParams =
     tags && tags.length > 0 ? `&tags=${tags.join("&tags=")}` : "";
   const response = await fetch(
-    `${baseUrl}/service/filter?hide_pending=${hidePending}&sort_rating=${sortRating}${queryParams}`,
+    `${baseUrl}/service/filter?hide_pending=${hidePending}${queryParams}`,
     {
       method: "GET",
     }
@@ -214,22 +210,14 @@ export const userCheckPerm = async () => {
 };
 
 /*        Tag Services       */
-export const getTags = async (option: boolean = false) => {
-  const response = await fetch(`${baseUrl}/tags/get?system=${option}`, {
+export const getTags = async () => {  
+  const response = await fetch(`${baseUrl}/tags/get`, {
     method: "GET",
   });
   const data = await response.json();
-  console.log(data);
   return data.tags;
 };
 
-export const getCustomTags = async (option: boolean = false) => {
-  const response = await fetch(`${baseUrl}/tags/get/ranked?num=${10}&custom=${option}`,{
-    method: "GET",
-  });
-  const data = await response.json();
-  return data.tags;
-}
 
 export const addTag = async (tagName: string) => {
   const tag: TagData = {
@@ -293,6 +281,14 @@ export const apiGetIcon = async (sid: string) => {
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
   return url;
 };
+
+export const apiGetOwner = async (sid: string) => {
+  const response = await fetch(`${baseUrl}/service/get_service?sid=${sid}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  return data.owner.id;
+}
 
 /*        Document Services       */
 
@@ -378,7 +374,8 @@ export const apiGetReviews = async (sid: string, filter: string = '') => {
     u_toggle = data.uid;
   } else {
     u_toggle = "";
-  }
+  };
+
   console.log(u_toggle);
   const response = await fetch(
     `${baseUrl}/service/get/reviews?sid=${sid}&filter=${filter}&uid=${u_toggle}`,
@@ -629,6 +626,62 @@ export const userRemoveVote = async(rid: string) => {
   })
 }
 
+export const userGetId = async () => {
+  if (localStorage.getItem("token")) { 
+    const res = await fetch(`${baseUrl}/user/get/id`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    const data = await res.json();
+    return data.uid;
+  } else {
+    return "";
+  }
+}
+
+export const userGetReplies = async () => {
+  const response = await fetch(`${baseUrl}/user/get/replies`,{
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  const data = await response.json();
+  return data.replies;
+}
+
+export const userDeleteReply = async (rid: string) => {
+  await fetch(`${baseUrl}/review/reply/delete?rid=${rid}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    }
+  });
+};
+
+export const userEditReply = async (rid: string, content: string) => {
+  const response = await fetch(`${baseUrl}/review/reply/edit`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      rid,
+      content,
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to edit reply');
+  }
+};
+
 /*        Misc Services       */
 export const verifyEmail = async (token: string | null) => {
   const response = await fetch(`${baseUrl}/auth/verify-email/${token}`, {
@@ -697,3 +750,64 @@ export const resetPasswordWithToken = async (token: string, newPassword: string)
 
   return response.json();
 };
+
+
+interface ReviewPackage {
+  rid: string;
+  content: string;
+}
+
+export const submitReviewReply = async (rid: string, content: string) => {
+  console.log('Submitting reply with data:', { rid, content }); // Debug log
+
+  const reviewPackage: ReviewPackage = {
+    rid,
+    content
+  };
+
+  try {
+    const response = await fetch(`${baseUrl}/review/reply`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reviewPackage),
+    });
+
+    console.log('Response status:', response.status); // Debug log
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Error response:', errorData);
+      throw new Error(errorData.detail || 'Failed to submit reply');
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Reply submission error:', error);
+    throw error;
+  }
+};
+
+export const getReplyService = async (rid: string) => {
+  const response = await fetch(`${baseUrl}/review/reply/get?rid=${rid}`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch reply');
+  }
+
+  return response.json();
+};
+
+export const getCustomTags = async (option: boolean = false) => {
+  const response = await fetch(`${baseUrl}/tags/get/ranked?num=${10}&custom=${option}`,{
+    method: "GET",
+  });
+  const data = await response.json();
+  return data.tags;
+}
