@@ -58,7 +58,6 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
 
   const deleteEndpoint = () => {
     if (currEndpointIdx !== -1) {
-      toast.success("Endpoint Deleted");
       setEndpoints(endpoints.filter((_, index) => index !== currEndpointIdx));
       setVersionUpdated(true);
       setCurrEndpointIdx(-1);
@@ -71,6 +70,7 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
         parameters: [],
         responses: [],
       });
+      toast.success("Endpoint Deleted");
     } else {
       toast.error("No endpoint selected");
     }
@@ -108,6 +108,7 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
           responses,
         },
       ]);
+      toast.success("Endpoint Added");
     } else {
       // Update an existing endpoint
       const updatedEndpoints = endpoints.map((endpoint, index) =>
@@ -127,7 +128,6 @@ const EndpointUpdateForm: React.FC<EndpointUpdateFormProps> = ({
       
       setEndpoints(updatedEndpoints);
     }
-    console.log("Endpoint Updated");
     setVersionUpdated(true);
     setCurrEndpoint({
       link: "",

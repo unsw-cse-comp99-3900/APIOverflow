@@ -74,7 +74,7 @@ const ApiPage: React.FC = () => {
             <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
               <div className="w-2/3">
                 <ApiDescription api={api} />
-                <VersionFields versions={api.versions} />
+                <VersionFields versions={api.versions.filter((version) => !version.newly_created)} />
               </div>
               <ApiReviews sid={api.id} />
             </div>

@@ -7,7 +7,7 @@ import FetchStatus from "../components/FetchStatus";
 import ApiReviews from "../components/ApiReviews";
 import ApiDescription from "../components/ApiDescription";
 import BackButton from "../components/BackButton";
-import EndpointAndDocumentation from "../components/VersionFields";
+import VersionFields from "../components/VersionFields";
 import ApiGeneralInfo from "../components/ApiGeneralInfo";
 
 const MyApiPage: React.FC = () => {
@@ -72,7 +72,7 @@ const MyApiPage: React.FC = () => {
             <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
               <div className="w-2/3">
                 <ApiDescription api={api} />
-                <EndpointAndDocumentation versions={api.versions} />
+                <VersionFields versions={api.versions} />
               </div>
               <ApiReviews sid={api.id} />
             </div>

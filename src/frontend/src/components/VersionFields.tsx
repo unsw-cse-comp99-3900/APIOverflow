@@ -13,30 +13,27 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [currVersions, setCurrVersions] = useState<Version[]>(
-    versions.filter((version) => !version.newly_created)
-  );
   const [currVersion, setCurrVersion] = useState<Version | null>(null);
   const [currVersionName, setCurrVersionName] = useState<string>("");
 
   useEffect(() => {
-    if (currVersions.length > 0) {
+    if (versions.length > 0) {
       const defaultVersion =
-        currVersions.find((ver) => ver.version_name === currVersionName) ||
-        currVersions[0]; // Fallback to the first version
+      versions.find((ver) => ver.version_name === currVersionName) ||
+      versions[0]; // Fallback to the first version
       setCurrVersion(defaultVersion);
       setCurrVersionName(defaultVersion.version_name); // Ensure `currVersionName` matches
     }
-  }, [currVersions, currVersionName]);
+  }, [versions, currVersionName]);
 
   useEffect(() => {
-    for (const currVer of currVersions) {
+    for (const currVer of versions) {
       if (currVer.version_name === currVersionName) {
         setCurrVersion(currVer);
         break;
       }
     }
-  }, [currVersionName, currVersions]);
+  }, [currVersionName, versions]);
 
   useEffect(() => {
     const fetchDocs = async () => {
@@ -47,7 +44,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
             "No live version available for this service yet, come back later!"
           );
         } else if (currVersion.docs && currVersion.docs.length > 0) {
-          const docURL = await getDoc(currVersions[0].docs[0]);
+          const docURL = await getDoc(currVersion.docs[0]);
           setPdfUrl(docURL);
         } else {
           setError("No document for this service available");
@@ -64,7 +61,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     };
 
     fetchDocs();
-  }, [currVersion, currVersions]);
+  }, [currVersion]);
 
   return (
     <>
@@ -82,7 +79,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
                   onChange={(e) => setCurrVersionName(e.target.value)}
                   className="p-2 border w-40 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-600"
                 >
-                  {currVersions.map((version, index) => (
+                  {versions.map((version, index) => (
                     <option key={index} value={version.version_name}>
                       {version.version_name}
                     </option>
@@ -98,9 +95,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
             ? currVersion.version_description
             : "No live version available for this service yet, come back later!"}
         </p>
-
         <div className="border border-gray-100 w-full my-5"></div>
-
         <h2 className="text-xl font-bold mb-4">Endpoints</h2>
 
         {currVersion

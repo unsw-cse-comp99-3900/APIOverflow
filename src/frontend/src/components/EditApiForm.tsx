@@ -162,7 +162,6 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
       if (versionUpdated) {
         // version specific update
         setIsVersionInfoOverlayOpen(true);
-        
       }
       if (generalInfoUpdated) {
         // general info update
