@@ -353,6 +353,10 @@ export const apiAddReview = async (
     body: JSON.stringify(info),
   });
   const data = await response.json();
+  if(response.status === 401){
+    throw new Error("Unauthorized");
+  }
+
   if (response.status === 403) {
     throw new Error(data.detail);
   }

@@ -47,7 +47,10 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
     try {
       await apiAddReview(sid, reviewRating, "reviewTitle", reviewComment);
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof Error && error.message === "Unauthorized") {
+        setWarning("You need to login to submit a review");
+      }
+      else if (error instanceof Error) {
         setWarning(error.message);
       }
     }
