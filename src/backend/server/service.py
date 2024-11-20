@@ -524,7 +524,7 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str, service_globa
     
     db_update_service(sid, service.to_json())
 
-    content = {'action': action, 'sname': sname, 'uname': uname}
+    content = {'action': action, 'sname': sname, 'uname': uname, 'reason': reason}
     send_email(uemail, '', 'service_approval', content)
   
       
