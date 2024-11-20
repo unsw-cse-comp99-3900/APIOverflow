@@ -264,13 +264,16 @@ def get_doc_wrapper(doc_id: str) -> FileResponse:
    return FileResponse(doc.get_path())
 
 
-def delete_service(sid: str):
+def delete_service(sid: str, uid: str, is_admin: bool):
     if sid == '':
         raise HTTPException(status_code=400, detail='No service id provided')
 
     service = data_store.get_api_by_id(sid)
     if service is None:
         raise HTTPException(status_code=404, detail='No service found with given sid')
+    
+    if service.get_owner().get_id() != uid and not is_admin:
+        raise HTTPException(status_code=403, detail="No permission to delete review")
     service_name = service.get_name()
     
     # Disassociate server from tag

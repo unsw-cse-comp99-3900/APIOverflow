@@ -119,8 +119,6 @@ def user_delete_association(uid: str):
     user = data_store.get_user_by_id(uid)
     upvoted_review_ids = user.get_upvotes()
     downvoted_review_ids = user.get_downvotes()
-    print(upvoted_review_ids)
-    print(downvoted_review_ids)
     for rid in upvoted_review_ids:
         review_remove_vote_wrapper(rid, uid)
 
@@ -133,7 +131,7 @@ def user_delete_association(uid: str):
 
     service_ids = user.get_services()
     for sid in service_ids:
-        delete_service(sid)
+        delete_service(sid, '0', True)
 
     blacklist_user_token(uid)
 

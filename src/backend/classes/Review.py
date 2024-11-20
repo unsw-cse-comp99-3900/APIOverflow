@@ -125,6 +125,18 @@ class Review(Comment):
             Returns reply if any
         '''
         return self._reply
+    
+    def get_upvote_ids(self):
+        '''
+            Gets review's upvotes ids
+        '''
+        return self._upvote
+    
+    def get_downvote_ids(self):
+        '''
+            Gets review's downvotes ids
+        '''
+        return self._downvote
 
     #############################
     #   JSON methods

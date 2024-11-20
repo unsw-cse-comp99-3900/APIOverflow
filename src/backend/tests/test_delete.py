@@ -296,4 +296,87 @@ def test_upvote_review_removed_user_delete(simple_user):
     assert response.json()['upvotes'] == 1
     assert response.json()['downvotes'] == 0
 
+def test_upvote_review_removed_service_delete(simple_user):
+    '''
+        Test whether upvoting a review works
+    '''
+    data = simple_user
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+    package = {
+            'sid': data['sid'],
+            'rating': 'positive',
+            'comment': 'Mid at best'
+        }
+    response = client.post("/service/review/add",
+                headers={"Authorization": f"Bearer {data['u_token']}"},
+                json=package)
+    assert response.status_code == SUCCESS
+
+    rid = '0'
+    response = client.get("/review/get",
+                          params = {'rid': rid})
+    assert response.status_code == SUCCESS
+    assert response.json()['rid'] == rid
+    assert response.json()['upvotes'] == 0
+    assert response.json()['downvotes'] == 0
+
+    response = client.post("/auth/register", json={
+        "displayname": "guestuser",
+        "username": "guestuser123",
+        "password": "guestpassword",
+        "email" : "doxxedddddd@gmail.com"
+    })
+    response = client.post("/auth/login", json={
+        "username": "guestuser123",
+        "password": "guestpassword"
+    })
+    access_token_g = response.json()["access_token"]
+
+    package = {
+        'rid': rid
+    }
+    response = client.post("/review/upvote",
+                           headers={"Authorization": f"Bearer {data['c_token']}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.post("/review/downvote",
+                           headers={"Authorization": f"Bearer {access_token_g}"},
+                           json=package)
+    assert response.status_code == SUCCESS
+
+    response = client.get("/review/get",
+                          params = {'rid': rid})
+    assert response.status_code == SUCCESS
+    assert response.json()['rid'] == rid
+    assert response.json()['upvotes'] == 1
+    assert response.json()['downvotes'] == 1
+
+    response = client.get("/admin/dashboard/users", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+    assert response.json()["user_count"] == 4
+    assert response.json()["users"][1]["upvotes"] == [rid]
+    assert response.json()["users"][3]["downvotes"] == [rid]
+
+    response = client.delete("/service/delete", headers={"Authorization": f"Bearer {access_token}"},
+                            params={
+                              'sid' : data['sid']
+                            })
+    assert response.status_code == SUCCESS
+
+    response = client.get("/review/get",
+                          params = {'rid': rid})
+    assert response.status_code == MISSING_ERROR
+
+    response = client.get("/admin/dashboard/users", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+    assert response.json()["user_count"] == 4
+    assert response.json()["users"][1]["upvotes"] == []
+    assert response.json()["users"][3]["downvotes"] == []
+
 

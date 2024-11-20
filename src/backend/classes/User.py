@@ -35,6 +35,8 @@ class User:
             num_replies: Number of replies made
             token:      Current token of the user
             service:    Service id created by the user
+            upvotes:    Review ids user upvoted
+            downvotes:  Review ids user downvoted
 
     '''
 
@@ -195,6 +197,15 @@ class User:
         self._replies.remove(rid)
         self._num_replies -= 1
 
+    def remove_vote(self, rid: str) -> None:
+        '''
+            Removes rid vote from user's list
+        '''
+        if rid in self._upvotes:
+            self._upvotes.remove(rid)
+
+        elif rid in self._downvotes:
+            self._downvotes.remove(rid)
 
     ################################
     #  Get Methods
@@ -331,7 +342,9 @@ class User:
             'is_verified': self._is_verified,
             'reviews': self._reviews,
             'replies': self._replies,
-            'icon' : self._icon
+            'icon' : self._icon,
+            'upvotes': self._upvotes,
+            'downvotes': self._downvotes
         }
 
         if include_password:

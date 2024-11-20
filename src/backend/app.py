@@ -244,11 +244,11 @@ async def search(
 
 
 @app.delete("/service/delete")
-async def delete_api(sid: str):
+async def delete_api(sid: str, user: User = Depends(manager)):
    """
        Delete an API service by its service id (id).
    """
-   return delete_service(sid)
+   return delete_service(sid, user['id'], user['is_admin'])
 
 
 @app.post("/service/add_icon")

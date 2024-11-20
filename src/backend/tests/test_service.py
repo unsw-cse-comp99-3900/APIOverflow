@@ -18,6 +18,7 @@ INPUT_ERROR = 400
 AUTHENTICATION_ERROR = 401
 SUCCESS = 200
 NOT_FOUND = 404
+FORBIDDEN = 403
 
 # test endpoint
 simple_parameter = Parameter(id="1", endpoint_link='https://api.example.com/users/12345', required=True, 
@@ -474,6 +475,84 @@ def test_delete_api(simple_user):
     assert response.status_code == SUCCESS
     response_info = response.json()
     assert response_info == []
+
+def test_delete_api_no_perm(simple_user):
+    '''
+        Test whether delete an API works
+    '''
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    api_info1 = {
+                'name' : 'Test API',
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()]
+                }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {access_token}"},
+                           json=api_info1)
+    assert response.status_code == SUCCESS
+    sid = response.json()['id']
+
+    response = client.get("/service/my_services",
+                          headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == SUCCESS
+    response_info = response.json()[0]
+    assert response_info != {}
+
+    assert db_get_service(sid) is not None
+
+    response = client.delete("/service/delete",
+                        headers={"Authorization": f"Bearer {simple_user['token']}"},
+                        params={
+                              'sid' : sid
+                          })
+    assert response.status_code == FORBIDDEN
+
+def test_delete_api_admin_perm(simple_user):
+    '''
+        Test whether delete an API works
+    '''
+    response = client.post("/auth/login", json={
+        "username": "superadmin",
+        "password": "superadminpassword"
+    })
+    assert response.status_code == SUCCESS
+    access_token = response.json()["access_token"]
+
+    api_info1 = {
+                'name' : 'Test API',
+                'description' : 'This is a test API',
+                'tags' : ['API'],
+                'endpoints': [simple_endpoint.model_dump()]
+                }
+    
+    response = client.post("/service/add",
+                           headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api_info1)
+    assert response.status_code == SUCCESS
+    sid = response.json()['id']
+
+    response = client.get("/service/my_services",
+                          headers={"Authorization": f"Bearer {simple_user['token']}"})
+    assert response.status_code == SUCCESS
+    response_info = response.json()[0]
+    assert response_info != {}
+
+    assert db_get_service(sid) is not None
+
+    response = client.delete("/service/delete",
+                        headers={"Authorization": f"Bearer {access_token}"},
+                        params={
+                              'sid' : sid
+                          })
+    assert response.status_code == SUCCESS
 
 def test_delete_apis(simple_user):
     '''
