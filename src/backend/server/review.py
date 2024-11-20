@@ -37,6 +37,15 @@ def review_delete_wrapper(rid: str, uid: str, is_admin: bool) -> None:
     if review.get_owner() != uid and not is_admin: 
         raise HTTPException(status_code=403, detail="No permission to delete review")
 
+    # Delete associated votes
+    user_ids_up = review.get_upvote_ids()
+    user_ids_down = review.get_downvote_ids()
+    combined_user_ids = user_ids_up + user_ids_down
+    for voted_id in combined_user_ids:
+        review_remove_vote_wrapper(rid, voted_id)
+        voted_user = data_store.get_user_by_id(voted_id)
+        voted_user.remove_vote(rid)
+
     # Delete review
     user = data_store.get_user_by_id(review.get_owner())
     service = data_store.get_api_by_id(review.get_service())
@@ -90,6 +99,8 @@ def review_vote_wrapper(rid: str, uid: str, vote: str) -> None:
         Wrapper which processes adding a vote to a review
     '''
     review = data_store.get_review_by_id(rid)
+    user = data_store.get_user_by_id(uid)
+    user.add_vote(rid, vote)
     if review is None:
         raise HTTPException(status_code=404, detail="Review not found")
     
