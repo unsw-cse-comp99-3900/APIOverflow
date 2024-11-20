@@ -19,8 +19,8 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
   useEffect(() => {
     if (versions.length > 0) {
       const defaultVersion =
-      versions.find((ver) => ver.version_name === currVersionName) ||
-      versions[0]; // Fallback to the first version
+        versions.find((ver) => ver.version_name === currVersionName) ||
+        versions[0]; // Fallback to the first version
       setCurrVersion(defaultVersion);
       setCurrVersionName(defaultVersion.version_name); // Ensure `currVersionName` matches
     }
@@ -63,29 +63,38 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     fetchDocs();
   }, [currVersion]);
 
+  const textColor = {
+    "LIVE": "text-green-600",
+    "PENDING": "text-amber-600",
+    "UPDATE_PENDING": "text-amber-600",
+    "REJECTED": "text-red-600",
+    "UPDATE_REJECTED": "text-red-600",
+  }
+
   return (
     <>
       <div className=" bg-white rounded-2xl shadow-lg p-6 mt-6">
         <div className="flex justify-between mb-2">
-          <div className="flex items-center text-xl font-bold">
-            <h2 className="text-xl font-bold">Patch Note</h2>
+          <div className="flex justify-between items-center">
+            <div className="flex text-xl font-bold">
+              <h2 className="text-xl font-bold">Version Patch Note</h2>
+            </div>
           </div>
+
           {currVersion !== null && (
-            <div className="flex items-center text-xl font-bold">
-              <h2 className="text-xl font-bold mr-2">Version</h2>
-              <div className="flex items-center">
-                <select
-                  value={currVersionName}
-                  onChange={(e) => setCurrVersionName(e.target.value)}
-                  className="p-2 border w-40 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-600"
-                >
-                  {versions.map((version, index) => (
-                    <option key={index} value={version.version_name}>
-                      {version.version_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="flex items-center">
+              <div className={`mr-2 font-semibold ${textColor[currVersion.status]}`}>status: {currVersion.status}</div>
+              <select
+                value={currVersionName}
+                onChange={(e) => setCurrVersionName(e.target.value)}
+                className="p-2 border w-40 rounded-md focus:ring-2 focus:ring-indigo-600"
+              >
+                {versions.map((version, index) => (
+                  <option key={index} value={version.version_name}>
+                    {version.version_name}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
         </div>

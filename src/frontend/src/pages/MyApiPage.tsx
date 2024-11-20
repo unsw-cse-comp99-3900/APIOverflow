@@ -49,7 +49,6 @@ const MyApiPage: React.FC = () => {
       }
     };
   }, [id]);
-
   return (
     <>
       <BackButton toUrl="/profile/my-apis" />
@@ -60,6 +59,7 @@ const MyApiPage: React.FC = () => {
             {/* Header Section */}
             <ApiGeneralInfo
               apiId={api.id}
+              status={api.status}
               apiName={api.name}
               iconURL={iconURL}
               ownerName={api.owner.name}

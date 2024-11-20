@@ -67,6 +67,7 @@ const ApiPage: React.FC = () => {
               iconURL={iconURL}
               ownerName={api.owner.name}
               payModel={api.pay_model}
+              status = {api.status}
               tags={api.tags}
               isMyApi={false}
               rating={String(Number(api.upvotes) - Number(api.downvotes))}
