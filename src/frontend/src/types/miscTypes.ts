@@ -25,6 +25,13 @@ export type ReviewDetail = {
   downvotes: string;
 }
 
+export type ReplyDetail = {
+  rid: string;
+  reviewerName: string;
+  service: string;
+  comment: string;
+}
+
 export type Rating = "positive" | "negative"
 
 export type Tag = string

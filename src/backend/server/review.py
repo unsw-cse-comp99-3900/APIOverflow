@@ -202,11 +202,38 @@ def review_edit_reply_wrapper(rid: str, uid: str, comment: str) -> None:
 
 def review_get_reply_wrapper(rid: str) -> dict[str, str]:
     '''
-        Wrapper which grabs a review reply given an id
+        Wrapper which grabs a review reply given a reply id
     '''
     # Grab reply
     reply = data_store.get_reply_by_id(rid)
     if reply is None:
         raise HTTPException(status_code=404, detail='Reply not found')
     
+    return reply.to_json()
+
+def review_get_comments_wrapper(rid: str) -> dict[str, str]:
+    '''
+        Wrapper which grabs all comments under a review given a review id
+    '''
+    review = data_store.get_review_by_id(rid)
+    if review is None:
+        raise HTTPException(status_code=404, detail='Review not found')
+    
+    # Grab reply
+    reply_id = review.get_reply()
+    if reply_id is None:
+        return {
+                'rid': "-1",
+                'reviewer': "-1",
+                'service': "-1",
+                'comment': "-1",
+                'timestamp': "-1",
+                'edited': False,
+                'e_timestamp': "-1",
+            }
+    
+    reply = data_store.get_reply_by_id(reply_id)
+    if reply is None:
+        raise HTTPException(status_code=404, detail='eply not found')
+
     return reply.to_json()

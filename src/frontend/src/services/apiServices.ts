@@ -282,6 +282,14 @@ export const apiGetIcon = async (sid: string) => {
   return url;
 };
 
+export const apiGetOwner = async (sid: string) => {
+  const response = await fetch(`${baseUrl}/service/get_service?sid=${sid}`, {
+    method: "GET",
+  });
+  const data = await response.json();
+  return data.owner.id;
+}
+
 /*        Document Services       */
 
 // Upload service to database
@@ -366,7 +374,8 @@ export const apiGetReviews = async (sid: string, filter: string = '') => {
     u_toggle = data.uid;
   } else {
     u_toggle = "";
-  }
+  };
+
   console.log(u_toggle);
   const response = await fetch(
     `${baseUrl}/service/get/reviews?sid=${sid}&filter=${filter}&uid=${u_toggle}`,
@@ -617,6 +626,62 @@ export const userRemoveVote = async(rid: string) => {
   })
 }
 
+export const userGetId = async () => {
+  if (localStorage.getItem("token")) { 
+    const res = await fetch(`${baseUrl}/user/get/id`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    const data = await res.json();
+    return data.uid;
+  } else {
+    return "";
+  }
+}
+
+export const userGetReplies = async () => {
+  const response = await fetch(`${baseUrl}/user/get/replies`,{
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  const data = await response.json();
+  return data.replies;
+}
+
+export const userDeleteReply = async (rid: string) => {
+  await fetch(`${baseUrl}/review/reply/delete?rid=${rid}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    }
+  });
+};
+
+export const userEditReply = async (rid: string, content: string) => {
+  const response = await fetch(`${baseUrl}/review/reply/edit`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      rid,
+      content,
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to edit reply');
+  }
+};
+
 /*        Misc Services       */
 export const verifyEmail = async (token: string | null) => {
   const response = await fetch(`${baseUrl}/auth/verify-email/${token}`, {
@@ -725,43 +790,6 @@ export const submitReviewReply = async (rid: string, content: string) => {
   }
 };
 
-export const deleteReplyService = async (rid: string) => {
-  const response = await fetch(`${baseUrl}/review/reply/delete?rid=${rid}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-    }
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || 'Failed to delete reply');
-  }
-  
-  return response.json();
-};
-
-export const editReplyService = async (rid: string, content: string) => {
-  const response = await fetch(`${baseUrl}/review/reply/edit`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      rid,
-      content
-    })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || 'Failed to edit reply');
-  }
-
-  return response.json();
-};
-
 export const getReplyService = async (rid: string) => {
   const response = await fetch(`${baseUrl}/review/reply/get?rid=${rid}`, {
     headers: {
@@ -775,7 +803,6 @@ export const getReplyService = async (rid: string) => {
 
   return response.json();
 };
-
 
 export const getCustomTags = async (option: boolean = false) => {
   const response = await fetch(`${baseUrl}/tags/get/ranked?num=${10}&custom=${option}`,{

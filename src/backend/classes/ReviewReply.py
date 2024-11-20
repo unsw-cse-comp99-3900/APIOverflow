@@ -46,7 +46,8 @@ class ReviewReply(Comment):
                 'rid': self.get_id(),
                 'service': self.get_service(),
                 'timestamp': self.get_timestamp(),
-                'e_timestamp': self.get_e_timestamp()
+                'e_timestamp': self.get_e_timestamp(),
+                'comment': self.get_content()
             }
 
         return {
@@ -56,5 +57,5 @@ class ReviewReply(Comment):
                 'comment': self._content,
                 'timestamp': self.get_timestamp(),
                 'edited': self.is_edited(),
-                'e_timestamp': self.get_content(),
+                'e_timestamp': self.get_e_timestamp(),
             }
