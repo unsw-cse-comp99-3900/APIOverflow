@@ -13,7 +13,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [currVersion, setCurrVersion] = useState<Version | null>(null);
+  const [currVersion, setCurrVersion] = useState<Version | null>(versions[0]);
   const [currVersionName, setCurrVersionName] = useState<string>("");
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     };
 
     fetchDocs();
-  }, [currVersion]);
+  }, [currVersion, currVersionName]);
 
   const textColor = {
     "LIVE": "text-green-600",
