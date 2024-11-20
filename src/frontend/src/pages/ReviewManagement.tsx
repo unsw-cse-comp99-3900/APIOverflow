@@ -7,28 +7,24 @@ import { Review } from "../types/miscTypes";
 
 // Dummy data for testing
 const reviews: Review[] = [
-  {
-    id: "1",
-    rid: "R001",
-    reviewer: "Jane Doe",
-    reviewerName: "hihi",
-    service: "Service001",
-    title: "Great Service",
-    comment: "I had an amazing experience with this service!",
-    type: "positive",
-    status: "approved"
-  },
-  {
-    id: "2",
-    rid: "R002",
-    reviewer: "John Smith",
-    reviewerName: "hihi",
-    service: "Service002",
-    title: "Not Satisfied",
-    comment: "The service quality was below my expectations.",
-    type: "negative",
-    status: "pending"
-  },
+  // {
+  //   rid: "R001",
+  //   reviewer: "Jane Doe",
+  //   reviewerName: "hihi",
+  //   service: "Service001",
+  //   title: "Great Service",
+  //   comment: "I had an amazing experience with this service!",
+  //   type: "positive",
+
+  // },
+  //   rid: "R002",
+  //   reviewer: "John Smith",
+  //   reviewerName: "hihi",
+  //   service: "Service002",
+  //   title: "Not Satisfied",
+  //   comment: "The service quality was below my expectations.",
+  //   type: "negative",
+  // },
 ];
 
 const ReviewManagement: React.FC = () => {
@@ -62,7 +58,7 @@ const ReviewManagement: React.FC = () => {
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {reviews.map((review) => (
-          <div key={review.id} className="shadow-lg rounded-xl p-4 transition-transform transform hover:scale-105">
+          <div key={review.rid} className="shadow-lg rounded-xl p-4 transition-transform transform hover:scale-105">
             <ReviewCard review={review} />
             <button
               className="mt-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold py-2 px-6 rounded-full hover:from-blue-600 hover:to-blue-800 transition-all shadow-lg"

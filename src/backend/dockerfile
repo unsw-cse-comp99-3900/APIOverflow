@@ -32,6 +32,6 @@ ENV TEST ${TEST}
 
 # for increased testing speed, can change below command to 
 # pytest tests/file_name.py -vv
-CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv tests/test_ollama_api.py; fi
+CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv tests/test_delete.py; fi
 
 # pytest -vv tests/test.py::testfunc

@@ -37,6 +37,15 @@ def review_delete_wrapper(rid: str, uid: str, is_admin: bool) -> None:
     if review.get_owner() != uid and not is_admin: 
         raise HTTPException(status_code=403, detail="No permission to delete review")
 
+    # Delete associated votes
+    user_ids_up = review.get_upvote_ids()
+    user_ids_down = review.get_downvote_ids()
+    combined_user_ids = user_ids_up + user_ids_down
+    for voted_id in combined_user_ids:
+        review_remove_vote_wrapper(rid, voted_id)
+        voted_user = data_store.get_user_by_id(voted_id)
+        voted_user.remove_vote(rid)
+
     # Delete review
     user = data_store.get_user_by_id(review.get_owner())
     service = data_store.get_api_by_id(review.get_service())
@@ -77,6 +86,11 @@ def review_edit_wrapper(info: ServiceReviewEditInfo, uid: str, is_admin: bool) -
     if rating not in ['positive', 'negative']:
          raise HTTPException(status_code=400, detail="Invalid rating given")
 
+    # Check if rating has changed
+    if rating != review.get_rating():
+        service = data_store.get_api_by_id(review.get_service())
+        service.update_rating(rating)
+
     # Edit review
     review.update_review(rating, comment)
 
@@ -85,6 +99,8 @@ def review_vote_wrapper(rid: str, uid: str, vote: str) -> None:
         Wrapper which processes adding a vote to a review
     '''
     review = data_store.get_review_by_id(rid)
+    user = data_store.get_user_by_id(uid)
+    user.add_vote(rid, vote)
     if review is None:
         raise HTTPException(status_code=404, detail="Review not found")
     
@@ -197,11 +213,38 @@ def review_edit_reply_wrapper(rid: str, uid: str, comment: str) -> None:
 
 def review_get_reply_wrapper(rid: str) -> dict[str, str]:
     '''
-        Wrapper which grabs a review reply given an id
+        Wrapper which grabs a review reply given a reply id
     '''
     # Grab reply
     reply = data_store.get_reply_by_id(rid)
     if reply is None:
         raise HTTPException(status_code=404, detail='Reply not found')
     
+    return reply.to_json()
+
+def review_get_comments_wrapper(rid: str) -> dict[str, str]:
+    '''
+        Wrapper which grabs all comments under a review given a review id
+    '''
+    review = data_store.get_review_by_id(rid)
+    if review is None:
+        raise HTTPException(status_code=404, detail='Review not found')
+    
+    # Grab reply
+    reply_id = review.get_reply()
+    if reply_id is None:
+        return {
+                'rid': "-1",
+                'reviewer': "-1",
+                'service': "-1",
+                'comment': "-1",
+                'timestamp': "-1",
+                'edited': False,
+                'e_timestamp': "-1",
+            }
+    
+    reply = data_store.get_reply_by_id(reply_id)
+    if reply is None:
+        raise HTTPException(status_code=404, detail='eply not found')
+
     return reply.to_json()

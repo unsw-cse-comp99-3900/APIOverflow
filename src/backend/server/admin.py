@@ -9,6 +9,7 @@ from src.backend.database import *
 from src.backend.classes.Manager import manager
 from src.backend.classes.Service import PENDING_OPTIONS
 from src.backend.server.email import send_email
+from src.backend.server.user import user_delete_association
 
 T = TypeVar("T")
 ADMIN = 'admin'
@@ -23,12 +24,15 @@ def is_valid_user(uid: str):
         raise HTTPException(status_code=404, detail='No user found with given uid')
 
 
-def promote_user(uid: str):
+def promote_user(uid: str, is_super: bool):
     is_valid_user(uid)
     user = data_store.get_user_by_id(uid)
     if user.get_is_admin():
         raise HTTPException(status_code=400, detail=f"User {user.get_name()} is already an admin.")
-    user.promote_to_admin()
+    if is_super:
+        user.promote_to_admin()
+    else:
+        raise HTTPException(status_code=403, detail="Only Superadmin can promote users.")
     db_update_user(uid, user.to_json())
     username = user.get_name()
     return {"name": username, "status": user.get_is_admin()}
@@ -54,6 +58,7 @@ def delete_user(uid: str, is_super: bool):
     target_is_super = user.get_is_super()
     target_is_admin = user.get_is_admin()
     if (is_super and not target_is_super):
+        user_delete_association(uid)
         data_store.delete_item(uid, 'user')
         db_status = db_delete_user(username)
     else:
@@ -62,6 +67,7 @@ def delete_user(uid: str, is_super: bool):
         elif target_is_admin:
             raise HTTPException(status_code=403, detail="Admins cannot delete other Admins.")
         else:
+            user_delete_association(uid)
             data_store.delete_item(uid, 'user')
             db_status = db_delete_user(username)
     action = "admin"

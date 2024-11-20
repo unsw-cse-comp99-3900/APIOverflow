@@ -28,7 +28,6 @@ const MyApiPage: React.FC = () => {
         const data = await getApi(id);
         const iconURL = await apiGetIcon(id);
         setApi(data);
-        console.log(data);
         setIconURL(iconURL);
       } catch (error) {
         console.log("Error fetching data", error);
@@ -62,7 +61,7 @@ const MyApiPage: React.FC = () => {
             <ApiGeneralInfo
               apiId={api.id}
               apiName={api.name}
-              iconURL={api.icon_url}
+              iconURL={iconURL}
               ownerName={api.owner.name}
               payModel={api.pay_model}
               tags={api.tags}

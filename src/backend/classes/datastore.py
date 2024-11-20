@@ -29,6 +29,7 @@ schema = {
     'max_user_count' : 0,
     'apis' : [],
     'api_count' : 0,
+    'max_api_count': 0,
     'tags' : DEFAULT_TAGS.copy(),
     'tag_count' : len(DEFAULT_TAGS),
     'max_tag_count': len(DEFAULT_TAGS),
@@ -86,6 +87,7 @@ class Datastore:
         '''
         self.__store['apis'].append(api)
         self.__store['api_count'] += 1
+        self.__store['max_api_count'] += 1
 
     def add_tag(self, tag: T) -> Union[None, T]:
         '''
@@ -184,10 +186,16 @@ class Datastore:
         # Screen for unapproved services
         output = []
         for tag in tags:
-            for service in tag.get_servers():
-                if service.get_status() == LIVE:
+            for _service in tag.get_servers():
+                service = self.get_api_by_id(_service)
+                if service.get_status().value == LIVE:
                     output.append(tag)
         
+        if len(output) < num:
+            return {
+                'tags': [tag.to_json() for tag in output]
+            }
+
         return {
             'tags': [tag.to_json() for tag in output[:num]]
         }
@@ -297,6 +305,12 @@ class Datastore:
             Returns max number of users
         '''
         return self.__store['max_user_count']
+    
+    def max_num_apis(self) -> int:
+        '''
+            Returns max number of apis
+        '''
+        return self.__store['max_api_count']
 
     def num_apis(self) -> int:
         '''

@@ -1,4 +1,5 @@
 from datetime import datetime
+import pytz
 
 class Comment:
 
@@ -25,7 +26,8 @@ class Comment:
         self._content = body
 
         # Internal timestamp
-        self._timestamp = datetime.now()
+        self._tz = pytz.timezone('Australia/Sydney')
+        self._timestamp = datetime.now(self._tz)
         self._edited = False
         self._e_timestamp = None
 
@@ -38,7 +40,7 @@ class Comment:
         '''
         self._content = body
         self._edited = True
-        self._e_timestamp = datetime.now()
+        self._e_timestamp = datetime.now(self._tz)
 
     #############################
     #   Get methods
@@ -71,7 +73,7 @@ class Comment:
         '''
             Returns timestamp of comment when created
         '''
-        return self._timestamp.strftime("%-I:%M%p on %-d %b %Y")
+        return self._timestamp.strftime("%-I:%M%p AEST on %-d %b %Y")
     
     def is_edited(self) -> bool:
         '''
@@ -85,4 +87,4 @@ class Comment:
         '''
         if self._e_timestamp is None:
             return None
-        return self._e_timestamp.strftime("%-I:%M%p on %-d %b %Y")
+        return self._e_timestamp.strftime("%-I:%M%p AEST on %-d %b %Y")

@@ -125,6 +125,18 @@ class Review(Comment):
             Returns reply if any
         '''
         return self._reply
+    
+    def get_upvote_ids(self):
+        '''
+            Gets review's upvotes ids
+        '''
+        return self._upvote
+    
+    def get_downvote_ids(self):
+        '''
+            Gets review's downvotes ids
+        '''
+        return self._downvote
 
     #############################
     #   JSON methods
@@ -139,10 +151,14 @@ class Review(Comment):
         if brief:
             return {
                 'rid': self._id,
+                'reviewer': self.get_owner(),
                 'service': self._service,
+                'comment': self.get_content(),
                 'type': self._rating,
                 'timestamp': self.get_timestamp(),
-                'e_timestamp': self.get_e_timestamp()
+                'e_timestamp': self.get_e_timestamp(),
+                'upvotes': self.get_upvote(),
+                'downvotes': self.get_downvote()
             }
         
         reply = None if self._reply is None else self._reply
@@ -152,7 +168,6 @@ class Review(Comment):
                 voted = 'up'
             elif uid in self._downvote:
                 voted = 'down'
-
         return {
                 'rid': self._id,
                 'reviewer': self._owner,
@@ -163,7 +178,7 @@ class Review(Comment):
                 'downvotes': len(self._downvote),
                 'timestamp': self.get_timestamp(),
                 'edited': self.is_edited(),
-                'e_timestamp': self.get_content(),
+                'e_timestamp': self.get_e_timestamp(),
                 'reply' : reply,
                 'voted' : voted
             }

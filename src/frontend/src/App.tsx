@@ -25,7 +25,12 @@ import ReviewManagement from "./pages/ReviewManagement";
 import ServiceManagement from "./pages/ServiceManagement";
 import UserManagement from "./pages/UserManagement";
 import MyProfilePage from "./pages/UserProfilePage";
+import PasswordResetRequest from './components/PasswordResetRequest';
+import PasswordReset from './components/PasswordReset';
+
 import VerificationPage from "./pages/VerificationPage";
+import MyReviewsPage from "./pages/MyReviewsPage";
+import MyRepliesPage from "./pages/MyRepliesPage";
 
 const UserProtectedRoute = () => {
   const auth = useAuth();
@@ -75,7 +80,9 @@ const App = () => {
           <Route path="/apis" element={<TagsSidebarLayout />}>
             <Route path="/apis" element={<APIsPage />} />
           </Route>
-
+          <Route path="/forgot-password" element={<PasswordResetRequest />} />
+          <Route path="/reset-password/:token" element={<PasswordReset />} />
+          <Route path="/verified-password-reset" element={<PasswordReset />} />
           <Route element={<UserProtectedRoute />}>
             <Route path="/profile" element={<UserSidebarLayout />}>
               <Route element={<AdminProtectedRoute />}>
@@ -89,6 +96,8 @@ const App = () => {
               <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
               <Route path="/profile/add-api" element={<AddApiPage />} />
               <Route path="/profile/my-apis/:id/edit" element={<EditApiPage />}/>
+              <Route path="/profile/my-reviews" element={<MyReviewsPage/>}/>
+              <Route path="/profile/my-replies" element={<MyRepliesPage/>}/>
             </Route>
           </Route>
           <Route path="/*" element={<NotFoundPage />} />
