@@ -108,8 +108,8 @@ def create_users(n):
             f"user{i}",
             manager.hash_password(f"user{i}password"),
             f"user{i}@example.com",
-            True,
-            True
+            False,
+            False
         )
         user.verify_user()
         db_add_user(user.to_json())
@@ -138,7 +138,7 @@ def import_dummy_data():
         'description': 'This is a test API',
         'tags': ['API', 'Microservice'],
         'endpoints': [post_endpoint.model_dump()],
-        'version_name': "some_version_name",
+        'version_name': "v0.6.9",
         'version_description': "This is the initial version of the Test API"
     }
 
@@ -173,8 +173,13 @@ def import_dummy_data():
         'version_name': "v2.0",
         'version_description': "Comprehensive API with full CRUD support"
     }
+
     api_infos = [api_info1, api_info2, api_info3, api_info4]
 
+    for api_info in api_infos:
+        for tag in api_info['tags']:
+            data_store.add_tag(tag)
+            
     services = [
         ServiceAdd(
             name=api_info['name'],
@@ -188,49 +193,85 @@ def import_dummy_data():
     service_requests = [service.model_dump() for service in services]
 
     sid1 = add_service_wrapper(service_requests[0], user1)
+    approve_service(sid1, 'first api ever', True, api_info1)
 
-    request = {
-        'sid': sid1,
-        'reason': 'first api ever',
-        'approved': True,
-        'version_name': api_info1["version_name"],
-        'service_global': True
-    }
-    approve_service_wrapper(request["sid"],
-                           request["approved"],
-                           request["reason"],
-                           request["service_global"],
-                           request["version_name"]
-                           )
-    package = {
-        'sid': sid1,
-        'rating': 'positive',
-        'comment': 'it is ok'
-    }
-    review1 = ServiceReviewInfo(
-        sid=package['sid'],
-        rating=package['rating'],
-        comment=package['comment']
+    add_service_review(user2.get_id(), sid1, 'positive', 'it is ok')
+
+    add_reply('0', 'why are you so mean to me', user1)
+
+    api_info1_new_version = ServiceAddVersion(
+        sid=sid1,
+        version_name="v1.0.1",
+        endpoints=[
+            Endpoint(**endpoint) for endpoint in api_info3['endpoints']
+        ],
+        version_description="Major update with enhanced operations"
     )
-    service_add_review_wrapper(user2.get_id(), review1)
+    request_info1 = api_info1_new_version.model_dump()
+    add_new_service_version_wrapper(request_info1)
 
     sid2 = add_service_wrapper(service_requests[0], user2)
 
-    request = {
-        'sid': sid2,
-        'reason': 'someone already uploaded this',
-        'approved': False,
-        'version_name': api_info1["version_name"],
-        'service_global': True
-    }
-    approve_service_wrapper(request["sid"],
-                           request["approved"],
-                           request["reason"],
-                           request["service_global"],
-                           request["version_name"]
-                           )
+    approve_service(sid2, 'someone already uploaded this', False, api_info1)
     
     sid3 = add_service_wrapper(service_requests[1], user3)
     sid4 = add_service_wrapper(service_requests[2], user4)
     sid5 = add_service_wrapper(service_requests[3], user5)
+    approve_service(sid5, 'very unique service, approved', True, api_info4)
+
+    add_service_review(user1.get_id(), sid5, 'positive', 'wow, very good')
+    add_service_review(user2.get_id(), sid5, 'positive', 'this changed my life for the better')
+    add_service_review(user3.get_id(), sid5, 'negative', 'overrated')
+    add_reply('3', 'I am an admin and I will delete your account', user5)
+    add_service_review(user4.get_id(), sid5, 'negative', '@superadmin')
+    review_vote_wrapper('3', superadmin.get_id(), 'positive')
+    review_vote_wrapper('3', user1.get_id(), 'positive')
+    review_vote_wrapper('3', user2.get_id(), 'positive')
+
+    api_info4_update_version = ServiceUpdateVersion(
+        sid=sid5,
+        version_name="v2.0",
+        new_version_name="v2.5",
+        endpoints=[
+            Endpoint(**endpoint) for endpoint in api_info4['endpoints']
+        ],
+        version_description="Minor update to add support for all methods"
+    )
+    request_info4 = api_info4_update_version.model_dump()
+    update_new_service_version_wrapper(request_info4)
+
+def add_service_review(user_id, sid, rating, comment):
+    package = {
+        'sid': sid,
+        'rating': rating,
+        'comment': comment
+    }
+    review = ServiceReviewInfo(
+        sid=package['sid'],
+        rating=package['rating'],
+        comment=package['comment']
+    )
+    service_add_review_wrapper(user_id, review)
+
+def approve_service(sid, reason, approve, api_info):
+    request = {
+        'sid': sid,
+        'reason': reason,
+        'approved': approve,
+        'version_name': api_info["version_name"],
+        'service_global': True
+    }
+    approve_service_wrapper(sid=request["sid"],
+                           approved=request["approved"],
+                           reason=request["reason"],
+                           service_global=request["service_global"],
+                           version=request["version_name"]
+                           )
+    
+def add_reply(rid, content, user):
+    info = ReviewPackage(
+        rid=rid,
+        content=content
+    )
+    review_add_reply_wrapper(info.rid, user.get_id(), info.content)
 

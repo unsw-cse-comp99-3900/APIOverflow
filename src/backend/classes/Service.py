@@ -566,7 +566,7 @@ class Service:
         versions = [ver for ver in self._version_info if ver._version_name == version]
 
         if len(versions) == 0:
-            raise HTTPException(status_code=404, detail="Service version {version} not found in service")
+            raise HTTPException(status_code=404, detail=f"Service version {version} not found in service")
         return versions[0]
 
     def get_all_versions(self) -> List[ServiceVersionInfo]:
