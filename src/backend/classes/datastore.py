@@ -29,6 +29,7 @@ schema = {
     'max_user_count' : 0,
     'apis' : [],
     'api_count' : 0,
+    'max_api_count': 0,
     'tags' : DEFAULT_TAGS.copy(),
     'tag_count' : len(DEFAULT_TAGS),
     'max_tag_count': len(DEFAULT_TAGS),
@@ -86,6 +87,7 @@ class Datastore:
         '''
         self.__store['apis'].append(api)
         self.__store['api_count'] += 1
+        self.__store['max_api_count'] += 1
 
     def add_tag(self, tag: T) -> Union[None, T]:
         '''
@@ -303,6 +305,12 @@ class Datastore:
             Returns max number of users
         '''
         return self.__store['max_user_count']
+    
+    def max_num_apis(self) -> int:
+        '''
+            Returns max number of apis
+        '''
+        return self.__store['max_api_count']
 
     def num_apis(self) -> int:
         '''

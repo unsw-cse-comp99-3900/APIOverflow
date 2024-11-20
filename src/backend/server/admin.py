@@ -9,6 +9,7 @@ from src.backend.database import *
 from src.backend.classes.Manager import manager
 from src.backend.classes.Service import PENDING_OPTIONS
 from src.backend.server.email import send_email
+from src.backend.server.user import user_delete_association
 
 T = TypeVar("T")
 ADMIN = 'admin'
@@ -57,6 +58,7 @@ def delete_user(uid: str, is_super: bool):
     target_is_super = user.get_is_super()
     target_is_admin = user.get_is_admin()
     if (is_super and not target_is_super):
+        user_delete_association(uid)
         data_store.delete_item(uid, 'user')
         db_status = db_delete_user(username)
     else:
@@ -65,6 +67,7 @@ def delete_user(uid: str, is_super: bool):
         elif target_is_admin:
             raise HTTPException(status_code=403, detail="Admins cannot delete other Admins.")
         else:
+            user_delete_association(uid)
             data_store.delete_item(uid, 'user')
             db_status = db_delete_user(username)
     action = "admin"

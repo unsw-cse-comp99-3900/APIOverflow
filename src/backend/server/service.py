@@ -15,6 +15,7 @@ from src.backend.classes.models import ServiceReviewInfo
 from src.backend.classes.Review import Review
 import re
 from src.backend.server.email import send_email
+from src.backend.server.review import review_delete_wrapper
 
 
 # Ollama information
@@ -71,7 +72,7 @@ def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
                     detail="Must input at least 1 endpoint")
 
     # Create new API
-    new_api = API(str(data_store.num_apis()),
+    new_api = API(str(data_store.max_num_apis()),
                     packet['name'],
                     user,
                     internal_url,
@@ -82,9 +83,10 @@ def add_service_wrapper(packet: dict[T, K], user: User) -> dict[T, K]:
                     packet['version_description'],
                     pay_model=packet['pay_model']
                     )
-    
+
     data_store.add_api(new_api)
     db_add_service(new_api.to_json())
+    user.add_service(new_api.get_id())
     return str(new_api.get_id())
 
 def update_service_wrapper(packet: dict[T, K]) -> None:
@@ -262,19 +264,25 @@ def get_doc_wrapper(doc_id: str) -> FileResponse:
    return FileResponse(doc.get_path())
 
 
-def delete_service(sid: str):
+def delete_service(sid: str, uid: str, is_admin: bool):
     if sid == '':
         raise HTTPException(status_code=400, detail='No service id provided')
 
     service = data_store.get_api_by_id(sid)
     if service is None:
         raise HTTPException(status_code=404, detail='No service found with given sid')
+    
+    if service.get_owner().get_id() != uid and not is_admin:
+        raise HTTPException(status_code=403, detail="No permission to delete review")
     service_name = service.get_name()
     
     # Disassociate server from tag
     for _tag in service.get_tags():
         tag = data_store.get_tag_by_name(_tag)
         tag.remove_server(sid)
+
+    for _review in service.get_reviews():
+        review_delete_wrapper(_review, '0', True)
 
     data_store.delete_item(sid, 'api')
     db_status = db_delete_service(service_name)

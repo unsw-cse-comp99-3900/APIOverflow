@@ -17,3 +17,6 @@ jobs:
     # - name: Run tests
     #   run: docker compose up --abort-on-container-exit
 
+    - name: Exit
+      if: success() || failure()
+      run: docker compose down

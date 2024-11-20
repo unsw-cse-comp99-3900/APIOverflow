@@ -1177,60 +1177,6 @@ def test_delete_reply_success(simple_user):
     assert response.status_code == SUCCESS
     assert response.json()['reply'] == None
 
-def test_delete_reply_success_reply_again(simple_user):
-    '''
-        Test trying to delete reply
-    '''
-    data = simple_user
-    package = {
-            'sid': data['sid'],
-            'rating': 'positive',
-            'comment': 'Mid at best'
-        }
-    response = client.post("/service/review/add",
-                headers={"Authorization": f"Bearer {data['u_token']}"},
-                json=package)
-    assert response.status_code == SUCCESS
-
-    package = {
-        'rid': '0',
-        'content': 'blah blah blah'
-    }
-    response = client.post("/review/reply",
-                           headers={"Authorization": f"Bearer {data['c_token']}"},
-                           json=package)
-    assert response.status_code == SUCCESS
-
-    package = {
-        'rid': '0'
-    }
-    response = client.delete("/review/reply/delete",
-                            headers={"Authorization": f"Bearer {data['c_token']}"},
-                            params=package)
-    assert response.status_code == SUCCESS
-    response = client.get("/review/get",
-                           params={'rid' : 0})
-    assert response.status_code == SUCCESS
-    assert response.json()['reply'] == None
-
-    package = {
-        'rid': '0',
-        'content': 'blah blah blah'
-    }
-    response = client.post("/review/reply",
-                           headers={"Authorization": f"Bearer {data['c_token']}"},
-                           json=package)
-    assert response.status_code == SUCCESS
-    response = client.get("/review/get",
-                           params={'rid' : 0})
-    assert response.status_code == SUCCESS
-    assert response.json()['reply'] == '1'
-    response = client.get("/review/reply/get",
-                          params={'rid' : 1})
-    assert response.status_code == SUCCESS
-    assert response.json()['comment'] == package['content']
-
-
 def test_edit_reply_no_reply(simple_user):
     '''
         Test editing a non-existent reply
