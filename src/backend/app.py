@@ -7,7 +7,7 @@ from src.backend.classes.models import *
 from src.backend.server.service import *
 from src.backend.classes.datastore import data_store as ds
 from src.backend.server.auth import *
-from src.backend.classes.Manager import manager as _manager, blacklisted_tokens, TOKEN_DURATION, clear_blacklist
+from src.backend.classes.Manager import manager as _manager, blacklist_user_token, clear_blacklist
 from src.backend.database import db
 from src.backend.server.tags import *
 from src.backend.server.admin import *
@@ -244,11 +244,11 @@ async def search(
 
 
 @app.delete("/service/delete")
-async def delete_api(sid: str):
+async def delete_api(sid: str, user: User = Depends(manager)):
    """
        Delete an API service by its service id (id).
    """
-   return delete_service(sid)
+   return delete_service(sid, user['id'], user['is_admin'])
 
 
 @app.post("/service/add_icon")
@@ -433,6 +433,12 @@ async def review_reply_get(rid: str):
    '''
    return review_get_reply_wrapper(rid)
 
+@app.get("/review/get/replies")
+async def review_replies_get(rid: str):
+   '''
+    Endpoint which retrivees all comments underneath a review
+   '''
+   return review_get_comments_wrapper(rid)
 
 #####################################
 #   Auth Paths
@@ -513,10 +519,8 @@ async def logout(user: User = Depends(manager)):
    '''
        Blacklist a user's current token and logs them out
    '''
-   user = data_store.get_user_by_id(user['id'])
-   token = user.get_token()
-   expiration_time = datetime.now(timezone.utc) + TOKEN_DURATION
-   blacklisted_tokens[token] = expiration_time
+   uid = user['id']
+   blacklist_user_token(uid)
    return {"message": "Successfully logged out"}
 
 

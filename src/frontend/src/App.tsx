@@ -25,6 +25,9 @@ import ReviewManagement from "./pages/ReviewManagement";
 import ServiceManagement from "./pages/ServiceManagement";
 import UserManagement from "./pages/UserManagement";
 import MyProfilePage from "./pages/UserProfilePage";
+import PasswordResetRequest from './components/PasswordResetRequest';
+import PasswordReset from './components/PasswordReset';
+
 import VerificationPage from "./pages/VerificationPage";
 import MyReviewsPage from "./pages/MyReviewsPage";
 import MyRepliesPage from "./pages/MyRepliesPage";
@@ -77,7 +80,9 @@ const App = () => {
           <Route path="/apis" element={<TagsSidebarLayout />}>
             <Route path="/apis" element={<APIsPage />} />
           </Route>
-
+          <Route path="/forgot-password" element={<PasswordResetRequest />} />
+          <Route path="/reset-password/:token" element={<PasswordReset />} />
+          <Route path="/verified-password-reset" element={<PasswordReset />} />
           <Route element={<UserProtectedRoute />}>
             <Route path="/profile" element={<UserSidebarLayout />}>
               <Route element={<AdminProtectedRoute />}>

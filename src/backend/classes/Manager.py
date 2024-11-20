@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from src.backend.classes.datastore import data_store
 from src.backend.database import *
-from datetime import timedelta
+from datetime import datetime, timezone, timedelta
 
 TOKEN_DURATION = timedelta(days=1)     # 1 day expiration
 blacklisted_tokens = {}
@@ -12,7 +12,13 @@ blacklisted_tokens = {}
 def clear_blacklist():
     blacklisted_tokens.clear()
     print("Blacklist cleared.")
-    
+
+def blacklist_user_token(uid: str):
+    user = data_store.get_user_by_id(uid)
+    token = user.get_token()
+    expiration_time = datetime.now(timezone.utc) + TOKEN_DURATION
+    blacklisted_tokens[token] = expiration_time
+
 class Manager:
     '''
         Class which handles session-management and password security

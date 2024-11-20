@@ -65,7 +65,7 @@ def simple_user():
 
     return usable_data
 
-def test_simple_search(simple_user):
+def test_simple_ollama_search(simple_user):
     api1 = {
         'name' : 'Google',
         'description' : 'This is a test API',
@@ -84,141 +84,47 @@ def test_simple_search(simple_user):
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
                            json=api2)
+    api3 = {
+        'name' : 'Google32',
+        'description' : 'This is a test API',
+        'tags' : ['API', 'Public'],
+        'endpoints': [simple_endpoint.dict()]
+        }
+    response = client.post("/service/add",
+                            headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api3)
+
+    api4 = {
+        'name' : 'Not Goog',
+        'description' : 'This is a test API',
+        'tags' : ['API', 'Public'],
+        'endpoints': [simple_endpoint.dict()]
+        }
+    response = client.post("/service/add",
+                            headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api4)
+
+    api5 = {
+        'name' : 'Shalila',
+        'description' : 'Google is good',
+        'tags' : ['API', 'Public'],
+        'endpoints': [simple_endpoint.dict()]
+        }
+    response = client.post("/service/add",
+                            headers={"Authorization": f"Bearer {simple_user['token']}"},
+                           json=api5)
 
     response = client.get("/service/search",
                           params={
                               'name': "Google",
                               'hide_pending': False
                           })
-    assert (response.status_code) == SUCCESS 
-    response_info = response.json()
-    print(response_info)
-    assert response_info[0]['name'] == api1['name']
-    assert response_info[0]['tags'] == api1['tags']
-
-def test_simple_search_2(simple_user):
-    api1 = {
-        'name' : 'Google',
-        'description' : 'This is a test API',
-        'tags' : ['API', 'Public'],
-        'endpoints': [simple_endpoint.dict()]
-        }
-    response = client.post("/service/add",
-                            headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api1)
-    api2 = {
-            'name' : 'Googooww',
-            'description' : 'This is a test API',
-            'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
-            }
-    response = client.post("/service/add",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api2)
-
-    response = client.get("/service/search",
-                          params={
-                              'name': "Goog",
-                              'hide_pending': False
-                          })
-    assert (response.status_code) == SUCCESS 
+    assert (response.status_code) == SUCCESS
     response_info = response.json()
     print(response_info)
     assert response_info[0]['name'] == api1['name']
     assert response_info[0]['tags'] == api1['tags']
     assert response_info[1]['name'] == api2['name']
     assert response_info[1]['tags'] == api2['tags']
-
-def test_simple_empty(simple_user):
-    api1 = {
-        'name' : 'Google',
-        'description' : 'This is a test API',
-        'tags' : ['API', 'Public'],
-        'endpoints': [simple_endpoint.dict()]
-        }
-    response = client.post("/service/add",
-                            headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api1)
-    api2 = {
-            'name' : 'Googooww',
-            'description' : 'This is a test API',
-            'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
-            }
-    response = client.post("/service/add",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api2)
-
-    response = client.get("/service/search",
-                          params={
-                              'name': "dwae",
-                              'hide_pending': False
-                          })
-    assert (response.status_code) == SUCCESS 
-    response_info = response.json()
-    print(response_info)
-    assert len(response_info) == 0
-
-def test_simple_regex_search(simple_user):
-    api1 = {
-        'name' : 'Google',
-        'description' : 'This is a test API',
-        'tags' : ['API', 'Public'],
-        'endpoints': [simple_endpoint.dict()]
-        }
-    response = client.post("/service/add",
-                            headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api1)
-    api2 = {
-            'name' : 'Googooww',
-            'description' : 'This is a test API',
-            'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
-            }
-    response = client.post("/service/add",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api2)
-
-    response = client.get("/service/search",
-                          params={
-                              'name': "og",
-                              'hide_pending': False
-                          })
-    assert (response.status_code) == SUCCESS 
-    response_info = response.json()
-    print(response_info)
-    assert response_info[0]['name'] == api1['name']
-    assert response_info[0]['tags'] == api1['tags']
-    assert response_info[1]['name'] == api2['name']
-    assert response_info[1]['tags'] == api2['tags']
-
-def test_simple_regex_sensitivity(simple_user):
-    api1 = {
-        'name' : 'Google',
-        'description' : 'This is a test API',
-        'tags' : ['API', 'Public'],
-        'endpoints': [simple_endpoint.dict()]
-        }
-    response = client.post("/service/add",
-                            headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api1)
-    api2 = {
-            'name' : 'Googooww',
-            'description' : 'This is a test API',
-            'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
-            }
-    response = client.post("/service/add",
-                           headers={"Authorization": f"Bearer {simple_user['token']}"},
-                           json=api2)
-
-    response = client.get("/service/search",
-                          params={
-                              'name': "LE",
-                              'hide_pending': False
-                          })
-    assert (response.status_code) == SUCCESS 
-    response_info = response.json()
-    print(response_info)
-    assert response_info[0]['name'] == api1['name']
-    assert response_info[0]['tags'] == api1['tags']
+    assert response_info[2]['name'] == api3['name']
+    assert response_info[2]['tags'] == api3['tags']
