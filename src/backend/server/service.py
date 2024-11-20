@@ -14,13 +14,13 @@ from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
 from src.backend.classes.Review import Review
 import re
+import json
+import requests
 from src.backend.server.email import send_email
 from src.backend.server.review import review_delete_wrapper
 
-
-# Ollama information
-OLLAMA_API_KEY = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBqE8KSc69XaJ4GwS37IXdk44ooXGidxNxeaKJNOUm4r'
-OLLAMA_API_URL = 'http://<ip>:11434/api/generate'
+vm_ip = "34.116.117.133"
+url = f"http://{vm_ip}:11434/api/generate"
 
 
 # Constants
@@ -149,17 +149,6 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool, sort_rating:
     api_list = data_store.get_apis()
     filtered_apis = []
 
-    # print(api_list)
-    #query = input("Search")
-
-    #if query != "":
-        # if not empty, then Ollama match
-    #    data = {
-    #        "model": "llama3.2",
-    #        "prompt": query
-    #    }    
-    #    response = requests.post(url, json=data)
-        
     if not tags:
         # if they don't specify any tags, assume all APIs
         for api in api_list:
@@ -208,14 +197,36 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool, sort_rating:
 
 # returns a list of regex matching services 
 def api_name_search(name, hide_pending: bool) -> list: 
+
     api_list = data_store.get_apis()
     return_list: List[dict[str, str]] = []
+    api_names = ""
+
+    for api in api_list:
+        api_names += f"{api.get_name()}, "
+
+    headers = {"Content-Type": "application/json"}
+    data = {
+        "model": "llama3:latest",
+        "prompt": "I'm going to give you a list of titles and a query. I want you to filter all of the titles, and respond "
+        + "only with the titles that: have the query in the title, have any word that is close or a synonym to the query in " 
+        + "the title, have any word that is spelt similarly to the query in the title (including typos, extra numbers or letters, etc.), "
+        + " or has any relevance to the query in the title (i.e. if the title was 'Not Food' and query was 'Food' or 'Cuisine' it should still match). Your response should be comma separated, with no "
+        + f"additional text or explanation. Here's the list: {api_names} and this is the query: {name}"
+    }
+
+    response = requests.post(url, headers=headers, data=json.dumps(data), stream=False)
+    if response:
+        lines = response.text.splitlines()
+        aggregated_message = "".join(json.loads(line)["response"] for line in lines)
+        for name in aggregated_message.split(","):
+            return_list.append(get_service_from_name(name.strip()).to_summary_json())
 
     for api in api_list:
         if re.search(name, api.get_name(), re.IGNORECASE) and (
             api.get_status() in LIVE_OPTIONS or
             api.get_status() == ServiceStatus.PENDING and not hide_pending
-        ):
+        ) and api.to_summary_json() not in return_list:
             return_list.append(api.to_summary_json())
     return return_list
 
@@ -583,3 +594,9 @@ def parse_yaml_to_api(yaml_data: dict, user: User) -> Service:
    data_store.add_api(return_api)
    db_add_service(return_api.to_json())
    return return_api
+
+def get_service_from_name(name: str) -> Service:
+    api_list = data_store.get_apis()
+    for api in api_list:
+        if api.get_name() == name:
+            return api
