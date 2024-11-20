@@ -142,6 +142,13 @@ async def upload_image(file: UploadFile = File(...)):
    doc_id = await upload_img_wrapper(file)
    return {'doc_id': doc_id}
 
+@app.get("/user/get/id")
+async def get_id(user: User = Depends(manager)):
+   '''
+    Returns user's id
+   '''
+   user = data_store.get_user_by_id(user['id'])
+   return {'uid': user.get_id()}
 
 #####################################
 #   Service Paths
@@ -294,7 +301,7 @@ async def api_get_reviews(sid: str, filter: str = '', uid: str = ''):
        Endpoint to retrieve a service's reviews
    '''
    return {
-       'reviews' : service_get_reviews_wrapper(sid, filter, uid)
+       'reviews' : service_get_reviews_wrapper(sid, filter=filter, uid=uid)
    }
 
 

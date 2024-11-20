@@ -64,8 +64,8 @@ const ApiPage: React.FC = () => {
             <ApiGeneralInfo
               apiId={api.id}
               apiName={api.name}
-              iconURL={api.icon_url}
-              ownerName={api.owner.displayName}
+              iconURL={iconURL}
+              ownerName={api.owner.name}
               payModel={api.pay_model}
               tags={api.tags}
               isMyApi={false}

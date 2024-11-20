@@ -26,6 +26,8 @@ import ServiceManagement from "./pages/ServiceManagement";
 import UserManagement from "./pages/UserManagement";
 import MyProfilePage from "./pages/UserProfilePage";
 import VerificationPage from "./pages/VerificationPage";
+import MyReviewsPage from "./pages/MyReviewsPage";
+import MyRepliesPage from "./pages/MyRepliesPage";
 
 const UserProtectedRoute = () => {
   const auth = useAuth();
@@ -89,6 +91,8 @@ const App = () => {
               <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
               <Route path="/profile/add-api" element={<AddApiPage />} />
               <Route path="/profile/my-apis/:id/edit" element={<EditApiPage />}/>
+              <Route path="/profile/my-reviews" element={<MyReviewsPage/>}/>
+              <Route path="/profile/my-replies" element={<MyRepliesPage/>}/>
             </Route>
           </Route>
           <Route path="/*" element={<NotFoundPage />} />

@@ -18,7 +18,6 @@ const FetchStatus: React.FC<FetchStatusProps> = ({
 }) => {
   const navigate = useNavigate();
   const auth = useAuth();
-
   const { logout } = auth!;
   useEffect(() => {
     if (error === "Unauthorized") {
