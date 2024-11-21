@@ -1,7 +1,7 @@
 // src/pages/ServiceManagement.tsx
 
 import React, { useEffect, useState } from "react";
-import NewServiceModal from "../components/PendingServiceModal";
+import PendingNewVersionModal from "../components/PendingNewVersionModal";
 import { getPendingServices } from "../services/apiServices";
 import {
   PendingGeneralInfo,
@@ -90,13 +90,21 @@ const ServiceManagement: React.FC = () => {
         />
       )}
 
+      {filter === "All" && <div className="border border-blue-800 my-10"></div>}
+
       {(filter === "All" || filter === "PendingVersions") && (
-        <PendingVersionsTable pendingVersions={newVersions} />
+        <PendingVersionsTable
+          pendingVersions={newVersions}
+          setCurrentPendingVersion={setSelectedNewVersion}
+        />
       )}
+
+      {filter === "All" && <div className="border border-blue-800 my-10"></div>}
 
       {(filter === "All" || filter === "PendingGeneralInfoUpdates") && (
         <PendingGeneralInfoUpdatesTable
           pendingGeneralInfo={generalInfoUpdates}
+          setCurrentPendingGeneralInfo={setSelectedGeneralInfo}
         />
       )}
 
@@ -104,6 +112,14 @@ const ServiceManagement: React.FC = () => {
         <PendingServiceModal
           pendingService={selectedNewService}
           setCurrentPendingService={setSelectedNewService}
+          refreshData={refreshData}
+        />
+      )}
+
+      {selectedNewVersion && (
+        <PendingNewVersionModal
+          pendingVersion={selectedNewVersion}
+          setCurrentPendingVersion={setSelectedNewVersion}
           refreshData={refreshData}
         />
       )}

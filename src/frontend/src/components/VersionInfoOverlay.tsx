@@ -31,7 +31,12 @@ const VersionInfoOverlay: React.FC<VersionInfoOverlayProps> = ({
     if (versionName.trim() === "") {
       toast.error("Please enter a version name");
       return;
-    } else if (versionDescription.trim() === "") {
+    } else if (versionName.length > 30) {
+      
+      toast.error("Version name must be less than 30 characters");
+      return;
+    }
+     else if (versionDescription.trim() === "") {
       toast.error("Please provide a version description");
       return;
     }

@@ -46,6 +46,7 @@ export type Version = {
 
 export type PendingVersion = Version & {
   id: string;
+  name: string;
 }
 
 export type PendingGeneralInfo = {

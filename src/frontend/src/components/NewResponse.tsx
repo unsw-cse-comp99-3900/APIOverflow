@@ -13,7 +13,7 @@ const NewResponse: React.FC<NewResponseProps> = ({
   responses,
   setResponses,
 }) => {
-  const [code, setCode] = useState<string>("");
+  const [code, setCode] = useState<string>("200");
   const [description, setDescription] = useState<string>("");
   const [currCondition, setCurrCondition] = useState<string>("");
   const [conditions, setConditions] = useState<string[]>([]);

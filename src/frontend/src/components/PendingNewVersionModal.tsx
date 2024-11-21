@@ -1,25 +1,25 @@
-// src/components/ServiceModal.tsx
+// src/components/VersionModal.tsx
 import React, { useEffect, useState } from "react";
-import { PendingNewService } from "../types/apiTypes";
+import { PendingVersion } from "../types/apiTypes";
 import ApiGeneralInfo from "./ApiGeneralInfo";
 import { toast } from "react-toastify";
-import { apiGetIcon, approveNewService } from "../services/apiServices";
+import { apiGetIcon, approveNewVersion } from "../services/apiServices";
 import ApiDescription from "./ApiDescription";
 import VersionFields from "./VersionFields";
 import FetchStatus from "./FetchStatus";
 
-interface PendingServiceModalProps {
-  pendingService: PendingNewService;
+interface PendingVersionModalProps {
+  pendingVersion: PendingVersion;
   refreshData: () => Promise<void>;
-  setCurrentPendingService: React.Dispatch<
-    React.SetStateAction<PendingNewService | null>
+  setCurrentPendingVersion: React.Dispatch<
+    React.SetStateAction<PendingVersion | null>
   >;
 }
 
-const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
-  pendingService,
+const PendingVersionModal: React.FC<PendingVersionModalProps> = ({
+  pendingVersion,
   refreshData,
-  setCurrentPendingService,
+  setCurrentPendingVersion,
 }) => {
   const [reason, setReason] = useState("");
   const [iconURL, setIconURL] = useState<string>("");
@@ -30,7 +30,7 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const iconURL = await apiGetIcon(pendingService.id);
+        const iconURL = await apiGetIcon(pendingVersion.id);
         setIconURL(iconURL);
       } catch (error) {
         console.log("Error fetching data", error);
@@ -60,17 +60,17 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
     }
 
     try {
-      await approveNewService(
-        pendingService.id,
+      await approveNewVersion(
+        pendingVersion.id,
         approval,
         reason,
-        pendingService.version_fields.version_name
+        pendingVersion.version_name
       );
-      toast.success(`Service ${approval ? "approved" : "rejected"} successfully`);
+      toast.success(`Version ${approval ? "approved" : "rejected"} successfully`);
       await refreshData();
-      setCurrentPendingService(null);
+      setCurrentPendingVersion(null);
     } catch (error) {
-      console.log("Error approving service", error);
+      console.log("Error approving version", error);
       if (error instanceof Error) {
         setError(error.message);
       }
@@ -88,39 +88,25 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
           className="overflow-y-auto flex-1 px-6 rounded-lg" // Add scrollable content area
           style={{ maxHeight: "calc(90vh - 120px)" }} // Account for padding and buttons
         >
-          <h1 className="text-2xl text-blue-800 font-bold">Service Approval</h1>
+          <h1 className="text-2xl text-blue-800 font-bold">Version Approval</h1>
           <textarea
             className="w-full h-32 p-2 border rounded-lg mt-6"
-            placeholder={`Reason for accepting/rejecting ${pendingService.name}`}
+            placeholder={`Reason for accepting/rejecting the version`}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
 
           <div className="text-red-500">{warning}</div>
 
-          <ApiGeneralInfo
-            apiId={pendingService.id}
-            apiName={pendingService.name}
-            iconURL={iconURL}
-            ownerName=""
-            payModel={pendingService.pay_model}
-            status={"PENDING"}
-            tags={pendingService.tags}
-            isMyApi={false}
-            rating={"0"}
-            isGettingApproved={true}
-          />
-
-          <ApiDescription description={pendingService.description} />
-
+          
           <VersionFields
             versions={[
               {
-                version_name: pendingService.version_fields.version_name,
+                version_name: pendingVersion.version_name,
                 version_description:
-                  pendingService.version_fields.version_description,
-                docs: pendingService.version_fields.docs,
-                endpoints: pendingService.version_fields.endpoints,
+                  pendingVersion.version_description,
+                docs: pendingVersion.docs,
+                endpoints: pendingVersion.endpoints,
                 newly_created: true,
                 status_reason: "",
                 status: "PENDING",
@@ -132,7 +118,7 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
         <div className="flex justify-between mt-6 ml-6">
           <button
             className="bg-gray-400 hover:bg-gray-500 text-white font-semibold rounded w-20 h-10"
-            onClick={() => setCurrentPendingService(null)}
+            onClick={() => setCurrentPendingVersion(null)}
           >
             Cancel
           </button>
@@ -158,4 +144,4 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
   );
 };
 
-export default PendingServiceModal;
+export default PendingVersionModal;

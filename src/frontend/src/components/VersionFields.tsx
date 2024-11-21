@@ -41,7 +41,6 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     console.log(currVersionName);
   
     const fetchDocs = async () => {
-      console.log(currVersion, currVersionName)
       try {
         if (!currVersion) {
           if (!isCancelled) {
@@ -112,7 +111,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
               <select
                 value={currVersionName}
                 onChange={(e) => setCurrVersionName(e.target.value)}
-                className="p-2 border w-40 rounded-md focus:ring-2 focus:ring-indigo-600"
+                className="p-2 border w-56 rounded-md focus:ring-2 focus:ring-indigo-600"
               >
                 {versions.map((version, index) => (
                   <option key={index} value={version.version_name}>

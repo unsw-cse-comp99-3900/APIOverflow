@@ -22,7 +22,6 @@ import { DetailedApi } from "../types/apiTypes";
 import VersionInfoOverlay from "./VersionInfoOverlay";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
-
   // General Info
   const [api, setApi] = useState<DetailedApi | null>(null);
   const [name, setName] = useState<string>("");
@@ -136,6 +135,9 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
     if (name === "") {
       toast.error("Name cannot be empty");
       return;
+    } else if (name.length > 30) {
+      toast.error("Name cannot be longer than 30 characters");
+      return;
     } else if (description === "") {
       toast.error("Description cannot be empty");
       return;
@@ -174,7 +176,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         navigate(`/profile/my-apis/${apiId}`);
       }
 
-      if (!versionUpdated && !generalInfoUpdated){
+      if (!versionUpdated && !generalInfoUpdated) {
         toast.error("No changes to update");
       }
     }

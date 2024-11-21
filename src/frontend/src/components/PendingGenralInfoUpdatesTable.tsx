@@ -3,11 +3,14 @@ import { PendingGeneralInfo } from "../types/apiTypes";
 
 interface PendingGeneralInfoUpdatesTableProps {
   pendingGeneralInfo: PendingGeneralInfo[];
+  setCurrentPendingGeneralInfo: React.Dispatch<
+    React.SetStateAction<PendingGeneralInfo | null>
+  >;
 }
 
 const PendingGeneralInfoUpdatesTable: React.FC<
   PendingGeneralInfoUpdatesTableProps
-> = ({ pendingGeneralInfo }) => {
+> = ({ pendingGeneralInfo, setCurrentPendingGeneralInfo }) => {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-8 text-blue-800 underline-offset-8">
