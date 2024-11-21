@@ -41,7 +41,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     console.log(currVersionName);
   
     const fetchDocs = async () => {
-      console.log("Fetching docs for", currVersion);
+      console.log(currVersion, currVersionName)
       try {
         if (!currVersion) {
           if (!isCancelled) {
@@ -92,9 +92,13 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     "UPDATE_REJECTED": "text-red-600",
   }
 
+  if (versions.length === 0) {
+    return null;
+  }
+
   return (
     <>
-      <div className=" bg-white rounded-2xl shadow-lg p-6 mt-6">
+      <div className="border-2 border-gray-100 bg-white rounded-2xl shadow-lg p-6 my-6">
         <div className="flex justify-between mb-2">
           <div className="flex justify-between items-center">
             <div className="flex text-xl font-bold">

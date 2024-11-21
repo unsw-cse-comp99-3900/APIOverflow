@@ -63,7 +63,7 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
   };
 
   return (
-    <div className="w-1/3 bg-white rounded-2xl shadow-lg p-6">
+    <div className="border-2 border-gray-100 w-1/3 bg-white rounded-2xl shadow-lg p-6">
       {/* Header with Sort Control */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Reviews</h2>

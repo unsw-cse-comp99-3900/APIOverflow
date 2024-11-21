@@ -2,9 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import NewServiceModal from "../components/PendingServiceModal";
-import {
-  getPendingServices,
-} from "../services/apiServices";
+import { getPendingServices } from "../services/apiServices";
 import {
   PendingGeneralInfo,
   PendingNewService,
@@ -13,6 +11,7 @@ import {
 import PendingServicesTable from "../components/PendingServicesTable";
 import PendingVersionsTable from "../components/PendingVersionsTable";
 import PendingGeneralInfoUpdatesTable from "../components/PendingGenralInfoUpdatesTable";
+import PendingServiceModal from "../components/PendingServiceModal";
 
 const ServiceManagement: React.FC = () => {
   // services waiting for approval
@@ -32,15 +31,8 @@ const ServiceManagement: React.FC = () => {
 
   // filter for the services
   const [filter, setFilter] = useState<
-    "All" | "NewServices" | "NewVersions" | "GeneralInfoUpdates"
+    "All" | "PendingServices" | "PendingVersions" | "PendingGeneralInfoUpdates"
   >("All");
-
-  // modal open state
-  const [isNewServiceModalOpen, setIsNewServiceModalOpen] = useState(false);
-  const [isNewVersionModalOpen, setIsNewVersionModalOpen] = useState(false);
-  const [isGeneralInfoModalOpen, setIsGeneralInfoModalOpen] = useState(false);
-
-  // React Hooks
 
   // Fetch services from the API
   useEffect(() => {
@@ -50,83 +42,69 @@ const ServiceManagement: React.FC = () => {
       setNewServices(data.new_services);
       setNewVersions(data.version_updates);
       setGeneralInfoUpdates(data.global_updates);
-      console.log(data);
     };
     fetchPendingApis();
   }, []);
 
-  const openNewServiceModal = (newService: PendingNewService) => {
-    setSelectedNewService(newService);
-    setIsNewServiceModalOpen(true);
-  };
-
-  const openNewVersionModal = (version: PendingVersion) => {
-    setSelectedNewVersion(version);
-    setIsNewVersionModalOpen(true);
-  };
-
-  const openGeneralInfoModal = (generalInfo: PendingGeneralInfo) => {
-    setSelectedGeneralInfo(generalInfo);
-    setIsGeneralInfoModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setSelectedNewService(null);
-    setSelectedNewVersion(null);
-    setSelectedGeneralInfo(null);
-    setIsNewServiceModalOpen(false);
-    setIsGeneralInfoModalOpen(false);
-    setIsNewVersionModalOpen(false);
+  const refreshData = async () => {
+    const data = await getPendingServices();
+    setNewServices(data.new_services);
+    setNewVersions(data.version_updates);
+    setGeneralInfoUpdates(data.global_updates);
   };
 
   return (
-    <div className="p-12">
-      <div></div>
-      <label className="mr-2 text-gray-700 font-semibold">Filter:</label>
-      <select
-        value={filter}
-        onChange={(e) =>
-          setFilter(
-            e.target.value as
-              | "All"
-              | "NewServices"
-              | "NewVersions"
-              | "GeneralInfoUpdates"
-          )
-        }
-        className="p-2 border rounded-md w-48 h-10"
-      >
-        <option className="border rounded-md" value="All">
-          All
-        </option>
-        <option className="border rounded-md" value="newServices">
-          New Services
-        </option>
-        <option value="newVersions">New Versions</option>
-        <option value="generalInfoUpdates">General Info Updates</option>
-      </select>
+    <div className="container-xl lg:container mx-auto p-10">
+      <div className="flex justify-end items-center mb-4">
+        <label className="mr-2 text-gray-700 font-semibold">Filter:</label>
+        <select
+          value={filter}
+          onChange={(e) =>
+            setFilter(
+              e.target.value as
+                | "All"
+                | "PendingServices"
+                | "PendingVersions"
+                | "PendingGeneralInfoUpdates"
+            )
+          }
+          className="p-2 border rounded-md w-48 h-10"
+        >
+          <option className="border rounded-md" value="All">
+            All
+          </option>
+          <option className="border rounded-md" value="PendingServices">
+            Pending New Services
+          </option>
+          <option value="PendingVersions">Pending Versions</option>
+          <option value="PendingGeneralInfoUpdates">
+            Pending General Info Updates
+          </option>
+        </select>
+      </div>
 
-      {(filter === "All" || filter === "NewServices") && (
+      {(filter === "All" || filter === "PendingServices") && (
         <PendingServicesTable
           pendingServices={newServices}
-          openModal={openNewServiceModal}
-          closeModal={closeModal}
+          setCurrentPendingService={setSelectedNewService}
         />
       )}
 
-      {(filter === "All" || filter === "NewServices") && (
-        <PendingVersionsTable
-          pendingVersions={newVersions}
-          openModal={openNewVersionModal}
-          closeModal={closeModal}
-        />
+      {(filter === "All" || filter === "PendingVersions") && (
+        <PendingVersionsTable pendingVersions={newVersions} />
       )}
 
-      {(filter === "All" || filter === "GeneralInfoUpdates") && (
+      {(filter === "All" || filter === "PendingGeneralInfoUpdates") && (
         <PendingGeneralInfoUpdatesTable
           pendingGeneralInfo={generalInfoUpdates}
-          openModal={openGeneralInfoModal}
-          closeModal={closeModal}
+        />
+      )}
+
+      {selectedNewService && (
+        <PendingServiceModal
+          pendingService={selectedNewService}
+          setCurrentPendingService={setSelectedNewService}
+          refreshData={refreshData}
         />
       )}
     </div>

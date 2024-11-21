@@ -17,6 +17,7 @@ interface ApiGeneralInfoProps {
   tags: string[];
   isMyApi: boolean;
   rating: string;
+  isGettingApproved?: boolean;
 }
 
 const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
@@ -29,6 +30,7 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
   tags,
   isMyApi,
   rating,
+  isGettingApproved,
 }) => {
   const bgColor = {
     Free: "bg-blue-500",
@@ -57,8 +59,8 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
   }
 
   return (
-    <div className="mx-auto max-w-[100rem] relative bg-white rounded-2xl shadow-lg p-10">
-      <div className="flex items-center">
+    <div className=" border-2 border-gray-100 bg-white rounded-2xl shadow-lg p-10 my-6">
+      <div className="flex items-center ">
         <div className="flex flex-shrink-0 items-center">
           <img
             className="w-56 h-56 rounded-full object-cover mx-auto border-2 border-gray-300"
@@ -69,7 +71,7 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
 
         <div className="ml-10 w-full">
           <div className="flex items-center">
-            <h1 className="text-4xl font-bold mb-2">{apiName}</h1>
+            <h1 className="text-4xl font-bold">{apiName}</h1>
             <div
               className={`flex items-center ${bgColor[payModel]} rounded-md mx-3 px-2`}
             >
@@ -80,27 +82,30 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
               )}
               <span className="text-white text-lg font-medium">{payModel}</span>
             </div>
-            <div className="absolute top-24 right-8 flex space-x-2">
-              <div>
-                <div
-                  className={`flex items-center ${ratingCol} rounded-md mx-5 px-3`}
-                >
-                  {numRating < 0 && (
-                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
-                      <FaThumbsDown />
-                    </div>
-                  )}
-                  {numRating >= 0 && (
-                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
-                      <FaThumbsUp />
-                    </div>
-                  )}
-                  <span className="text-white text-md font-medium">
-                    {displayRating}
-                  </span>
+
+            {!isGettingApproved && (
+              <div className="absolute top-24 right-8 flex space-x-2">
+                <div>
+                  <div
+                    className={`flex items-center ${ratingCol} rounded-md mx-5 px-3`}
+                  >
+                    {numRating < 0 && (
+                      <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                        <FaThumbsDown />
+                      </div>
+                    )}
+                    {numRating >= 0 && (
+                      <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                        <FaThumbsUp />
+                      </div>
+                    )}
+                    <span className="text-white text-md font-medium">
+                      {displayRating}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* <div className="flex justify-between my-2">
@@ -109,12 +114,16 @@ const ApiGeneralInfo: React.FC<ApiGeneralInfoProps> = ({
               status: {status}
             </div>
           </div> */}
-          <div className="text-gray-600">{`By: ${ownerName}`}</div>
+
+          {!isGettingApproved && (
+            <div className="text-gray-600">{`By: ${ownerName}`}</div>
+          )}
           <div className={`font-semibold my-2 ${textColor[status]}`}>
             status: {status}
           </div>
+
           <div className="border border-gray-100 w-full"></div>
-          <div className="flex flex-wrap max-w-3xl mt-4 mb-5">
+          <div className="flex flex-wrap max-w-3xl mt-6 mb-5">
             {tags.map((tag, index) => (
               <Tag key={index} tag={tag} className="mr-3 mb-2" />
             ))}

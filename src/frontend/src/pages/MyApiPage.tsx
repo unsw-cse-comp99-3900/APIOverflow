@@ -57,21 +57,23 @@ const MyApiPage: React.FC = () => {
         {api && (
           <div className="p-10">
             {/* Header Section */}
-            <ApiGeneralInfo
-              apiId={api.id}
-              status={api.status}
-              apiName={api.name}
-              iconURL={iconURL}
-              ownerName={api.owner.name}
-              payModel={api.pay_model}
-              tags={api.tags}
-              isMyApi={true}
-              rating={String(Number(api.upvotes) - Number(api.downvotes))}
-            />
 
+            <div className="mx-auto max-w-[100rem] relative">
+              <ApiGeneralInfo
+                apiId={api.id}
+                status={api.status}
+                apiName={api.name}
+                iconURL={iconURL}
+                ownerName={api.owner.name}
+                payModel={api.pay_model}
+                tags={api.tags}
+                isMyApi={true}
+                rating={String(Number(api.upvotes) - Number(api.downvotes))}
+              />
+            </div>
             <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
               <div className="w-2/3">
-                <ApiDescription api={api} />
+                <ApiDescription description={api.description} />
                 <VersionFields versions={api.versions} />
               </div>
               <ApiReviews sid={api.id} />

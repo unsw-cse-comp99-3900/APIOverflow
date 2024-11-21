@@ -4,7 +4,7 @@ import {
   PendingNewService,
 } from "../types/apiTypes";
 
-interface PendingServiceModalProps {
+interface PendingGeneralInfoModalProps {
   isOpen: boolean;
   onRequestClose: () => void;
   modalTitle: string;
@@ -12,7 +12,7 @@ interface PendingServiceModalProps {
   onSubmit: (reason: string) => void;
 }
 
-const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
+const PendingGeneralInfoModal: React.FC<PendingGeneralInfoModalProps> = ({
   isOpen,
   onRequestClose,
   modalTitle,
@@ -63,4 +63,4 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
   );
 };
 
-export default PendingServiceModal;
+export default PendingGeneralInfoModal;

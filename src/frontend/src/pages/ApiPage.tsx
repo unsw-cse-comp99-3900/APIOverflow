@@ -30,7 +30,6 @@ const ApiPage: React.FC = () => {
       try {
         const data = await getApi(id);
         const iconURL = await apiGetIcon(id);
-        console.log(data);
         setApi(data);
         setIconURL(iconURL);
       } catch (error) {
@@ -61,21 +60,27 @@ const ApiPage: React.FC = () => {
       <FetchStatus loading={loading} error={error} data={api}>
         {api && (
           <div className="p-10">
-            <ApiGeneralInfo
-              apiId={api.id}
-              apiName={api.name}
-              iconURL={iconURL}
-              ownerName={api.owner.name}
-              payModel={api.pay_model}
-              status = {api.status}
-              tags={api.tags}
-              isMyApi={false}
-              rating={String(Number(api.upvotes) - Number(api.downvotes))}
-            />
+            <div className="mx-auto max-w-[100rem] relative">
+              <ApiGeneralInfo
+                apiId={api.id}
+                apiName={api.name}
+                iconURL={iconURL}
+                ownerName={api.owner.name}
+                payModel={api.pay_model}
+                status={api.status}
+                tags={api.tags}
+                isMyApi={false}
+                rating={String(Number(api.upvotes) - Number(api.downvotes))}
+              />
+            </div>
             <div className="flex mx-auto max-w-[100rem] mt-10 space-x-10">
               <div className="w-2/3">
-                <ApiDescription api={api} />
-                <VersionFields versions={api.versions.filter((version) => !version.newly_created)} />
+                <ApiDescription description={api.description} />
+                <VersionFields
+                  versions={api.versions.filter(
+                    (version) => !version.newly_created
+                  )}
+                />
               </div>
               <ApiReviews sid={api.id} />
             </div>

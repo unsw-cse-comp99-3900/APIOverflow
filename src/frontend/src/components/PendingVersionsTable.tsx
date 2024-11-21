@@ -3,14 +3,10 @@ import { PendingVersion } from "../types/apiTypes";
 
 interface PendingVersionsTableProps {
   pendingVersions: PendingVersion[];
-  openModal: (generalInfoUpdate: PendingVersion) => void;
-  closeModal: () => void;
 }
 
 const PendingVersionsTable: React.FC<PendingVersionsTableProps> = ({
   pendingVersions,
-  openModal,
-  closeModal,
 }) => {
   return (
     <div>
