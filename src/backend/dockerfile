@@ -33,5 +33,5 @@ ENV TEST ${TEST}
 # pytest -vv tests/file_name.py to test specific file
 # pytest -vv tests/test.py::testfunc to test specific function
 
-CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv tests/test_tags.py::test_ollama_tag_gen; fi
+CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv tests/test_name_search.py; fi
 

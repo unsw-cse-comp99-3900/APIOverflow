@@ -199,30 +199,31 @@ def api_name_search(name, hide_pending: bool) -> list:
 
     api_list = data_store.get_apis()
     return_list: List[dict[str, str]] = []
-    api_names = ""
+    # api_names = ""
+
+    #for api in api_list:
+    #    api_names += f"{api.get_name()}, "
+
+    #headers = {"Content-Type": "application/json"}
+    #data = {
+    #    "model": "llama3:latest",
+    #    "prompt": "I'm going to give you a list of titles and a query. I want you to filter all of the titles, and respond "
+    #    + "only with the titles that: have the query in the title, have any word that is close or a synonym to the query in " 
+    #    + "the title, have any word that is spelt similarly to the query in the title (including typos, extra numbers or letters, etc.), "
+    #    + " or has any relevance to the query in the title (i.e. if the title was 'Not Food' and query was 'Food' or 'Cuisine' it should still match). Your response should be comma separated, with no "
+    #    + f"additional text or explanation. Here's the list: {api_names} and this is the query: {name}"
+    #}
+
+    #response = requests.post(url, headers=headers, data=json.dumps(data), stream=False)
+    #if response:
+    #    lines = response.text.splitlines()
+    #    aggregated_message = "".join(json.loads(line)["response"] for line in lines)
+    #    for name in aggregated_message.split(","):
+    #        return_list.append(get_service_from_name(name.strip()).to_summary_json())
 
     for api in api_list:
-        api_names += f"{api.get_name()}, "
-
-    headers = {"Content-Type": "application/json"}
-    data = {
-        "model": "llama3:latest",
-        "prompt": "I'm going to give you a list of titles and a query. I want you to filter all of the titles, and respond "
-        + "only with the titles that: have the query in the title, have any word that is close or a synonym to the query in " 
-        + "the title, have any word that is spelt similarly to the query in the title (including typos, extra numbers or letters, etc.), "
-        + " or has any relevance to the query in the title (i.e. if the title was 'Not Food' and query was 'Food' or 'Cuisine' it should still match). Your response should be comma separated, with no "
-        + f"additional text or explanation. Here's the list: {api_names} and this is the query: {name}"
-    }
-
-    response = requests.post(url, headers=headers, data=json.dumps(data), stream=False)
-    if response:
-        lines = response.text.splitlines()
-        aggregated_message = "".join(json.loads(line)["response"] for line in lines)
-        for name in aggregated_message.split(","):
-            return_list.append(get_service_from_name(name.strip()).to_summary_json())
-
-    for api in api_list:
-        if re.search(name, api.get_name(), re.IGNORECASE) and (
+        complete_string = api.get_name() + " " + api.get_description()
+        if re.search(name, complete_string, re.IGNORECASE) and (
             api.get_status() in LIVE_OPTIONS or
             api.get_status() in PENDING_OPTIONS and not hide_pending
         ) and api.to_summary_json() not in return_list:
