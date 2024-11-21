@@ -9,21 +9,6 @@ export const briefApiDataFormatter = (data: any) => {
   };
 };
 
-export const detailedApiDataFormatter = (data: any) => {
-  return {
-    id: data.id,
-    name: data.name,
-    description: data.description,
-    owner: data.owner,
-    tags: data.tags,
-    docs: data.versions[0].docs,
-    endpoint: data.versions[0].endpoints[0].link,
-    reviews: data.reviews,
-    upvotes: data.upvotes,
-    type: data.type,
-  };
-};
-
 export const permDataFormatter = (data: any) => {
   return {
     isAdmin: data.is_admin,

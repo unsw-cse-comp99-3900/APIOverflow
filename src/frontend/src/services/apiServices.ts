@@ -820,8 +820,8 @@ export const getReplyService = async (rid: string) => {
   return response.json();
 };
 
-export const getCustomTags = async (option: boolean = false) => {
-  const response = await fetch(`${baseUrl}/tags/get/ranked?num=${10}&custom=${option}`,{
+export const getCustomTags = async () => {
+  const response = await fetch(`${baseUrl}/tags/get/ranked?num=${10}&custom=${true}`,{
     method: "GET",
   });
   const data = await response.json();
