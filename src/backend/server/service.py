@@ -34,7 +34,6 @@ K = TypeVar('K')
 
 # Helper functions
 
-
 def validate_api_fields(packet: dict[T, K]) -> None:
     if packet['name'] == '':
         raise HTTPException(status_code=400, detail='No service name provided')
@@ -187,7 +186,7 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool, sort_rating:
     
     output =  [api.to_summary_json() for api in return_list if
             api.get_status() in LIVE_OPTIONS or 
-            (not hide_pending and api.get_status() == ServiceStatus.PENDING)
+            (not hide_pending and api.get_status() in PENDING_OPTIONS)
             ]
     
     if sort_rating:
@@ -225,7 +224,7 @@ def api_name_search(name, hide_pending: bool) -> list:
     for api in api_list:
         if re.search(name, api.get_name(), re.IGNORECASE) and (
             api.get_status() in LIVE_OPTIONS or
-            api.get_status() == ServiceStatus.PENDING and not hide_pending
+            api.get_status() in PENDING_OPTIONS and not hide_pending
         ) and api.to_summary_json() not in return_list:
             return_list.append(api.to_summary_json())
     return return_list
@@ -257,12 +256,7 @@ async def upload_docs_wrapper(sid: str, uid: str, doc_id: str, version: Optional
    # Add document to service
    service.add_docs([file.get_id()], version)
 
-
    db_update_service(sid, service.to_json())
-
-
-   # db_add_document(sid, file.get_id())
-
 
 def get_doc_wrapper(doc_id: str) -> FileResponse:
    '''
@@ -464,15 +458,13 @@ def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> Li
         if review is None:
             continue
 
-
         reviews.append(review)
 
     # Sorting the review list
     if filter == 'best':
-        review.sort(reverse=True, key=lambda x : x.get_net_vote())
-  
-    if filter == 'worst':
-       review.sort(key=lambda x: x.get_net_vote())
+        reviews.sort(reverse=True, key=lambda x: x.get_net_vote())
+    elif filter == 'worst': 
+        reviews.sort(key=lambda x: x.get_net_vote())
 
     output = []
     for review in reviews:
@@ -482,7 +474,6 @@ def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> Li
         output.append(r)
 
     return output
-
 
 
 def approve_service_wrapper(sid: str, approved: bool, reason: str, service_global: bool, version: Optional[str]):

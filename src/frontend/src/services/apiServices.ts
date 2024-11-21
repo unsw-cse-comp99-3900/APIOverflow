@@ -358,34 +358,35 @@ export const apiAddReview = async (
   }
 };
 
-export const apiGetReviews = async (sid: string, filter: string = '') => {
-  
+export const apiGetReviews = async (sid: string, filter: string = "") => {
+  console.log("apiGetReviews called with:", { sid, filter }); // Debug parameters
+
   let u_toggle;
-  if (localStorage.getItem("token")) { 
-    const res = await fetch(`${baseUrl}/user/get/id`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+  if (localStorage.getItem("token")) {
+    const res = await fetch(`${baseUrl}/user/get/id`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     const data = await res.json();
     u_toggle = data.uid;
   } else {
     u_toggle = "";
-  };
+  }
 
-  console.log(u_toggle);
-  const response = await fetch(
-    `${baseUrl}/service/get/reviews?sid=${sid}&filter=${filter}&uid=${u_toggle}`,
-    {
-      method: "GET",
-    }
-  );
+  console.log("User toggle ID:", u_toggle);
+
+  const url = `${baseUrl}/service/get/reviews?sid=${sid}&filter=${filter}&uid=${u_toggle}`;
+  console.log("Request URL:", url); // Log the request URL
+
+  const response = await fetch(url);
   const data = await response.json();
+  console.log("Response data:", data); // Log the response data
+
   return data.reviews;
 };
+
 
 export const apiGetRating = async (sid: string) => {
   const response = await fetch(`${baseUrl}/service/get/rating?sid=${sid}`, {
@@ -811,3 +812,32 @@ export const getCustomTags = async (option: boolean = false) => {
   const data = await response.json();
   return data.tags;
 }
+
+export const fetchReviews = async (sid: string, filter: boolean = false, sort: 'best' | 'worst' = 'best') => {
+  try {
+    const u_toggle = await userGetId();
+    
+    const url = `${baseUrl}/service/get/reviews?sid=${sid}&filter=${sort}&uid=${u_toggle}`;
+    
+    console.log('Fetching reviews from:', url); // Debug log
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch reviews');
+    }
+
+    const data = await response.json();
+    console.log('Received reviews:', data.reviews); // Debug log
+    return data.reviews;
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    throw error;
+  }
+};
