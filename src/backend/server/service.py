@@ -464,15 +464,13 @@ def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> Li
         if review is None:
             continue
 
-
         reviews.append(review)
 
     # Sorting the review list
     if filter == 'best':
-        review.sort(reverse=True, key=lambda x : x.get_net_vote())
-  
-    if filter == 'worst':
-       review.sort(key=lambda x: x.get_net_vote())
+        reviews.sort(reverse=True, key=lambda x: x.get_net_vote())
+    elif filter == 'worst': 
+        reviews.sort(key=lambda x: x.get_net_vote())
 
     output = []
     for review in reviews:
@@ -482,7 +480,6 @@ def service_get_reviews_wrapper(sid: str, filter: str = '', uid: str = '') -> Li
         output.append(r)
 
     return output
-
 
 
 def approve_service_wrapper(sid: str, approved: bool, reason: str, service_global: bool, version: Optional[str]):
