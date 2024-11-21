@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { DetailedApi } from "../types/apiTypes";
 import VersionInfoOverlay from "./VersionInfoOverlay";
+import UploadModal from "./UploadModal";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
   // General Info
@@ -52,6 +53,8 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
     parameters: [],
     responses: [],
   });
+  const [createModal, setCreateModal] = useState<boolean>(false);
+
 
   // Hooks
   const navigate = useNavigate();
@@ -72,10 +75,16 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         } catch (error) {
           toast.error("Error loading API data");
         }
+      } else {
+        setCreateModal(true);
       }
     };
     fetchApi();
   }, []);
+
+  const handleCloseModal = () => {
+    setCreateModal(false);
+  };
 
   const submitApiOverlay = async () => {
     try {
@@ -259,6 +268,13 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
           submitApi={submitApi}
         />
       </div>
+      {createModal && (
+        <UploadModal
+          isOpen={true}
+          onRequestClose={handleCloseModal}
+          onErrorReset={setCreateModal}
+        />
+      )}
     </div>
   );
 };

@@ -880,3 +880,26 @@ export const fetchReviews = async (sid: string, filter: boolean = false, sort: '
 };
 
 
+export const uploadYAML = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  try {
+    const response = await fetch(`${baseUrl}/service/yaml`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      return '';
+    }
+
+    const data = await response.json();
+    return data.id;
+  } catch (error) {
+    console.error('Bad file');
+    throw error;
+  }
+}
