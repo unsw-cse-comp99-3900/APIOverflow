@@ -103,8 +103,10 @@ const ServiceManagement: React.FC = () => {
       {filter === "All" && <div className="border border-blue-800 my-10"></div>}
 
       {(filter === "All" || filter === "PendingGeneralInfoUpdates") && (
-        <PendingGeneralInfoUpdatesTable pendingGeneralInfoUpdates={generalInfoUpdates} setCurrentPendingGeneralInfo={setSelectedGeneralInfo} />
-        
+        <PendingGeneralInfoUpdatesTable
+          pendingGeneralInfoUpdates={generalInfoUpdates}
+          setCurrentPendingGeneralInfo={setSelectedGeneralInfo}
+        />
       )}
 
       {selectedNewService && (
@@ -123,14 +125,13 @@ const ServiceManagement: React.FC = () => {
         />
       )}
 
-
-{/* {selectedGeneralInfo && (
+      {selectedGeneralInfo && (
         <PendingGeneralInfoModal
-          pendingGeneralInfo={selectedGeneralInfo}
-          setCurrentPendingGeneralInfo={setSelectedGeneralInfo}
+          pendingGeneralInfoUpdate={selectedGeneralInfo}
+          setCurrentPendingGeneralInfoUpdate={setSelectedGeneralInfo}
           refreshData={refreshData}
         />
-      )} */}
+      )}
     </div>
   );
 };
