@@ -37,7 +37,6 @@ const LoginPage: React.FC = () => {
           const token = await userLogin(credentials);
       login(token);
       setIsLoading(false);
-      console.log("Login successful:", { username, password });
       navigate("/apis");
     } catch (error) {
       setError("Invalid credentials");

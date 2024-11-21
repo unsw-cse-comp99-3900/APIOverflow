@@ -24,9 +24,7 @@ const HomePage: React.FC = () => {
     setError(null);
   
     try {
-      console.log('Searching for:', term);
       const data = await searchApis(term);
-      console.log('Raw API response:', data);
 
       // Map the data to match your BriefApi structure
       const validResults: BriefApi[] = data.map((item: any) => ({
@@ -48,7 +46,6 @@ const HomePage: React.FC = () => {
         users: []
       }));
   
-      console.log('Processed results:', validResults);
       setResults(validResults);
       setShowDropdown(true);
     } catch (err) {

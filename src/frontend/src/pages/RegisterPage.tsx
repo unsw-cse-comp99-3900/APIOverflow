@@ -24,10 +24,8 @@ const RegisterPage: React.FC = () => {
       setError("Please fill in both fields.");
       return;
     }
-    console.log("hi1")
     await userRegister(email, username, password, displayname);
     setIsLoading(true);
-    console.log("hi2")
     navigate("/login", {
       state: {
         username: username,

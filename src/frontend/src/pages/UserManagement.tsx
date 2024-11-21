@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import UserTable from "../components/UserTable";
 import { getUsers, userDelete, userDemote, userPromote } from "../services/apiServices";
 import { UserBrief } from "../types/userTypes";
+import { toast } from "react-toastify";
 
 const UserManagement: React.FC = () => {
   // Dummy data for testing (you can replace this with fetched data)
@@ -19,18 +20,31 @@ const UserManagement: React.FC = () => {
   }, [users]);
 
   const handlePromote = (userId: string, userName: string) => {
-    userPromote(userId);
-    console.log(`User with ID: ${userId} (${userName}) promoted to admin.`);
+    try{
+      userPromote(userId);
+      toast.success(`User Promoted Successfully`);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleDemote = (userId: string, userName: string) => {
-    userDemote(userId);
-    console.log(`User with ID: ${userId} (${userName}) demoted to general user.`);
+    try{
+      userDemote(userId);
+      toast.success(`User Demoted Successfully`);
+    } catch (error) {
+      console.log(error);
+    }
+
   };
 
   const handleDelete = (userId: string, userName: string) => {
-    userDelete(userId);
-    console.log(`User with ID: ${userId} (${userName}) deleted.`);
+    try{
+      userDelete(userId);
+      toast.success(`User Deleted Successfully`);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

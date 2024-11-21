@@ -150,7 +150,6 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
           content: replyContent.trim()
         }),
       });
-      console.log(response.json());
 
       if (!response.ok) {
         throw new Error('Failed to submit reply');
