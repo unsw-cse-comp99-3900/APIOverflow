@@ -811,3 +811,32 @@ export const getCustomTags = async (option: boolean = false) => {
   const data = await response.json();
   return data.tags;
 }
+
+export const fetchReviews = async (sid: string, filter: boolean = false, sort: 'best' | 'worst' = 'best') => {
+  try {
+    const u_toggle = await userGetId();
+    
+    const url = `${baseUrl}/service/get/reviews?sid=${sid}&filter=${sort}&uid=${u_toggle}`;
+    
+    console.log('Fetching reviews from:', url); // Debug log
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch reviews');
+    }
+
+    const data = await response.json();
+    console.log('Received reviews:', data.reviews); // Debug log
+    return data.reviews;
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    throw error;
+  }
+};
