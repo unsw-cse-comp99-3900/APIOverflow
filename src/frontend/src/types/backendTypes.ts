@@ -95,7 +95,7 @@ export interface ServiceApprove{
     approved: boolean;
     reason: string;
     service_global: boolean;
-    version_name: string | null;
+    version_name?: string;
 }
 
 export interface ServiceAddVersion{

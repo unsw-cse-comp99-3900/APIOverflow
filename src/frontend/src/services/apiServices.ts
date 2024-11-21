@@ -67,6 +67,10 @@ export const getApi = async (id: string) => {
 
 export const deleteApi = async (id: string) => {
   await fetch(`${baseUrl}/service/delete?sid=${id}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
     method: "DELETE",
   });
   return;
@@ -408,34 +412,67 @@ export const getPendingServices = async () => {
     method: "GET",
   });
   const data = await response.json();
-  return adminUpdateDataFormatter(data);
-};
-
-export const getAdminPendingServices = async () => {
-  const response = await fetch(`${baseUrl}/admin/get/services`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    method: "GET",
-  });
-  const data = await response.json();
-  console.log(data)
   return data;
 };
 
-export const approveService = async (
+export const approveNewService = async (
   sid: string,
   approved: boolean,
   reason: string,
-  serviceGlobal: boolean,
-  versionName: string | null
+  versionName: string
 ) => {
   const approvalInfo: ServiceApprove = {
     sid,
     approved,
     reason,
-    service_global: serviceGlobal,
+    service_global: true,
     version_name: versionName,
+  };
+
+  await fetch(`${baseUrl}/admin/service/approve`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(approvalInfo),
+    method: "POST",
+  });
+};
+
+export const approveNewVersion = async (
+  sid: string,
+  approved: boolean,
+  reason: string,
+  versionName: string
+) => {
+  const approvalInfo: ServiceApprove = {
+    sid,
+    approved,
+    reason,
+    service_global: false,
+    version_name: versionName,
+  };
+
+  await fetch(`${baseUrl}/admin/service/approve`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(approvalInfo),
+    method: "POST",
+  });
+};
+
+export const approveGeneralInfo = async (
+  sid: string,
+  approved: boolean,
+  reason: string,
+) => {
+  const approvalInfo: ServiceApprove = {
+    sid,
+    approved,
+    reason,
+    service_global: true,
   };
 
   await fetch(`${baseUrl}/admin/service/approve`, {

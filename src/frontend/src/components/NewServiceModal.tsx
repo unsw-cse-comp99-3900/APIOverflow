@@ -1,18 +1,21 @@
 // src/components/ServiceModal.tsx
 import React, { useState } from "react";
+import {
+  PendingNewService,
+} from "../types/apiTypes";
 
-interface ServiceModalProps {
+interface NewServiceModalProps {
   isOpen: boolean;
   onRequestClose: () => void;
-  serviceName: string;
+  modalTitle: string;
   actionType: "approve" | "reject";
   onSubmit: (reason: string) => void;
 }
 
-const ServiceModal: React.FC<ServiceModalProps> = ({
+const NewServiceModal: React.FC<NewServiceModalProps> = ({
   isOpen,
   onRequestClose,
-  serviceName,
+  modalTitle,
   actionType,
   onSubmit,
 }) => {
@@ -33,7 +36,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
       <div className="bg-white w-11/12 md:w-1/3 p-6 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4">
-          {actionType === "approve" ? "Approve" : "Reject"} Service: {serviceName}
+          {actionType === "approve" ? "Approve" : "Reject"} Service: {modalTitle}
         </h2>
         <textarea
           className="w-full h-32 p-2 border rounded-lg mb-4"
@@ -60,4 +63,4 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   );
 };
 
-export default ServiceModal;
+export default NewServiceModal;

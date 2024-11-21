@@ -1,88 +1,90 @@
 // src/pages/ServiceManagement.tsx
 
 import React, { useEffect, useState } from "react";
-import ServiceTable from "../components/ServiceTable";
-import ServiceModal from "../components/ServiceModal";
-import { approveService, getAdminPendingServices, getPendingServices } from "../services/apiServices";
+import ServiceTable from "../components/NewServicesTable";
+import NewServiceModal from "../components/NewServiceModal";
 import {
-  ServiceAdminBrief,
-  ServiceUpdateDataAdminView,
+  approveGeneralInfo,
+  approveNewVersion,
+  approveNewService,
+  getPendingServices,
+} from "../services/apiServices";
+import {
+  PendingGeneralInfo,
+  PendingNewService,
+  Version,
 } from "../types/apiTypes";
+import NewServicesTable from "../components/NewServicesTable";
 
 const ServiceManagement: React.FC = () => {
-  // Dummy data for testing (you can replace this with fetched data)
-  const [updateData, setUpdateData] =
-    useState<ServiceUpdateDataAdminView | null>(null);
-  const [services, setServices] = useState<ServiceAdminBrief[]>([]);
-  const [newServices, setNewServices] = useState<ServiceAdminBrief[]>([]);
-  const [newVersions, setNewVersions] = useState<ServiceAdminBrief[]>([]);
-  const [generalInfoUpdates, setGeneralInfoUpdates] = useState<
-    ServiceAdminBrief[]
-  >([]);
-  const [selectedService, setSelectedService] =
-    useState<ServiceAdminBrief | null>(null);
-  const [modalActionType, setModalActionType] = useState<"approve" | "reject">(
-    "approve"
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filter, setFilter] = useState<
-    "newServices" | "newVersions" | "generalInfoUpdates"
-  >("newServices");
 
+  // services waiting for approval
+  const [newServices, setNewServices] = useState<PendingNewService[]>([]);
+  const [newVersions, setNewVersions] = useState<Version[]>([]);
+  const [generalInfoUpdates, setGeneralInfoUpdates] = useState<
+    PendingGeneralInfo[]
+  >([]);
+
+  // currentl open service which has its detail being displayed
+  const [selectedNewService, setSelectedNewService] = useState<PendingNewService | null>(
+    null
+  );
+  const [selectedNewVersion, setSelectedNewVersion] = useState<Version | null>(null);
+  const [selectedUpdatedGeneralInfo, setSelectedGeneralInfo] = useState<PendingGeneralInfo | null>(null)
+
+  // filter for the services
+  const [filter, setFilter] = useState<
+    "All" | "NewService" | "NewVersion" | "GeneralInfoUpdate"
+  >("All");
+
+  // modal open state
+  const [isNewServiceModalOpen, setIsNewServiceModalOpen] = useState(false);
+  const [isNewVersionModalOpen, setIsNewVersionModalOpen] = useState(false);
+  const [isGeneralInfoModalOpen, setIsGeneralInfoModalOpen] = useState(false);
+
+  // React Hooks
+
+  // Fetch services from the API
   useEffect(() => {
     const fetchPendingApis = async () => {
       // Fetch services from the API
-      const res = await getPendingServices();
-      setUpdateData(res);
-
-      const data = await getAdminPendingServices();
-      setNewServices(data.newServices);
-      setNewVersions(data.newVersions);
-      setGeneralInfoUpdates(data.generalInfoUpdates);
+      const data = await getPendingServices();
+      setNewServices(data.new_services);
+      setNewVersions(data.version_updates);
+      setGeneralInfoUpdates(data.global_updates);
+      console.log(data);
     };
     fetchPendingApis();
-  }, [ ]);
+  }, []);
 
-  useEffect(() => {
-    if (filter === "newServices") setServices(updateData?.newServices || []);
-    else if (filter === "newVersions")
-      setServices(updateData?.newVersions || []);
-    else if (filter === "generalInfoUpdates")
-      setServices(updateData?.generalInfoUpdates || []);
-  }, [filter, updateData]);
-
-  const handleOpenModal = (
-    service: ServiceAdminBrief,
-    actionType: "approve" | "reject"
+  const openNewServiceModal = (
+    newService: PendingNewService
   ) => {
-    setSelectedService(service);
-    setModalActionType(actionType);
-    setIsModalOpen(true);
+    setSelectedNewService(newService);
+    setIsNewServiceModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setSelectedService(null);
-    setIsModalOpen(false);
+  const openNewVersionModal = (
+    version: Version
+  ) => {
+    setSelectedNewVersion(version);
+    setIsNewVersionModalOpen(true);
   };
 
-  const handleApprove = (service: ServiceAdminBrief, reason: string) => {
-    approveService(
-      service.id,
-      true,
-      reason,
-      service.serviceGlobal,
-      service.versionName
-    );
+  const openGeneralInfoModal = (
+    generalInfo: PendingGeneralInfo
+  ) => {
+    setSelectedGeneralInfo(generalInfo);
+    setIsGeneralInfoModalOpen(true);
   };
 
-  const handleReject = (service: ServiceAdminBrief, reason: string) => {
-    approveService(
-      service.id,
-      false,
-      reason,
-      service.serviceGlobal,
-      service.versionName
-    );
+  const closeModal = () => {
+    setSelectedNewService(null);
+    setSelectedNewVersion(null);
+    setSelectedGeneralInfo(null);
+    setIsNewServiceModalOpen(false);
+    setIsGeneralInfoModalOpen(false);
+    setIsNewVersionModalOpen(false);
   };
 
   return (
@@ -96,9 +98,10 @@ const ServiceManagement: React.FC = () => {
         onChange={(e) =>
           setFilter(
             e.target.value as
-              | "newServices"
-              | "newVersions"
-              | "generalInfoUpdates"
+              | "All"
+              | "NewService"
+              | "NewVersion"
+              | "GeneralInfoUpdate"
           )
         }
         className="p-2 border rounded-md w-48 h-10"
@@ -109,29 +112,8 @@ const ServiceManagement: React.FC = () => {
         <option value="newVersions">New Versions</option>
         <option value="generalInfoUpdates">General Info Update</option>
       </select>
-      <ServiceTable
-        services={services}
-        onApprove={(service: ServiceAdminBrief) =>
-          handleOpenModal(service, "approve")
-        }
-        onReject={(service) => handleOpenModal(service, "reject")}
-      />
-
-      {selectedService && (
-        <ServiceModal
-          isOpen={isModalOpen}
-          onRequestClose={handleCloseModal}
-          serviceName={selectedService.name}
-          actionType={modalActionType}
-          onSubmit={(reason) => {
-            if (modalActionType === "approve") {
-              handleApprove(selectedService, reason);
-            } else {
-              handleReject(selectedService, reason);
-            }
-          }}
-        />
-      )}
+      
+      <NewServicesTable  />
     </div>
   );
 };

@@ -44,19 +44,24 @@ export type Version = {
   version_name: string;
 };
 
-
-export interface ServiceAdminBrief {
+export type PendingVersion = Version & {
   id: string;
-  name: string;
-  serviceGlobal: boolean;
-  versionName: string | null;
-  description: string;
 }
 
-export interface ServiceUpdateDataAdminView {
-  newServices: ServiceAdminBrief[];
-  newVersions: ServiceAdminBrief[];
-  generalInfoUpdates: ServiceAdminBrief[];
+export type PendingGeneralInfo = {
+  description: string;
+  id: string;
+  name: string;
+  tags: string[];
+}
+
+export type PendingNewService = {
+  id: string;
+  name: string;
+  description: string;
+  pay_model: PayModel;
+  tags: string[];
+  version_fields: Version;
 }
 
 export type NewApi = Omit<DetailedApi, "id">;
