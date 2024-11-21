@@ -144,7 +144,6 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
   // Submit the API update to the backend
   const submitApi = async () => {
-    console.log(versionUpdated);
     if (name === "") {
       toast.error("Name cannot be empty");
       return;

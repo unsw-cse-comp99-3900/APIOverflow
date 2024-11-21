@@ -12,6 +12,7 @@ import PendingServicesTable from "../components/PendingServicesTable";
 import PendingVersionsTable from "../components/PendingVersionsTable";
 import PendingGeneralInfoUpdatesTable from "../components/PendingGenralInfoUpdatesTable";
 import PendingServiceModal from "../components/PendingServiceModal";
+import PendingGeneralInfoModal from "../components/PendingGeneralInfoUpdateModal";
 
 const ServiceManagement: React.FC = () => {
   // services waiting for approval
@@ -26,7 +27,7 @@ const ServiceManagement: React.FC = () => {
     useState<PendingNewService | null>(null);
   const [selectedNewVersion, setSelectedNewVersion] =
     useState<PendingVersion | null>(null);
-  const [selectedUpdatedGeneralInfo, setSelectedGeneralInfo] =
+  const [selectedGeneralInfo, setSelectedGeneralInfo] =
     useState<PendingGeneralInfo | null>(null);
 
   // filter for the services
@@ -68,17 +69,17 @@ const ServiceManagement: React.FC = () => {
                 | "PendingGeneralInfoUpdates"
             )
           }
-          className="p-2 border rounded-md w-48 h-10"
+          className="p-2 border rounded-md w-52 h-10"
         >
           <option className="border rounded-md" value="All">
             All
           </option>
           <option className="border rounded-md" value="PendingServices">
-            Pending New Services
+            Pending Services
           </option>
           <option value="PendingVersions">Pending Versions</option>
           <option value="PendingGeneralInfoUpdates">
-            Pending General Info Updates
+            General Info Updates
           </option>
         </select>
       </div>
@@ -102,10 +103,8 @@ const ServiceManagement: React.FC = () => {
       {filter === "All" && <div className="border border-blue-800 my-10"></div>}
 
       {(filter === "All" || filter === "PendingGeneralInfoUpdates") && (
-        <PendingGeneralInfoUpdatesTable
-          pendingGeneralInfo={generalInfoUpdates}
-          setCurrentPendingGeneralInfo={setSelectedGeneralInfo}
-        />
+        <PendingGeneralInfoUpdatesTable pendingGeneralInfoUpdates={generalInfoUpdates} setCurrentPendingGeneralInfo={setSelectedGeneralInfo} />
+        
       )}
 
       {selectedNewService && (
@@ -123,6 +122,15 @@ const ServiceManagement: React.FC = () => {
           refreshData={refreshData}
         />
       )}
+
+
+{/* {selectedGeneralInfo && (
+        <PendingGeneralInfoModal
+          pendingGeneralInfo={selectedGeneralInfo}
+          setCurrentPendingGeneralInfo={setSelectedGeneralInfo}
+          refreshData={refreshData}
+        />
+      )} */}
     </div>
   );
 };

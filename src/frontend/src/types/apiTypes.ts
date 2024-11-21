@@ -53,6 +53,7 @@ export type PendingGeneralInfo = {
   description: string;
   id: string;
   name: string;
+  pay_model: PayModel;
   tags: string[];
 }
 
