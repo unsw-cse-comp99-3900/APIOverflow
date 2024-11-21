@@ -480,6 +480,16 @@ async def verify_email(token: str):
    db_update_user(uid, user.to_json())
    return {"message": "Email verified successfully."}
 
+@app.post("/auth/resend-verification")
+async def resend_verification(email: GeneralString):
+    
+    user = data_store.get_user_by_email(email.content)
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+    uid = user.get_id()
+    verification_token = generate_verification_token(uid)
+    send_email(email.content, verification_token)
+    return {"message": "Email has been sent!"}
 
 @app.post("/auth/reset-password")
 async def request_password_reset(user: User = Depends(manager)):
