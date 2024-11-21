@@ -27,13 +27,7 @@ const ReviewManagement: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
-      console.log('Fetching reviews with sort type:', sortType); 
-      
       const fetchedReviews = await fetchReviews(sid, false, sortType);
-      
-      console.log('Sorted reviews:', fetchedReviews);
-      
       setReviews(fetchedReviews);
     } catch (err) {
       console.error('Error loading reviews:', err);

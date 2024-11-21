@@ -55,6 +55,7 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
 
   const handleApproval = async (approval: boolean) => {
     if (reason.trim() === "") {
+      toast.error("Please provide a reason for your decision");
       setWarning("Please provide a reason for your decision");
       return;
     }

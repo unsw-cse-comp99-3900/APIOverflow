@@ -608,7 +608,6 @@ export const userEditReview = async (id: string, rting: Rating | null, comment: 
       body: JSON.stringify(info),
     }
   );
-  console.log(response.json());
 }
 
 export const userDeleteReview = async (rid: string) => {
@@ -806,8 +805,6 @@ interface ReviewPackage {
 }
 
 export const submitReviewReply = async (rid: string, content: string) => {
-  console.log('Submitting reply with data:', { rid, content }); // Debug log
-
   const reviewPackage: ReviewPackage = {
     rid,
     content
@@ -822,9 +819,6 @@ export const submitReviewReply = async (rid: string, content: string) => {
       },
       body: JSON.stringify(reviewPackage),
     });
-
-    console.log('Response status:', response.status); // Debug log
-
     if (!response.ok) {
       const errorData = await response.json();
       console.error('Error response:', errorData);
@@ -865,9 +859,6 @@ export const fetchReviews = async (sid: string, filter: boolean = false, sort: '
     const u_toggle = await userGetId();
     
     const url = `${baseUrl}/service/get/reviews?sid=${sid}&filter=${sort}&uid=${u_toggle}`;
-    
-    console.log('Fetching reviews from:', url); // Debug log
-    
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -881,13 +872,13 @@ export const fetchReviews = async (sid: string, filter: boolean = false, sort: '
     }
 
     const data = await response.json();
-    console.log('Received reviews:', data.reviews); // Debug log
     return data.reviews;
   } catch (error) {
     console.error('Error fetching reviews:', error);
     throw error;
   }
 };
+
 
 export const uploadYAML = async (file: File) => {
   const formData = new FormData();

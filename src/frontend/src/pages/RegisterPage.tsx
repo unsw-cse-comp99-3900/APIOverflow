@@ -7,6 +7,7 @@ import Blob2 from "../assets/images/blobs/blob2.svg";
 import { useAuth } from "../contexts/AuthContext";
 import { userRegister } from "../services/apiServices";
 import { UserCreate } from "../types/backendTypes";
+import { toast } from "react-toastify";
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -24,10 +25,9 @@ const RegisterPage: React.FC = () => {
       setError("Please fill in both fields.");
       return;
     }
-    console.log("hi1")
     await userRegister(email, username, password, displayname);
+    toast.success("Please verify your email to signin");
     setIsLoading(true);
-    console.log("hi2")
     navigate("/login", {
       state: {
         username: username,

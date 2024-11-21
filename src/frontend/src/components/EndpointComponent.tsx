@@ -58,7 +58,6 @@ const EndpointComponent: React.FC<EndpointComponentProps> = ({ endpoint }) => {
       await navigator.clipboard.writeText(textToCopy);
       toast.success("Copied to clipboard!");
     } catch (err) {
-      console.log("Failed to copy!");
       toast.error("Failed to copy to clipboard");
     }
   };
