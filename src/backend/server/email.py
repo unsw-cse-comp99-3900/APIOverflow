@@ -51,7 +51,7 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
         msg_html = f"""
         Hi,<br/>
         <br/>
-        Thank you for registering! Please click the link below to verify your email address:<br/>
+        Thank you for registering! Please click the link below within 30 minutes to verify your email address:<br/>
         <br/>
         <a href="{verification_link}">Verify Email</a><br/>
         <br/>
@@ -60,7 +60,7 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
         Best regards,<br/>
         API Overflow Team
         """
-        msg_plain = "Hi,\nThank you for registering! Please click the link below to verify your email address:\n" \
+        msg_plain = "Hi,\nThank you for registering! Please click the link below within 30 minutes to verify your email address:\n" \
                     f"{verification_link}\nIf you did not create an account, please ignore this email.\nBest regards,\nAPI Overflow Team"
 
     elif email_type == 'password_reset':
@@ -68,13 +68,13 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
         subject = "Password Reset Request"
         msg_html = f"""
         Hi,<br/>
-        We received a request to reset your password. Please click the link below to reset it:<br/>
+        We received a request to reset your password. Please click the link below within 30 minutes to reset it:<br/>
         <a href="{reset_link}">Reset Password</a><br/>
         If you did not request a password reset, please ignore this email.<br/>
         Best regards,<br/>
         API Overflow Team
         """
-        msg_plain = "Hi,\nWe received a request to reset your password. Please click the link below to reset it:\n" \
+        msg_plain = "Hi,\nWe received a request to reset your password. Please click the link below within 30 minutes to reset it:\n" \
                     f"{reset_link}\nIf you did not request a password reset, please ignore this email.\nBest regards,\nAPI Overflow Team"
 
     elif email_type == 'service_approval':
