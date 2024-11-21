@@ -59,7 +59,7 @@ const NewResponse: React.FC<NewResponseProps> = ({
         example,
       },
     ]);
-    setCode("");
+    setCode("200");
     setDescription("");
     setExample("");
     setConditions([]);

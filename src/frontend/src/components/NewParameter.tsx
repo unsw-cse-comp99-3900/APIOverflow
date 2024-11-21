@@ -44,7 +44,7 @@ const NewParameter: React.FC<NewPrameterProps> = ({
     ]);
     setName("");
     setComponent("BODY");
-    setType("");
+    setType("string");
     setExample("");
     setRequired(false);
   };
