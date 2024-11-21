@@ -79,6 +79,8 @@ app = FastAPI(lifespan=lifespan)
 
 origins = [
    "http://localhost:3000",
+   "http://localhost:5000",
+   "http://localhost:5001"
 ]
 
 
@@ -187,9 +189,8 @@ async def get_service(sid: str):
 @app.post("/service/update")
 async def update_service(service: ServiceGlobalUpdate, user: User = Depends(manager)):
    '''
-       Method used to update service to platform
+       Method used to update global fields to platform
    '''
-
 
    request = service.model_dump()
  
@@ -343,11 +344,11 @@ async def delete_service_version(sid: str, version_name: str,  user: User = Depe
     delete_service_version_wrapper(sid, version_name)
 
 @app.post("/service/tags/generate") 
-async def generate_tags_endpoint(sid: str, user: User = Depends(manager)): 
+async def generate_tags_endpoint(description: str, user: User = Depends(manager)): 
     '''
         Method used to generate tags using ollama
     '''
-    tags = auto_generate_tags(sid) 
+    tags = auto_generate_tags(description) 
     return {"tags": tags}
                                                                                                                                
 #####################################
