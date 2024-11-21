@@ -6,10 +6,6 @@ import os
 T = TypeVar("T")
 K = TypeVar("K")
 
-# load_dotenv()
-# Initialize MongoDB client
-# client = MongoClient("mongodb://mongodb:27017/", connect=False)
-
 mongo_env = os.getenv('MONGO_ENV', 'local')
 
 if mongo_env == 'docker':
@@ -66,11 +62,6 @@ def db_update_service(sid: str, updated_service_object: dict[T, K]) -> None:
         Update a service into MongoDB
     '''
     db.services.replace_one({'id': sid}, updated_service_object)
-
-# def db_add_document(sid: str, new_doc: int) -> None:
-#     old_documents = db_get_service(sid)["docs"]
-#     old_documents.append(new_doc)
-#     db.services.update_one({'id': sid}, {"$set": {'docs': old_documents}}, upsert=False)
 
 ###################################
 #       Delete Methods
