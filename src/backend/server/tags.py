@@ -9,9 +9,7 @@ url = f"http://{vm_ip}:11434/api/generate"
 
 n_tags_max = 10
 n_tags_min = 1
-def auto_generate_tags(sid: str):
-    service = data_store.get_api_by_id(sid)
-    description = service.get_description()
+def auto_generate_tags(description: str):
     headers = {"Content-Type": "application/json"}
     data = {
         "model": "llama3:latest",
