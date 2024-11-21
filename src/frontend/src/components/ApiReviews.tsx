@@ -1,3 +1,4 @@
+// src/components/ApiReviews.tsx
 import React, { useEffect, useState } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { Rating, Review } from "../types/miscTypes";
@@ -60,6 +61,7 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
 
   return (
     <div className="w-1/3 bg-white rounded-2xl shadow-lg p-6">
+      {/* Header with Sort Control */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Reviews</h2>
         <select
@@ -73,24 +75,8 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
         </select>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        </div>
-      ) : reviews.length === 0 ? (
-        <p className="text-gray-500 text-center">No reviews yet</p>
-      ) : (
-        <div className="space-y-4">
-          {reviews.map((review) => (
-            <div key={review.rid} className="mb-4">
-              <ReviewCard review={review} />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Review Form */}
-      <form onSubmit={handleReviewSubmit} className="mt-4">
+      {/* Review Form - Moved to top */}
+      <form onSubmit={handleReviewSubmit} className="mb-6">
         <textarea
           value={reviewComment}
           onChange={(e) => setReviewComment(e.target.value)}
@@ -98,6 +84,7 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
           placeholder="Write your review..."
         />
         <div className="flex items-center justify-between space-x-2 mt-2">
+          {/* Rating Buttons */}
           <div className="flex space-x-2">
             <button
               type="button"
@@ -106,11 +93,12 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
                   ? "bg-blue-500 text-white"
                   : "bg-white text-blue-500"
               } rounded-xl`}
-              onClick={() =>
+              onClick={() => {
                 setReviewRating((prev) =>
                   prev === "positive" ? null : "positive"
-                )
-              }
+                );
+                setWarning("");
+              }}
             >
               <FaThumbsUp />
             </button>
@@ -121,25 +109,46 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
                   ? "bg-red-500 text-white"
                   : "bg-white text-red-500"
               } rounded-xl`}
-              onClick={() =>
+              onClick={() => {
                 setReviewRating((prev) =>
                   prev === "negative" ? null : "negative"
-                )
-              }
+                );
+                setWarning("");
+              }}
             >
               <FaThumbsDown />
             </button>
           </div>
-
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-800 text-white rounded-lg font-semibold hover:bg-blue-900 transition-colors"
+            className="px-4 py-2 bg-blue-800 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
           >
             Submit Review
           </button>
         </div>
-        {warning && <p className="text-red-500 text-sm my-2">{warning}</p>}
+        {warning && <p className="text-red-500 text-sm mt-2">{warning}</p>}
       </form>
+
+      <div className="border-t border-gray-200 mb-4"></div>
+
+      {/* Scrollable Reviews Section */}
+      <div className="max-h-[500px] overflow-y-auto">
+        {loading ? (
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          </div>
+        ) : reviews.length === 0 ? (
+          <p className="text-gray-500 text-center py-4">No reviews yet</p>
+        ) : (
+          <div className="space-y-4 pr-2">
+            {reviews.map((review) => (
+              <div key={review.rid}>
+                <ReviewCard review={review} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
