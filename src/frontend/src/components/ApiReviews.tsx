@@ -1,6 +1,6 @@
 // src/components/ApiReviews.tsx
 import React, { useEffect, useState } from "react";
-import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { FaThumbsDown, FaThumbsUp, FaChevronDown } from "react-icons/fa"; // Add FaChevronDown import
 import { Rating, Review } from "../types/miscTypes";
 import { apiAddReview, apiGetReviews } from "../services/apiServices";
 import ReviewCard from "./ReviewCard";
@@ -65,15 +65,22 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Reviews</h2>
         <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value as "" | "best" | "worst")}
-          className="px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-        >
-          <option value="">Default Order</option>
-          <option value="best">Highest Rated</option>
-          <option value="worst">Lowest Rated</option>
-        </select>
-      </div>
+            value={filter}
+            onChange={(e) => setFilter(e.target.value as "" | "best" | "worst")}
+            className="px-3 py-2 pr-8 border rounded-lg focus:outline-none focus:border-blue-500 appearance-none cursor-pointer bg-white"
+          >
+            <option value="">Default Order</option>
+            <option value="best">Highest Rated</option>
+            <option value="worst">Lowest Rated</option>
+          </select>
+          <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2">
+            <FaChevronDown 
+              className={`transition-transform duration-200 ${
+                filter ? 'text-blue-600' : 'text-gray-400'
+              }`}
+            />
+          </div>
+        </div>
 
       {/* Review Form - Moved to top */}
       <form onSubmit={handleReviewSubmit} className="mb-6">
