@@ -84,19 +84,28 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
         reason = content['reason']
         if action == 'approved':
             tone = 'pleased'
+            resubmit_message_html = ""
+            resubmit_message_plain = ""
         else:
             tone = 'regret'
-        reason = "Please see the reason as follows: " + reason
+            resubmit_message_html = "You may update your service and resubmit it for approval.<br/>"
+            resubmit_message_plain = "You may update your service and resubmit it for approval.\n"
         subject = "Service Upload Outcome"
         msg_html = f"""
-        Hi {user_name},<br/>
-        We are {tone} to inform you that your service - {service_name} has been {action}. {reason}<br/>
-        Thank you for your contribution to API Overflow.<br/>
-        Best regards,<br/>
-        API Overflow Team
-        """
-        msg_plain = f"Hi {user_name},\nWe are {tone} to inform you that your service - {service_name} has been {action}. {reason}" \
-        f"Thank you for your contribution to API Overflow.\nBest regards,\nAPI Overflow Team"
+                Hi {user_name},<br/>
+                We are {tone} to inform you that your service - {service_name} has been {action}. Please see the reason below:<br/>
+                <br/>
+                {reason}<br/>
+                {resubmit_message_html}<br/>
+                Thank you for your contribution to API Overflow!<br/>
+                Best regards,<br/>
+                API Overflow Team
+                """
+        msg_plain = f"Hi {user_name},\nWe are {tone} to inform you that your service - {service_name} has been {action}. " \
+                    f"Please see the reason below:\n\n" \
+                    f"{reason}\n" \
+                    f"{resubmit_message_plain}\n" \
+                    f"Thank you for your contribution to API Overflow!\nBest regards,\nAPI Overflow Team"
     
     elif email_type == 'account_deleted':
         action = content['action']
