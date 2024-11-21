@@ -15,24 +15,25 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
   const [warning, setWarning] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"" | "best" | "worst">("");
 
   useEffect(() => {
-    const fetchApi = async () => {
-      try {
-        const data = await apiGetReviews(sid);
-        setReviews(data);
-      } catch (error) {
-        console.log("Error fetching data", error);
-        if (error instanceof Error) {
-          setError(error.message);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchApi();
-  }, []);
+  }, [filter, sid]);
+
+  const fetchApi = async () => {
+    try {
+      setLoading(true);
+      const data = await apiGetReviews(sid, filter);
+      setReviews(data);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,22 +47,50 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
     }
     try {
       await apiAddReview(sid, reviewRating, "reviewTitle", reviewComment);
+      setReviewComment("");
+      setReviewRating(null);
+      setWarning("");
+      await fetchApi();
     } catch (error) {
       if (error instanceof Error) {
         setWarning(error.message);
       }
     }
-    const data = await apiGetReviews(sid);
-    setReviewComment("");
-    setReviews(data);
   };
 
   return (
     <div className="w-1/3 bg-white rounded-2xl shadow-lg p-6">
-      <h2 className="text-xl font-bold mb-4">Reviews</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Reviews</h2>
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value as "" | "best" | "worst")}
+          className="px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+        >
+          <option value="">Default Order</option>
+          <option value="best">Highest Rated</option>
+          <option value="worst">Lowest Rated</option>
+        </select>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      ) : reviews.length === 0 ? (
+        <p className="text-gray-500 text-center">No reviews yet</p>
+      ) : (
+        <div className="space-y-4">
+          {reviews.map((review) => (
+            <div key={review.rid} className="mb-4">
+              <ReviewCard review={review} />
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Review Form */}
-      <form onSubmit={handleReviewSubmit} className="mb-4">
+      <form onSubmit={handleReviewSubmit} className="mt-4">
         <textarea
           value={reviewComment}
           onChange={(e) => setReviewComment(e.target.value)}
@@ -77,62 +106,40 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
                   ? "bg-blue-500 text-white"
                   : "bg-white text-blue-500"
               } rounded-xl`}
-              onClick={() => {
-                if (reviewRating === "positive") {
-                  setReviewRating(null);
-                } else {
-                  setReviewRating("positive");
-                }
-                setWarning("");
-              }}
+              onClick={() =>
+                setReviewRating((prev) =>
+                  prev === "positive" ? null : "positive"
+                )
+              }
             >
               <FaThumbsUp />
             </button>
             <button
               type="button"
-              className={`ring-2 ring-red-500  w-10 h-10 flex items-center justify-center ${
+              className={`ring-2 ring-red-500 w-10 h-10 flex items-center justify-center ${
                 reviewRating === "negative"
                   ? "bg-red-500 text-white"
                   : "bg-white text-red-500"
               } rounded-xl`}
-              onClick={() => {
-                if (reviewRating === "negative") {
-                  setReviewRating(null);
-                } else {
-                  setReviewRating("negative");
-                }
-                setWarning("");
-              }}
+              onClick={() =>
+                setReviewRating((prev) =>
+                  prev === "negative" ? null : "negative"
+                )
+              }
             >
               <FaThumbsDown />
             </button>
           </div>
 
           <button
-            type="button"
-            onClick={handleReviewSubmit}
-            className="px-4 py-2 bg-blue-800 text-white rounded-lg font-semibold"
+            type="submit"
+            className="px-4 py-2 bg-blue-800 text-white rounded-lg font-semibold hover:bg-blue-900 transition-colors"
           >
             Submit Review
           </button>
         </div>
         {warning && <p className="text-red-500 text-sm my-2">{warning}</p>}
       </form>
-
-      <div className="border border-gray-100 w-full my-5"></div>
-
-      {/* Display Reviews */}
-      {reviews.length === 0 ? (
-        <p className="text-gray-500">No reviews yet</p>
-      ) : (
-        <ul className="space-y-4">
-          {reviews.map((review, index) => (
-            <li key={index}>
-              <ReviewCard review={review} />
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 };
