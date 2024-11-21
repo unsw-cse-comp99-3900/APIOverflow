@@ -669,5 +669,6 @@ class Service:
             'icon_url': self._icon_url,
             'tags': self._tags,
             'pay_model': self._pay_model,
-            'ratings': self.get_ratings()
+            'ratings': self.get_ratings(),
+            'status': self.get_status().name
         }
