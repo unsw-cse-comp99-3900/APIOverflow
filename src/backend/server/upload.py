@@ -89,9 +89,10 @@ async def import_yaml_wrapper(file: UploadFile, user: User) -> Service:
    '''
        Function which uploads YAML files - returns a Service object
    '''
+   print(file.content_type)
    # Check type
-   if file.content_type != 'application/x-yaml':
-       raise HTTPException(status_code=400, detail="File uploaded is not YAML")
+#    if file.content_type != 'application/x-yaml':
+#        raise HTTPException(status_code=400, detail="File uploaded is not YAML")
   
    try:
        file_content = await file.read()
