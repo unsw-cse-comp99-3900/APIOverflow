@@ -407,4 +407,3 @@ print('Loading Datastore...')
 
 global data_store
 data_store = Datastore()
-#data_store.load_database()

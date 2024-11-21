@@ -81,19 +81,21 @@ def send_email(to_email: str, token: str, email_type: str = 'verification', cont
         action = content['action']
         service_name = content['sname']
         user_name = content['uname']
+        reason = content['reason']
         if action == 'approved':
             tone = 'pleased'
         else:
             tone = 'regret'
+        reason = "Please see the reason as follows: " + reason
         subject = "Service Upload Outcome"
         msg_html = f"""
         Hi {user_name},<br/>
-        We are {tone} to inform you that your service - {service_name} has been {action}.<br/>
+        We are {tone} to inform you that your service - {service_name} has been {action}. {reason}<br/>
         Thank you for your contribution to API Overflow.<br/>
         Best regards,<br/>
         API Overflow Team
         """
-        msg_plain = f"Hi {user_name},\nWe are {tone} to inform you that your service - {service_name} has been {action}." \
+        msg_plain = f"Hi {user_name},\nWe are {tone} to inform you that your service - {service_name} has been {action}. {reason}" \
         f"Thank you for your contribution to API Overflow.\nBest regards,\nAPI Overflow Team"
     
     elif email_type == 'account_deleted':

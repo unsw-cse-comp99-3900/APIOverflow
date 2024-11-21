@@ -80,7 +80,12 @@ class ServiceVersionInfo:
                 "name": name,
                 "version_name": updated_fields.get_version_name(),
                 "endpoints": updated_fields.get_endpoints(),
-                "version_description": updated_fields.get_version_description()
+                "version_description": updated_fields.get_version_description(),
+                "docs": [doc.get_id() for doc in self._docs],
+                "status": self._status,
+                "status_reason": "",
+                "newly_created": self._newly_created
+
             }
         return None
     
@@ -96,6 +101,9 @@ class ServiceVersionInfo:
     
     def get_endpoints(self):
         return self._endpoints
+    
+    def get_docs(self):
+        return self._docs
     
     def get_version_description(self):
         return self._version_description
@@ -116,6 +124,9 @@ class ServiceVersionInfo:
             self._version_description = self._pending_update._version_description
 
             self._pending_update = None
+    
+    def has_pending_update(self) -> bool:
+        return self._pending_update != None
 
 class ServicePendingVersionUpdate:
     '''
@@ -296,13 +307,6 @@ class Service:
         
         new_endpoint = Endpoint(tab, parameters, method)
         self.get_version_info(version)._endpoints.append(new_endpoint)
-
-    # def add_owner(self, owner: str) -> None:
-    #     '''
-    #         Adds owner to service
-    #     '''
-    #     self._owner.append(owner)
-    #     self._owner_count += 1
     
     ################################
     #   Update Methods
@@ -356,6 +360,14 @@ class Service:
         
         self.update_status(ServiceStatus.UPDATE_PENDING, "")
         self._pending_update = ServicePendingGlobalUpdate(name, description, tags, pay_model)
+
+        version = self.get_latest_version()
+        if self._newly_created and not version.has_pending_update():
+            # can only be one version here
+            version.create_pending_update(version.get_version_name(),
+                                          version.get_endpoints(),
+                                          version.get_version_description())
+
     
     def complete_update(self):
         if self._status == ServiceStatus.UPDATE_PENDING:
@@ -435,13 +447,6 @@ class Service:
             Removes specified endpoint 
         '''
         self.get_version_info(version)._endpoints.remove(endpoint)
-
-    # def remove_owner(self, uid: str) -> None:
-    #     '''
-    #         Remove owner from ownership list
-    #     '''
-    #     self._owner.remove(uid)
-    #     self._owner_count -= 1
 
     ################################
     #   Get Methods
@@ -566,7 +571,7 @@ class Service:
         versions = [ver for ver in self._version_info if ver._version_name == version]
 
         if len(versions) == 0:
-            raise HTTPException(status_code=404, detail="Service version {version} not found in service")
+            raise HTTPException(status_code=404, detail=f"Service version {version} not found in service")
         return versions[0]
 
     def get_all_versions(self) -> List[ServiceVersionInfo]:
@@ -588,6 +593,9 @@ class Service:
             version_name = new_version_name
         
         version.create_pending_update(version_name, endpoints, version_description)
+
+        if self._newly_created and self._pending_update == None:
+            self.create_pending_update(self._name, self._description, self._tags, self._pay_model)
     
     def remove_version(self, version_name: str) -> None:
         if len(self._version_info) == 1:
@@ -636,7 +644,6 @@ class Service:
             "versions": [version.to_json() for version in self._version_info]
         }
     
-            
 
     def to_updated_json(self) -> dict[T, K]:
         '''

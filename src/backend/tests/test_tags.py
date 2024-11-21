@@ -441,9 +441,10 @@ def test_ollama_tag_gen(simple_user):
     '''
         Test whether an API is correctly created
     '''
+    description = 'The Tag Generation API is a microservice designed to automatically generate relevant tags from a given text input. This service leverages the capabilities of the Ollama API to analyze the provided text and produce a set of tags that accurately represent the content.'
     api_info = {
                 'name' : 'Test API',
-                'description' : 'The Tag Generation API is a microservice designed to automatically generate relevant tags from a given text input. This service leverages the capabilities of the Ollama API to analyze the provided text and produce a set of tags that accurately represent the content.',
+                'description' : description,
                 'tags' : ['API'],
                 'endpoints': [simple_endpoint.model_dump()]
                 }
@@ -464,7 +465,7 @@ def test_ollama_tag_gen(simple_user):
     response = client.post("/service/tags/generate",
                           headers={"Authorization": f"Bearer {simple_user['token']}"},
                           params={
-                              'sid' : sid
+                              'description' : description
                           })
     
     assert response.status_code == SUCCESS
