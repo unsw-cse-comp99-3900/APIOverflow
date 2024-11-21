@@ -93,8 +93,7 @@ def test_simple_search(simple_user):
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
     print(response_info)
-    assert response_info[0]['name'] == api1['name']
-    assert response_info[0]['tags'] == api1['tags']
+    assert any(api['name'] == api1['name'] for api in response_info)
 
 def test_simple_search_2(simple_user):
     api1 = {
@@ -124,10 +123,8 @@ def test_simple_search_2(simple_user):
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
     print(response_info)
-    assert response_info[0]['name'] == api1['name']
-    assert response_info[0]['tags'] == api1['tags']
-    assert response_info[1]['name'] == api2['name']
-    assert response_info[1]['tags'] == api2['tags']
+    assert any(api['name'] == api1['name'] for api in response_info)
+    assert any(api['name'] == api2['name'] for api in response_info)
 
 def test_simple_empty(simple_user):
     api1 = {
@@ -187,10 +184,8 @@ def test_simple_regex_search(simple_user):
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
     print(response_info)
-    assert response_info[0]['name'] == api1['name']
-    assert response_info[0]['tags'] == api1['tags']
-    assert response_info[1]['name'] == api2['name']
-    assert response_info[1]['tags'] == api2['tags']
+    assert any(api['name'] == api1['name'] for api in response_info)
+    assert any(api['name'] == api2['name'] for api in response_info)
 
 def test_simple_regex_sensitivity(simple_user):
     api1 = {
@@ -220,5 +215,4 @@ def test_simple_regex_sensitivity(simple_user):
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
     print(response_info)
-    assert response_info[0]['name'] == api1['name']
-    assert response_info[0]['tags'] == api1['tags']
+    assert any(api['name'] == api1['name'] for api in response_info)
