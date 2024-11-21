@@ -61,7 +61,7 @@ export type PendingNewService = {
   description: string;
   pay_model: PayModel;
   tags: string[];
-  version_fields: Version;
+  version_fields: PendingVersion;
 }
 
 export type NewApi = Omit<DetailedApi, "id">;

@@ -1,40 +1,38 @@
 // src/pages/ServiceManagement.tsx
 
 import React, { useEffect, useState } from "react";
-import ServiceTable from "../components/NewServicesTable";
-import NewServiceModal from "../components/NewServiceModal";
+import NewServiceModal from "../components/PendingServiceModal";
 import {
-  approveGeneralInfo,
-  approveNewVersion,
-  approveNewService,
   getPendingServices,
 } from "../services/apiServices";
 import {
   PendingGeneralInfo,
   PendingNewService,
-  Version,
+  PendingVersion,
 } from "../types/apiTypes";
-import NewServicesTable from "../components/NewServicesTable";
+import PendingServicesTable from "../components/PendingServicesTable";
+import PendingVersionsTable from "../components/PendingVersionsTable";
+import PendingGeneralInfoUpdatesTable from "../components/PendingGenralInfoUpdatesTable";
 
 const ServiceManagement: React.FC = () => {
-
   // services waiting for approval
   const [newServices, setNewServices] = useState<PendingNewService[]>([]);
-  const [newVersions, setNewVersions] = useState<Version[]>([]);
+  const [newVersions, setNewVersions] = useState<PendingVersion[]>([]);
   const [generalInfoUpdates, setGeneralInfoUpdates] = useState<
     PendingGeneralInfo[]
   >([]);
 
   // currentl open service which has its detail being displayed
-  const [selectedNewService, setSelectedNewService] = useState<PendingNewService | null>(
-    null
-  );
-  const [selectedNewVersion, setSelectedNewVersion] = useState<Version | null>(null);
-  const [selectedUpdatedGeneralInfo, setSelectedGeneralInfo] = useState<PendingGeneralInfo | null>(null)
+  const [selectedNewService, setSelectedNewService] =
+    useState<PendingNewService | null>(null);
+  const [selectedNewVersion, setSelectedNewVersion] =
+    useState<PendingVersion | null>(null);
+  const [selectedUpdatedGeneralInfo, setSelectedGeneralInfo] =
+    useState<PendingGeneralInfo | null>(null);
 
   // filter for the services
   const [filter, setFilter] = useState<
-    "All" | "NewService" | "NewVersion" | "GeneralInfoUpdate"
+    "All" | "NewServices" | "NewVersions" | "GeneralInfoUpdates"
   >("All");
 
   // modal open state
@@ -57,23 +55,17 @@ const ServiceManagement: React.FC = () => {
     fetchPendingApis();
   }, []);
 
-  const openNewServiceModal = (
-    newService: PendingNewService
-  ) => {
+  const openNewServiceModal = (newService: PendingNewService) => {
     setSelectedNewService(newService);
     setIsNewServiceModalOpen(true);
   };
 
-  const openNewVersionModal = (
-    version: Version
-  ) => {
+  const openNewVersionModal = (version: PendingVersion) => {
     setSelectedNewVersion(version);
     setIsNewVersionModalOpen(true);
   };
 
-  const openGeneralInfoModal = (
-    generalInfo: PendingGeneralInfo
-  ) => {
+  const openGeneralInfoModal = (generalInfo: PendingGeneralInfo) => {
     setSelectedGeneralInfo(generalInfo);
     setIsGeneralInfoModalOpen(true);
   };
@@ -89,9 +81,7 @@ const ServiceManagement: React.FC = () => {
 
   return (
     <div className="p-12">
-      <h1 className="text-3xl font-bold mb-8 text-blue-800 underline-offset-8">
-        Services
-      </h1>
+      <div></div>
       <label className="mr-2 text-gray-700 font-semibold">Filter:</label>
       <select
         value={filter}
@@ -99,21 +89,46 @@ const ServiceManagement: React.FC = () => {
           setFilter(
             e.target.value as
               | "All"
-              | "NewService"
-              | "NewVersion"
-              | "GeneralInfoUpdate"
+              | "NewServices"
+              | "NewVersions"
+              | "GeneralInfoUpdates"
           )
         }
         className="p-2 border rounded-md w-48 h-10"
       >
+        <option className="border rounded-md" value="All">
+          All
+        </option>
         <option className="border rounded-md" value="newServices">
           New Services
         </option>
         <option value="newVersions">New Versions</option>
-        <option value="generalInfoUpdates">General Info Update</option>
+        <option value="generalInfoUpdates">General Info Updates</option>
       </select>
-      
-      <NewServicesTable  />
+
+      {(filter === "All" || filter === "NewServices") && (
+        <PendingServicesTable
+          pendingServices={newServices}
+          openModal={openNewServiceModal}
+          closeModal={closeModal}
+        />
+      )}
+
+      {(filter === "All" || filter === "NewServices") && (
+        <PendingVersionsTable
+          pendingVersions={newVersions}
+          openModal={openNewVersionModal}
+          closeModal={closeModal}
+        />
+      )}
+
+      {(filter === "All" || filter === "GeneralInfoUpdates") && (
+        <PendingGeneralInfoUpdatesTable
+          pendingGeneralInfo={generalInfoUpdates}
+          openModal={openGeneralInfoModal}
+          closeModal={closeModal}
+        />
+      )}
     </div>
   );
 };
