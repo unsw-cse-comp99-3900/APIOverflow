@@ -189,9 +189,8 @@ async def get_service(sid: str):
 @app.post("/service/update")
 async def update_service(service: ServiceGlobalUpdate, user: User = Depends(manager)):
    '''
-       Method used to update service to platform
+       Method used to update global fields to platform
    '''
-
 
    request = service.model_dump()
  
