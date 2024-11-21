@@ -6,10 +6,11 @@ import { toast } from "react-toastify";
 import { apiGetIcon, approveNewService } from "../services/apiServices";
 import ApiDescription from "./ApiDescription";
 import VersionFields from "./VersionFields";
+import FetchStatus from "./FetchStatus";
 
 interface PendingServiceModalProps {
   pendingService: PendingNewService;
-  refreshData: () => void;
+  refreshData: () => Promise<void>;
   setCurrentPendingService: React.Dispatch<
     React.SetStateAction<PendingNewService | null>
   >;
@@ -59,13 +60,14 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
     }
 
     try {
-      approveNewService(
+      await approveNewService(
         pendingService.id,
         approval,
         reason,
         pendingService.version_fields.version_name
       );
-      refreshData();
+      toast.success(`Service ${approval ? "approved" : "rejected"} successfully`);
+      await refreshData();
       setCurrentPendingService(null);
     } catch (error) {
       console.log("Error approving service", error);
@@ -76,6 +78,7 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
   };
 
   return (
+    <FetchStatus loading={loading} error={error} data={iconURL}>
     <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
       <div
         className="bg-white w-4/5 p-6 rounded-lg flex flex-col"
@@ -126,7 +129,7 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
           />
         </div>
 
-        <div className="flex justify-between my-6 ml-6">
+        <div className="flex justify-between mt-6 ml-6">
           <button
             className="bg-gray-400 hover:bg-gray-500 text-white font-semibold rounded w-20 h-10"
             onClick={() => setCurrentPendingService(null)}
@@ -151,6 +154,7 @@ const PendingServiceModal: React.FC<PendingServiceModalProps> = ({
         </div>
       </div>
     </div>
+    </FetchStatus>
   );
 };
 
