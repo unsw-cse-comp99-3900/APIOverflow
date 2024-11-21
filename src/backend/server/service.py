@@ -195,7 +195,7 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool, sort_rating:
     return output
 
 # returns a list of regex matching services 
-def api_name_search(name, hide_pending: bool) -> list: 
+def api_name_search(query, hide_pending: bool) -> list: 
 
     api_list = data_store.get_apis()
     return_list: List[dict[str, str]] = []
@@ -209,20 +209,21 @@ def api_name_search(name, hide_pending: bool) -> list:
         "model": "llama3:latest",
         "prompt": "I'm going to give you a list of titles and a query. I want you to filter all of the titles, and respond "
         + "only with the titles that: have the query in the title, have any word that is close or a synonym to the query in " 
-        + "the title, have any word that is spelt similarly to the query in the title (including typos, extra numbers or letters, etc.), "
+        + "the title, have any word that is spelt similarly to the query in the title,"
         + " or has any relevance to the query in the title (i.e. if the title was 'Not Food' and query was 'Food' or 'Cuisine' it should still match). Your response should be comma separated, with no "
-        + f"additional text or explanation. Here's the list: {api_names} and this is the query: {name}"
+        + f"additional text or explanation. Here's the list: {api_names} and this is the query: {query}. If the query is not similar to any query, return an empty string."
     }
 
     response = requests.post(url, headers=headers, data=json.dumps(data), stream=False)
     if response:
         lines = response.text.splitlines()
         aggregated_message = "".join(json.loads(line)["response"] for line in lines)
+        print(aggregated_message)
         for name in aggregated_message.split(","):
             return_list.append(get_service_from_name(name.strip()).to_summary_json())
 
     for api in api_list:
-        if re.search(name, api.get_name(), re.IGNORECASE) and (
+        if re.search(query, api.get_name(), re.IGNORECASE) and (
             api.get_status() in LIVE_OPTIONS or
             api.get_status() in PENDING_OPTIONS and not hide_pending
         ) and api.to_summary_json() not in return_list:
