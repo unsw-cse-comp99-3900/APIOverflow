@@ -35,33 +35,51 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     }
   }, [currVersionName, versions]);
 
+
   useEffect(() => {
+    let isCancelled = false; // Cancellation token for this effect
     const fetchDocs = async () => {
       try {
-        console.log(currVersion);
         if (!currVersion) {
-          setError(
-            "No live version available for this service yet, come back later!"
-          );
-        } else if (currVersion.docs && currVersion.docs.length > 0) {
+          if (!isCancelled) {
+            setError(
+              "No live version available for this service yet, come back later!"
+            );
+            setPdfUrl(null);
+          }
+        } else if (currVersion.docs.length > 0) {
           const docURL = await getDoc(currVersion.docs[0]);
-          setPdfUrl(docURL);
+          if (!isCancelled) {
+            setPdfUrl(docURL);
+            setError("");
+          }
         } else {
-          setError("No document for this service available");
+          if (!isCancelled) {
+            setError("No document for this version available");
+            setPdfUrl(null);
+          }
         }
       } catch (error) {
-        console.log("Error fetching data", error);
-        if (error instanceof Error) {
-          setError(error.message);
+        if (!isCancelled) {
+          if (error instanceof Error) {
+            setError(error.message);
+          }
+          toast.error("Error loading API documentation");
         }
-        toast.error("Error loading API documentation");
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
-
+  
     fetchDocs();
+  
+    return () => {
+      isCancelled = true; // Cancel this effect on cleanup
+    };
   }, [currVersion, currVersionName]);
+  
 
   const textColor = {
     "LIVE": "text-green-600",
@@ -71,9 +89,13 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     "UPDATE_REJECTED": "text-red-600",
   }
 
+  if (versions.length === 0) {
+    return null;
+  }
+
   return (
     <>
-      <div className=" bg-white rounded-2xl shadow-lg p-6 mt-6">
+      <div className="border-2 border-gray-100 bg-white rounded-2xl shadow-lg p-6 my-6">
         <div className="flex justify-between mb-2">
           <div className="flex justify-between items-center">
             <div className="flex text-xl font-bold">
@@ -87,7 +109,7 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
               <select
                 value={currVersionName}
                 onChange={(e) => setCurrVersionName(e.target.value)}
-                className="p-2 border w-40 rounded-md focus:ring-2 focus:ring-indigo-600"
+                className="p-2 border w-56 rounded-md focus:ring-2 focus:ring-indigo-600"
               >
                 {versions.map((version, index) => (
                   <option key={index} value={version.version_name}>

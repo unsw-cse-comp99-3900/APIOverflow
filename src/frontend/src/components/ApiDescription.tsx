@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { DetailedApi } from "../types/apiTypes";
-import { toast } from "react-toastify";
-import { FaRegCopy } from "react-icons/fa";
-import { getDoc } from "../services/apiServices";
+import React from "react";
+
 
 interface ApiDescriptionProps {
-  api: DetailedApi;
+  description: string;
 }
 
-const ApiDescription: React.FC<ApiDescriptionProps> = ({ api }) => {
+const ApiDescription: React.FC<ApiDescriptionProps> = ({ description }) => {
   return (
-    <div className=" bg-white rounded-2xl shadow-lg p-6">
+    <div className=" bg-white border-2 border-gray-100 rounded-2xl shadow-lg p-6 my-6">
       <h2 className="text-xl font-bold mb-4">Description</h2>
-      <p className="break-words text-justify">{api.description}</p>
+      <p className="break-words text-justify">{description}</p>
       <div className="border border-gray-100 w-full my-5"></div>
     </div>
   );

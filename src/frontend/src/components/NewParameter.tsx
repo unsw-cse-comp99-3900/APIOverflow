@@ -15,7 +15,7 @@ const NewParameter: React.FC<NewPrameterProps> = ({
 }) => {
   const [name, setName] = useState<string>("");
   const [component, setComponent] = useState<AllowedParameterTypes>("BODY");
-  const [type, setType] = useState<string>("");
+  const [type, setType] = useState<string>("string");
   const [required, setRequired] = useState<boolean>(false);
   const [example, setExample] = useState<string>("");
 

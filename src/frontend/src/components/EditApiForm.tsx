@@ -22,7 +22,6 @@ import { DetailedApi } from "../types/apiTypes";
 import VersionInfoOverlay from "./VersionInfoOverlay";
 
 const EditApiForm = ({ apiId }: { apiId?: string }) => {
-
   // General Info
   const [api, setApi] = useState<DetailedApi | null>(null);
   const [name, setName] = useState<string>("");
@@ -109,19 +108,32 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
             return;
           }
         }
-        await addNewVersion(apiId, versionName, versionDescription, endpoints);
-        if (selectedImageData) {
-          const doc_id = await uploadImage(selectedImageData);
-          apiAddIcon(apiId, doc_id);
+        try {
+          await addNewVersion(
+            apiId,
+            versionName,
+            versionDescription,
+            endpoints
+          );
+          if (selectedImageData) {
+            const doc_id = await uploadImage(selectedImageData);
+            apiAddIcon(apiId, doc_id);
+          }
+          if (selectedFile) {
+            const doc_id = await uploadPDF(selectedFile);
+            await uploadDocs(apiId, doc_id, versionName);
+          }
+          toast.success("Success!");
+        } catch (error) {
+          if (error instanceof Error && error.message === "PendingService") {
+            toast.error(
+              "Cannot create new version while service is pending approval"
+            );
+          }
         }
-        if (selectedFile) {
-          const doc_id = await uploadPDF(selectedFile);
-          await uploadDocs(apiId, doc_id, versionName);
-        }
+        setIsVersionInfoOverlayOpen(false);
         navigate(`/profile/my-apis/${apiId}`);
       }
-      toast.success("Success!");
-      setIsVersionInfoOverlayOpen(false);
     } catch (error) {
       if (error instanceof Error && error.message === "Unauthorized") {
         logout();
@@ -132,9 +144,11 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
 
   // Submit the API update to the backend
   const submitApi = async () => {
-    console.log(versionUpdated);
     if (name === "") {
       toast.error("Name cannot be empty");
+      return;
+    } else if (name.length > 30) {
+      toast.error("Name cannot be longer than 30 characters");
       return;
     } else if (description === "") {
       toast.error("Description cannot be empty");
@@ -174,7 +188,7 @@ const EditApiForm = ({ apiId }: { apiId?: string }) => {
         navigate(`/profile/my-apis/${apiId}`);
       }
 
-      if (!versionUpdated && !generalInfoUpdated){
+      if (!versionUpdated && !generalInfoUpdated) {
         toast.error("No changes to update");
       }
     }

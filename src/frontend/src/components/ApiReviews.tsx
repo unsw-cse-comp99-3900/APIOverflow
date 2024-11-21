@@ -53,14 +53,17 @@ const ApiReviews: React.FC<ApiReviewsProps> = ({ sid }) => {
       setWarning("");
       await fetchApi();
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof Error && error.message === "Unauthorized") {
+        setWarning("You need to login to submit a review");
+      }
+      else if (error instanceof Error) {
         setWarning(error.message);
       }
     }
   };
 
   return (
-    <div className="w-1/3 bg-white rounded-2xl shadow-lg p-6">
+    <div className="border-2 border-gray-100 w-1/3 bg-white rounded-2xl shadow-lg p-6">
       {/* Header with Sort Control */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Reviews</h2>

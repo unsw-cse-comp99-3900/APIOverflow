@@ -67,6 +67,10 @@ export const getApi = async (id: string) => {
 
 export const deleteApi = async (id: string) => {
   await fetch(`${baseUrl}/service/delete?sid=${id}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
     method: "DELETE",
   });
   return;
@@ -131,6 +135,7 @@ export const addNewVersion = async (
     version_description: versionDescription,
     endpoints,
   };
+  
   const response = await fetch(`${baseUrl}/service/version/add`, {
     method: "POST",
     headers: {
@@ -142,6 +147,8 @@ export const addNewVersion = async (
 
   if (response.status === 401) {
     throw new Error("Unauthorized");
+  } else if (response.status === 404) {
+    throw new Error("PendingService");
   }
   return;
 }
@@ -353,14 +360,16 @@ export const apiAddReview = async (
     body: JSON.stringify(info),
   });
   const data = await response.json();
+  if(response.status === 401){
+    throw new Error("Unauthorized");
+  }
+
   if (response.status === 403) {
     throw new Error(data.detail);
   }
 };
 
 export const apiGetReviews = async (sid: string, filter: string = "") => {
-  console.log("apiGetReviews called with:", { sid, filter }); // Debug parameters
-
   let u_toggle;
   if (localStorage.getItem("token")) {
     const res = await fetch(`${baseUrl}/user/get/id`, {
@@ -374,16 +383,9 @@ export const apiGetReviews = async (sid: string, filter: string = "") => {
   } else {
     u_toggle = "";
   }
-
-  console.log("User toggle ID:", u_toggle);
-
   const url = `${baseUrl}/service/get/reviews?sid=${sid}&filter=${filter}&uid=${u_toggle}`;
-  console.log("Request URL:", url); // Log the request URL
-
   const response = await fetch(url);
   const data = await response.json();
-  console.log("Response data:", data); // Log the response data
-
   return data.reviews;
 };
 
@@ -405,22 +407,67 @@ export const getPendingServices = async () => {
     method: "GET",
   });
   const data = await response.json();
-  return adminUpdateDataFormatter(data);
+  return data;
 };
 
-export const approveService = async (
+export const approveNewService = async (
   sid: string,
   approved: boolean,
   reason: string,
-  serviceGlobal: boolean,
-  versionName: string | null
+  versionName: string
 ) => {
   const approvalInfo: ServiceApprove = {
     sid,
     approved,
     reason,
-    service_global: serviceGlobal,
+    service_global: true,
     version_name: versionName,
+  };
+
+  await fetch(`${baseUrl}/admin/service/approve`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(approvalInfo),
+    method: "POST",
+  });
+};
+
+export const approveNewVersion = async (
+  sid: string,
+  approved: boolean,
+  reason: string,
+  versionName: string
+) => {
+  const approvalInfo: ServiceApprove = {
+    sid,
+    approved,
+    reason,
+    service_global: false,
+    version_name: versionName,
+  };
+
+  await fetch(`${baseUrl}/admin/service/approve`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(approvalInfo),
+    method: "POST",
+  });
+};
+
+export const approveGeneralInfo = async (
+  sid: string,
+  approved: boolean,
+  reason: string,
+) => {
+  const approvalInfo: ServiceApprove = {
+    sid,
+    approved,
+    reason,
+    service_global: true,
   };
 
   await fetch(`${baseUrl}/admin/service/approve`, {
@@ -805,8 +852,8 @@ export const getReplyService = async (rid: string) => {
   return response.json();
 };
 
-export const getCustomTags = async (option: boolean = false) => {
-  const response = await fetch(`${baseUrl}/tags/get/ranked?num=${10}&custom=${option}`,{
+export const getCustomTags = async () => {
+  const response = await fetch(`${baseUrl}/tags/get/ranked?num=${10}&custom=${true}`,{
     method: "GET",
   });
   const data = await response.json();
