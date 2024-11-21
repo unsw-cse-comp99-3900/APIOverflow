@@ -35,33 +35,54 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
     }
   }, [currVersionName, versions]);
 
+
   useEffect(() => {
+    let isCancelled = false; // Cancellation token for this effect
+    console.log(currVersionName);
+  
     const fetchDocs = async () => {
+      console.log("Fetching docs for", currVersion);
       try {
-        console.log(currVersion);
         if (!currVersion) {
-          setError(
-            "No live version available for this service yet, come back later!"
-          );
-        } else if (currVersion.docs && currVersion.docs.length > 0) {
+          if (!isCancelled) {
+            setError(
+              "No live version available for this service yet, come back later!"
+            );
+            setPdfUrl(null);
+          }
+        } else if (currVersion.docs.length > 0) {
           const docURL = await getDoc(currVersion.docs[0]);
-          setPdfUrl(docURL);
+          if (!isCancelled) {
+            setPdfUrl(docURL);
+            setError("");
+          }
         } else {
-          setError("No document for this service available");
+          if (!isCancelled) {
+            setError("No document for this version available");
+            setPdfUrl(null);
+          }
         }
       } catch (error) {
-        console.log("Error fetching data", error);
-        if (error instanceof Error) {
-          setError(error.message);
+        if (!isCancelled) {
+          if (error instanceof Error) {
+            setError(error.message);
+          }
+          toast.error("Error loading API documentation");
         }
-        toast.error("Error loading API documentation");
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
-
+  
     fetchDocs();
+  
+    return () => {
+      isCancelled = true; // Cancel this effect on cleanup
+    };
   }, [currVersion, currVersionName]);
+  
 
   const textColor = {
     "LIVE": "text-green-600",

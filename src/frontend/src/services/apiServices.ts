@@ -411,6 +411,18 @@ export const getPendingServices = async () => {
   return adminUpdateDataFormatter(data);
 };
 
+export const getAdminPendingServices = async () => {
+  const response = await fetch(`${baseUrl}/admin/get/services`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    method: "GET",
+  });
+  const data = await response.json();
+  console.log(data)
+  return data;
+};
+
 export const approveService = async (
   sid: string,
   approved: boolean,
