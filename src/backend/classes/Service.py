@@ -81,7 +81,7 @@ class ServiceVersionInfo:
                 "version_name": updated_fields.get_version_name(),
                 "endpoints": updated_fields.get_endpoints(),
                 "version_description": updated_fields.get_version_description(),
-                "docs": [doc.get_id() for doc in self._docs],
+                'docs' : self._docs,
                 "status": self._status,
                 "status_reason": "",
                 "newly_created": self._newly_created

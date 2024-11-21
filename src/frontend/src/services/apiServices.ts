@@ -135,6 +135,7 @@ export const addNewVersion = async (
     version_description: versionDescription,
     endpoints,
   };
+  
   const response = await fetch(`${baseUrl}/service/version/add`, {
     method: "POST",
     headers: {
@@ -146,6 +147,8 @@ export const addNewVersion = async (
 
   if (response.status === 401) {
     throw new Error("Unauthorized");
+  } else if (response.status === 404) {
+    throw new Error("PendingService");
   }
   return;
 }
@@ -367,8 +370,6 @@ export const apiAddReview = async (
 };
 
 export const apiGetReviews = async (sid: string, filter: string = "") => {
-  console.log("apiGetReviews called with:", { sid, filter }); // Debug parameters
-
   let u_toggle;
   if (localStorage.getItem("token")) {
     const res = await fetch(`${baseUrl}/user/get/id`, {
@@ -382,16 +383,9 @@ export const apiGetReviews = async (sid: string, filter: string = "") => {
   } else {
     u_toggle = "";
   }
-
-  console.log("User toggle ID:", u_toggle);
-
   const url = `${baseUrl}/service/get/reviews?sid=${sid}&filter=${filter}&uid=${u_toggle}`;
-  console.log("Request URL:", url); // Log the request URL
-
   const response = await fetch(url);
   const data = await response.json();
-  console.log("Response data:", data); // Log the response data
-
   return data.reviews;
 };
 

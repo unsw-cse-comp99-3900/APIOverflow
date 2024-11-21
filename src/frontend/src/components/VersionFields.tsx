@@ -38,8 +38,6 @@ const VersionFields: React.FC<VersionFieldsProps> = ({ versions }) => {
 
   useEffect(() => {
     let isCancelled = false; // Cancellation token for this effect
-    console.log(currVersionName);
-  
     const fetchDocs = async () => {
       try {
         if (!currVersion) {
