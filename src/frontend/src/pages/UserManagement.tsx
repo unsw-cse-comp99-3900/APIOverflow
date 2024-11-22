@@ -5,6 +5,7 @@ import UserTable from "../components/UserTable";
 import { getUsers, userDelete, userDemote, userPromote } from "../services/apiServices";
 import { UserBrief } from "../types/userTypes";
 import { toast } from "react-toastify";
+import { escape } from "querystring";
 
 const UserManagement: React.FC = () => {
   // Dummy data for testing (you can replace this with fetched data)
@@ -28,23 +29,34 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const handleDemote = (userId: string, userName: string) => {
+  const handleDemote = async (userId: string, userName: string) => {
     try{
-      userDemote(userId);
-      toast.success(`User Demoted Successfully`);
+      const res = await userDemote(userId);
+
+      if (res) {
+        toast.success(`User Demoted Successfully`);
+      } else {
+        toast.error("Demote disallowed");
+      };
+
     } catch (error) {
       console.log(error);
-    }
+    };
 
   };
 
-  const handleDelete = (userId: string, userName: string) => {
+  const handleDelete = async (userId: string, userName: string) => {
     try{
-      userDelete(userId);
-      toast.success(`User Deleted Successfully`);
+      const res = await userDelete(userId);
+      if (res) {
+        toast.success(`User Deleted Successfully`);
+      } else {
+        toast.error("Delete disallowed");
+      };
+
     } catch (error) {
       console.log(error);
-    }
+    };
   };
 
   return (
