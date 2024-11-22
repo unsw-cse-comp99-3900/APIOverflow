@@ -282,9 +282,15 @@ def delete_service(sid: str, uid: str, is_admin: bool):
         raise HTTPException(status_code=403, detail="No permission to delete review")
     service_name = service.get_name()
     
+
     # Disassociate server from tag
     for _tag in service.get_tags():
         tag = data_store.get_tag_by_name(_tag)
+
+        # Screen situations where tag not yet associated due to pending
+        if tag is None:
+            continue
+        
         tag.remove_server(sid)
 
     for _review in service.get_reviews():
