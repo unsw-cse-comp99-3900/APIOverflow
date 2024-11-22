@@ -22,7 +22,6 @@ const ApiListing: React.FC<ApiListingProps> = ({ api, isMyApis, onDelete }) => {
   const [rating, setRating] = useState<string>("0");
   const [numRating, setNumRating] = useState<number>(0);
 
-
   const bgColor = {
     Free: "bg-blue-500",
     Freemium: "bg-purple-500",
@@ -41,7 +40,7 @@ const ApiListing: React.FC<ApiListingProps> = ({ api, isMyApis, onDelete }) => {
 
     const getRating = async () => {
       try {
-        const rating = await apiGetRating(api.id)
+        const rating = await apiGetRating(api.id);
         const numRating = Number(rating);
         setNumRating(numRating);
         if (numRating > 0) {
@@ -54,7 +53,7 @@ const ApiListing: React.FC<ApiListingProps> = ({ api, isMyApis, onDelete }) => {
       } catch (error) {
         console.log(error);
       }
-    }
+    };
     fetchIcon();
     getRating();
     // Cleanup the object URL to avoid memory leaks
@@ -126,68 +125,35 @@ const ApiListing: React.FC<ApiListingProps> = ({ api, isMyApis, onDelete }) => {
           )}
         </div>
 
-        {!isMyApis && (
-          <div className="absolute top-8 right-8 flex space-x-2">
-            <div>
-                <div
-                  className={`flex items-center ${
-                    ratingCol
-                  } rounded-md mx-5 px-3`}
-                >
-                  {(numRating < 0 ) && (
-                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
-                      <FaThumbsDown />
-                    </div>
-                  )}
-                  {(numRating >= 0 ) && (
-                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
-                      <FaThumbsUp />
-                    </div>
-                  )}
-                  <span className="text-white text-md font-medium">
-                    {rating}
-                  </span>
-                </div>
-            </div>
-          </div>
-        )}
-
         {isMyApis && (
           <div>
             <div className="absolute top-8 right-8 flex space-x-2">
               <EditApiButton apiId={api.id} />
               <DeleteApiButton apiId={api.id} onDelete={onDelete} />
             </div>
-            <div className="absolute top-24 right-8 flex space-x-2">
-              <div>
-                  <div
-                    className={`flex items-center ${
-                      ratingCol
-                    } rounded-md mx-5 px-3`}
-                  >
-                  {(numRating < 0 ) && (
-                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
-                      <FaThumbsDown />
-                    </div>
-                  )}
-                  {(numRating >= 0 ) && (
-                    <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
-                      <FaThumbsUp />
-                    </div>
-                  )}
-                    <span className="text-white text-md font-medium">
-                      {rating}
-                    </span>
-                  </div>
-              </div>
-            </div>
           </div>
         )}
 
-        <div className="absolute bottom-8 right-8">
+        <div className=" flex justify-between items-center">
+          <div
+            className={`flex items-center ${ratingCol} rounded-md mx-5 px-3 py-1`}
+          >
+            {numRating < 0 && (
+              <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                <FaThumbsDown />
+              </div>
+            )}
+            {numRating >= 0 && (
+              <div className="flex items-center justify-center text-md text-white rounded-md mr-2">
+                <FaThumbsUp />
+              </div>
+            )}
+            <span className="text-white text-md font-medium">{rating}</span>
+          </div>
+
           <Link
             to={isMyApis ? `/profile/my-apis/${api.id}` : `/apis/${api.id}`}
-            className="h-[36px] border-blue-800 border-2 bg-blue-800 hover:bg-white text-white hover:text-blue-800 font-bold hover:underline px-4 py-2 rounded-lg text-center text-sm"
+            className="w-30 mx-6 my-2 border-blue-800 border-2 bg-blue-800 hover:bg-white text-white hover:text-blue-800 font-semibold hover:underline px-4 py-2 rounded-lg text-center text-sm"
           >
             Read More
           </Link>
