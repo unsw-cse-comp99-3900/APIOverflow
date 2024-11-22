@@ -282,9 +282,15 @@ def delete_service(sid: str, uid: str, is_admin: bool):
         raise HTTPException(status_code=403, detail="No permission to delete review")
     service_name = service.get_name()
     
+
     # Disassociate server from tag
     for _tag in service.get_tags():
         tag = data_store.get_tag_by_name(_tag)
+
+        # Screen situations where tag not yet associated due to pending
+        if tag is None:
+            continue
+        
         tag.remove_server(sid)
 
     for _review in service.get_reviews():
@@ -521,71 +527,81 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str, service_globa
   
       
 def parse_yaml_to_api(yaml_data: dict, user: User) -> Service:
-   '''
-       Function which uploads YAML files - returns a Service object
-   '''
-   FIELD_MAPPING = {
-       "name": ["name", "service_title", "title", "service_name", "api_name", "api"],
-       "owner": ["owner", "author", "developer", "writer"],
-       "description": ["description", "desc", "details"],
-       "tags": ["tags", "categories", "labels"],
-       "endpoints": ["links", "endpoint", "endpoints", "api_endpoints", "service_endpoints"],
-       "version_name": ["version_name", "version", "api_version", "service_version"],
-       "paid": ["payment", "paid", "pay", "monetise", "monetised", "model", "pay_model"]
-   }
-   # maybe add AI to this later
-  
-   def find_field(yaml_data: dict, possible_names: List[str]) -> Optional[str]:
-       """Find the first matching key in the YAML data"""
-       for name in possible_names:
-           if name in yaml_data:
-               return yaml_data[name]
-       return None
+    '''
+        Function which uploads YAML files - returns a Service object
+    '''
+    FIELD_MAPPING = {
+        "name": ["name", "service_title", "title", "service_name", "api_name", "api"],
+        "owner": ["owner", "author", "developer", "writer"],
+        "description": ["description", "desc", "details"],
+        "tags": ["tags", "categories", "labels"],
+        "endpoints": ["links", "endpoint", "endpoints", "api_endpoints", "service_endpoints"],
+        "version_name": ["version_name", "version", "api_version", "service_version"],
+        "paid": ["payment", "paid", "pay", "monetise", "monetised", "model", "pay_model"]
+    }
+    # maybe add AI to this later
+
+    def find_field(yaml_data: dict, possible_names: List[str]) -> Optional[str]:
+        """Find the first matching key in the YAML data"""
+        for name in possible_names:
+            if name in yaml_data:
+                return yaml_data[name]
+        return None
 
 
-   service_name = find_field(yaml_data, FIELD_MAPPING["name"])
-   service_description = find_field(yaml_data, FIELD_MAPPING["description"]) or "No description given"
-   service_tags = find_field(yaml_data, FIELD_MAPPING["tags"]) or []
-   endpoints_data = find_field(yaml_data, FIELD_MAPPING["endpoints"]) or []
-   version_name = find_field(yaml_data, FIELD_MAPPING["version_name"]) or "Unknown version"
-   paid = find_field(yaml_data, FIELD_MAPPING["paid"]) or "Free"
+    service_name = find_field(yaml_data, FIELD_MAPPING["name"])
+    service_description = find_field(yaml_data, FIELD_MAPPING["description"]) or "No description given"
+    service_tags = find_field(yaml_data, FIELD_MAPPING["tags"]) or []
+    endpoints_data = find_field(yaml_data, FIELD_MAPPING["endpoints"]) or ['API']
+    version_name = find_field(yaml_data, FIELD_MAPPING["version_name"]) or "Unknown version"
+    paid = find_field(yaml_data, FIELD_MAPPING["paid"]) or "Free"
 
+    # Screening to prevent custom 'pay models'
+    if paid not in ["Premium", "Freemium", "Free"]:
+        paid = "Free"
 
-   endpoints = []
-   for endpoint in endpoints_data:
-       if isinstance(endpoint, dict):
-           # Convert parameters and responses to dictionaries if they are objects
-           if 'parameters' in endpoint:
-               endpoint['parameters'] = [
-                   param.model_dump() if hasattr(param, 'model_dump') else
-                   (param.dict() if hasattr(param, 'dict') else param)
-                   for param in endpoint['parameters']
-               ]
-           if 'responses' in endpoint:
-               endpoint['responses'] = [
-                   resp.model_dump() if hasattr(resp, 'model_dump') else
-                   (resp.dict() if hasattr(resp, 'dict') else resp)
-                   for resp in endpoint['responses']
-               ]
-           endpoints.append(endpoint)
+    endpoints = []
+    for endpoint in endpoints_data:
+        if isinstance(endpoint, dict):
+            # Convert parameters and responses to dictionaries if they are objects
+            if 'parameters' in endpoint:
+                endpoint['parameters'] = [
+                    param.model_dump() if hasattr(param, 'model_dump') else
+                    (param.dict() if hasattr(param, 'dict') else param)
+                    for param in endpoint['parameters']
+                ]
+            if 'responses' in endpoint:
+                endpoint['responses'] = [
+                    resp.model_dump() if hasattr(resp, 'model_dump') else
+                    (resp.dict() if hasattr(resp, 'dict') else resp)
+                    for resp in endpoint['responses']
+                ]
+            endpoints.append(endpoint)
 
+    # Handle tags (create if not already in system)
+    if "API" not in service_tags or "Microservice" not in service_tags:
+        # Default tag insert 
+        service_tags.append('API')
 
-   return_api = API(str(data_store.num_apis()),
-                     service_name,
-                     user,
-                     "", # replce with actual icon url
-                     service_description,
-                     service_tags,
-                     endpoints,
-                     version_name,
-                     "", # add versino description if needed
-                     paid, # assume not paid
-                   )
+    for tag in service_tags:
+        data_store.add_tag(tag)
 
+    return_api = API(str(data_store.num_apis()),
+                        service_name,
+                        user,
+                        "", # replce with actual icon url
+                        service_description,
+                        service_tags,
+                        endpoints,
+                        version_name,
+                        "Created by YAML file upload", # add versino description if needed
+                        paid, # assume not paid
+                    )
 
-   data_store.add_api(return_api)
-   db_add_service(return_api.to_json())
-   return return_api
+    data_store.add_api(return_api)
+    db_add_service(return_api.to_json())
+    user.add_service(return_api.get_id())
+    return return_api
 
 def get_service_from_name(name: str) -> Service:
     api_list = data_store.get_apis()

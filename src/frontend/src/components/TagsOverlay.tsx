@@ -78,6 +78,13 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
     setNewTag("");
   };
 
+  // Facilitate pressing enter to submit tags
+  const onKeyPress = (e: any) => {
+    if (e.keyCode === 13 || e.which === 13) {
+      handleAddClick();
+    }
+  }
+
   const handleResetTags = () => {
     setSelectedTags([]);
   };
@@ -121,6 +128,7 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
             value={newTag}
             className="w-full text-gray-700 focus:outline-none focus:ring-0 border-none rounded-full"
             onChange={(e) => setNewTag(e.target.value)} // Update state on change
+            onKeyDown={onKeyPress}
           />
           <button
             type="button"
