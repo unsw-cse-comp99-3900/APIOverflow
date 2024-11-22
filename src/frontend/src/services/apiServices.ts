@@ -903,3 +903,9 @@ export const uploadYAML = async (file: File) => {
     throw error;
   }
 }
+
+export const seedApp = async () => {
+  const response = await fetch(`${baseUrl}/testing/dummy`, {
+    method: "POST",
+  });
+}
