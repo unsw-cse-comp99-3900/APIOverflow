@@ -194,7 +194,7 @@ export const userRegister = async (
     password,
     displayname,
   };
-  await fetch(`${baseUrl}/auth/register`, {
+  const response = await fetch(`${baseUrl}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -202,6 +202,9 @@ export const userRegister = async (
     body: JSON.stringify(newUser),
   });
 
+  if (response.status === 400) {
+    throw new Error("DuplicateCredentials");
+  }
   return;
 };
 
