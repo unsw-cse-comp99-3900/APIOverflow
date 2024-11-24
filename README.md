@@ -18,12 +18,14 @@ docker compose build --build-arg TEST=t; docker compose up
 Our system currently supports a single superadmin user who by default has all permissions enabled. Initially, this is the only user with the permissions to approve or disapprove new services / pending service updates. The default provided login details for this
 user are:
 
-username: superadmin
+username: superadmin \
 password: superadminpassword
 
 We have provided some example yaml (to demonstrate swagger implementation) and pdf files in the /files folder to help you test our work.
 
-# Key Feature Summary (See Report for more details)
+# Key Feature Summary
+
+See Report for more details
 
 ## Authentication and User Management
 - Multi-tier user systerm (Guest, Registered User, Admin, Superadmin)
