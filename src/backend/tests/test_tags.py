@@ -83,10 +83,6 @@ def admin_user():
 
     usable_data = {"token" : None}
 
-    # response = client.post("/auth/register",
-    #                         json=user_creds)
-    # assert response.status_code == SUCCESS
-
     # Log into account
     response = client.post("/auth/login",
                            json=user_creds)

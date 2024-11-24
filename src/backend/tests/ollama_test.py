@@ -121,7 +121,6 @@ def test_simple_ollama_search(simple_user):
                           })
     assert (response.status_code) == SUCCESS
     response_info = response.json()
-    print(response_info)
     assert response_info[0]['name'] == api1['name']
     assert response_info[0]['tags'] == api1['tags']
     assert response_info[1]['name'] == api2['name']

@@ -1505,17 +1505,6 @@ def test_update_version_api_fields(simple_user):
     assert new_version["status_reason"] == reason
     assert not new_version["newly_created"]
 
-
-
-    #TODO: check newly created
-    # TODO: database tests
-    # database_object = db_get_service(sid)
-    # assert database_object['id'] == sid
-    # assert database_object['name'] == update_request_info['name']
-    # assert database_object['description'] == update_request_info['description']
-    # assert database_object['tags'] == update_request_info['tags']
-
-
 def test_global_version_combination_updates(simple_user):
 
     service1 = {

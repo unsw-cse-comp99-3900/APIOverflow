@@ -104,7 +104,6 @@ def test_simple_filter(simple_user):
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
-    print(response_info)
     assert response_info[0]['name'] == api2['name']
     assert response_info[0]['tags'] == api2['tags']
 

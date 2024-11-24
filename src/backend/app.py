@@ -104,8 +104,6 @@ async def home():
        "register_link": "/auth/register"
    }
 
-
-# todo: auth gate this so that endpoint is private
 @app.post("/testing/clear")
 async def clear():
    '''
@@ -196,12 +194,6 @@ async def update_service(service: ServiceGlobalUpdate, user: User = Depends(mana
  
    update_service_wrapper(request)
    return None
-
-
-# @app.get("/service/apis")
-# async def view_apis():
-#    return list_nonpending_apis()
-
 
 @app.post("/service/upload_docs")
 async def upload_docs(info: ServiceUpload, user: User=Depends(manager)):
@@ -449,7 +441,6 @@ async def register(user: UserCreate):
    '''
        Register a user onto the platform
    '''
-   print("Received request")
    uid = register_wrapper(user.displayname, user.username, user.password, user.email)
    return {'uid' : uid}
 
@@ -669,9 +660,6 @@ async def admin_user_filter(standard: bool, admin: bool, super: bool, user: User
    '''
        Endpoint which filters users depending on standard users, admins, or supers
    '''
-   print(standard)
-   print(admin)
-   print(super)
    return admin_filter_users(standard, admin, super)
 
 
@@ -769,8 +757,6 @@ async def user_check_perms(user: User = Depends(manager)):
 if __name__ == "__main__":
    import uvicorn
    uvicorn.run(app, host='0.0.0.0', port=5000)
-   # Run using uvicorn app:app --reload
-
 
 
 
