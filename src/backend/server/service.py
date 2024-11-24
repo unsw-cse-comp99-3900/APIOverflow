@@ -192,29 +192,6 @@ def api_name_search(name, hide_pending: bool) -> list:
 
     api_list = data_store.get_apis()
     return_list: List[dict[str, str]] = []
-    # Currently commented out due to performance issues with using AI Model
-    # Future work may iterate on this work so we have left this here for now
-    # api_names = ""
-
-    #for api in api_list:
-    #    api_names += f"{api.get_name()}, "
-
-    #headers = {"Content-Type": "application/json"}
-    #data = {
-    #    "model": "llama3:latest",
-    #    "prompt": "I'm going to give you a list of titles and a query. I want you to filter all of the titles, and respond "
-    #    + "only with the titles that: have the query in the title, have any word that is close or a synonym to the query in " 
-    #    + "the title, have any word that is spelt similarly to the query in the title (including typos, extra numbers or letters, etc.), "
-    #    + " or has any relevance to the query in the title (i.e. if the title was 'Not Food' and query was 'Food' or 'Cuisine' it should still match). Your response should be comma separated, with no "
-    #    + f"additional text or explanation. Here's the list: {api_names} and this is the query: {name}"
-    #}
-
-    #response = requests.post(url, headers=headers, data=json.dumps(data), stream=False)
-    #if response:
-    #    lines = response.text.splitlines()
-    #    aggregated_message = "".join(json.loads(line)["response"] for line in lines)
-    #    for name in aggregated_message.split(","):
-    #        return_list.append(get_service_from_name(name.strip()).to_summary_json())
 
     for api in api_list:
         complete_string = api.get_name() + " " + api.get_description()
