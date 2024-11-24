@@ -139,31 +139,35 @@ def import_dummy_data():
         'tags': ['API', 'Microservice'],
         'endpoints': [post_endpoint.model_dump()],
         'version_name': "v0.6.9",
-        'version_description': "This is the initial version of the Test API"
+        'version_description': "This is the initial version of the Test API",
+        'pay_model': "Free"
     }
 
     api_info2 = {
         'name': 'User Management API',
         'description': 'API to manage user resources, including retrieval and deletion.',
-        'tags': ['Users', 'Management'],
+        'tags': ['API', 'Users', 'Management'],
         'endpoints': [get_endpoint.model_dump(), delete_endpoint.model_dump()],
         'version_name': "v1.0",
-        'version_description': "First release of the User Management API"
+        'version_description': "First release of the User Management API",
+        'pay_model': "Premium"
     }
 
     api_info3 = {
         'name': 'Resource Update API',
         'description': 'API to update and create resources.',
-        'tags': ['Resources', 'Update', 'Creation'],
+        'tags': ['Microservices', 'Resources', 'Update', 'Creation'],
         'endpoints': [put_endpoint.model_dump(), post_endpoint.model_dump()],
         'version_name': "v1.2",
-        'version_description': "Update to include PUT and POST methods"
+        'version_description': "Update to include PUT and POST methods",
+        'pay_model': "Freemium"
+        
     }
 
     api_info4 = {
         'name': 'Comprehensive Resource API',
         'description': 'Full-featured API for resource CRUD operations.',
-        'tags': ['Resources', 'CRUD'],
+        'tags': ['API', 'Resources', 'CRUD'],
         'endpoints': [
             get_endpoint.model_dump(),
             post_endpoint.model_dump(),
@@ -171,7 +175,8 @@ def import_dummy_data():
             delete_endpoint.model_dump()
         ],
         'version_name': "v2.0",
-        'version_description': "Comprehensive API with full CRUD support"
+        'version_description': "Comprehensive API with full CRUD support",
+        'pay_model': 'Free'
     }
 
     api_infos = [api_info1, api_info2, api_info3, api_info4]
@@ -186,7 +191,8 @@ def import_dummy_data():
             description=api_info['description'],
             tags=api_info['tags'],
             endpoints=[Endpoint(**endpoint) for endpoint in api_info['endpoints']],
-            version_name=api_info['version_name']
+            version_name=api_info['version_name'],
+            pay_model=api_info['pay_model']
         ) for api_info in api_infos
     ]
 
@@ -217,7 +223,9 @@ def import_dummy_data():
     sid3 = add_service_wrapper(service_requests[1], user3)
     sid4 = add_service_wrapper(service_requests[2], user4)
     sid5 = add_service_wrapper(service_requests[3], user5)
+
     approve_service(sid5, 'very unique service, approved', True, api_info4)
+
 
     add_service_review(user1.get_id(), sid5, 'positive', 'wow, very good')
     add_service_review(user2.get_id(), sid5, 'positive', 'this changed my life for the better')
@@ -267,7 +275,8 @@ def approve_service(sid, reason, approve, api_info):
                            service_global=request["service_global"],
                            version=request["version_name"]
                            )
-    
+
+
 def add_reply(rid, content, user):
     info = ReviewPackage(
         rid=rid,

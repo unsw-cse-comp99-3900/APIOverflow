@@ -70,7 +70,7 @@ def test_simple_search(simple_user):
         'name' : 'Google',
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
-        'endpoints': [simple_endpoint.dict()]
+        'endpoints': [simple_endpoint.model_dump()]
         }
     response = client.post("/service/add",
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -79,7 +79,7 @@ def test_simple_search(simple_user):
             'name' : 'Googooww',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -99,7 +99,7 @@ def test_simple_search_2(simple_user):
         'name' : 'Google',
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
-        'endpoints': [simple_endpoint.dict()]
+        'endpoints': [simple_endpoint.model_dump()]
         }
     response = client.post("/service/add",
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -108,7 +108,7 @@ def test_simple_search_2(simple_user):
             'name' : 'Googooww',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -129,7 +129,7 @@ def test_simple_empty(simple_user):
         'name' : 'Google',
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
-        'endpoints': [simple_endpoint.dict()]
+        'endpoints': [simple_endpoint.model_dump()]
         }
     response = client.post("/service/add",
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -138,7 +138,7 @@ def test_simple_empty(simple_user):
             'name' : 'Googooww',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -158,7 +158,7 @@ def test_simple_regex_search(simple_user):
         'name' : 'Google',
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
-        'endpoints': [simple_endpoint.dict()]
+        'endpoints': [simple_endpoint.model_dump()]
         }
     response = client.post("/service/add",
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -167,7 +167,7 @@ def test_simple_regex_search(simple_user):
             'name' : 'Googooww',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -188,7 +188,7 @@ def test_simple_regex_sensitivity(simple_user):
         'name' : 'Google',
         'description' : 'This is a test API',
         'tags' : ['API', 'Public'],
-        'endpoints': [simple_endpoint.dict()]
+        'endpoints': [simple_endpoint.model_dump()]
         }
     response = client.post("/service/add",
                             headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -197,7 +197,7 @@ def test_simple_regex_sensitivity(simple_user):
             'name' : 'Googooww',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},

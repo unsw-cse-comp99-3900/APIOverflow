@@ -179,13 +179,13 @@ class Datastore:
             tags.sort(key=lambda x : (-len(x.get_servers()), x.get_tag().lower()))
         else:
             tags = sorted(self.__store['tags'], key=lambda x : (-len(x.get_servers()), x.get_tag().lower()))
-        
+
         # Screen for unapproved services
         output = []
         for tag in tags:
             for _service in tag.get_servers():
                 service = self.get_api_by_id(_service)
-                if service.get_status().value == LIVE:
+                if service.get_status().value == LIVE and tag not in output:
                     output.append(tag)
         
         if len(output) < num or num == -1:

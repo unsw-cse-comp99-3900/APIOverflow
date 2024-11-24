@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import Blob1 from "../assets/images/blobs/blob1.svg";
 import Blob2 from "../assets/images/blobs/blob2.svg";
 import Logo from "../assets/images/logo.svg";
-import { searchApis, seedApp } from "../services/apiServices";
+import { searchApis } from "../services/apiServices";
 import { BriefApi } from "../types/apiTypes";
 
 const HomePage: React.FC = () => {
@@ -183,12 +183,6 @@ const HomePage: React.FC = () => {
               Add an API/Microservice
             </NavLink>
           </div>
-          <button
-            className="bg-gray-400 hover:bg-gray-500 text-white font-semibold rounded w-20 h-10"
-            onClick={seedApp}
-          >
-            Populate
-          </button>
         </div>
       </div>
     </div>

@@ -81,7 +81,7 @@ def test_simple_filter(simple_user):
                                 'name' : 'Googl3',
                                 'description' : 'This is a test API',
                                 'tags' : ['API', 'Public'],
-                                'endpoints': [simple_endpoint.dict()]
+                                'endpoints': [simple_endpoint.model_dump()]
                            })
     assert(response.status_code) == SUCCESS
 
@@ -89,7 +89,7 @@ def test_simple_filter(simple_user):
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint2.dict()]
+            'endpoints': [simple_endpoint2.model_dump()]
             }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -112,7 +112,7 @@ def test_simple_filter_multiple(simple_user):
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     
     response = client.post("/service/add",
@@ -125,13 +125,13 @@ def test_simple_filter_multiple(simple_user):
                                     'name' : 'Googl3',
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoints': [simple_endpoint2.dict()]
+                                    'endpoints': [simple_endpoint2.model_dump()]
                             })
     api2 = {
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     response = client.post("/service/add",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -162,7 +162,7 @@ def test_providers(simple_user):
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     
     response = client.post("/service/add",
@@ -175,13 +175,13 @@ def test_providers(simple_user):
                                     'name' : 'Googl3',
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoints': [simple_endpoint2.dict()]
+                                    'endpoints': [simple_endpoint2.model_dump()]
                             })
     api2 = {
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     response = client.post("/service/add",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -212,7 +212,7 @@ def test_providers_with_tags(simple_user):
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     
     response = client.post("/service/add",
@@ -225,13 +225,13 @@ def test_providers_with_tags(simple_user):
                                     'name' : 'Googl3',
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoints': [simple_endpoint2.dict()]
+                                    'endpoints': [simple_endpoint2.model_dump()]
                             })
     api2 = {
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     response = client.post("/service/add",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -262,7 +262,7 @@ def test_invalid_providers(simple_user):
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     
     response = client.post("/service/add",
@@ -275,13 +275,13 @@ def test_invalid_providers(simple_user):
                                     'name' : 'Googl3',
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoints': [simple_endpoint2.dict()]
+                                    'endpoints': [simple_endpoint2.model_dump()]
                             })
     api2 = {
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     response = client.post("/service/add",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -312,7 +312,7 @@ def test_providers_with_tags2(simple_user):
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()] 
+            'endpoints': [simple_endpoint.model_dump()] 
             }
     
     response = client.post("/service/add",
@@ -331,7 +331,7 @@ def test_providers_with_tags2(simple_user):
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['NOT API'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     response = client.post("/service/add",
                         headers={"Authorization": f"Bearer {simple_user['token']}"},
@@ -382,7 +382,7 @@ def test_providers_with_tags_multiple(simple_user):
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     
     response = client.post("/service/add",
@@ -400,13 +400,13 @@ def test_providers_with_tags_multiple(simple_user):
                                     'y_end' : 0,
                                     'description' : 'This is a test API',
                                     'tags' : ['API', 'Public'],
-                                    'endpoints': [simple_endpoint.dict()]
+                                    'endpoints': [simple_endpoint.model_dump()]
                             })
     api2 = {
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     
     response = client.post("/service/add",
@@ -463,7 +463,7 @@ def test_providers_with_tags_multiple2(simple_user):
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     
     response = client.post("/service/add",
@@ -476,13 +476,13 @@ def test_providers_with_tags_multiple2(simple_user):
                                     'name' : 'Googl3',
                                     'description' : 'This is a test API',
                                     'tags' : ['NOT API', 'Public'],
-                                    'endpoints': [simple_endpoint.dict()]
+                                    'endpoints': [simple_endpoint.model_dump()]
                             })
     api2 = {
             'name' : 'Googl2',
             'description' : 'This is a test API',
             'tags' : ['API'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     
     response = client.post("/service/add",
@@ -539,7 +539,7 @@ def test_duplicate_apis(simple_user):
             'name' : 'test1',
             'description' : 'This is a test API',
             'tags' : ['API', 'Private'],
-            'endpoints': [simple_endpoint.dict()]
+            'endpoints': [simple_endpoint.model_dump()]
             }
     
     response = client.post("/service/add",
@@ -552,7 +552,7 @@ def test_duplicate_apis(simple_user):
                                     'name' : 'test2',
                                     'description' : 'This is a test API',
                                     'tags' : ['Not API', 'Public'],
-                                    'endpoints': [simple_endpoint.dict()]
+                                    'endpoints': [simple_endpoint.model_dump()]
                             })
 
     response = client.get("/service/filter",
