@@ -22,19 +22,27 @@ const RegisterPage: React.FC = () => {
     e.preventDefault();
 
     if (username === "" || password === "") {
+      toast.error("Please fill in both fields.");
       setError("Please fill in both fields.");
       return;
     }
-    await userRegister(email, username, password, displayname);
-    toast.success("Please verify your email to signin");
-    setIsLoading(true);
-    navigate("/login", {
-      state: {
-        username: username,
-        password: password,
-        warning: "Please verify your email first",
-      },
-    });
+    try{
+      await userRegister(email, username, password, displayname);
+      toast.success("Please verify your email to signin");
+      setIsLoading(true);
+      navigate("/login", {
+        state: {
+          username: username,
+          password: password,
+          warning: "Please verify your email first",
+        },
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message === "DuplicateCredentials") {
+        toast.error("Username or email already exists");
+        setError("Username or email already exists");
+      }
+    }
   };
 
   return (
