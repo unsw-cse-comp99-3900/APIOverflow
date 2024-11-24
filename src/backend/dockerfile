@@ -20,18 +20,9 @@ EXPOSE 5000
 ARG TEST="false"
 ENV TEST ${TEST}
 
-# copied from ray idk if this is better/different
-# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
-
-# to run normally: docker compose build; docker compose up
-# to run pytest: docker compose build --build-arg TEST=t; docker compose up
-# unless switching from normal to pytest or vice versa, no need to run docker compose build again
-# rebuilding is only required when modifying dockerfiles or switching between running
-# normally and running pytest
-
 # for increased testing speed, can change below command to 
 # pytest -vv tests/file_name.py to test specific file
 # pytest -vv tests/test.py::testfunc to test specific function
 
-CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv tests/test_name_search.py; fi
+CMD if [ "$TEST" = "false" ] ; then python app.py; else pytest -vv; fi
 

@@ -63,9 +63,6 @@ class Datastore:
     ######################################
     #   Loading and Saving Methods Methods
     ######################################
-    def load_datastore(self) -> None:
-        # TODO - load data from mongoDB
-        pass
 
     def clear_datastore(self) -> None:
         self.__store = deepcopy(schema)
@@ -182,13 +179,13 @@ class Datastore:
             tags.sort(key=lambda x : (-len(x.get_servers()), x.get_tag().lower()))
         else:
             tags = sorted(self.__store['tags'], key=lambda x : (-len(x.get_servers()), x.get_tag().lower()))
-        
+
         # Screen for unapproved services
         output = []
         for tag in tags:
             for _service in tag.get_servers():
                 service = self.get_api_by_id(_service)
-                if service.get_status().value == LIVE:
+                if service.get_status().value == LIVE and tag not in output:
                     output.append(tag)
         
         if len(output) < num or num == -1:
@@ -251,7 +248,6 @@ class Datastore:
             Returns with user obj base on given ID, or None if cannot find user
         '''
         for item in self.__store['docs']:
-            print(item.get_id(), type(item.get_id()), eid, type(eid), item.get_id() == eid)
             if item.get_id() == eid:
                 return item
 
@@ -262,7 +258,6 @@ class Datastore:
             Retrieves a review by id if it exists, else None
         '''
         for item in self.__store['reviews']:
-            # print(f"RID: {rid} | Item ID: {item.get_id()} Comparison: {rid == item.get_id()}")
             if item.get_id() == rid:
                 return item
 
@@ -402,8 +397,6 @@ class Datastore:
                 return True
             
         return None
-
-print('Loading Datastore...')
 
 global data_store
 data_store = Datastore()

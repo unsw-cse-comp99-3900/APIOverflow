@@ -11,7 +11,6 @@ blacklisted_tokens = {}
 
 def clear_blacklist():
     blacklisted_tokens.clear()
-    print("Blacklist cleared.")
 
 def blacklist_user_token(uid: str):
     user = data_store.get_user_by_id(uid)

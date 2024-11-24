@@ -219,7 +219,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
       setError(err instanceof Error ? err.message : 'Failed to delete reply');
     }
   };
-  // console.log(`Visitor: ${visitor} | Owner: ${owner}`);
+
   return (
     <div className={`p-3 bg-white border-2 ${review.type === "positive" ? "border-blue-300" : "border-red-300"} rounded-lg`}>
       <div className={`flex items-center justify-between`}>

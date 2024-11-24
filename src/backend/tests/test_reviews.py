@@ -84,7 +84,7 @@ def simple_user():
                 'name' : 'Test API',
                 'description' : 'This is a test API',
                 'tags' : ['API'],
-                'endpoints': [simple_endpoint.dict()]
+                'endpoints': [simple_endpoint.model_dump()]
                 }
     response = client.post("/service/add",
                            headers={"Authorization": f"Bearer {usable_data['c_token']}"},
@@ -195,7 +195,6 @@ def test_add_review_success(simple_user):
                               'testing': True
                           })
     assert response.status_code == SUCCESS
-    print(response.json())
     assert len(response.json()['reviews']) == 1
     assert response.json()['reviews'][0]['reviewer'] == '2'
     assert response.json()['reviews'][0]['type'] == package['rating']
@@ -203,7 +202,6 @@ def test_add_review_success(simple_user):
     assert response.json()['reviews'][0]['service'] == package['sid']
 
     rid = response.json()['reviews'][0]['rid']
-    print(rid)
     response = client.get("/review/get",
                           params = {'rid': rid})
     assert response.status_code == SUCCESS

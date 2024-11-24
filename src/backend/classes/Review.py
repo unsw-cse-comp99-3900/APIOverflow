@@ -53,9 +53,6 @@ class Review(Comment):
         # Check whether user has voted
         if uid in self._upvote or uid in self._downvote:
             return None
-        
-        # Alternative:
-        # self.remove_vote(uid)
 
         # Add user's vote
         if _type == 'positive':

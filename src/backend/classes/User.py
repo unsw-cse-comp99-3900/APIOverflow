@@ -23,7 +23,7 @@ class User:
             username:   Username of user (unique)
             password:   Hashed password for security
             email:      Email registered with user
-            icon_url:   Path to image store on backend (todo)
+            icon_url:   Path to image store on backend
             is_admin:   Is the user an admin
             is_super:   Is the user a super admin
             icon:       ID of image file serving as user's icon

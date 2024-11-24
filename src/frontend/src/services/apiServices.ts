@@ -491,23 +491,27 @@ export const userPromote = async (uid: string) => {
 };
 
 export const userDemote = async (uid: string) => {
-  const reponse = await fetch(`${baseUrl}/admin/demote?uid=${uid}`, {
+  const response = await fetch(`${baseUrl}/admin/demote?uid=${uid}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
     method: "POST",
   });
+
+  return response.ok;
 };
 
 export const userDelete = async (uid: string) => {
-  const reponse = await fetch(`${baseUrl}/admin/delete/user?uid=${uid}`, {
+  const response = await fetch(`${baseUrl}/admin/delete/user?uid=${uid}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       "Content-Type": "application/json",
     },
     method: "DELETE",
   });
+
+  return response.ok;
 };
 
 export const getUsers = async () => {
