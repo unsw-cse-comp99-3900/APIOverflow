@@ -25,7 +25,7 @@ We have provided some example yaml (to demonstrate swagger implementation) and p
 
 # NOTES
 
-Note that for some reason you currently cannot register an account with a UNSW account - please register with a gmail account or other personal account. Make sure to check your spam if you do not receive the registration email.
+Note that you currently cannot register an account with a UNSW student account - please register with a gmail account or other personal account. Make sure to check your spam if you do not receive the registration email.
 
 # Key Feature Summary
 
