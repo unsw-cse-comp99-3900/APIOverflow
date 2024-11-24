@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Tag } from "../types/miscTypes";
 import { getTags } from "../services/apiServices";
 import { FaPlus } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 interface TagsOverlayProps {
   isOpen: boolean;
@@ -63,20 +64,34 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
 
   // Event Handlers
   const handleAddClick = () => {
-    if (newTag === ""){
+    if (newTag.trim() === ""){
       setError("Tag cannot be empty");
+      toast.error("Tag cannot be empty");
       return
-    } else if (tags.includes(newTag)){
+    }else if (newTag.trim().length > 20) {
+      setError("Tag must be less than 20 characters");
+      toast.error("Tag must be less than 20 characters");
+      return
+    }
+     else if (tags.includes(newTag)){
       setError("Tag already exists");
+      toast.error("Tag already exists");
       return
     }
 
-    setTags([...tags, newTag]);
-    setNewTags([...newTags, newTag]);
-    setSelectedTags([...selectedTags, newTag]);
+    setTags([...tags, newTag.trim()]);
+    setNewTags([...newTags, newTag.trim()]);
+    setSelectedTags([...selectedTags, newTag.trim()]);
     setError("");
     setNewTag("");
   };
+
+  // Facilitate pressing enter to submit tags
+  const onKeyPress = (e: any) => {
+    if (e.keyCode === 13 || e.which === 13) {
+      handleAddClick();
+    }
+  }
 
   const handleResetTags = () => {
     setSelectedTags([]);
@@ -121,6 +136,7 @@ const TagsOverlay: React.FC<TagsOverlayProps> = ({
             value={newTag}
             className="w-full text-gray-700 focus:outline-none focus:ring-0 border-none rounded-full"
             onChange={(e) => setNewTag(e.target.value)} // Update state on change
+            onKeyDown={onKeyPress}
           />
           <button
             type="button"
