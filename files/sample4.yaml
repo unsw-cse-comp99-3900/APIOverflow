@@ -1,0 +1,74 @@
+- service_title: "Chicken Wings API"
+  author: "Wing Lover"
+  description: "API for exploring chicken wing recipes, flavors, and nutrition info."
+  tags:
+    - "Food"
+    - "API"
+    - "Published"
+  api_endpoints:
+    - link: "/v1/wings/flavors"
+      title_description: "Get Wing Flavors"
+      main_description: "Retrieve a list of popular chicken wing flavors."
+      tab: "Flavor Info"
+      parameters: []
+      method: "GET"
+      responses:
+        - code: "200"
+          description: "Success"
+          conditions:
+            - "Flavors found"
+          example: '{"flavors": ["Buffalo", "BBQ", "Honey Garlic", "Lemon Pepper"]}'
+        - code: "500"
+          description: "Server Error"
+          conditions:
+            - "Unexpected error"
+          example: '{"error": "Unable to fetch flavors"}'
+    - link: "/v1/wings/recipe"
+      title_description: "Get Wing Recipe"
+      main_description: "Retrieve the recipe for a specific chicken wing flavor."
+      tab: "Recipes"
+      parameters:
+        - id: "param1"
+          endpoint_link: "/v1/wings/recipe"
+          required: true
+          type: "QUERY"
+          name: "flavor"
+          value_type: "string"
+          example: "Buffalo"
+      method: "GET"
+      responses:
+        - code: "200"
+          description: "Success"
+          conditions:
+            - "Recipe available for the flavor"
+          example: '{"flavor": "Buffalo", "ingredients": ["chicken wings", "hot sauce", "butter"], "steps": ["Fry wings", "Mix sauce", "Coat wings"]}'
+        - code: "404"
+          description: "Flavor Not Found"
+          conditions:
+            - "No recipe exists for the specified flavor"
+          example: '{"error": "Flavor not found"}'
+    - link: "/v1/wings/nutrition"
+      title_description: "Get Nutrition Info"
+      main_description: "Retrieve nutrition information for a specific flavor of chicken wings."
+      tab: "Nutrition Info"
+      parameters:
+        - id: "param1"
+          endpoint_link: "/v1/wings/nutrition"
+          required: true
+          type: "QUERY"
+          name: "flavor"
+          value_type: "string"
+          example: "BBQ"
+      method: "GET"
+      responses:
+        - code: "200"
+          description: "Success"
+          conditions:
+            - "Nutrition data available for the flavor"
+          example: '{"flavor": "BBQ", "calories": 150, "protein": 10, "fat": 8}'
+        - code: "404"
+          description: "Flavor Not Found"
+          conditions:
+            - "No nutrition data exists for the specified flavor"
+          example: '{"error": "Flavor not found"}'
+  api_version: "1.0.0"

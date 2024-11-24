@@ -1,0 +1,48 @@
+service_title: "Weather Data API"
+author: "Lisa Brown"
+description: "Public API for accessing global weather data and forecasts."
+tags:
+  - "API"
+  - "Public"
+  - "Published"
+api_endpoints:
+  - link: "/v1/weather"
+    title_description: "Get Current Weather"
+    main_description: "Retrieve current weather conditions for a specific location."
+    tab: "Weather Data"
+    parameters:
+      - id: "param1"
+        endpoint_link: "/v1/weather"
+        required: true
+        type: "QUERY"
+        name: "latitude"
+        value_type: "number"
+        example: "37.7749"
+      - id: "param2"
+        endpoint_link: "/v1/weather"
+        required: true
+        type: "QUERY"
+        name: "longitude"
+        value_type: "number"
+        example: "-122.4194"
+      - id: "param3"
+        endpoint_link: "/v1/weather"
+        required: true
+        type: "HEADER"
+        name: "API-Key"
+        value_type: "string"
+        example: "pk_weather_abc123"
+    method: "GET"
+    responses:
+      - code: "200"
+        description: "Success"
+        conditions:
+          - "Valid coordinates"
+          - "Valid API key"
+        example: '{"temperature": 22.5, "conditions": "sunny", "humidity": 65}'
+      - code: "429"
+        description: "Too Many Requests"
+        conditions:
+          - "Rate limit exceeded"
+        example: '{"error": "Rate limit exceeded. Please try again in 60 seconds."}'
+api_version: "1.2.0"
