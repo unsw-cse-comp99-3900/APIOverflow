@@ -590,7 +590,6 @@ def test_admin_filter_duplicates(simple_user):
                           })
     
     assert response.status_code == SUCCESS 
-    print(response.json())
     assert len(response.json()) == 1
 
 def test_admin_filter_overlapping_users(simple_user):

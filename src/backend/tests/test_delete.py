@@ -143,7 +143,6 @@ def test_review_removed_user_delete(simple_user):
                               'testing': True
                           })
     assert response.status_code == SUCCESS
-    print(response.json())
     assert len(response.json()['reviews']) == 1
 
     response = client.delete("/user/delete/me",
@@ -156,7 +155,6 @@ def test_review_removed_user_delete(simple_user):
                               'testing': True
                           })
     assert response.status_code == SUCCESS
-    print(response.json())
     assert len(response.json()['reviews']) == 0
 
     package = {

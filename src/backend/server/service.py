@@ -1,14 +1,10 @@
 from typing import TypeVar, List, Union
 from fastapi import File, UploadFile, HTTPException
 from fastapi.responses import FileResponse
-from PIL import Image
-import urllib.request
-from urllib.error import HTTPError, URLError
-from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS, PENDING_OPTIONS, REJECTED_OPTIONS
+from src.backend.classes.Service import ServiceStatus, LIVE_OPTIONS, PENDING_OPTIONS
 from src.backend.classes.datastore import data_store
 from src.backend.classes.API import API
 from src.backend.classes.Service import Service, ServiceVersionInfo
-from src.backend.classes.Endpoint import Endpoint
 from src.backend.classes.User import User
 from src.backend.database import *
 from src.backend.classes.models import ServiceReviewInfo
@@ -164,8 +160,6 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool, sort_rating:
         # if providers list is not empty
         for api in filtered_apis:
             for provider in providers:
-                # I refactored get_owner so that it now returns the User object
-                # I've fixed this to what it was before (which is bugged)
                 if provider in api.get_owner().get_id() and api not in secondary_list:
                     secondary_list.append(api)
                     break
@@ -178,7 +172,6 @@ def api_tag_filter(tags, providers, pay_models, hide_pending: bool, sort_rating:
         for api in secondary_list:
             for pay_model in pay_models:
                 if pay_model == api.get_pay_model() and api not in return_list:
-                    print(pay_model, api.get_pay_model())
                     return_list.append(api)
                     break
     else:
@@ -199,27 +192,6 @@ def api_name_search(name, hide_pending: bool) -> list:
 
     api_list = data_store.get_apis()
     return_list: List[dict[str, str]] = []
-    # api_names = ""
-
-    #for api in api_list:
-    #    api_names += f"{api.get_name()}, "
-
-    #headers = {"Content-Type": "application/json"}
-    #data = {
-    #    "model": "llama3:latest",
-    #    "prompt": "I'm going to give you a list of titles and a query. I want you to filter all of the titles, and respond "
-    #    + "only with the titles that: have the query in the title, have any word that is close or a synonym to the query in " 
-    #    + "the title, have any word that is spelt similarly to the query in the title (including typos, extra numbers or letters, etc.), "
-    #    + " or has any relevance to the query in the title (i.e. if the title was 'Not Food' and query was 'Food' or 'Cuisine' it should still match). Your response should be comma separated, with no "
-    #    + f"additional text or explanation. Here's the list: {api_names} and this is the query: {name}"
-    #}
-
-    #response = requests.post(url, headers=headers, data=json.dumps(data), stream=False)
-    #if response:
-    #    lines = response.text.splitlines()
-    #    aggregated_message = "".join(json.loads(line)["response"] for line in lines)
-    #    for name in aggregated_message.split(","):
-    #        return_list.append(get_service_from_name(name.strip()).to_summary_json())
 
     for api in api_list:
         complete_string = api.get_name() + " " + api.get_description()
@@ -509,7 +481,6 @@ def approve_service_wrapper(sid: str, approved: bool, reason: str, service_globa
         
         # Handle tag inclusions - ASSUMES THAT ALL TAGS HAVE BEEN ADDED PREVIOUSLY
         for _tag in service.get_tags():
-            print(_tag)
             tag = data_store.get_tag_by_name(_tag)
             tag.add_server(service.get_id())
 
