@@ -14,36 +14,6 @@ import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { apiGetReviews, userDeleteReview, userEditReview, userGetReviews } from "../services/apiServices";
 import ReviewDetailCard from "../components/ReviewDetailCard";
 
-// Dummy data for testing
-// const reviews: ReviewDetail[] = [
-//     {
-//       id: "1",
-//       rid: "R001",
-//       reviewer: "Jane Doe",
-//       reviewerName: "hihi",
-//       service: "Service001",
-//       title: "Great Service",
-//       comment: "I had an amazing experience with this service!",
-//       type: "positive",
-//       status: "approved",
-//       upvotes: "5",
-//       downvotes: "20",
-//     },
-//     {
-//       id: "2",
-//       rid: "R002",
-//       reviewer: "John Smith",
-//       reviewerName: "hihi",
-//       service: "Service002",
-//       title: "Not Satisfied",
-//       comment: "The service quality was below my expectations.",
-//       type: "negative",
-//       status: "pending",
-//       upvotes: "20",
-//       downvotes: "5",
-//     },
-//   ];
-
 const MyReviewsPage = () => {
   const navigate = useNavigate();
   const [selectedReview, setSelectedReview] = useState<ReviewDetail | null>(null);

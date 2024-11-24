@@ -188,7 +188,7 @@ class Datastore:
                 if service.get_status().value == LIVE:
                     output.append(tag)
         
-        if len(output) < num or num == -1:
+        if len(output) < num:
             return {
                 'tags': [tag.to_json() for tag in output]
             }

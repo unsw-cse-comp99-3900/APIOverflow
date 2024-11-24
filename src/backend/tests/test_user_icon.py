@@ -81,7 +81,6 @@ def test_bad_icon(simple_user):
     response = client.post("/user/add_icon",
                            headers={"Authorization": f"Bearer {data['token']}"},
                            json=package)
-    print(response.json()['detail'])
     assert response.status_code == MISSING_ERROR
 
 def test_delete_guest():

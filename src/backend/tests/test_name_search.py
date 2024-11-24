@@ -92,7 +92,6 @@ def test_simple_search(simple_user):
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
-    print(response_info)
     assert any(api['name'] == api1['name'] for api in response_info)
 
 def test_simple_search_2(simple_user):
@@ -122,7 +121,6 @@ def test_simple_search_2(simple_user):
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
-    print(response_info)
     assert any(api['name'] == api1['name'] for api in response_info)
     assert any(api['name'] == api2['name'] for api in response_info)
 
@@ -153,7 +151,6 @@ def test_simple_empty(simple_user):
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
-    print(response_info)
     assert len(response_info) == 0
 
 def test_simple_regex_search(simple_user):
@@ -183,7 +180,6 @@ def test_simple_regex_search(simple_user):
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
-    print(response_info)
     assert any(api['name'] == api1['name'] for api in response_info)
     assert any(api['name'] == api2['name'] for api in response_info)
 
@@ -214,5 +210,4 @@ def test_simple_regex_sensitivity(simple_user):
                           })
     assert (response.status_code) == SUCCESS 
     response_info = response.json()
-    print(response_info)
     assert any(api['name'] == api1['name'] for api in response_info)
