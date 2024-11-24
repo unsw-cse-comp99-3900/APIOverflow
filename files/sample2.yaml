@@ -1,0 +1,40 @@
+- service_title: "Stock Market API"
+  author: "James Carter"
+  description: "API to access stock market data and real-time quotes."
+  tags:
+    - "Finance"
+    - "Published"
+    - "API"
+  api_endpoints:
+    - link: "/v1/stock/quote"
+      title_description: "Get Stock Quote"
+      main_description: "Retrieve the latest quote for a specific stock ticker."
+      tab: "Market Data"
+      parameters:
+        - id: "param1"
+          endpoint_link: "/v1/stock/quote"
+          required: true
+          type: "QUERY"
+          name: "ticker"
+          value_type: "string"
+          example: "AAPL"
+        - id: "param2"
+          endpoint_link: "/v1/stock/quote"
+          required: false
+          type: "HEADER"
+          name: "Authorization"
+          value_type: "string"
+          example: "Bearer <token>"
+      method: "GET"
+      responses:
+        - code: "200"
+          description: "Success"
+          conditions:
+            - "Valid ticker"
+          example: '{"ticker": "AAPL", "price": 150.25, "change": 1.05}'
+        - code: "404"
+          description: "Stock Not Found"
+          conditions:
+            - "Invalid ticker"
+          example: '{"error": "Stock not found"}'
+  api_version: "2.0.0"
