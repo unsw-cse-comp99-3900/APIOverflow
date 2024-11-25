@@ -25,8 +25,8 @@ import ReviewManagement from "./pages/ReviewManagement";
 import ServiceManagement from "./pages/ServiceManagement";
 import UserManagement from "./pages/UserManagement";
 import MyProfilePage from "./pages/UserProfilePage";
-import PasswordResetRequest from './components/PasswordResetRequest';
-import PasswordReset from './components/PasswordReset';
+import PasswordResetRequest from "./components/PasswordResetRequest";
+import PasswordReset from "./components/PasswordReset";
 
 import VerificationPage from "./pages/VerificationPage";
 import MyReviewsPage from "./pages/MyReviewsPage";
@@ -70,7 +70,10 @@ const App = () => {
           <Route index element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/verify-email" element={<VerificationPage />}/>
+          <Route path="/verify-email" element={<VerificationPage />} />
+          <Route path="/forgot-password" element={<PasswordResetRequest />} />
+          <Route path="/reset-password/:token" element={<PasswordReset />} />
+          <Route path="/verified-password-reset" element={<PasswordReset />} />
         </Route>
 
         <Route path="/" element={<ContentLayout />}>
@@ -80,24 +83,31 @@ const App = () => {
           <Route path="/apis" element={<TagsSidebarLayout />}>
             <Route path="/apis" element={<APIsPage />} />
           </Route>
-          <Route path="/forgot-password" element={<PasswordResetRequest />} />
-          <Route path="/reset-password/:token" element={<PasswordReset />} />
-          <Route path="/verified-password-reset" element={<PasswordReset />} />
+
           <Route element={<UserProtectedRoute />}>
             <Route path="/profile" element={<UserSidebarLayout />}>
               <Route element={<AdminProtectedRoute />}>
-                <Route path="/profile/admin/services" element={<ServiceManagement />} />
+                <Route
+                  path="/profile/admin/services"
+                  element={<ServiceManagement />}
+                />
                 <Route element={<SuperAdminProtectedRoute />}>
-                  <Route path="/profile/admin/users" element={<UserManagement />} />
+                  <Route
+                    path="/profile/admin/users"
+                    element={<UserManagement />}
+                  />
                 </Route>
               </Route>
               <Route path="/profile/my-profile" element={<MyProfilePage />} />
               <Route path="/profile/my-apis" element={<MyApisPage />} />
               <Route path="/profile/my-apis/:id" element={<MyApiPage />} />
               <Route path="/profile/add-api" element={<AddApiPage />} />
-              <Route path="/profile/my-apis/:id/edit" element={<EditApiPage />}/>
-              <Route path="/profile/my-reviews" element={<MyReviewsPage/>}/>
-              <Route path="/profile/my-replies" element={<MyRepliesPage/>}/>
+              <Route
+                path="/profile/my-apis/:id/edit"
+                element={<EditApiPage />}
+              />
+              <Route path="/profile/my-reviews" element={<MyReviewsPage />} />
+              <Route path="/profile/my-replies" element={<MyRepliesPage />} />
             </Route>
           </Route>
           <Route path="/*" element={<NotFoundPage />} />
