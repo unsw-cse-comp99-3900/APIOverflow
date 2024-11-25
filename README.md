@@ -1,5 +1,7 @@
 # APIOverflow
-a super cool api hub :)
+A super cool api hub :)
+
+Please refer to the User Manual for detailed usage guide
 
 # Installation Instructions
 
