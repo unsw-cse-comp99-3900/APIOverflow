@@ -65,6 +65,7 @@ const OverviewUpdateForm: React.FC<OverviewUpdateFormProps> = ({
       return;
     }
     setWarning("");
+    setGeneralInfoUpdated(true);
     setSelectedTags(selectedTags.filter((t) => t !== tag));
   };
 
